@@ -268,6 +268,7 @@ WeaponDescription._stats_shown = {
 		percent = false
 	}
 }
+table.insert(WeaponDescription._stats_shown, {name = "reload"})
 
 function WeaponDescription.get_bonus_stats(cosmetic_id, weapon_id, bonus)
 	local base_stats = WeaponDescription._get_base_stats(weapon_id)
@@ -378,6 +379,12 @@ function WeaponDescription._get_skill_stats(name, category, slot, base_stats, mo
 				end
 				skill_stats[stat.name].skill_in_effect = managers.player:has_category_upgrade(name, "clip_ammo_increase") or managers.player:has_category_upgrade("weapon", "clip_ammo_increase") or add_modifier
 			elseif stat.name == "totalammo" then
+			elseif stat.name == "reload" then
+				local mult = 0
+				mult = 1 / managers.player:upgrade_value(weapon_tweak.category, "reload_speed_multiplier", 1)
+				local diff = base_stats[stat.name].value * mult - base_stats[stat.name].value
+				skill_stats[stat.name].value = skill_stats[stat.name].value + diff
+				skill_stats[stat.name].skill_in_effect = managers.player:has_category_upgrade(weapon_tweak.category, "reload_speed_multiplier")
 			else
 				base_value = math.max(base_stats[stat.name].value + mods_stats[stat.name].value, 0)
 				if base_stats[stat.name].index and mods_stats[stat.name].index then
@@ -476,6 +483,15 @@ function WeaponDescription._get_mods_stats(name, base_stats, equipped_mods, bonu
 						elseif stat.name == "totalammo" then
 							local ammo = part_data.stats.total_ammo_mod
 							mods_stats[stat.name].index = mods_stats[stat.name].index + (ammo or 0)
+						elseif stat.name == "reload" then
+							if not base_stats[stat.name].index then
+								debug_pause("weapon is missing reload stat", name)
+							end
+							local chosen_index = part_data.stats.reload or 0
+							chosen_index = math.clamp(base_stats[stat.name].index + chosen_index, 1, #tweak_stats[stat.name])
+							local mult = 1 / tweak_data.weapon.stats[stat.name][chosen_index]
+							mods_stats[stat.name].value = base_stats[stat.name].value * mult
+							mods_stats[stat.name].index = chosen_index
 						else
 							mods_stats[stat.name].index = mods_stats[stat.name].index + (part_data.stats[stat.name] or 0)
 						end
@@ -492,7 +508,9 @@ function WeaponDescription._get_mods_stats(name, base_stats, equipped_mods, bonu
 				else
 					index = math.clamp(base_stats[stat.name].index + mods_stats[stat.name].index, 1, #tweak_stats[stat_name])
 				end
-				mods_stats[stat.name].value = stat.index and index or tweak_stats[stat_name][index] * tweak_data.gui.stats_present_multiplier
+				if stat.name ~= "reload" then
+					mods_stats[stat.name].value = stat.index and index or tweak_stats[stat_name][index] * tweak_data.gui.stats_present_multiplier
+				end
 				local offset = math.min(tweak_stats[stat_name][1], tweak_stats[stat_name][#tweak_stats[stat_name]]) * tweak_data.gui.stats_present_multiplier
 				if stat.offset then
 					mods_stats[stat.name].value = mods_stats[stat.name].value - offset
@@ -558,6 +576,12 @@ function WeaponDescription._get_base_stats(name)
 		elseif stat.name == "fire_rate" then
 			local fire_rate = 60 / tweak_data.weapon[name].fire_mode_data.fire_rate
 			base_stats[stat.name].value = fire_rate / 10 * 10
+		elseif stat.name == "reload" then
+			index = math.clamp(tweak_data.weapon[name].stats[stat.name], 1, #tweak_stats[stat.name])
+			base_stats[stat.name].index = tweak_data.weapon[name].stats[stat.name]
+			local reload_time = managers.blackmarket:get_reload_time(name)
+			local mult = 1 / tweak_data.weapon.stats[stat.name][index]
+			base_stats[stat.name].value = reload_time * mult
 		elseif tweak_stats[stat.name] then
 			index = math.clamp(tweak_data.weapon[name].stats[stat.name], 1, #tweak_stats[stat.name])
 			base_stats[stat.name].index = index
@@ -707,6 +731,11 @@ function WeaponDescription._get_weapon_mod_stats(mod_name, weapon_name, base_sta
 					local chosen_index = part_data.stats.total_ammo_mod or 0
 					chosen_index = math.clamp(base_stats[stat.name].index + chosen_index, 1, #tweak_stats.total_ammo_mod)
 					mod[stat.name] = base_stats[stat.name].value * tweak_stats.total_ammo_mod[chosen_index]
+				elseif stat.name == "reload" then
+					local chosen_index = part_data.stats.reload or 0
+					chosen_index = math.clamp(base_stats[stat.name].index + chosen_index, 1, #tweak_stats[stat.name])
+					local mult = 1 / tweak_data.weapon.stats[stat.name][chosen_index]
+					mod[stat.name] = base_stats[stat.name].value * mult - base_stats[stat.name].value
 				else
 					local chosen_index = part_data.stats[stat.name] or 0
 					if tweak_stats[stat.name] then

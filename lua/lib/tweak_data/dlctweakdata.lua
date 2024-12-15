@@ -50,6 +50,7 @@ function DLCTweakData:init(tweak_data)
 			wild = true,
 			fez1 = true,
 			chill = 1,
+			tng = true,
 			howl = 1,
 			paydaycon2016 = 1,
 			rip = true,
@@ -5246,6 +5247,121 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "masks",
 			item_entry = "hwl_hoxton_zombie",
+			amount = 1
+		}
+	}
+	self.tango = {}
+	self.tango.content = {}
+	self.tango.content.loot_global_value = "tango"
+	self.tango.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_o_45rds",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_1911_m_big",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_mp5_fg_flash",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_o_spot",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_aug_m_quick",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_mp5_s_folding",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_m4_upg_m_quick",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_p90_m_strap",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ns_duck",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_pis_usp_m_big",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_gre_arbiter_b_comp",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_mac10_m_quick",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_g36_m_quick",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_ak_m_quick",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_g36_b_ultra",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_g36_fg_long",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_ass_g36_o_vintage",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_o_box",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_sho_saiga_fg_holy",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_sho_saiga_b_short",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_smg_sr2_m_quick",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_gre_arbiter_b_long",
 			amount = 1
 		}
 	}

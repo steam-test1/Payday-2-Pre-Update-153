@@ -65,6 +65,9 @@ function CustomSafehouseGuiPageDaily:_setup_side_menu()
 		"weekly",
 		"monthly"
 	}
+	if managers.dlc:has_dlc("tango") then
+		table.insert(categories, "tango")
+	end
 	self._side_panel_buttons = {}
 	self._side_panel_categories = {}
 	local challenges = {}
@@ -123,6 +126,21 @@ function CustomSafehouseGuiPageDaily:_setup_side_menu()
 		data = daily_data
 	}
 	self._challenges[current_daily.id] = challenges.safehouse_daily[1].data
+	if managers.dlc:has_dlc("tango") then
+		challenges.tango = {}
+		challenges.tango.category_id = "menu_tango"
+		for _, tango_data in ipairs(managers.tango:challenges()) do
+			local data = deep_clone(tango_data)
+			data.name_id = tango_data.name_id
+			data.category = "tango"
+			local tango_challenge = {
+				id = tango_data.id,
+				data = data
+			}
+			table.insert(challenges.tango, tango_challenge)
+			self._challenges[tango_challenge.id] = tango_challenge.data
+		end
+	end
 	local current_y = 0
 	local first = true
 	for _, category in ipairs(categories) do
@@ -178,6 +196,7 @@ function CustomSafehouseGuiPageDaily:_update_buttons()
 			completed = managers.custom_safehouse:has_completed_daily()
 		else
 			local challenge = managers.challenge:get_active_challenge(id)
+			challenge = challenge or managers.tango:get_challenge(id)
 			rewarded = challenge and challenge.rewarded
 			completed = challenge and challenge.completed
 		end
@@ -481,7 +500,9 @@ function CustomSafehouseGuiPageDaily:_setup_challenge(id)
 		end
 	end
 	if daily_challenge.rewards then
-		local updated_challenge = self:is_safehouse_daily(id) and managers.custom_safehouse:get_daily_challenge() or managers.challenge:get_active_challenge(id) or daily_challenge
+		local updated_challenge = self:is_safehouse_daily(id) and managers.custom_safehouse:get_daily_challenge() or managers.challenge:get_active_challenge(id)
+		updated_challenge = updated_challenge or managers.tango:get_challenge(id)
+		updated_challenge = updated_challenge or daily_challenge
 		local rewards_panel = rewards_container:panel({
 			w = REWARD_SIZE * #daily_challenge.rewards,
 			h = REWARD_SIZE
@@ -529,6 +550,33 @@ function CustomSafehouseGuiPageDaily:_setup_challenge(id)
 				layer = 1,
 				blend_mode = "add",
 				text = daily_challenge.reward_s or managers.localization:text(daily_challenge.reward_id),
+				w = rewards_container:w() - rewards_panel:w(),
+				wrap = true
+			})
+			self:make_fine_text(reward_text)
+			reward_text:set_top(reward_title:bottom())
+		elseif daily_challenge.reward_type == "tango" then
+			local reward_macros = {}
+			for _, reward_data in ipairs(daily_challenge.rewards) do
+				if reward_data.tango_mask then
+					if tweak_data.blackmarket.masks[reward_data.tango_mask] then
+						reward_macros.mask = managers.localization:text(tweak_data.blackmarket.masks[reward_data.tango_mask].name_id)
+					end
+				elseif reward_data.item_entry then
+					local entry = tweak_data:get_raw_value("blackmarket", reward_data.type_items, reward_data.item_entry)
+					print("entry: ", entry)
+					if entry then
+						reward_macros[reward_data.type_items == "masks" and "mask" or reward_data.type_items] = managers.localization:text(entry.name_id)
+					end
+				end
+			end
+			local reward_text = rewards_container:text({
+				name = "RewardBody",
+				font_size = small_font_size,
+				font = small_font,
+				layer = 1,
+				blend_mode = "add",
+				text = managers.localization:text("menu_tango_reward", reward_macros),
 				w = rewards_container:w() - rewards_panel:w(),
 				wrap = true
 			})
@@ -853,7 +901,7 @@ function CustomSafehouseGuiPageDaily:update(t, dt)
 				expire_string = self:_create_timestamp_string_extended(expire_time)
 			else
 				local challenge = self._challenges[self._current_challenge]
-				if challenge then
+				if challenge and challenge.timestamp then
 					local timestamp = challenge.timestamp
 					local expire_timestamp = challenge.interval + timestamp
 					local current_timestamp = managers.challenge:get_timestamp()
@@ -861,8 +909,10 @@ function CustomSafehouseGuiPageDaily:update(t, dt)
 					expire_string = self:_create_timestamp_string_extended(expire_time)
 				end
 			end
-			self._expire_timer:set_text(expire_string)
-			self._expire_panel:set_visible(true)
+			if utf8.len(expire_string) > 0 then
+				self._expire_timer:set_text(expire_string)
+				self._expire_panel:set_visible(true)
+			end
 		end
 	end
 	self:_update_animation(t, dt)
@@ -1111,6 +1161,7 @@ function CustomSafehouseGuiRewardItem:init(daily_page, panel, order, reward_data
 	self._is_safehouse_daily = is_safehouse_daily or false
 	local texture_path, texture_rect, reward_string
 	local is_pattern = false
+	local is_material = false
 	if reward_data[1] == "safehouse_coins" then
 		texture_path = "guis/dlcs/chill/textures/pd2/safehouse/continental_coins_drop"
 		reward_string = managers.localization:text("menu_es_safehouse_reward_coins", {
@@ -1136,6 +1187,7 @@ function CustomSafehouseGuiRewardItem:init(daily_page, panel, order, reward_data
 			end
 			if category == "textures" then
 				texture_path = td.texture
+				reward_string = managers.localization:text(td.name_id)
 				is_pattern = true
 			elseif category == "cash" then
 				texture_path = "guis/textures/pd2/blackmarket/cash_drop"
@@ -1147,10 +1199,14 @@ function CustomSafehouseGuiRewardItem:init(daily_page, panel, order, reward_data
 				if category == "weapon_mods" or category == "weapon_bonus" then
 					category = "mods"
 				end
+				is_material = category == "materials"
 				texture_path = guis_catalog .. "textures/pd2/blackmarket/icons/" .. category .. "/" .. id
 				reward_string = managers.localization:text(td.name_id)
 			end
 		end
+	elseif reward_data.tango_weapon_part then
+		texture_path = "guis/dlcs/tng/textures/pd2/blackmarket/icons/side_job_rewards/gage_mod_rewards"
+		reward_string = managers.localization:text("menu_tango_reward_weapon_part")
 	end
 	self._panel = panel:panel({w = REWARD_SIZE, h = REWARD_SIZE})
 	self._panel:set_x((self._order - 1) * REWARD_SIZE)
@@ -1185,7 +1241,17 @@ function CustomSafehouseGuiRewardItem:init(daily_page, panel, order, reward_data
 	self._image:set_h(panel:h() * 0.8)
 	self._image:set_bottom(self._text:top() + PANEL_PADDING)
 	self._image:set_x(self._panel:w() * 0.5 - self._image:w() * 0.5)
-	if (self._is_safehouse_daily and managers.custom_safehouse:has_completed_daily() or managers.challenge:get_active_challenge(id) and managers.challenge:get_active_challenge(id).completed) and not reward_data.rewarded then
+	if is_pattern then
+		self._image:set_render_template(Idstring("VertexColorTexturedPatterns"))
+		self._image:set_blend_mode("normal")
+	end
+	if is_material then
+		self._image:set_w(panel:h() * 0.7 * ratio)
+		self._image:set_h(panel:h() * 0.7)
+	end
+	local completed = (not self._is_safehouse_daily or not managers.custom_safehouse:has_completed_daily()) and managers.challenge:get_active_challenge(id) and managers.challenge:get_active_challenge(id).completed
+	completed = completed or managers.tango:get_challenge(self._id) and managers.tango:get_challenge(self._id).completed
+	if completed and not reward_data.rewarded then
 		local glow_anim = function(o)
 			while true do
 				over(5, function(p)
@@ -1262,6 +1328,13 @@ function CustomSafehouseGuiRewardItem:trigger()
 				end
 				self._daily_page:select_challenge(self._id)
 			end
+		elseif managers.tango:get_challenge(self._id) and managers.tango:get_challenge(self._id).completed and not managers.tango:get_challenge(self._id).rewarded and not managers.tango:has_already_claimed_reward(self._id, self._order) then
+			managers.menu_component:post_event("menu_skill_investment")
+			self._glow:stop()
+			self._glow:set_alpha(0)
+			self:set_active(false)
+			managers.tango:claim_reward(self._id, self._order)
+			self._daily_page:select_challenge(self._id)
 		end
 		self._daily_page:_update_buttons()
 	end

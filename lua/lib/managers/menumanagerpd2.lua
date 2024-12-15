@@ -38,6 +38,7 @@ function MenuManager:on_enter_lobby()
 	managers.menu_component:pre_set_game_chat_leftbottom(0, 50)
 	managers.network:session():on_entered_lobby()
 	self:setup_local_lobby_character()
+	managers.tango:attempt_announce_tango_weapon()
 	if Global.exe_argument_level or self._lobby_autoplay then
 		MenuCallbackHandler:start_the_game()
 	end

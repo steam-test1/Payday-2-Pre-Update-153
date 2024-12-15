@@ -1334,6 +1334,7 @@ function LoadoutItem:populate_category(category, data)
 		new_data.can_afford = true
 		new_data.skill_based = weapon_data[crafted.weapon_id].skill_based
 		new_data.skill_name = new_data.skill_based and "bm_menu_skill_locked_" .. new_data.name
+		new_data.func_based = weapon_data[crafted.weapon_id].func_based
 		new_data.level = managers.blackmarket:weapon_level(crafted.weapon_id)
 		local texture_name = tweak_data.weapon[crafted.weapon_id].texture_name or tostring(crafted.weapon_id)
 		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. texture_name
@@ -2414,6 +2415,7 @@ function NewLoadoutTab:populate_category(data)
 			new_data.can_afford = true
 			new_data.skill_based = weapon_data[crafted.weapon_id].skill_based
 			new_data.skill_name = new_data.skill_based and "bm_menu_skill_locked_" .. new_data.name
+			new_data.func_based = weapon_data[crafted.weapon_id].func_based
 			new_data.level = managers.blackmarket:weapon_level(crafted.weapon_id)
 			local texture_name, bg_texture = managers.blackmarket:get_weapon_icon_path(crafted.weapon_id, crafted.cosmetics)
 			new_data.bitmap_texture = texture_name

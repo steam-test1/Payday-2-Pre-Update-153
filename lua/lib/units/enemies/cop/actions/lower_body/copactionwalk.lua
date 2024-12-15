@@ -1666,6 +1666,15 @@ function CopActionWalk:_upd_stop_anim_first_frame(t)
 		debug_pause_unit(self._unit, "[CopActionWalk:_upd_stop_anim_first_frame] Redirect", redir_name, "failed in", self._machine:segment_state(idstr_base), self._common_data.unit)
 		return
 	end
+	if not self._walk_anim_velocities[self._ext_anim.pose] then
+		debug_pause("Invalid pose", self._ext_anim.pose)
+	end
+	if not self._walk_anim_velocities[self._ext_anim.pose][self._stance.name] then
+		debug_pause("Invalid stance", self._stance.name)
+	end
+	if not self._walk_anim_velocities[self._ext_anim.pose][self._stance.name][self._haste] then
+		debug_pause("Invalid haste", self._haste)
+	end
 	local speed_mul = self:_get_current_max_walk_speed(self._stop_anim_side) / self._walk_anim_velocities[self._ext_anim.pose][self._stance.name][self._haste][self._stop_anim_side]
 	self._machine:set_speed(redir_res, speed_mul)
 	self._stop_anim_init_pos = mvec3_cpy(self._last_pos)

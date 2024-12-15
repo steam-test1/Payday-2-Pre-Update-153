@@ -1200,7 +1200,8 @@ function StatisticsManager:_get_boom_guns()
 			"arblast",
 			"hunter",
 			"plainsrider",
-			"long"
+			"long",
+			"arbiter"
 		}
 	end
 	return self._boom_guns
@@ -1258,7 +1259,7 @@ function StatisticsManager:killed(data)
 		stats_name = "other"
 	end
 	local by_bullet = data.variant == "bullet"
-	local by_melee = data.variant == "melee" or (data.name_id or data.name) and tweak_data.blackmarket.melee_weapons[data.name_id or data.name]
+	local by_melee = data.variant == "melee" or data.weapon_id and tweak_data.blackmarket.melee_weapons[data.weapon_id]
 	local by_explosion = data.variant == "explosion"
 	local by_other_variant = not by_bullet and not by_melee and not by_explosion
 	local type = self._global.killed[stats_name]

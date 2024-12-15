@@ -504,7 +504,11 @@ function StatisticsTweakData:statistics_table()
 		"hwl_dallas_zombie",
 		"hwl_hoxton_zombie",
 		"hwl_wolf_zombie",
-		"pdc16_clover"
+		"pdc16_clover",
+		"tng_cap",
+		"tng_zeal_swat_mask",
+		"tng_cloaker",
+		"tng_bandana"
 	}
 	local weapon_list = {
 		"ak5",
@@ -615,7 +619,8 @@ function StatisticsTweakData:statistics_table()
 		"schakal",
 		"desertfox",
 		"x_packrat",
-		"rota"
+		"rota",
+		"arbiter"
 	}
 	local melee_list = {
 		"weapon",

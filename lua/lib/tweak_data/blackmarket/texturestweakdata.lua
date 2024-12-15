@@ -1996,6 +1996,30 @@ function BlackMarketTweakData:_init_textures(tweak_data)
 	self.textures.piety.texture = "units/pd2_dlc_pim/masks/patterns/pattern_piety_df"
 	self.textures.piety.value = 0
 	self.textures.piety.dlc = "pim"
+	self.textures.facepaint = {}
+	self.textures.facepaint.name_id = "bm_txt_facepaint"
+	self.textures.facepaint.pcs = {}
+	self.textures.facepaint.texture = "units/pd2_dlc_tng/masks/patterns/pattern_facepaint_df"
+	self.textures.facepaint.value = 0
+	self.textures.facepaint.dlc = "tango"
+	self.textures.stripes = {}
+	self.textures.stripes.name_id = "bm_txt_eye_stripes"
+	self.textures.stripes.pcs = {}
+	self.textures.stripes.texture = "units/pd2_dlc_tng/masks/patterns/pattern_stripes_df"
+	self.textures.stripes.value = 0
+	self.textures.stripes.dlc = "tango"
+	self.textures.sight = {}
+	self.textures.sight.name_id = "bm_txt_sight"
+	self.textures.sight.pcs = {}
+	self.textures.sight.texture = "units/pd2_dlc_tng/masks/patterns/pattern_sight_df"
+	self.textures.sight.value = 0
+	self.textures.sight.dlc = "tango"
+	self.textures.bullets = {}
+	self.textures.bullets.name_id = "bm_txt_bullets"
+	self.textures.bullets.pcs = {}
+	self.textures.bullets.texture = "units/pd2_dlc_tng/masks/patterns/pattern_bullets_df"
+	self.textures.bullets.value = 0
+	self.textures.bullets.dlc = "tango"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.textures) do
 		if free_dlcs[data.dlc] then

@@ -224,6 +224,7 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_multipliers.sparkle = 0
 	self.global_value_multipliers.rota = 1
 	self.global_value_multipliers.pim = 1
+	self.global_value_multipliers.tango = 1
 	self.global_value_bonus_multiplier = {}
 	self.global_value_bonus_multiplier.normal = 0
 	self.global_value_bonus_multiplier.superior = 0.1
@@ -296,6 +297,8 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_bonus_multiplier.born = 0.2
 	self.global_value_bonus_multiplier.sparkle = 0
 	self.global_value_bonus_multiplier.rota = 1
+	self.global_value_bonus_multiplier.pim = 1
+	self.global_value_bonus_multiplier.tango = 1
 	local smallest_cashout = (self.stage_completion[1] + self.job_completion[1]) * self.offshore_rate
 	local biggest_mask_cost = self.biggest_cashout * 40
 	local biggest_mask_cost_deinfamous = math.round(biggest_mask_cost / self.global_value_multipliers.infamous)
@@ -318,6 +321,16 @@ function MoneyTweakData:init(tweak_data)
 		{spending = 0, offshore = 0},
 		{spending = 0, offshore = 1000000},
 		{spending = 0, offshore = 10000000},
+		{spending = 0, offshore = 25000000},
+		{spending = 0, offshore = 25000000},
+		{spending = 0, offshore = 25000000},
+		{spending = 0, offshore = 25000000},
+		{spending = 0, offshore = 25000000},
+		{spending = 0, offshore = 30000000},
+		{spending = 0, offshore = 30000000},
+		{spending = 0, offshore = 30000000},
+		{spending = 0, offshore = 30000000},
+		{spending = 0, offshore = 30000000},
 		{spending = 0, offshore = 20000000}
 	}
 	self.mission_asset_cost_by_pc = self._create_value_table(1, 1, 10, true, 1)

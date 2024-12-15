@@ -887,7 +887,7 @@ function CopDamage:damage_dot(attack_data)
 	end
 	local attacker_unit = attack_data.attacker_unit
 	if result.type == "death" then
-		local variant = attack_data.name_id and tweak_data.blackmarket and tweak_data.blackmarket.melee_weapons and tweak_data.blackmarket.melee_weapons[attack_data.name_id] and "melee" or attack_data.variant
+		local variant = attack_data.weapon_id and tweak_data.blackmarket and tweak_data.blackmarket.melee_weapons and tweak_data.blackmarket.melee_weapons[attack_data.weapon_id] and "melee" or attack_data.variant
 		local data = {
 			name = self._unit:base()._tweak_table,
 			stats_name = self._unit:base()._stats_name,
@@ -895,7 +895,7 @@ function CopDamage:damage_dot(attack_data)
 			weapon_unit = attack_data.weapon_unit,
 			variant = variant,
 			head_shot = head,
-			name_id = attack_data.name_id
+			weapon_id = attack_data.weapon_id
 		}
 		managers.statistics:killed_by_anyone(data)
 		if attacker_unit == managers.player:player_unit() then
@@ -2110,7 +2110,7 @@ function CopDamage:_send_fire_attack_result(attack_data, attacker, damage_percen
 end
 
 function CopDamage:_send_dot_attack_result(attack_data, attacker, damage_percent, variant, direction)
-	self._unit:network():send("damage_dot", attacker, damage_percent, self._dead and true or false, variant, attack_data.hurt_animation, attack_data.name_id)
+	self._unit:network():send("damage_dot", attacker, damage_percent, self._dead and true or false, variant, attack_data.hurt_animation, attack_data.weapon_id)
 end
 
 function CopDamage:_send_tase_attack_result(attack_data, damage_percent, variant)

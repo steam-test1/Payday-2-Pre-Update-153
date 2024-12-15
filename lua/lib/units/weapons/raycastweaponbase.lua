@@ -142,6 +142,7 @@ function RaycastWeaponBase:setup(setup_data, damage_multiplier)
 		self._spread_moving = self._spread_moving or weapon_stats.spread_moving[stats.spread_moving]
 		self._concealment = self._concealment or weapon_stats.concealment[stats.concealment]
 		self._value = self._value or weapon_stats.value[stats.value]
+		self._reload = self._reload or weapon_stats.reload[stats.reload]
 		for i, _ in pairs(weapon_stats) do
 			local stat = self["_" .. tostring(i)]
 			if not stat then
@@ -157,6 +158,7 @@ function RaycastWeaponBase:setup(setup_data, damage_multiplier)
 		self._spread = 1
 		self._recoil = 1
 		self._spread_moving = 1
+		self._reload = 1
 	end
 	self._bullet_slotmask = setup_data.hit_slotmask or self._bullet_slotmask
 	self._panic_suppression_chance = setup_data.panic_suppression_skill and self:weapon_tweak_data().panic_suppression_chance
@@ -479,6 +481,28 @@ function RaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul
 					managers.challenge:award(achievement_data.challenge_award)
 				end
 			end
+		end
+	end
+	if not tweak_data.achievement.tango_4.difficulty or table.contains(tweak_data.achievement.tango_4.difficulty, Global.game_settings.difficulty) then
+		if self._has_gadget and table.contains(self._has_gadget, "wpn_fps_upg_o_45rds") and hit_unit and hit_unit.type == "death" and managers.player:player_unit():movement():current_state():in_steelsight() and col_ray.unit:base() and col_ray.unit:base()._tweak_table ~= "civilian" and col_ray.unit:base()._tweak_table ~= "civilian_female" then
+			if self._tango_4_data then
+				if self._gadget_on == self._tango_4_data.last_gadget_state then
+					self._tango_4_data = nil
+				else
+					self._tango_4_data.last_gadget_state = self._gadget_on
+					self._tango_4_data.count = self._tango_4_data.count + 1
+				end
+				if self._tango_4_data and self._tango_4_data.count >= tweak_data.achievement.tango_4.count then
+					managers.achievment:_award_achievement(tweak_data.achievement.tango_4, "tango_4")
+				end
+			else
+				self._tango_4_data = {
+					count = 1,
+					last_gadget_state = self._gadget_on
+				}
+			end
+		elseif self._tango_4_data and not shoot_through_data then
+			self._tango_4_data = nil
 		end
 	end
 	return result
@@ -943,6 +967,10 @@ function RaycastWeaponBase:reload_speed_multiplier()
 	return multiplier
 end
 
+function RaycastWeaponBase:reload_speed_stat()
+	return self._reload
+end
+
 function RaycastWeaponBase:damage_multiplier()
 	local multiplier = managers.player:upgrade_value(self:weapon_tweak_data().category, "damage_multiplier", 1)
 	if self:weapon_tweak_data().sub_category then
@@ -1190,6 +1218,9 @@ function RaycastWeaponBase:on_equip(user_unit)
 end
 
 function RaycastWeaponBase:on_unequip(user_unit)
+	if self._tango_4_data then
+		self._tango_4_data = nil
+	end
 end
 
 function RaycastWeaponBase:on_enabled()
@@ -1701,7 +1732,7 @@ function DOTBulletBase:give_damage_dot(col_ray, weapon_unit, attacker_unit, dama
 	action_data.attacker_unit = attacker_unit
 	action_data.col_ray = col_ray
 	action_data.hurt_animation = hurt_animation
-	action_data.name_id = weapon_id
+	action_data.weapon_id = weapon_id
 	local defense_data = {}
 	if col_ray and col_ray.unit and alive(col_ray.unit) and col_ray.unit:character_damage() then
 		defense_data = col_ray.unit:character_damage():damage_dot(action_data)

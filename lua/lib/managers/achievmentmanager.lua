@@ -416,8 +416,10 @@ function AchievmentManager:check_complete_heist_stats_achivements()
 end
 
 function AchievmentManager:check_autounlock_achievements()
-	self:_check_autounlock_complete_heist()
-	self:_check_autounlock_difficulties()
+	if SystemInfo:platform() == Idstring("WIN32") then
+		self:_check_autounlock_complete_heist()
+		self:_check_autounlock_difficulties()
+	end
 	self:_check_autounlock_infamy()
 end
 

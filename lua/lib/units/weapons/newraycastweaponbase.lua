@@ -426,6 +426,9 @@ function NewRaycastWeaponBase:_update_stats_values()
 		stats.suspicion = math.clamp(#stats_tweak_data.concealment - base_stats.concealment - (parts_stats.concealment or 0), 1, #stats_tweak_data.concealment)
 		self._current_stats.suspicion = stats_tweak_data.concealment[stats.suspicion]
 	end
+	if parts_stats and parts_stats.spread_multi then
+		self._current_stats.spread_multi = parts_stats.spread_multi
+	end
 	self._alert_size = self._current_stats.alert_size or self._alert_size
 	self._suppression = self._current_stats.suppression or self._suppression
 	self._zoom = self._current_stats.zoom or self._zoom
@@ -434,6 +437,8 @@ function NewRaycastWeaponBase:_update_stats_values()
 	self._spread_moving = self._current_stats.spread_moving or self._spread_moving
 	self._extra_ammo = self._current_stats.extra_ammo or self._extra_ammo
 	self._total_ammo_mod = self._current_stats.total_ammo_mod or self._total_ammo_mod
+	self._reload = self._current_stats.reload or self._reload
+	self._spread_multiplier = self._current_stats.spread_multi or self._spread_multiplier
 	self._has_gadget = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._factory_id, self._blueprint)
 	self._scopes = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("scope", self._factory_id, self._blueprint)
 	self._can_highlight_with_perk = managers.weapon_factory:has_perk("highlight", self._factory_id, self._blueprint)
@@ -757,6 +762,7 @@ function NewRaycastWeaponBase:on_equip(user_unit)
 end
 
 function NewRaycastWeaponBase:on_unequip(user_unit)
+	NewRaycastWeaponBase.super.on_unequip(self, user_unit)
 end
 
 function NewRaycastWeaponBase:has_gadget()
@@ -950,6 +956,10 @@ function NewRaycastWeaponBase:_get_spread(user_unit)
 		spread_x = spread_x * multi_x
 		spread_y = spread_y * multi_y
 	end
+	if self._spread_multiplier then
+		spread_x = spread_x * self._spread_multiplier[1]
+		spread_y = spread_y * self._spread_multiplier[2]
+	end
 	return spread_x, spread_y
 end
 
@@ -1122,6 +1132,7 @@ function NewRaycastWeaponBase:reload_speed_multiplier()
 	multiplier = multiplier + (1 - managers.player:get_property("shock_and_awe_reload_multiplier", 1))
 	multiplier = multiplier + (1 - managers.player:get_temporary_property("bloodthirst_reload_speed", 1))
 	multiplier = self:_convert_add_to_mul(multiplier)
+	multiplier = multiplier * self:reload_speed_stat()
 	return multiplier
 end
 

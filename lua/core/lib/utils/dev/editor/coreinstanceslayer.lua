@@ -140,6 +140,8 @@ function InstancesLayer:use_grab_info()
 		self._grab = false
 		self:set_instance_positions(self._grab_info:position())
 		self:set_instance_rotations(self._grab_info:rotation() * self._selected_instance_data.rotation:inverse())
+		self:reset_grab_info()
+		self._grab_cancelled = true
 	end
 end
 
@@ -447,6 +449,17 @@ function InstancesLayer:update(t, dt)
 		end
 		self:draw_marker(t, dt)
 		self:draw_grid(t, dt)
+	end
+	if self._grab_cancelled then
+		if self._move_command then
+			self._move_command:undo()
+		end
+		if self._rotate_command then
+			self._rotate_command:undo()
+		end
+		self._move_command = nil
+		self._rotate_command = nil
+		self:reset_grab_info()
 	end
 	self:update_move_triggers(t, dt)
 	self:update_rotate_triggers(t, dt)

@@ -32,6 +32,7 @@ require("lib/tweak_data/EconomyTweakData")
 require("lib/tweak_data/VanSkinsTweakData")
 require("lib/tweak_data/EnvEffectTweakData")
 require("lib/tweak_data/CustomSafehouseTweakData")
+require("lib/tweak_data/TangoTweakData")
 TweakData = TweakData or class()
 
 function TweakData:_init_wip_tweak_data()
@@ -603,6 +604,7 @@ function TweakData:init()
 	self._init_wip_economy(self.economy, self)
 	self.van = VanSkinsTweakData:new(self)
 	self.env_effect = EnvEffectTweakData:new()
+	self.tango = TangoTweakData:new(self)
 	self.EFFECT_QUALITY = 0.5
 	if SystemInfo:platform() == Idstring("X360") then
 		self.EFFECT_QUALITY = 0.5
@@ -1295,6 +1297,11 @@ Play the full version soon to get your full PAYDAY!]],
 			"concussion"
 		}
 	}
+	self.achievement.tango_4 = {
+		award = "tango_achieve_4",
+		count = 10,
+		difficulty = overkill_and_above
+	}
 	self.achievement.infamous = {
 		"ignominy_1",
 		"ignominy_2",
@@ -1522,6 +1529,12 @@ Play the full version soon to get your full PAYDAY!]],
 			success = true,
 			is_civilian = false
 		},
+		tango_2 = {
+			stat = "tango_2_stats",
+			enemy = "sniper",
+			kill = true,
+			grenade_type = "launcher_frag_arbiter"
+		},
 		any_kills = {challenge_stat = "any_kills", kill = true},
 		any_sniper_kills = {
 			challenge_stat = "any_sniper_kills",
@@ -1584,6 +1597,17 @@ Play the full version soon to get your full PAYDAY!]],
 			trophy_stat = "daily_grenades",
 			grenade_type = "frag_com",
 			kill = true
+		}
+	}
+	self.achievement.shotgun_single_shot_kills = {
+		tango_1 = {
+			award = "tango_achieve_1",
+			count = 3,
+			blueprint = {
+				"wpn_fps_upg_ns_duck"
+			},
+			headshot = true,
+			is_not_civilian = true
 		}
 	}
 	self.achievement.enemy_kill_achievements = {
@@ -3207,6 +3231,14 @@ Play the full version soon to get your full PAYDAY!]],
 			everyone_killed_by_grenade = 0,
 			everyone_killed_by_weapons = 0
 		},
+		tango_3 = {
+			award = "tango_achieve_3",
+			difficulty = veryhard_and_above,
+			killed_by_blueprint = {
+				blueprint = "wpn_fps_upg_o_spot",
+				amount = 200
+			}
+		},
 		bain_jobs = {
 			challenge_stat = "bain_jobs",
 			complete_job = true,
@@ -3379,7 +3411,7 @@ Play the full version soon to get your full PAYDAY!]],
 			trophy_stat = "trophy_shoutout",
 			difficulty = overkill_and_above,
 			job = "shoutout_raid",
-			timer = 600
+			timer = 420
 		},
 		trophy_stealth = {
 			trophy_stat = "trophy_stealth",
@@ -5019,6 +5051,36 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.launcher_incendiary_m32 = deep_clone(self.projectiles.launcher_incendiary)
 	self.projectiles.launcher_frag_china = deep_clone(self.projectiles.launcher_frag)
 	self.projectiles.launcher_incendiary_china = deep_clone(self.projectiles.launcher_incendiary)
+	self.projectiles.launcher_frag_arbiter = {}
+	self.projectiles.launcher_frag_arbiter.damage = 70
+	self.projectiles.launcher_frag_arbiter.launch_speed = 7000
+	self.projectiles.launcher_frag_arbiter.curve_pow = 0.1
+	self.projectiles.launcher_frag_arbiter.player_damage = 8
+	self.projectiles.launcher_frag_arbiter.range = 350
+	self.projectiles.launcher_frag_arbiter.init_timer = 2.5
+	self.projectiles.launcher_frag_arbiter.mass_look_up_modifier = 1
+	self.projectiles.launcher_frag_arbiter.sound_event = "gl_explode"
+	self.projectiles.launcher_frag_arbiter.name_id = "bm_launcher_frag"
+	self.projectiles.launcher_incendiary_arbiter = {}
+	self.projectiles.launcher_incendiary_arbiter.damage = 10
+	self.projectiles.launcher_incendiary_arbiter.launch_speed = 7000
+	self.projectiles.launcher_incendiary_arbiter.curve_pow = 0.1
+	self.projectiles.launcher_incendiary_arbiter.player_damage = 2
+	self.projectiles.launcher_incendiary_arbiter.fire_dot_data = {
+		dot_damage = 25,
+		dot_trigger_max_distance = 3000,
+		dot_trigger_chance = 35,
+		dot_length = 6.1,
+		dot_tick_period = 0.5
+	}
+	self.projectiles.launcher_incendiary_arbiter.range = 75
+	self.projectiles.launcher_incendiary_arbiter.init_timer = 2.5
+	self.projectiles.launcher_incendiary_arbiter.mass_look_up_modifier = 1
+	self.projectiles.launcher_incendiary_arbiter.sound_event = "gl_explode"
+	self.projectiles.launcher_incendiary_arbiter.sound_event_impact_duration = 1
+	self.projectiles.launcher_incendiary_arbiter.name_id = "bm_launcher_incendiary"
+	self.projectiles.launcher_incendiary_arbiter.burn_duration = 3
+	self.projectiles.launcher_incendiary_arbiter.burn_tick_period = 0.5
 	self.projectiles.rocket_frag = {}
 	self.projectiles.rocket_frag.launch_speed = 2500
 	self.projectiles.rocket_frag.adjust_z = 0

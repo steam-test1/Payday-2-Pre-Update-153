@@ -54,7 +54,7 @@ function PlayerMovement:init(unit)
 	}
 	if managers.player:has_category_upgrade("player", "morale_boost") or managers.player:has_category_upgrade("cooldown", "long_dis_revive") then
 		self._rally_skill_data = {
-			range_sq = 490000,
+			range_sq = 810000,
 			morale_boost_delay_t = managers.player:has_category_upgrade("player", "morale_boost") and 0 or nil,
 			long_dis_revive = managers.player:has_category_upgrade("cooldown", "long_dis_revive"),
 			revive_chance = managers.player:cooldown_upgrade_value("cooldown", "long_dis_revive", 0),

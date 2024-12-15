@@ -21,7 +21,7 @@ function ControllerWrapper:get_input_released(connection_name)
 			cache = self._enabled and self._virtual_controller and self:get_connection_enabled(connection_name) and self._virtual_controller:released(Idstring(connection_name)) or false
 			cache = not not cache
 		else
-			Application:error(self:to_string() .. " No controller input binded to connection \"" .. tostring(connection_name) .. "\".")
+			self:print_invalid_connection_error(connection_name)
 			cache = false
 		end
 		self._input_released_cache[connection_name] = cache

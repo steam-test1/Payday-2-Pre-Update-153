@@ -2053,6 +2053,7 @@ function PlayerInventoryGui:_update_stats(name)
 				percent = false
 			}
 		}
+		table.insert(stats, {name = "reload", inverted = true})
 		self:set_weapon_stats(self._info_panel, stats)
 		self:_update_info_weapon(name)
 	elseif name == "armor" then
@@ -2137,6 +2138,7 @@ function PlayerInventoryGui:_update_stats(name)
 				percent = false
 			}
 		}
+		table.insert(stats, {name = "reload", inverted = true})
 		if box and box.params and box.params.mod_data then
 			if box.params.mod_data.selected_tab == "weapon_cosmetics" then
 				local cosmetics = managers.blackmarket:get_weapon_cosmetics(box.params.mod_data.category, box.params.mod_data.slot)

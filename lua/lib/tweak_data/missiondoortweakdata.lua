@@ -319,6 +319,62 @@ function MissionDoorTweakData:init()
 			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
 		}
 	}
+	self.safe_giga_90sec = {}
+	self.safe_giga_90sec.devices = {}
+	self.safe_giga_90sec.devices.drill = {
+		{
+			align = "a_drill",
+			unit = Idstring("units/payday2/equipment/item_door_drill_small/item_door_drill_small"),
+			can_jam = true,
+			timer = 90
+		}
+	}
+	self.safe_giga_90sec.devices.c4 = {
+		{
+			align = "a_shp_charge_1",
+			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
+		},
+		{
+			align = "a_shp_charge_2",
+			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
+		},
+		{
+			align = "a_shp_charge_3",
+			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
+		},
+		{
+			align = "a_shp_charge_4",
+			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
+		}
+	}
+	self.safe_giga_60sec = {}
+	self.safe_giga_60sec.devices = {}
+	self.safe_giga_60sec.devices.drill = {
+		{
+			align = "a_drill",
+			unit = Idstring("units/payday2/equipment/item_door_drill_small/item_door_drill_small"),
+			can_jam = true,
+			timer = 60
+		}
+	}
+	self.safe_giga_60sec.devices.c4 = {
+		{
+			align = "a_shp_charge_1",
+			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
+		},
+		{
+			align = "a_shp_charge_2",
+			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
+		},
+		{
+			align = "a_shp_charge_3",
+			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
+		},
+		{
+			align = "a_shp_charge_4",
+			unit = Idstring("units/payday2/equipment/gen_equipment_shape_charge/gen_equipment_shape_charge")
+		}
+	}
 	self.only_shape_charge_4 = {}
 	self.only_shape_charge_4.devices = {}
 	self.only_shape_charge_4.devices.c4 = {

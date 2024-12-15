@@ -2023,6 +2023,9 @@ end
 
 function PlayerStandard:_update_equip_weapon_timers(t, input)
 	if self._unequip_weapon_expire_t and t >= self._unequip_weapon_expire_t then
+		if self._change_weapon_data.unequip_callback and not self._change_weapon_data.unequip_callback() then
+			return
+		end
 		self._unequip_weapon_expire_t = nil
 		self:_start_action_equip_weapon(t)
 	end

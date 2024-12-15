@@ -2511,7 +2511,11 @@ function UpgradesTweakData:init(tweak_data)
 	}
 	self.level_tree[47] = {
 		name_id = "weapons",
-		upgrades = {"freedom", "whiskey"}
+		upgrades = {
+			"freedom",
+			"whiskey",
+			"arbiter"
+		}
 	}
 	self.level_tree[48] = {
 		name_id = "weapons",
@@ -2819,6 +2823,7 @@ function UpgradesTweakData:init(tweak_data)
 	self:_desertfox_weapon_definitions()
 	self:_x_packrat_weapon_definitions()
 	self:_rota_weapon_definitions()
+	self:_arbiter_weapon_definitions()
 	self:_melee_weapon_definitions()
 	self:_grenades_definitions()
 	self:_carry_definitions()
@@ -11406,5 +11411,14 @@ function UpgradesTweakData:_rota_weapon_definitions()
 		weapon_id = "rota",
 		factory_id = "wpn_fps_sho_rota",
 		dlc = "rota"
+	}
+end
+
+function UpgradesTweakData:_arbiter_weapon_definitions()
+	self.definitions.arbiter = {
+		category = "weapon",
+		weapon_id = "arbiter",
+		factory_id = "wpn_fps_gre_arbiter",
+		dlc = "tango"
 	}
 end

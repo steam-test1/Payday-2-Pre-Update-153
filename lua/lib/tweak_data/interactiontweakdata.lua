@@ -3774,4 +3774,18 @@ function InteractionTweakData:init(tweak_data)
 	self.hold_pull_switch.timer = 1
 	self.hold_pull_switch.interact_distance = 200
 	self.hold_pull_switch.start_active = false
+	self.pickup_keys = {}
+	self.pickup_keys.icon = "develop"
+	self.pickup_keys.text_id = "hud_int_hold_pick_up"
+	self.pickup_keys.start_active = true
+	self.pickup_keys.timer = 1
+	self.pickup_keys.action_text_id = "hud_action_picking_up"
+	self.pickup_keys.blocked_hint = "hint_key_pickup"
+	self.pickup_case = {}
+	self.pickup_case.icon = "develop"
+	self.pickup_case.text_id = "hud_int_hold_pick_up"
+	self.pickup_case.start_active = true
+	self.pickup_case.timer = 1
+	self.pickup_case.action_text_id = "hud_action_picking_up"
+	self.pickup_case.blocked_hint = "hint_case_pickup"
 end

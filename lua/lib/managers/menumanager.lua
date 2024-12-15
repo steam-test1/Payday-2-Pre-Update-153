@@ -1181,6 +1181,7 @@ function MenuManager:do_clear_progress()
 	managers.gage_assignment:reset()
 	managers.crimenet:reset_seed()
 	managers.custom_safehouse:reset()
+	managers.tango:reset()
 	if Global.game_settings.difficulty == "overkill_145" then
 		Global.game_settings.difficulty = "overkill"
 	end
@@ -1384,6 +1385,11 @@ function MenuCallbackHandler:dlc_buy_pim_pc()
 	Steam:overlay_activate("store", 545100)
 end
 
+function MenuCallbackHandler:dlc_buy_tango_pc()
+	print("[MenuCallbackHandler:dlc_buy_tango_pc]")
+	Steam:overlay_activate("store", 548420)
+end
+
 function MenuCallbackHandler:dlc_buy_ps3()
 	print("[MenuCallbackHandler:dlc_buy_ps3]")
 	managers.dlc:buy_product("dlc1")
@@ -1461,6 +1467,7 @@ end
 
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
+		"tango",
 		"pim",
 		"born",
 		"wild",
@@ -1630,6 +1637,10 @@ end
 
 function MenuCallbackHandler:visible_callback_pim()
 	return self:is_dlc_latest_locked("pim")
+end
+
+function MenuCallbackHandler:visible_callback_tango()
+	return self:is_dlc_latest_locked("tango")
 end
 
 function MenuCallbackHandler:not_has_all_dlcs()
@@ -2110,6 +2121,16 @@ function MenuCallbackHandler:change_resolution(item)
 		managers.viewport:set_resolution(old_resolution)
 		managers.viewport:set_aspect_ratio(old_resolution.x / old_resolution.y)
 	end)
+end
+
+function MenuCallbackHandler:toggle_throwable_contour(item)
+	local state = item:value() == "on"
+	managers.user:set_setting("throwable_contour", state, nil)
+end
+
+function MenuCallbackHandler:toggle_ammo_contour(item)
+	local state = item:value() == "on"
+	managers.user:set_setting("ammo_contour", state, nil)
 end
 
 function MenuCallbackHandler:choice_test(item)
@@ -6874,7 +6895,7 @@ function MenuCrimeNetSpecialInitiator:create_job(node, contract)
 		local player_stars = managers.experience:level_to_stars()
 		local max_jc = managers.job:get_max_jc_for_player()
 		local job_tweak = tweak_data.narrative:job_data(id)
-		local jc_lock = math.clamp(job_tweak.jc + (job_tweak.professional and 10 or 0), 0, 100)
+		local jc_lock = math.clamp(job_tweak.jc, 0, 100)
 		local min_stars = #tweak_data.narrative.STARS
 		for i, d in ipairs(tweak_data.narrative.STARS) do
 			if jc_lock <= d.jcs[1] then
@@ -7802,6 +7823,8 @@ function MenuOptionInitiator:modify_node(node)
 		return self:modify_options(node)
 	elseif node_name == "network_options" then
 		return self:modify_network_options(node)
+	elseif node_name == "gameplay_options" then
+		return self:modify_gameplay_options(node)
 	end
 end
 
@@ -8047,6 +8070,26 @@ function MenuOptionInitiator:modify_controls(node)
 		cs_item:set_value(managers.user:get_setting("enable_camera_sensitivity_separate") and "on" or "off")
 	end
 	node:item("toggle_fov_based_zoom"):set_value(managers.user:get_setting("enable_fov_based_sensitivity") and "on" or "off")
+	return node
+end
+
+function MenuOptionInitiator:modify_gameplay_options(node)
+	local option_value = "off"
+	local throwable_contour = node:item("toggle_throwable_contour")
+	if throwable_contour then
+		if managers.user:get_setting("throwable_contour") then
+			option_value = "on"
+		end
+		throwable_contour:set_value(option_value)
+	end
+	option_value = "off"
+	local ammo_contour = node:item("toggle_ammo_contour")
+	if ammo_contour then
+		if managers.user:get_setting("ammo_contour") then
+			option_value = "on"
+		end
+		ammo_contour:set_value(option_value)
+	end
 	return node
 end
 

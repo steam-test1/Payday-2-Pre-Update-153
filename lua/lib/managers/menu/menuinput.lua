@@ -595,34 +595,60 @@ function MenuInput:update(t, dt)
 					"menu_change_profile_left"
 				}
 				for _, button in ipairs(special_btns) do
-					if self._accept_input and self._controller and self._controller:get_input_pressed(button) and managers.menu:active_menu().renderer:special_btn_pressed(Idstring(button)) then
-						managers.menu:active_menu().renderer:disable_input(0.2)
-						break
+					if self._accept_input and self._controller then
+						if self._controller:get_input_pressed(button) then
+							if managers.menu:active_menu().renderer:special_btn_pressed(Idstring(button)) then
+								managers.menu:active_menu().renderer:disable_input(0.2)
+								break
+							end
+						elseif self._controller:get_input_released(button) and managers.menu:active_menu().renderer:special_btn_released(Idstring(button)) then
+							managers.menu:active_menu().renderer:disable_input(0.2)
+							break
+						end
 					end
 				end
 			end
 		end
-	elseif self._controller and managers.menu:active_menu().renderer.special_btn_pressed then
-		if self._controller:get_input_pressed("menu_toggle_voice_message") then
-			managers.menu:active_menu().renderer:special_btn_pressed(Idstring("voice_message"))
+	else
+		if self._controller and not managers.menu:active_menu().renderer.special_btn_released then
+			Application:error("Menu is missing special_btn_released function! Prepare for crashing!")
 		end
-		if self._controller:get_input_pressed("menu_modify_item") then
-			managers.menu:active_menu().renderer:special_btn_pressed(Idstring("menu_modify_item"))
-		end
-		if self._controller:get_input_pressed("menu_casino_bet") then
-			managers.menu:active_menu().renderer:special_btn_pressed(Idstring("start_bet"))
-		end
-		if self._controller:get_input_pressed("menu_challenge_claim") then
-			managers.menu:active_menu().renderer:special_btn_pressed(Idstring("menu_challenge_claim"))
-		end
-		if self._controller:get_input_pressed("toggle_chat") then
-			managers.menu:active_menu().renderer:special_btn_pressed(Idstring("toggle_chat"))
-		end
-		if self._controller:get_input_pressed("menu_toggle_pp_drawboard") then
-			managers.menu:active_menu().renderer:special_btn_pressed(Idstring("menu_toggle_pp_drawboard"))
-		end
-		if self._controller:get_input_pressed("menu_toggle_pp_breakdown") then
-			managers.menu:active_menu().renderer:special_btn_pressed(Idstring("menu_toggle_pp_breakdown"))
+		if self._controller and managers.menu:active_menu().renderer.special_btn_pressed then
+			if self._controller:get_input_pressed("menu_toggle_voice_message") then
+				managers.menu:active_menu().renderer:special_btn_pressed(Idstring("voice_message"))
+			elseif self._controller:get_input_released("menu_toggle_voice_message") then
+				managers.menu:active_menu().renderer:special_btn_released(Idstring("voice_message"))
+			end
+			if self._controller:get_input_pressed("menu_modify_item") then
+				managers.menu:active_menu().renderer:special_btn_pressed(Idstring("menu_modify_item"))
+			elseif self._controller:get_input_released("menu_modify_item") then
+				managers.menu:active_menu().renderer:special_btn_released(Idstring("menu_modify_item"))
+			end
+			if self._controller:get_input_pressed("menu_casino_bet") then
+				managers.menu:active_menu().renderer:special_btn_pressed(Idstring("start_bet"))
+			elseif self._controller:get_input_released("menu_casino_bet") then
+				managers.menu:active_menu().renderer:special_btn_released(Idstring("start_bet"))
+			end
+			if self._controller:get_input_pressed("menu_challenge_claim") then
+				managers.menu:active_menu().renderer:special_btn_pressed(Idstring("menu_challenge_claim"))
+			elseif self._controller:get_input_released("menu_challenge_claim") then
+				managers.menu:active_menu().renderer:special_btn_released(Idstring("menu_challenge_claim"))
+			end
+			if self._controller:get_input_pressed("toggle_chat") then
+				managers.menu:active_menu().renderer:special_btn_pressed(Idstring("toggle_chat"))
+			elseif self._controller:get_input_released("toggle_chat") then
+				managers.menu:active_menu().renderer:special_btn_released(Idstring("toggle_chat"))
+			end
+			if self._controller:get_input_pressed("menu_toggle_pp_drawboard") then
+				managers.menu:active_menu().renderer:special_btn_pressed(Idstring("menu_toggle_pp_drawboard"))
+			elseif self._controller:get_input_released("menu_toggle_pp_drawboard") then
+				managers.menu:active_menu().renderer:special_btn_released(Idstring("menu_toggle_pp_drawboard"))
+			end
+			if self._controller:get_input_pressed("menu_toggle_pp_breakdown") then
+				managers.menu:active_menu().renderer:special_btn_pressed(Idstring("menu_toggle_pp_breakdown"))
+			elseif self._controller:get_input_released("menu_toggle_pp_breakdown") then
+				managers.menu:active_menu().renderer:special_btn_released(Idstring("menu_toggle_pp_breakdown"))
+			end
 		end
 	end
 	if not self._keyboard_used and self._mouse_active and self._accept_input and not self._mouse_moved then

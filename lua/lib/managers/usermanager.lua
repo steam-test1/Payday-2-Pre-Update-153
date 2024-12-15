@@ -119,6 +119,8 @@ function GenericUserManager:setup_setting_map()
 	self:setup_setting(66, "crimenet_filter_contract", -1)
 	self:setup_setting(67, "crimenet_filter_kick", -1)
 	self:setup_setting(68, "crimenet_filter_safehouses", false)
+	self:setup_setting(73, "throwable_contour", false)
+	self:setup_setting(74, "ammo_contour", false)
 	self:setup_setting(75, "chromatic_setting", "standard")
 end
 
@@ -218,6 +220,16 @@ function GenericUserManager:reset_network_setting_map()
 		"net_packet_throttling",
 		"net_forwarding",
 		"net_use_compression"
+	}
+	for _, name in pairs(settings) do
+		self:set_setting(name, self:get_default_setting(name))
+	end
+end
+
+function GenericUserManager:reset_gameplay_setting_map()
+	local settings = {
+		"throwable_contour",
+		"ammo_contour"
 	}
 	for _, name in pairs(settings) do
 		self:set_setting(name, self:get_default_setting(name))

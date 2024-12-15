@@ -7,17 +7,20 @@ local make_fine_text = function(text)
 	return x, y, w, h
 end
 HUDPackageUnlockedItem = HUDPackageUnlockedItem or class()
+HUDPackageUnlockedItem.MIN_DISPLAYED = 2
+HUDPackageUnlockedItem.MAX_DISPLAYED = 2
 
 function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
+	local num_unlocks = math.clamp(params.unlocks, HUDPackageUnlockedItem.MIN_DISPLAYED, HUDPackageUnlockedItem.MAX_DISPLAYED)
 	self._panel = panel:panel({
 		w = panel:w() - 20,
-		h = panel:h() * 0.5 - 15 - 10,
+		h = panel:h() * (1 / num_unlocks) - 15 - 10,
 		x = 10,
 		y = 40,
 		alpha = 0
 	})
 	self._panel:move(0, self._panel:h() * (row - 1))
-	if 2 < row then
+	if row > HUDPackageUnlockedItem.MAX_DISPLAYED then
 		self._panel:hide()
 	end
 	local announcement = params.announcement
@@ -25,6 +28,7 @@ function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
 	local ghost_bonus = params.ghost_bonus
 	local gage_assignment = params.gage_assignment
 	local challenge_completed = params.challenge_completed
+	local tango_mission_completed = params.tango_mission
 	local bitmap_texture = "guis/textures/pd2/endscreen/test_icon_package"
 	local text_string = ""
 	local blend_mode = "normal"
@@ -118,6 +122,10 @@ function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
 		bitmap_texture = "guis/textures/pd2/endscreen/announcement"
 		blend_mode = "add"
 		text_string = managers.localization:to_upper_text("menu_es_challenge_completed", {})
+	elseif tango_mission_completed then
+		bitmap_texture = "guis/dlcs/tng/textures/pd2/blackmarket/icons/endscreen_icons/endscreen_gage_modpack"
+		blend_mode = "add"
+		text_string = managers.localization:to_upper_text("menu_es_tango_completed", {})
 	else
 		Application:debug("HUDPackageUnlockedItem: Something something unknown")
 	end
@@ -702,6 +710,29 @@ function HUDStageEndScreen:init(hud, workspace)
 			child:set_text(string.gsub(text, ":", ""))
 		end
 	end
+	local skip_panel = self._foreground_layer_safe:panel({
+		name = "skip_forepanel",
+		w = self._foreground_layer_safe:w() / 2 - 10,
+		h = self._foreground_layer_safe:h() / 2,
+		y = 70
+	})
+	local macros = {
+		BTN_SPEED = managers.localization:btn_macro("menu_challenge_claim", true)
+	}
+	if not managers.menu:is_pc_controller() then
+		macros.BTN_SPEED = managers.localization:get_default_macro("BTN_SWITCH_WEAPON")
+	end
+	self._skip_text = skip_panel:text({
+		name = "skip_text",
+		font = small_font,
+		font_size = small_font_size,
+		text = managers.localization:to_upper_text("menu_stageendscreen_speed_up", macros),
+		alpha = 0.5,
+		visible = false
+	})
+	make_fine_text(self._skip_text)
+	self._skip_text:set_right(skip_panel:w() - 10)
+	self._skip_text:set_bottom(skip_panel:h() - 10)
 end
 
 function HUDStageEndScreen:hide()
@@ -1151,6 +1182,19 @@ function HUDStageEndScreen:_check_special_packages()
 	local got_ghost = false
 	local row = 1
 	local ghost_package, gage_package, challenge_completed
+	local unlock_count = 0
+	if ghost_bonus_mul and 0 < ghost_bonus_mul then
+		unlock_count = unlock_count + 1
+	end
+	if self._tango_mission_completed then
+		unlock_count = unlock_count + 1
+	end
+	if self._gage_assignment then
+		unlock_count = unlock_count + 1
+	end
+	if self._challenge_completed then
+		unlock_count = unlock_count + 1
+	end
 	if ghost_bonus_mul and 0 < ghost_bonus_mul then
 		local ghost_bonus = math.round(ghost_bonus_mul * 100)
 		if ghost_bonus == 0 then
@@ -1158,20 +1202,28 @@ function HUDStageEndScreen:_check_special_packages()
 		else
 			ghost_string = tostring(math.abs(ghost_bonus))
 		end
-		ghost_package = HUDPackageUnlockedItem:new(self._package_forepanel, row, {ghost_bonus = ghost_string}, self)
+		ghost_package = HUDPackageUnlockedItem:new(self._package_forepanel, row, {ghost_bonus = ghost_string, unlocks = unlock_count}, self)
+		row = row + 1
+	end
+	local tango_completed
+	if self._tango_mission_completed then
+		tango_completed = HUDPackageUnlockedItem:new(self._package_forepanel, row, {tango_mission = true, unlocks = unlock_count}, self)
 		row = row + 1
 	end
 	if self._gage_assignment then
-		gage_package = HUDPackageUnlockedItem:new(self._package_forepanel, row, {gage_assignment = true}, self)
+		gage_package = HUDPackageUnlockedItem:new(self._package_forepanel, row, {gage_assignment = true, unlocks = unlock_count}, self)
 		row = row + 1
 	end
 	if self._challenge_completed then
-		challenge_completed = HUDPackageUnlockedItem:new(self._package_forepanel, row, {challenge_completed = true}, self)
+		challenge_completed = HUDPackageUnlockedItem:new(self._package_forepanel, row, {challenge_completed = true, unlocks = unlock_count}, self)
 		row = row + 1
 	end
 	local package_items = {}
 	if ghost_package and (not gage_package or not challenge_completed) then
 		table.insert(package_items, ghost_package)
+	end
+	if tango_completed then
+		table.insert(package_items, tango_completed)
 	end
 	if gage_package then
 		table.insert(package_items, gage_package)
@@ -1220,7 +1272,7 @@ function HUDStageEndScreen:_wait_for_video()
 	local fade_t = 1
 	local alpha = 0
 	while alive(video) and video:loop_count() == 0 do
-		local dt = coroutine.yield()
+		local dt = coroutine.yield() * (self._speed_up or 1)
 		time = time + dt
 		video:set_alpha(math.min(time, 1) * 0.2)
 	end
@@ -1235,6 +1287,9 @@ function HUDStageEndScreen:_wait_for_video()
 end
 
 function HUDStageEndScreen:stage_money_counter_init(t, dt)
+	if alive(self._skip_text) then
+		self._skip_text:set_visible(true)
+	end
 	local is_success = game_state_machine:current_state().is_success and game_state_machine:current_state():is_success()
 	self:_check_special_packages()
 	self._is_fail_video = not is_success
@@ -2009,18 +2064,22 @@ function HUDStageEndScreen:anim_count_experience(o, stat)
 	local dt
 	managers.menu_component:post_event("count_1_finished")
 	while o:left() < 0 do
-		dt = coroutine.yield()
+		dt = coroutine.yield() * (self._speed_up or 1)
 		o:move(o:w() * dt * 6, 0)
 		o:set_left(math.min(o:left(), 0))
 	end
-	wait(0.85)
+	local wait_t = 0.85
+	while 0 < wait_t do
+		dt = coroutine.yield() * (self._speed_up or 1)
+		wait_t = wait_t - dt
+	end
 	if 0 < stat then
 		managers.menu_component:post_event("zoom_in")
 	else
 		managers.menu_component:post_event("zoom_out")
 	end
 	while 0 < o:top() do
-		dt = coroutine.yield()
+		dt = coroutine.yield() * (self._speed_up or 1)
 		o:move(0, -o:h() * dt * 6)
 		o:set_top(math.max(o:top(), 0))
 		o:set_alpha(o:top() / o:h())
@@ -2040,7 +2099,7 @@ function HUDStageEndScreen:anim_count_experience(o, stat)
 	local st = 0.5
 	local t = st
 	while 0 < t do
-		dt = coroutine.yield()
+		dt = coroutine.yield() * (self._speed_up or 1)
 		t = t - dt
 		old_exp_text:move(dt * 5, -35 * dt)
 		old_exp_text:set_alpha(t / st)
@@ -2288,6 +2347,7 @@ function HUDStageEndScreen:stage_done(t, dt)
 		WalletGuiObject.set_object_visible("wallet_level_text", true)
 		WalletGuiObject.set_object_visible("wallet_skillpoint_icon", managers.skilltree:points() > 0)
 		WalletGuiObject.set_object_visible("wallet_skillpoint_text", managers.skilltree:points() > 0)
+		self._skip_text:set_visible(false)
 		self._done_clbk(true)
 		self._all_done = true
 	end
@@ -2361,8 +2421,8 @@ function HUDStageEndScreen:level_up(level)
 			end
 		end
 		self._package_forepanel:child("title_text"):set_text(managers.localization:to_upper_text("menu_es_package_unlocked_" .. (#new_items == 1 and "singular" or "plural")))
-		if 2 < #new_items then
-			Application:error("HUDStageEndScreen: Please, max 2 announcements+upgrades per level in tweak_data.level_tree, rest will not be shown in gui!")
+		if #new_items > HUDPackageUnlockedItem.MAX_DISPLAYED then
+			Application:error(string.format("HUDStageEndScreen: Please, max %i announcements+upgrades per level in tweak_data.level_tree, rest will not be shown in gui!", HUDPackageUnlockedItem.MAX_DISPLAYED))
 		end
 		over(0.42, function(p)
 			o:set_alpha(math.cos(652 * p) * math.rand(0.4, 0.8))
@@ -2373,14 +2433,15 @@ function HUDStageEndScreen:level_up(level)
 		o:set_alpha(1)
 		local row
 		for i, item in ipairs(new_items) do
-			row = i % 2
+			row = i % HUDPackageUnlockedItem.MAX_DISPLAYED
 			if self._package_items[row] then
 				wait(0.23)
 				self._package_items[row]:close()
 				self._package_items[row] = nil
 				wait(0.33)
 			end
-			self._package_items[row] = HUDPackageUnlockedItem:new(o, 2 - row, item, self)
+			item.unlocks = #new_items
+			self._package_items[row] = HUDPackageUnlockedItem:new(o, math.clamp(item.unlocks, HUDPackageUnlockedItem.MIN_DISPLAYED, HUDPackageUnlockedItem.MAX_DISPLAYED) - row, item, self)
 			wait(0.27)
 		end
 	end
@@ -2456,7 +2517,8 @@ function HUDStageEndScreen:update(t, dt)
 	end
 	if self._update_skill_points then
 		self._update_skill_points = nil
-		local skill_point_text_func = function(o, text)
+		
+		local function skill_point_text_func(o, text)
 			local center_x, center_y = o:center()
 			local content_font_size = tweak_data.menu.pd2_small_font_size
 			local start_font_size = o:font_size()
@@ -2479,12 +2541,13 @@ function HUDStageEndScreen:update(t, dt)
 			local t = 0
 			local dt = 0
 			while true do
-				dt = coroutine.yield()
+				dt = coroutine.yield() * (self._speed_up or 1)
 				t = (t + dt * 90) % 180
 				local color = math.lerp(tweak_data.screen_colors.text, tweak_data.screen_colors.resource, math.clamp(math.sin(t), 0, 1))
 				o:set_color(color)
 			end
 		end
+		
 		local animate_new_skillpoints = function(o)
 			while true do
 				over(1, function(p)
@@ -2516,6 +2579,13 @@ function HUDStageEndScreen:update(t, dt)
 		self._lp_sp_gain:set_visible(visible)
 		self._lp_sp_info:set_visible(visible)
 	end
+	if alive(self._skip_text) then
+		local a = 0.75 + math.abs(math.sin(t * 120) * 0.25)
+		if self._speed_up and self._speed_up > 1 then
+			a = 0
+		end
+		self._skip_text:set_alpha(a)
+	end
 end
 
 function HUDStageEndScreen:set_continue_button_text(text)
@@ -2536,6 +2606,7 @@ function HUDStageEndScreen:set_special_packages(params)
 	self._challenge_completed = params.challenge_completed
 	self._gage_assignment = params.gage_assignment
 	self._ghost_bonus = params.ghost_bonus
+	self._tango_mission_completed = params.tango_mission_completed
 	self:_check_special_packages()
 end
 
@@ -2559,7 +2630,7 @@ function HUDStageEndScreen:animate_level_progress(o, data)
 			self._lp_xp_gain:set_text(managers.money:add_decimal_marks_to_string(math.floor(tostring(gained_xp))))
 			self._lp_xp_nl:set_text(managers.money:add_decimal_marks_to_string(math.floor(tostring(total_xp - xp))))
 			while true do
-				dt = coroutine.yield()
+				dt = coroutine.yield() * (self._speed_up or 1)
 				diff_xp = xp
 				xp = math.min(xp + dt * total_xp * 0.2 * speed, end_xp)
 				diff_xp = xp - diff_xp
@@ -2587,7 +2658,7 @@ function HUDStageEndScreen:animate_level_progress(o, data)
 					self._skip = nil
 					return
 				end
-				dt = coroutine.yield()
+				dt = coroutine.yield() * (self._speed_up or 1)
 				time = time - dt
 				if time <= 0 then
 					return

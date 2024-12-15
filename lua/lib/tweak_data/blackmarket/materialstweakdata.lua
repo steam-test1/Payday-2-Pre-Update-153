@@ -1266,6 +1266,32 @@ function BlackMarketTweakData:_init_materials(tweak_data)
 	self.materials.wheel.texture = "units/pd2_dlc_pim/masks/materials/matcap_wheel_df"
 	self.materials.wheel.value = 0
 	self.materials.wheel.dlc = "pim"
+	self.materials.army_deep_green = {}
+	self.materials.army_deep_green.name_id = "bm_mtl_army_deep_green"
+	self.materials.army_deep_green.pcs = {}
+	self.materials.army_deep_green.texture = "units/pd2_dlc_tng/masks/materials/matcap_army_deep_green_df"
+	self.materials.army_deep_green.value = 0
+	self.materials.army_deep_green.dlc = "tango"
+	self.materials.ranger_black = {}
+	self.materials.ranger_black.name_id = "bm_mtl_ranger_black"
+	self.materials.ranger_black.pcs = {}
+	self.materials.ranger_black.texture = "units/pd2_dlc_tng/masks/materials/matcap_ranger_black_df"
+	self.materials.ranger_black.value = 0
+	self.materials.ranger_black.dlc = "tango"
+	self.materials.digital_camo = {}
+	self.materials.digital_camo.name_id = "bm_mtl_digital_camo"
+	self.materials.digital_camo.pcs = {}
+	self.materials.digital_camo.texture = "units/pd2_dlc_tng/masks/materials/matcap_digital_camo_df"
+	self.materials.digital_camo.value = 0
+	self.materials.digital_camo.material_amount = 0
+	self.materials.digital_camo.dlc = "tango"
+	self.materials.midnight_camo = {}
+	self.materials.midnight_camo.name_id = "bm_mtl_midnight_camo"
+	self.materials.midnight_camo.pcs = {}
+	self.materials.midnight_camo.texture = "units/pd2_dlc_tng/masks/materials/matcap_midnight_camo_df"
+	self.materials.midnight_camo.value = 0
+	self.materials.midnight_camo.material_amount = 0
+	self.materials.midnight_camo.dlc = "tango"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.materials) do
 		if free_dlcs[data.dlc] then

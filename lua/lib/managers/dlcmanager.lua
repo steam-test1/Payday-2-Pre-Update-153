@@ -399,6 +399,10 @@ function GenericDLCManager:has_solus_clan()
 	return self:is_dlc_unlocked("solus_clan")
 end
 
+function GenericDLCManager:has_tango()
+	return self:is_dlc_unlocked("tango")
+end
+
 function GenericDLCManager:has_goty_all_dlc_bundle_2014()
 	return self:has_goty_weapon_bundle_2014() and self:has_goty_heist_bundle_2014() and self:is_dlcs_unlocked({
 		"character_pack_clover"
@@ -1183,6 +1187,7 @@ function WINDLCManager:init()
 			gotti_bundle = {app_id = "218620", no_install = true},
 			nyck_bundle = {app_id = "218620", no_install = true},
 			urf_bundle = {app_id = "218620", no_install = true},
+			tango = {app_id = "548420", no_install = true},
 			pd2_clan = {
 				source_id = "103582791433980119"
 			},

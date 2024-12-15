@@ -2585,6 +2585,46 @@ function SkillTreeTweakData:init()
 		},
 		{
 			name_id = "menu_st_skill_switch_5",
+			locks = {level = 100}
+		},
+		{
+			name_id = "menu_st_skill_switch_6",
+			locks = {level = 100}
+		},
+		{
+			name_id = "menu_st_skill_switch_7",
+			locks = {level = 100}
+		},
+		{
+			name_id = "menu_st_skill_switch_8",
+			locks = {level = 100}
+		},
+		{
+			name_id = "menu_st_skill_switch_9",
+			locks = {level = 100}
+		},
+		{
+			name_id = "menu_st_skill_switch_10",
+			locks = {level = 100}
+		},
+		{
+			name_id = "menu_st_skill_switch_11",
+			locks = {level = 100}
+		},
+		{
+			name_id = "menu_st_skill_switch_12",
+			locks = {level = 100}
+		},
+		{
+			name_id = "menu_st_skill_switch_13",
+			locks = {level = 100}
+		},
+		{
+			name_id = "menu_st_skill_switch_14",
+			locks = {level = 100}
+		},
+		{
+			name_id = "menu_st_skill_switch_15",
 			locks = {level = 100, achievement = "frog_1"}
 		}
 	}

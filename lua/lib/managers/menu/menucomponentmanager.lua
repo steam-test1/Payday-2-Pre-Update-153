@@ -28,6 +28,7 @@ require("lib/managers/menu/pages/CustomSafehouseGuiPageDaily")
 require("lib/managers/menu/pages/CustomSafehouseGuiPageTrophies")
 require("lib/managers/menu/MutatorsListGui")
 require("lib/managers/menu/pages/MutatorsCategoryPage")
+require("lib/managers/menu/NewHeistsGui")
 MenuComponentManager = MenuComponentManager or class()
 
 function MenuComponentManager:init()
@@ -179,6 +180,18 @@ function MenuComponentManager:init()
 	self._active_components.custom_safehouse_no_input = {
 		create = callback(self, self, "disable_custom_safehouse_input"),
 		close = callback(self, self, "enable_custom_safehouse_input")
+	}
+	self._active_components.custom_safehouse_primaries = {
+		create = callback(self, self, "create_custom_safehouse_primaries"),
+		close = callback(self, self, "close_custom_safehouse_primaries")
+	}
+	self._active_components.custom_safehouse_secondaries = {
+		create = callback(self, self, "create_custom_safehouse_secondaries"),
+		close = callback(self, self, "close_custom_safehouse_secondaries")
+	}
+	self._active_components.new_heists = {
+		create = callback(self, self, "create_new_heists_gui"),
+		close = callback(self, self, "close_new_heists_gui")
 	}
 	self._active_components.mutators_list = {
 		create = callback(self, self, "create_mutators_list_gui"),
@@ -910,6 +923,19 @@ function MenuComponentManager:special_btn_pressed(...)
 		return true
 	end
 	local used, values = self:run_return_on_all_live_components("special_btn_pressed", ...)
+	if used then
+		return unpack(values)
+	end
+end
+
+function MenuComponentManager:special_btn_released(...)
+	if self._game_chat_gui and self._game_chat_gui:input_focus() == true then
+		return true
+	end
+	if self._stage_endscreen_gui and self._stage_endscreen_gui:special_btn_released(...) then
+		return true
+	end
+	local used, values = self:run_return_on_all_live_components("special_btn_released", ...)
 	if used then
 		return unpack(values)
 	end
@@ -2806,7 +2832,7 @@ function MenuComponentManager:create_weapon_mod_icon_list(weapon, category, fact
 	local icon_list = {}
 	local mods_all = managers.blackmarket:get_dropable_mods_by_weapon_id(weapon)
 	local crafted = managers.blackmarket:get_crafted_category(category)[slot]
-	local instance_ids = managers.blackmarket:get_cosmetics_instances_by_weapon_id(weapon)
+	local cosmetics_ids = managers.blackmarket:get_cosmetics_by_weapon_id(weapon)
 	if table.size(mods_all) > 0 then
 		local weapon_factory_tweak_data = tweak_data.weapon.factory.parts
 		local mods_equip = deep_clone(managers.blackmarket:get_weapon_blueprint(category, slot))
@@ -2844,7 +2870,7 @@ function MenuComponentManager:create_weapon_mod_icon_list(weapon, category, fact
 		table.sort(mods_sorted, function(x, y)
 			return y < x
 		end)
-		if 0 < #instance_ids then
+		if table.size(cosmetics_ids) > 0 then
 			types.weapon_cosmetics = true
 			table.insert(mods_sorted, "weapon_cosmetics")
 		end
@@ -3747,5 +3773,95 @@ function MenuComponentManager:destroy_test_gui()
 	if alive(Global.test_gui) then
 		Overlay:gui():destroy_workspace(Global.test_gui)
 		Global.test_gui = nil
+	end
+end
+
+function MenuComponentManager:create_custom_safehouse_primaries(node)
+	self:create_ingame_custom_safehouse_menu(node, "primaries")
+end
+
+function MenuComponentManager:create_custom_safehouse_secondaries(node)
+	self:create_ingame_custom_safehouse_menu(node, "secondaries")
+end
+
+function MenuComponentManager:create_ingame_custom_safehouse_menu(node, category)
+	if not node then
+		return
+	end
+	category = category or "primaries"
+	local crafted_category = managers.blackmarket:get_crafted_category(category) or {}
+	local new_node_data = {category = category}
+	local rows = tweak_data.gui.WEAPON_ROWS_PER_PAGE or 3
+	local columns = tweak_data.gui.WEAPON_COLUMNS_PER_PAGE or 3
+	local max_pages = tweak_data.gui.MAX_WEAPON_PAGES or 8
+	local items_per_page = rows * columns
+	local item_data, selected_tab
+	for page = 1, max_pages do
+		local index = 1
+		local start_i = 1 + items_per_page * (page - 1)
+		item_data = {}
+		for i = start_i, items_per_page * page do
+			item_data[index] = i
+			index = index + 1
+			if crafted_category[i] and crafted_category[i].equipped then
+				selected_tab = page
+			end
+		end
+		local name_id = managers.localization:to_upper_text("bm_menu_page", {
+			page = tostring(page)
+		})
+		local data = {
+			name = category,
+			category = category,
+			prev_node_data = false,
+			start_i = start_i,
+			allow_preview = false,
+			allow_sell = false,
+			allow_modify = false,
+			allow_skinning = false,
+			allow_buy = false,
+			equip_immediately = false,
+			name_localized = name_id,
+			on_create_func_name = "populate_weapon_category_new",
+			on_create_data = item_data,
+			identifier = BlackMarketGui.identifiers.weapon,
+			override_slots = {columns, rows}
+		}
+		table.insert(new_node_data, data)
+	end
+	new_node_data.can_move_over_tabs = true
+	new_node_data.selected_tab = selected_tab
+	new_node_data.scroll_tab_anywhere = true
+	new_node_data.topic_id = "bm_menu_" .. category
+	new_node_data.topic_params = {
+		weapon_category = managers.localization:text("bm_menu_weapons")
+	}
+	managers.menu:open_node("blackmarket_node", {new_node_data})
+end
+
+function MenuComponentManager:close_custom_safehouse_primaries()
+	self:close_custom_safehouse_menu("primaries")
+end
+
+function MenuComponentManager:close_custom_safehouse_secondaries()
+	self:close_custom_safehouse_menu("secondaries")
+end
+
+function MenuComponentManager:close_custom_safehouse_menu(category)
+end
+
+function MenuComponentManager:create_new_heists_gui(node)
+	if not node then
+		return
+	end
+	self._new_heists_gui = self._new_heists_gui or NewHeistsGui:new(self._ws, self._fullscreen_ws, node)
+	self:register_component("new_heists", self._new_heists_gui)
+end
+
+function MenuComponentManager:close_new_heists_gui()
+	if self._new_heists_gui then
+		self._new_heists_gui:close()
+		self._new_heists_gui = nil
+		self:unregister_component("new_heists")
 	end
 end

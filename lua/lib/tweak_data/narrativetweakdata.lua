@@ -4,6 +4,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.STARS = {}
 	self.STARS[1] = {
 		jcs = {
+			70,
 			60,
 			50,
 			40,

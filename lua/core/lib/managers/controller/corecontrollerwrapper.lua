@@ -793,9 +793,11 @@ function ControllerWrapper:get_input_axis_clbk(connection_name, func)
 		id_strings[connection_name] = id
 	end
 	local connection = self._setup:get_connection(connection_name)
+	local unscaled_axis = Vector3()
 	
 	local function f(axis_id, controller_name, axis)
-		func(self:get_modified_axis(connection_name, connection, axis))
+		mvector3.set(unscaled_axis, axis)
+		func(self:get_modified_axis(connection_name, connection, axis), self:get_unscaled_axis(connection_name, connection, unscaled_axis))
 	end
 	
 	self._virtual_controller:add_axis_trigger(id, f)
@@ -821,6 +823,14 @@ function ControllerWrapper:get_input_axis(connection_name)
 		self._input_axis_cache[connection_name] = cache
 	end
 	return cache
+end
+
+function ControllerWrapper:get_unscaled_axis(connection_name, connection, axis)
+	local inversion = connection.get_inversion and connection:get_inversion()
+	if inversion then
+		mvector3.set_static(axis, mvector3.x(axis) * inversion.x, mvector3.y(axis) * inversion.y, mvector3.z(axis) * inversion.z)
+	end
+	return axis
 end
 
 function ControllerWrapper:get_modified_axis(connection_name, connection, axis)

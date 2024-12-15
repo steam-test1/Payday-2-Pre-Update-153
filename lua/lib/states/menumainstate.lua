@@ -103,6 +103,7 @@ function MenuMainState:at_enter(old_state)
 				managers.menu:show_question_new_safehouse({yes_func = yes_func})
 			end
 		end
+		managers.tango:attempt_announce_tango_weapon()
 	end
 	if Global.savefile_manager.backup_save_enabled then
 		managers.savefile:save_progress("local_hdd")

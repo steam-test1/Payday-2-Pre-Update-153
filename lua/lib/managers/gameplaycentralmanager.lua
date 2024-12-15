@@ -604,8 +604,9 @@ function GamePlayCentralManager:auto_highlight_enemy(unit, use_player_upgrades, 
 		if unit:base().get_type and unit:base():get_type() == "swat_turret" then
 			contour_type = "mark_unit_dangerous_damage_bonus"
 		end
-	else
-		contour_type = use_trip_mine_upgrades and managers.player:has_category_upgrade("trip_mine", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or contour_type
+	elseif use_trip_mine_upgrades then
+		contour_type = managers.player:has_category_upgrade("trip_mine", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or contour_type
+		time_multiplier = managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1)
 	end
 	unit:contour():add(contour_type, true, time_multiplier)
 	return true

@@ -571,6 +571,10 @@ function MenuLobbyRenderer:special_btn_pressed(...)
 	return managers.menu_component:special_btn_pressed(...)
 end
 
+function MenuLobbyRenderer:special_btn_released(...)
+	return managers.menu_component:special_btn_released(...)
+end
+
 function MenuLobbyRenderer:back_pressed(...)
 	return MenuRenderer.back_pressed(self, ...)
 end

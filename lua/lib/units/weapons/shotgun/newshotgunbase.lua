@@ -198,6 +198,10 @@ function NewShotgunBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, s
 		end
 		NewShotgunBase.super._fire_raycast(self, user_unit, from_pos, center_ray.ray, dmg_mul, shoot_player, 0, autohit_mul, suppr_mul, shoot_through_data)
 	end
+	local kill_data = {}
+	kill_data.kills = 0
+	kill_data.headshots = 0
+	kill_data.civilian_kills = 0
 	for _, col_ray in pairs(hit_enemies) do
 		local damage = self:get_damage_falloff(damage, col_ray, user_unit)
 		if 0 < damage then
@@ -211,6 +215,13 @@ function NewShotgunBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, s
 			my_result = managers.mutators:modify_value("NewShotgunBase:_fire_raycast", my_result)
 			if my_result and my_result.type == "death" then
 				managers.game_play_central:do_shotgun_push(col_ray.unit, col_ray.position, col_ray.ray, col_ray.distance, user_unit)
+				kill_data.kills = kill_data.kills + 1
+				if col_ray.body and col_ray.body:name() == Idstring("head") then
+					kill_data.headshots = kill_data.headshots + 1
+				end
+				if col_ray.unit and col_ray.unit:base() and (col_ray.unit:base()._tweak_table == "civilian" or col_ray.unit:base()._tweak_table == "civilian_female") then
+					kill_data.civilian_kills = kill_data.civilian_kills + 1
+				end
 			end
 		end
 	end
@@ -232,12 +243,51 @@ function NewShotgunBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, s
 			weapon_unit = self._unit
 		})
 	end
-	for _, _ in pairs(hit_enemies) do
+	for _, d in pairs(hit_enemies) do
 		managers.statistics:shot_fired({
 			hit = true,
 			weapon_unit = self._unit,
 			skip_bullet_count = true
 		})
+	end
+	print("total amount of kills:    ", kill_data.kills)
+	print("total amount of headshots:", kill_data.headshots)
+	print("amount of civ kills:      ", kill_data.civilian_kills)
+	print("amount of enemy kills:    ", kill_data.kills - kill_data.civilian_kills)
+	print("amount of enemy headshots:", kill_data.headshots - kill_data.civilian_kills)
+	for key, data in pairs(tweak_data.achievement.shotgun_single_shot_kills) do
+		if data.headshot and kill_data.headshots - kill_data.civilian_kills >= data.count or kill_data.kills - kill_data.civilian_kills >= data.count then
+			local should_award = true
+			if data.blueprint then
+				local missing_parts = false
+				for _, part_or_parts in ipairs(data.blueprint) do
+					if type(part_or_parts) == "string" then
+						if not table.contains(self._blueprint or {}, part_or_parts) then
+							missing_parts = true
+							break
+						end
+					else
+						local found_part = false
+						for _, part in ipairs(part_or_parts) do
+							if table.contains(self._blueprint or {}, part) then
+								found_part = true
+								break
+							end
+						end
+						if not found_part then
+							missing_parts = true
+							break
+						end
+					end
+				end
+				if missing_parts then
+					should_award = false
+				end
+			end
+			if should_award then
+				managers.achievment:_award_achievement(data, key)
+			end
+		end
 	end
 	return result
 end

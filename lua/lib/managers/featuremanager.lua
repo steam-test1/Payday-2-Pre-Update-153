@@ -21,6 +21,7 @@ function FeatureManager:_setup()
 	self._default.announcements.short_heist = 1
 	self._default.announcements.short_heists_available = 1
 	self._default.announcements.safehouse_dailies = 1
+	self._default.announcements.tango_weapon_unlocked = 1
 	if not Global.feature_manager then
 		Global.feature_manager = {}
 		Global.feature_manager.announcements = {}
@@ -271,5 +272,11 @@ function FeatureManager:safehouse_dailies()
 		title = "menu_cs_daily_title",
 		text = "menu_cs_daily_desc"
 	})
+	return true
+end
+
+function FeatureManager:tango_weapon_unlocked()
+	print("FeatureManager:tango_weapon_unlocked()")
+	managers.tango:announce_tango_weapon()
 	return true
 end

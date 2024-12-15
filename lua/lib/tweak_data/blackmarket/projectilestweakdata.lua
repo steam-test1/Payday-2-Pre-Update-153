@@ -134,6 +134,21 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 	self.projectiles.launcher_frag_china.weapon_id = "china"
 	self.projectiles.launcher_incendiary_china = deep_clone(self.projectiles.launcher_incendiary)
 	self.projectiles.launcher_incendiary_china.weapon_id = "china"
+	self.projectiles.launcher_frag_arbiter = {}
+	self.projectiles.launcher_frag_arbiter.name_id = "bm_launcher_frag"
+	self.projectiles.launcher_frag_arbiter.unit = "units/pd2_dlc_tng/weapons/wpn_arbiter_frag_grenade/wpn_arbiter_frag_grenade"
+	self.projectiles.launcher_frag_arbiter.weapon_id = "arbiter"
+	self.projectiles.launcher_frag_arbiter.no_cheat_count = true
+	self.projectiles.launcher_frag_arbiter.impact_detonation = true
+	self.projectiles.launcher_frag_arbiter.time_cheat = 0.2
+	self.projectiles.launcher_frag_arbiter.adjust_z = 0
+	self.projectiles.launcher_incendiary_arbiter = {}
+	self.projectiles.launcher_incendiary_arbiter.name_id = "bm_launcher_incendiary"
+	self.projectiles.launcher_incendiary_arbiter.unit = "units/pd2_dlc_tng/weapons/wpn_arbiter_frag_incendiary_grenade/wpn_arbiter_frag_incendiary_grenade"
+	self.projectiles.launcher_incendiary_arbiter.weapon_id = "arbiter"
+	self.projectiles.launcher_incendiary_arbiter.no_cheat_count = true
+	self.projectiles.launcher_incendiary_arbiter.impact_detonation = true
+	self.projectiles.launcher_incendiary_arbiter.time_cheat = 0.2
 	self.projectiles.west_arrow = {}
 	self.projectiles.west_arrow.name_id = "bm_launcher_frag"
 	self.projectiles.west_arrow.unit = "units/pd2_dlc_west/weapons/wpn_prj_west_arrow/wpn_prj_west_arrow"
@@ -346,7 +361,9 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 		"wpn_prj_hur",
 		"wpn_prj_target",
 		"frag_com",
-		"concussion"
+		"concussion",
+		"launcher_frag_arbiter",
+		"launcher_incendiary_arbiter"
 	}
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.projectiles) do

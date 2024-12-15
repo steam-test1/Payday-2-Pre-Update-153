@@ -851,6 +851,20 @@ function BlackMarketGuiSlotItem:init(main_panel, data, x, y, w, h)
 		text:move(0, text:h() / 2 - text:font_size() / 2)
 		text:set_vertical("top")
 		self._text_in_mid = true
+	elseif data.corner_text and type(data.corner_text) == "table" then
+		self._panel:text({
+			name = "corner_text",
+			text = data.corner_text.no_upper and data.corner_text.noselected_text or utf8.to_upper(data.corner_text.noselected_text),
+			align = data.corner_text.align or "center",
+			vertical = data.corner_text.vertical or "bottom",
+			font_size = data.corner_text.font_size or tiny_font_size,
+			font = data.corner_text.font or small_font,
+			color = data.corner_text.noselected_color or Color.red,
+			blend_mode = data.corner_text.blend_mode or "add",
+			layer = 2,
+			wrap = true,
+			word_wrap = true
+		})
 	end
 	local animate_loading_texture = function(o)
 		o:set_render_template(Idstring("VertexColorTexturedRadial"))
@@ -2384,6 +2398,13 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				name = "bm_menu_buy_dlc",
 				callback = callback(self, self, "show_buy_dlc_callback")
 			},
+			bw_preview_mods = {
+				prio = 2,
+				btn = "BTN_Y",
+				pc_btn = "menu_preview_item_alt",
+				name = "bm_menu_preview_mods",
+				callback = callback(self, self, "preview_weapon_mods_callback")
+			},
 			mt_choose = {
 				prio = 1,
 				btn = "BTN_A",
@@ -2454,6 +2475,13 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				name = "bm_menu_btn_buy_mod",
 				callback = callback(self, self, "purchase_weapon_mod_callback")
 			},
+			wm_clear_mod_preview = {
+				prio = 3,
+				btn = "BTN_Y",
+				pc_btn = "menu_preview_item_alt",
+				name = "bm_menu_btn_clear_mod_preview",
+				callback = callback(self, self, "clear_weapon_mod_preview_callback")
+			},
 			wcc_equip = {
 				prio = 1,
 				btn = "BTN_A",
@@ -2488,6 +2516,20 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				pc_btn = nil,
 				name = "bm_menu_btn_buy_new_weapon",
 				callback = callback(self, self, "buy_equip_weapon_cosmetics_callback")
+			},
+			wcc_cancel_preview = {
+				prio = 4,
+				btn = "BTN_STICK_R",
+				pc_btn = "menu_preview_item",
+				name = "bm_menu_btn_stop_preview_weapon_cosmetic",
+				callback = callback(self, self, "cancel_preview_cosmetic_on_weapon_callback")
+			},
+			wcc_market = {
+				prio = 5,
+				btn = "BTN_X",
+				pc_btn = "menu_remove_item",
+				name = "bm_menu_btn_buy_tradable",
+				callback = callback(self, self, "purchase_market_cosmetic_on_weapon_callback")
 			},
 			it_wcc_choose_equip = {
 				prio = 1,
@@ -3110,6 +3152,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 					percent = false
 				}
 			}
+			table.insert(self._stats_shown, {name = "reload", inverted = true})
 			self._stats_panel = self._weapon_info_panel:panel({
 				layer = 1,
 				x = 10,
@@ -5041,6 +5084,7 @@ function BlackMarketGui:update_info_text()
 			end
 			if not slot_data.unlocked then
 				local skill_based = slot_data.skill_based
+				local func_based = slot_data.func_based
 				local level_based = slot_data.level and 0 < slot_data.level
 				local dlc_based = tweak_data.lootdrop.global_values[slot_data.global_value] and tweak_data.lootdrop.global_values[slot_data.global_value].dlc and not managers.dlc:is_dlc_unlocked(slot_data.global_value)
 				local part_dlc_locked = slot_data.part_dlc_lock
@@ -5048,17 +5092,28 @@ function BlackMarketGui:update_info_text()
 				local level_text_id = level_based and "bm_menu_level_req" or false
 				local dlc_text_id = dlc_based and slot_data.dlc_locked or false
 				local part_dlc_text_id = part_dlc_locked and "bm_menu_part_dlc_locked"
+				local funclock_text_id = false
+				if func_based then
+					local unlocked, text_id = BlackMarketGui.get_func_based(func_based)
+					if not unlocked then
+						funclock_text_id = text_id
+					end
+				end
 				local text = ""
 				if slot_data.install_lock then
 					text = text .. managers.localization:to_upper_text(slot_data.install_lock, {}) .. "\n"
-				elseif skill_text_id then
-					text = text .. managers.localization:to_upper_text(skill_text_id, {
-						slot_data.name_localized
-					}) .. "\n"
 				elseif dlc_text_id then
 					text = text .. managers.localization:to_upper_text(dlc_text_id, {}) .. "\n"
 				elseif part_dlc_text_id then
 					text = text .. managers.localization:to_upper_text(part_dlc_text_id, {}) .. "\n"
+				elseif funclock_text_id then
+					text = text .. managers.localization:to_upper_text(funclock_text_id, {
+						slot_data.name_localized
+					}) .. "\n"
+				elseif skill_text_id then
+					text = text .. managers.localization:to_upper_text(skill_text_id, {
+						slot_data.name_localized
+					}) .. "\n"
 				elseif level_text_id then
 					text = text .. managers.localization:to_upper_text(level_text_id, {
 						level = slot_data.level
@@ -5306,7 +5361,7 @@ function BlackMarketGui:update_info_text()
 			updated_texts[2].text = updated_texts[2].text .. "##" .. managers.localization:to_upper_text("bm_menu_item_amount", {
 				amount = tostring(math.abs(unlocked))
 			}) .. "##"
-			table.insert(resource_colors, tweak_data.screen_colors.text)
+			table.insert(resource_colors, 0 < math.abs(unlocked) and tweak_data.screen_colors.text or tweak_data.screen_colors.important_1)
 		end
 		if #resource_colors == 1 then
 			updated_texts[2].resource_color = resource_colors[1]
@@ -5396,14 +5451,20 @@ function BlackMarketGui:update_info_text()
 			return weapon_mods[part_id]
 		end
 		local forbidden_parts = get_forbids(weapon_id, part_id)
+		local droppable_mods = managers.blackmarket:get_dropable_mods_by_weapon_id(prev_data.name)
 		if slot_data.removes and 0 < #slot_data.removes then
 			local removed_mods = ""
 			for i, name in ipairs(slot_data.removes) do
-				local mod_name = tweak_data.weapon.factory.parts[name] and tweak_data.weapon.factory.parts[name].name_id or name
-				mod_name = managers.localization:text(mod_name)
-				removed_mods = string.format("%s%s%s", removed_mods, 1 < i and ", " or "", mod_name)
+				local mod_data = tweak_data.weapon.factory.parts[name]
+				if droppable_mods[mod_data.type] then
+					local mod_name = mod_data and mod_data.name_id or name
+					mod_name = managers.localization:text(mod_name)
+					removed_mods = string.format("%s%s%s", removed_mods, 1 < i and ", " or "", mod_name)
+				end
 			end
-			updated_texts[5].text = managers.localization:to_upper_text("bm_mod_equip_remove", {mod = removed_mods})
+			if 0 < #removed_mods then
+				updated_texts[5].text = managers.localization:to_upper_text("bm_mod_equip_remove", {mod = removed_mods})
+			end
 		elseif forbidden_parts and 0 < #forbidden_parts then
 			local forbids = {}
 			for i, forbidden_part in ipairs(forbidden_parts) do
@@ -5414,22 +5475,24 @@ function BlackMarketGui:update_info_text()
 			end
 			local text = ""
 			for category, amount in pairs(forbids) do
-				if text ~= "" then
-					text = text .. "\n"
-				end
-				local category_count = 0
-				local weapon_data = tweak_data.weapon.factory[weapon_id]
-				for _, part_name in ipairs(weapon_data.uses_parts) do
-					local part_data = tweak_data.weapon.factory.parts[part_name]
-					if part_data and not part_data.unatainable and part_data.type == category and not table.contains(weapon_data.default_blueprint, part_name) then
-						category_count = category_count + 1
+				if droppable_mods[category] then
+					if text ~= "" then
+						text = text .. "\n"
 					end
+					local category_count = 0
+					local weapon_data = tweak_data.weapon.factory[weapon_id]
+					for _, part_name in ipairs(weapon_data.uses_parts) do
+						local part_data = tweak_data.weapon.factory.parts[part_name]
+						if part_data and not part_data.unatainable and part_data.type == category and not table.contains(weapon_data.default_blueprint, part_name) then
+							category_count = category_count + 1
+						end
+					end
+					local percent_forbidden = amount / category_count
+					local category = managers.localization:text("bm_menu_" .. tostring(category) .. "_plural")
+					local quantifier = percent_forbidden == 1 and "all" or 0.66 < percent_forbidden and "most" or "some"
+					quantifier = managers.localization:text("bm_mod_incompatibility_" .. tostring(quantifier))
+					text = managers.localization:to_upper_text("bm_mod_incompatibilities", {quantifier = quantifier, category = category})
 				end
-				local percent_forbidden = amount / category_count
-				local category = managers.localization:text("bm_menu_" .. tostring(category) .. "_plural")
-				local quantifier = percent_forbidden == 1 and "all" or 0.66 < percent_forbidden and "most" or "some"
-				quantifier = managers.localization:text("bm_mod_incompatibility_" .. tostring(quantifier))
-				text = managers.localization:to_upper_text("bm_mod_incompatibilities", {quantifier = quantifier, category = category})
 			end
 			updated_texts[5].text = text
 		end
@@ -5619,6 +5682,14 @@ function BlackMarketGui:update_info_text()
 		updated_texts[1].resource_color = tweak_data.screen_colors.text
 		if slot_data.weapon_id then
 			updated_texts[2].text = managers.weapon_factory:get_weapon_name_by_weapon_id(slot_data.weapon_id)
+		end
+		if not slot_data.unlocked then
+			local safe = self:get_safe_for_cosmetic(slot_data.name)
+			safe = safe and safe.name_id or "invalid skin"
+			local macros = {
+				safe = managers.localization:text(safe)
+			}
+			updated_texts[5].text = (slot_data.default_blueprint and "" or "\n") .. managers.localization:text("bm_menu_wcc_not_owned", macros)
 		end
 		updated_texts[4].resource_color = {}
 		if slot_data.cosmetic_rarity then
@@ -7019,11 +7090,16 @@ function BlackMarketGui:get_lock_icon(data, default)
 	local unlocked = data.unlocked
 	local level = data.level
 	local skill_based = data.skill_based
+	local func_based = data.func_based
 	if unlocked and (type(unlocked) ~= "number" or 0 < unlocked) then
 		return nil
 	end
 	if skill_based then
 		return "guis/textures/pd2/lock_skill"
+	end
+	if func_based then
+		local _, _, icon = BlackMarketGui.get_func_based(func_based)
+		return icon or "guis/textures/pd2/lock_skill"
 	end
 	local gv_tweak = tweak_data.lootdrop.global_values[global_value]
 	if gv_tweak and gv_tweak.dlc and not managers.dlc:is_dlc_unlocked(global_value) then
@@ -7032,7 +7108,12 @@ function BlackMarketGui:get_lock_icon(data, default)
 	return default or "guis/textures/pd2/lock_level"
 end
 
+function BlackMarketGui.get_func_based(func_based)
+	return managers.blackmarket[func_based](managers.blackmarket)
+end
+
 function BlackMarketGui:populate_weapon_category(category, data)
+	managers.blackmarket:clear_preview_blueprint()
 	local crafted_category = managers.blackmarket:get_crafted_category(category) or {}
 	local last_weapon = table.size(crafted_category) == 1
 	local last_unlocked_weapon
@@ -7076,6 +7157,7 @@ function BlackMarketGui:populate_weapon_category(category, data)
 		new_data.equipped = crafted.equipped
 		new_data.skill_based = weapon_data[crafted.weapon_id].skill_based
 		new_data.skill_name = new_data.skill_based and "bm_menu_skill_locked_" .. new_data.name
+		new_data.func_based = weapon_data[crafted.weapon_id].func_based
 		new_data.price = managers.money:get_weapon_slot_sell_value(category, i)
 		local bitmap_texture, bg_texture = managers.blackmarket:get_weapon_icon_path(crafted.weapon_id, crafted.cosmetics)
 		new_data.bitmap_texture = bitmap_texture
@@ -8591,6 +8673,7 @@ function BlackMarketGui:populate_weapon_category_new(data)
 			new_data.equipped = crafted.equipped
 			new_data.skill_based = weapon_data[crafted.weapon_id].skill_based
 			new_data.skill_name = new_data.skill_based and "bm_menu_skill_locked_" .. new_data.name
+			new_data.func_based = weapon_data[crafted.weapon_id].func_based
 			new_data.price = managers.money:get_weapon_slot_sell_value(category, index)
 			local bitmap_texture, bg_texture = managers.blackmarket:get_weapon_icon_path(crafted.weapon_id, crafted.cosmetics)
 			new_data.bitmap_texture = bitmap_texture
@@ -8961,6 +9044,7 @@ function BlackMarketGui:populate_weapon_cosmetics(data)
 	local inventory_tradable = managers.blackmarket:get_inventory_tradable()
 	local cosmetic_id
 	local cosmetics_instances = data.on_create_data.instances
+	local owned_cosmetics = {}
 	local index_i = 1
 	for _, instance_id in ipairs(cosmetics_instances) do
 		if inventory_tradable[instance_id] then
@@ -8985,6 +9069,7 @@ function BlackMarketGui:populate_weapon_cosmetics(data)
 			new_data.unlocked = true
 			new_data.equipped = crafted and crafted.cosmetics and crafted.cosmetics.instance_id == instance_id
 			new_data.stream = true
+			owned_cosmetics[cosmetic_id] = new_data.cosmetic_quality == "mint"
 			new_data.lock_texture = not new_data.unlocked
 			if new_data.default_blueprint then
 				new_data.comparision_data = managers.blackmarket:get_weapon_stats(new_data.category, new_data.slot, new_data.default_blueprint)
@@ -9019,8 +9104,65 @@ function BlackMarketGui:populate_weapon_cosmetics(data)
 			index_i = index_i + 1
 		end
 	end
+	local all_cosmetics = data.on_create_data.all
+	local cosmetic_data
+	for _, cosm_data in ipairs(all_cosmetics) do
+		cosmetic_id = cosm_data.id
+		cosmetic_data = cosm_data.data
+		my_cd = cosmetics_data[cosmetic_id]
+		if not my_cd.is_template and not owned_cosmetics[cosmetic_id] then
+			new_data = {}
+			new_data.name = cosmetic_id
+			new_data.name_localized = my_cd and my_cd.name_id and managers.localization:text(my_cd.name_id) or managers.localization:text("bm_menu_no_mod")
+			new_data.desc_id = my_cd and my_cd.desc_id
+			new_data.category = not data.category and data.prev_node_data and data.prev_node_data.category
+			new_data.default_blueprint = my_cd and my_cd.default_blueprint
+			new_data.locked_cosmetics = my_cd and my_cd.locked
+			bitmap_texture, bg_texture = managers.blackmarket:get_weapon_icon_path(data.prev_node_data.name, {id = cosmetic_id})
+			new_data.bitmap_texture = bitmap_texture
+			new_data.bitmap_locked_blend_mode = "normal"
+			new_data.bg_texture = bg_texture
+			new_data.bg_alpha = 0.4
+			new_data.slot = not data.slot and data.prev_node_data and data.prev_node_data.slot
+			new_data.global_value = my_cd and my_cd.global_value or "normal"
+			new_data.cosmetic_id = cosmetic_id
+			new_data.cosmetic_quality = "mint"
+			new_data.cosmetic_rarity = my_cd and my_cd.rarity or "common"
+			new_data.cosmetic_bonus = nil
+			new_data.unlocked = false
+			new_data.equipped = false
+			new_data.stream = true
+			new_data.lock_texture = not new_data.unlocked
+			if new_data.default_blueprint then
+				new_data.comparision_data = managers.blackmarket:get_weapon_stats(new_data.category, new_data.slot, new_data.default_blueprint)
+			end
+			new_data.mini_icons = new_data.mini_icons or {}
+			table.insert(new_data.mini_icons, {
+				texture = "guis/textures/pd2/lock_dlc",
+				right = 1,
+				bottom = 1,
+				layer = 2,
+				w = 30,
+				h = 30,
+				stream = true,
+				blend_mode = "normal",
+				color = tweak_data.screen_colors.important_1
+			})
+			if managers.blackmarket:last_previewed_cosmetic() == cosmetic_id then
+				table.insert(new_data, "wcc_cancel_preview")
+			else
+				table.insert(new_data, "wcc_preview")
+			end
+			if not crafted.previewing and managers.menu:is_pc_controller() then
+				table.insert(new_data, "wcc_market")
+			end
+			data[index_i] = new_data
+			index_i = index_i + 1
+		end
+	end
 	local new_data
 	local count = table.size(cosmetics_instances)
+	count = count + table.size(all_cosmetics)
 	for i = 1, math.ceil(count / 6) * 6 do
 		if not data[i] then
 			new_data = {}
@@ -9095,6 +9237,11 @@ function BlackMarketGui:populate_mods(data)
 			local weapon_id = managers.blackmarket:get_crafted_category(new_data.category)[new_data.slot].weapon_id
 			new_data.price = part_is_from_cosmetic and 0 or managers.money:get_weapon_modify_price(weapon_id, new_data.name, new_data.global_value)
 			new_data.can_afford = part_is_from_cosmetic or managers.money:can_afford_weapon_modification(weapon_id, new_data.name, new_data.global_value)
+			if crafted.previewing then
+				new_data.price = 0
+				new_data.can_afford = true
+				new_data.unlocked = 0
+			end
 			local font, font_size
 			local no_upper = false
 			if not new_data.lock_texture and (not new_data.unlocked or new_data.unlocked == 0) then
@@ -9130,29 +9277,17 @@ function BlackMarketGui:populate_mods(data)
 				end
 				selected_text = selected_text or managers.localization:text("bm_menu_no_items")
 				noselected_text = selected_text
-				new_data.mid_text = {}
-				new_data.mid_text.selected_text = selected_text
-				new_data.mid_text.selected_color = tweak_data.screen_colors.text
-				new_data.mid_text.noselected_text = noselected_text
-				new_data.mid_text.noselected_color = tweak_data.screen_colors.text
-				new_data.mid_text.vertical = "center"
-				new_data.mid_text.font = font
-				new_data.mid_text.font_size = font_size
-				new_data.mid_text.no_upper = no_upper
-				new_data.lock_texture = true
+				new_data.corner_text = {}
+				new_data.corner_text.selected_text = selected_text
+				new_data.corner_text.noselected_text = selected_text
 			elseif new_data.unlocked and not new_data.can_afford then
-				new_data.mid_text = {}
-				new_data.mid_text.selected_text = managers.localization:text("bm_menu_not_enough_cash")
-				new_data.mid_text.selected_color = tweak_data.screen_colors.text
-				new_data.mid_text.noselected_text = new_data.mid_text.selected_text
-				new_data.mid_text.noselected_color = tweak_data.screen_colors.text
-				new_data.mid_text.vertical = "center"
-				new_data.mid_text.font = small_font
-				new_data.mid_text.font_size = small_font_size
-				new_data.invalid_double_click = true
+				new_data.corner_text = {}
+				new_data.corner_text.selected_text = managers.localization:text("bm_menu_not_enough_cash")
+				new_data.corner_text.noselected_text = new_data.corner_text.selected_text
 			end
+			local forbid
 			if mod_name then
-				local forbid = managers.blackmarket:can_modify_weapon(new_data.category, new_data.slot, new_data.name)
+				forbid = managers.blackmarket:can_modify_weapon(new_data.category, new_data.slot, new_data.name)
 				if forbid then
 					if type(new_data.unlocked) == "number" then
 						new_data.unlocked = -math.abs(new_data.unlocked)
@@ -9209,23 +9344,40 @@ function BlackMarketGui:populate_mods(data)
 				end
 			end
 			local active = true
+			local can_apply = not crafted.previewing
+			local preview_forbidden = managers.blackmarket:preview_mod_forbidden(new_data.category, new_data.slot, new_data.name)
 			if mod_name and new_data.unlocked and not crafted.customize_locked and active then
-				if type(new_data.unlocked) ~= "number" or new_data.unlocked > 0 then
+				if type(new_data.unlocked) ~= "number" or new_data.unlocked > 0 and can_apply then
 					if new_data.can_afford then
 						table.insert(new_data, "wm_buy")
 					end
-					table.insert(new_data, "wm_preview")
-					if not new_data.is_internal then
-						table.insert(new_data, "wm_preview_mod")
+					if managers.blackmarket:is_previewing_any_mod() then
+						table.insert(new_data, "wm_clear_mod_preview")
+					end
+					if not new_data.is_internal and not preview_forbidden then
+						if managers.blackmarket:is_previewing_mod(new_data.name) then
+							table.insert(new_data, "wm_remove_preview")
+						else
+							table.insert(new_data, "wm_preview_mod")
+						end
 					end
 				else
-					table.insert(new_data, "wm_preview")
+					if managers.blackmarket:is_previewing_any_mod() then
+						table.insert(new_data, "wm_clear_mod_preview")
+					end
+					if not new_data.is_internal and not preview_forbidden then
+						if managers.blackmarket:is_previewing_mod(new_data.name) then
+							table.insert(new_data, "wm_remove_preview")
+						else
+							table.insert(new_data, "wm_preview_mod")
+						end
+					end
 				end
 				if managers.workshop and managers.workshop:enabled() and not table.contains(managers.blackmarket:skin_editor():get_excluded_weapons(), weapon_id) then
 					table.insert(new_data, "w_skin")
 				end
 				local weapon_mod_tweak = tweak_data.weapon.factory.parts[mod_name]
-				if weapon_mod_tweak and weapon_mod_tweak.type ~= "bonus" and weapon_mod_tweak.is_a_unlockable ~= true then
+				if weapon_mod_tweak and weapon_mod_tweak.type ~= "bonus" and weapon_mod_tweak.is_a_unlockable ~= true and can_apply then
 					table.insert(new_data, "wm_buy_mod")
 				end
 			end
@@ -9258,6 +9410,7 @@ function BlackMarketGui:populate_mods(data)
 			data[equipped].unlocked = not crafted.customize_locked and (data[equipped].unlocked or true)
 			data[equipped].mid_text = crafted.customize_locked and data[equipped].mid_text or nil
 			data[equipped].lock_texture = crafted.customize_locked and data[equipped].lock_texture or nil
+			data[equipped].corner_text = crafted.customize_locked and data[equipped].corner_text or nil
 			for i = 1, #data[equipped] do
 				table.remove(data[equipped], 1)
 			end
@@ -9266,8 +9419,14 @@ function BlackMarketGui:populate_mods(data)
 			if not crafted.customize_locked then
 				table.insert(data[equipped], "wm_remove_buy")
 				if not data[equipped].is_internal then
-					table.insert(data[equipped], "wm_remove_preview_mod")
-					table.insert(data[equipped], "wm_remove_preview")
+					if managers.blackmarket:is_previewing_any_mod() then
+						table.insert(data[equipped], "wm_clear_mod_preview")
+					end
+					if managers.blackmarket:is_previewing_mod(data[equipped].name) then
+						table.insert(data[equipped], "wm_remove_preview")
+					else
+						table.insert(data[equipped], "wm_preview_mod")
+					end
 				else
 					table.insert(data[equipped], "wm_preview")
 				end
@@ -9317,6 +9476,8 @@ function BlackMarketGui:set_equipped_comparision(data)
 end
 
 function BlackMarketGui:populate_buy_weapon(data)
+	managers.blackmarket:clear_temporary()
+	managers.blackmarket:clear_preview_blueprint()
 	local new_data = {}
 	local guis_catalog = "guis/"
 	for i = 1, #data.on_create_data do
@@ -9326,9 +9487,13 @@ function BlackMarketGui:populate_buy_weapon(data)
 		new_data.name_localized = managers.weapon_factory:get_weapon_name_by_factory_id(weapon_data.factory_id)
 		new_data.category = data.category
 		new_data.slot = data.prev_node_data and data.prev_node_data.slot
-		new_data.unlocked = weapon_data.unlocked
 		new_data.level = not new_data.unlocked and weapon_data.level
 		new_data.skill_based = weapon_data.skill_based
+		new_data.func_based = weapon_data.func_based
+		new_data.unlocked = weapon_data.unlocked
+		if weapon_data.func_based and not BlackMarketGui.get_func_based(weapon_data.func_based) then
+			new_data.unlocked = false
+		end
 		new_data.equipped = false
 		local texture_name = tweak_data.weapon[new_data.name].texture_name or tostring(new_data.name)
 		local bitmap_texture, bg_texture = managers.blackmarket:get_weapon_icon_path(weapon_data.weapon_id, nil)
@@ -9360,7 +9525,7 @@ function BlackMarketGui:populate_buy_weapon(data)
 		if active then
 			table.insert(new_data, "bw_preview")
 		end
-		table.insert(new_data, "bw_available_mods")
+		table.insert(new_data, "bw_preview_mods")
 		local new_weapon = managers.blackmarket:got_new_drop(data.category, "weapon_buy", new_data.name)
 		local got_mods = managers.blackmarket:got_new_drop("normal", new_data.category, data.on_create_data[i].factory_id)
 		if new_weapon or got_mods then
@@ -10007,6 +10172,11 @@ function BlackMarketGui:populate_inventory_tradable(data)
 	end
 end
 
+function BlackMarketGui:preview_weapon_mods_callback(data)
+	managers.blackmarket:craft_temporary(data.category, data.name, data.slot)
+	self:choose_weapon_mods_callback(data)
+end
+
 function BlackMarketGui:choose_weapon_mods_callback(data)
 	local dropable_mods = managers.blackmarket:get_dropable_mods_by_weapon_id(data.name, {
 		category = data.category,
@@ -10016,7 +10186,8 @@ function BlackMarketGui:choose_weapon_mods_callback(data)
 	local default_blueprint = managers.weapon_factory:get_default_blueprint_by_factory_id(factory_id)
 	local new_node_data = {}
 	local cosmetics_instances = managers.blackmarket:get_cosmetics_instances_by_weapon_id(data.name)
-	if table.size(cosmetics_instances) > 0 then
+	local all_cosmetics = managers.blackmarket:get_cosmetics_by_weapon_id(data.name)
+	if table.size(all_cosmetics) > 0 then
 		local inventory_tradable = managers.blackmarket:get_inventory_tradable()
 		local td = tweak_data.blackmarket.weapon_skins
 		local rtd = tweak_data.economy.rarities
@@ -10042,13 +10213,24 @@ function BlackMarketGui:choose_weapon_mods_callback(data)
 		end
 		
 		table.sort(cosmetics_instances, sort_func)
+		local all_cosmetics_sorted = {}
+		for cosmetic_id, data in pairs(all_cosmetics) do
+			table.insert(all_cosmetics_sorted, {id = cosmetic_id, data = data})
+		end
+		table.sort(all_cosmetics_sorted, function(x, y)
+			x_td = td[x.id]
+			x_rar = rtd[x_td.rarity]
+			y_td = td[y.id]
+			y_rar = rtd[y_td.rarity]
+			return x_rar.index > y_rar.index
+		end)
 		table.insert(new_node_data, {
 			name = "weapon_cosmetics",
 			name_localized = managers.localization:text("bm_menu_weapon_cosmetics"),
 			category = data.category,
 			prev_node_data = data,
 			on_create_func_name = "populate_weapon_cosmetics",
-			on_create_data = {instances = cosmetics_instances},
+			on_create_data = {instances = cosmetics_instances, all = all_cosmetics_sorted},
 			override_slots = {6, 1},
 			identifier = BlackMarketGui.identifiers.weapon_cosmetic
 		})
@@ -10328,8 +10510,14 @@ function BlackMarketGui:_rename_gamepad_callback(submitted, submitted_text)
 end
 
 function BlackMarketGui:equip_weapon_callback(data)
-	managers.blackmarket:equip_weapon(data.category, data.slot)
-	self:reload()
+	if managers.job and managers.job:current_real_job_id() == "chill" and (not managers.menu:active_menu() or managers.menu:active_menu().id ~= "kit_menu") then
+		managers.custom_safehouse:register_equipped_weapon(data)
+		managers.blackmarket:equip_weapon(data.category, data.slot, true)
+		self:reload()
+	else
+		managers.blackmarket:equip_weapon(data.category, data.slot)
+		self:reload()
+	end
 end
 
 function BlackMarketGui:equip_armor_callback(data)
@@ -10383,6 +10571,12 @@ end
 
 function BlackMarketGui:preview_weapon_mod_callback(data)
 	managers.blackmarket:view_weapon(data.category, data.slot, callback(self, self, "_update_crafting_node"), nil, BlackMarketGui.get_crafting_custom_data())
+end
+
+function BlackMarketGui:clear_weapon_mod_preview_callback(data)
+	managers.blackmarket:view_weapon(data.category, data.slot, callback(self, self, "_update_crafting_node"), nil, BlackMarketGui.get_crafting_custom_data())
+	managers.blackmarket:clear_preview_blueprint()
+	self:reload()
 end
 
 function BlackMarketGui:start_open_tradable_container_callback(data)
@@ -10477,6 +10671,21 @@ function BlackMarketGui:preview_cosmetic_on_weapon_callback(data)
 		quality = data.cosmetic_quality
 	}, callback(self, self, "_update_crafting_node"), nil, BlackMarketGui.get_crafting_custom_data())
 	self:reload()
+end
+
+function BlackMarketGui:cancel_preview_cosmetic_on_weapon_callback(data)
+	managers.blackmarket:view_weapon(data.category, data.slot, function()
+	end, nil, BlackMarketGui.get_crafting_custom_data())
+	self:reload()
+end
+
+function BlackMarketGui:purchase_market_cosmetic_on_weapon_callback(data)
+	if not MenuCallbackHandler:is_overlay_enabled() then
+		managers.menu:show_enable_steam_overlay_tradable_item()
+	else
+		local weapon = managers.blackmarket:get_crafted_category_slot(data.category, data.slot)
+		Steam:overlay_activate("url", tweak_data.economy:create_weapon_skin_market_search_url(weapon.weapon_id, data.cosmetic_id))
+	end
 end
 
 function BlackMarketGui:choose_weapon_cosmetics_callback(data)
@@ -11705,6 +11914,7 @@ end
 
 function BlackMarketGui:preview_weapon_with_mod_callback(data)
 	managers.blackmarket:view_weapon_with_mod(data.category, data.slot, data.name, callback(self, self, "_update_crafting_node"), nil, BlackMarketGui.get_crafting_custom_data())
+	self:reload()
 end
 
 function BlackMarketGui:remove_mod_callback(data)
@@ -11752,6 +11962,7 @@ function BlackMarketGui:preview_weapon_without_mod_callback(data)
 	else
 		managers.blackmarket:view_weapon_without_mod(data.category, data.slot, data.name, callback(self, self, "_update_crafting_node"), nil, BlackMarketGui.get_crafting_custom_data())
 	end
+	self:reload()
 end
 
 function BlackMarketGui:lo_equip_deployable_callback(data)
@@ -12002,4 +12213,28 @@ function BlackMarketGui:reload()
 	self._equipped_comparision_data = {}
 	BlackMarketGui._setup(self, false, self._data)
 	self:_post_reload()
+end
+
+function BlackMarketGui:get_safe_for_cosmetic(cosmetic_id)
+	local find_safe_name = function(cosmetic_id)
+		for safe_id, safe_data in pairs(tweak_data.economy.contents) do
+			if safe_data.contains.weapon_skins then
+				for _, skin_id in ipairs(safe_data.contains.weapon_skins) do
+					if cosmetic_id == skin_id then
+						return safe_id
+					end
+				end
+			end
+			if safe_data.contains.contents then
+				for _, skin_id in ipairs(safe_data.contains.contents) do
+					if cosmetic_id == skin_id then
+						return safe_id
+					end
+				end
+			end
+		end
+	end
+	local safe_id = find_safe_name(cosmetic_id)
+	safe_id = string.gsub(safe_id, "_legendary", "")
+	return tweak_data.economy.safes[safe_id], safe_id
 end

@@ -1578,7 +1578,7 @@ function MenuNodeMainGui:_setup_item_rows(node)
 			text = version,
 			font = tweak_data.menu.pd2_small_font,
 			font_size = tweak_data.menu.pd2_small_font_size,
-			align = SystemInfo:platform() == Idstring("WIN32") and "right" or "left",
+			align = "left",
 			vertical = "bottom",
 			alpha = 0.5
 		})

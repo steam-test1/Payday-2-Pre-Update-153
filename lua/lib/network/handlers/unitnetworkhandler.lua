@@ -2870,3 +2870,12 @@ function UnitNetworkHandler:sync_friendly_fire_damage(peer_id, unit, damage, var
 	end
 	managers.job:set_memory("trophy_flawless", true, false)
 end
+
+function UnitNetworkHandler:sync_flashbang_event(unit, event_id, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
+		return
+	end
+	if alive(unit) then
+		unit:base():on_network_event(event_id)
+	end
+end

@@ -1024,9 +1024,11 @@ function CoreEditor:close_editing()
 	self._lower_panel:layout()
 end
 
-function CoreEditor:output_error(text, no_time_stamp)
+function CoreEditor:output_error(text, no_time_stamp, silent)
 	self:output(text, no_time_stamp, Vector3(255, 0, 0), "FONTWEIGHT_BOLD")
-	EWS:MessageDialog(Global.frame_panel, text, "You are err0r...", "OK,ICON_HAND,STAY_ON_TOP"):show_modal()
+	if not silent then
+		EWS:MessageDialog(Global.frame_panel, text, "You are err0r...", "OK,ICON_HAND,STAY_ON_TOP"):show_modal()
+	end
 	if Global.running_simulation then
 		table.insert(self._error_log, text)
 	end

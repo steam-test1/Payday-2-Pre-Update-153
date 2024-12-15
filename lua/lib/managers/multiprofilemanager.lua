@@ -132,7 +132,7 @@ function MultiProfileManager:load(data)
 end
 
 function MultiProfileManager:_check_amount()
-	local wanted_amount = 5
+	local wanted_amount = 15
 	if not self:current_profile() then
 		self:save_current()
 	end

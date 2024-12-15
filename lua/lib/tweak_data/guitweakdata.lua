@@ -530,6 +530,14 @@ function GuiTweakData:init()
 		store = 545100,
 		image = "guis/dlcs/pim/textures/pd2/content_updates/pim"
 	}
+	local tango = {
+		id = "tango",
+		name_id = "menu_content_tango",
+		desc_id = "menu_content_tango_desc",
+		date_id = "menu_content_tango_date",
+		store = 487210,
+		image = "guis/dlcs/tango/textures/pd2/content_updates/tango"
+	}
 	self.content_updates = {
 		title_id = "menu_content_updates",
 		choice_id = "menu_content_updates_previous",
@@ -600,7 +608,8 @@ function GuiTweakData:init()
 			tutorial,
 			wild,
 			born,
-			pim
+			pim,
+			tango
 		}
 	elseif SystemInfo:platform() == Idstring("PS3") then
 		self.content_updates.item_list = {
@@ -4643,6 +4652,32 @@ function GuiTweakData:init()
 		"category",
 		"bonus"
 	}
+	self.new_heists = {}
+	table.insert(self.new_heists, {
+		name_id = "menu_nh_gage_spec_ops_2016",
+		texture_path = "guis/textures/pd2/new_heists/gage_spec_ops_2016",
+		url = "http://www.overkillsoftware.com/games/specops/"
+	})
+	table.insert(self.new_heists, {
+		name_id = "menu_nh_autumn_sale",
+		texture_path = "guis/textures/pd2/new_heists/autumn_sale",
+		url = "http://store.steampowered.com/dlc/218620/"
+	})
+	table.insert(self.new_heists, {
+		name_id = "menu_nh_beta_new_difficulty",
+		texture_path = "guis/textures/pd2/new_heists/beta_new_difficulty",
+		url = "http://steamcommunity.com/games/218620/announcements/detail/614007890988731544"
+	})
+	table.insert(self.new_heists, {
+		name_id = "menu_nh_halloween_2016",
+		texture_path = "guis/textures/pd2/new_heists/halloween_2016",
+		url = "http://www.overkillsoftware.com/games/halloween2016/"
+	})
+	table.insert(self.new_heists, {
+		name_id = "menu_nh_john_wick",
+		texture_path = "guis/textures/pd2/new_heists/john_wick",
+		url = "http://www.overkillsoftware.com/games/jwweaponpack/"
+	})
 end
 
 function GuiTweakData:_create_location_bounding_boxes()

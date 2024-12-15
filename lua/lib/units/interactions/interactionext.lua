@@ -2531,6 +2531,15 @@ function AccessSideJobsInteractionExt:interact(player)
 	return true
 end
 
+AccessWeaponMenuInteractionExt = AccessWeaponMenuInteractionExt or class(UseInteractionExt)
+
+function AccessWeaponMenuInteractionExt:interact(player)
+	AccessWeaponMenuInteractionExt.super.super.interact(self, player)
+	local category = self._tweak_data.category or "primaries"
+	managers.custom_safehouse:open_in_game_loadout(category)
+	return true
+end
+
 AccessCrimeNetInteractionExt = AccessCrimeNetInteractionExt or class(UseInteractionExt)
 
 function AccessCrimeNetInteractionExt:init(unit)

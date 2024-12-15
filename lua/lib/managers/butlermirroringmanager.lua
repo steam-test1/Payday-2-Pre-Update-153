@@ -6,14 +6,13 @@ local _pick_random_snd_event = function(snd_events)
 	local snd_event = snd_events[rnd_idx]
 	return snd_event
 end
+local _increase_priority = function(snd_event, inc, max)
+	snd_event.priority = math.min(snd_event.priority * inc, max)
+end
 ButlerMirroringManager = ButlerMirroringManager or class()
 
 function ButlerMirroringManager:init()
 	self:_setup()
-end
-
-local _increase_priority = function(snd_event, inc, max)
-	snd_event.priority = math.min(snd_event.priority * inc, max)
 end
 
 function ButlerMirroringManager:_setup()
@@ -63,45 +62,114 @@ function ButlerMirroringManager:save(data)
 	data.butler_mirroring = save_data
 end
 
-function ButlerMirroringManager:_on_enter_safe_house()
-	if not self._global._has_entered_safehouse then
-		self._global._has_entered_safehouse = true
-		self._global._queue[Message.OnEnterSafeHouse] = {
-			snd_events = {
-				"play_pln_gen_bfr_06"
+function ButlerMirroringManager:_on_heist_complete(level_id, difficulty_id)
+	local sound_event
+	local heist_difficulties = {
+		{
+			{
+				"overkill_290",
+				"sm_wish"
 			},
-			priority = _max_priority,
-			debug = "on enter safe house, for the first time VO"
+			"d"
+		},
+		{
+			{
+				"normal",
+				"hard",
+				"overkill",
+				"overkill_145",
+				"easy_wish",
+				"overkill_290",
+				"sm_wish"
+			},
+			"n"
 		}
+	}
+	local heist_events = {
+		gallery = "ag",
+		branchbank_prof = "bh",
+		branchbank_gold_prof = "bh",
+		branchbank_cash = "bh",
+		branchbank_deposit = "bh",
+		cage = "cs",
+		rat = "co",
+		family = "ds",
+		roberts = "gb",
+		jewelry_store = "js",
+		kosugi = "sr",
+		arena = "ah",
+		arm_cro = "at",
+		arm_hcm = "at",
+		arm_fac = "at",
+		arm_par = "at",
+		arm_und = "at",
+		arm_for = "th",
+		hox = "hb",
+		hox_3 = "hr",
+		big = "bb",
+		mus = "td",
+		kenaz = "gg",
+		mia = "hm",
+		welcome_to_the_jungle_prof = "bo",
+		election_day = "ed",
+		framing_frame = "ff",
+		born = "bkr",
+		firestarter = "fs",
+		alex = "rat",
+		watchdogs_wrapper = "wd",
+		watchdogs = "wd",
+		watchdogs_night = "wd",
+		jolly = "as",
+		four_stores = "fos",
+		mallcrasher = "mc",
+		shoutout_raid = "md",
+		nightclub = "nc",
+		cane = "sw",
+		ukrainian_job_prof = "uj",
+		pines = "wx",
+		peta = "gs",
+		crojob1 = "bd",
+		crojob2 = "bf",
+		mad = "bp",
+		dark = "ms",
+		pbr = "btm",
+		pbr2 = "bos",
+		red2 = "fwb",
+		dinner = "slh",
+		pal = "cf",
+		man = "uc",
+		nail = "lr",
+		haunted = "sfn",
+		chill_combat = "sfh",
+		flat = "pr"
+	}
+	local level_event_id = heist_events[level_id]
+	if level_event_id then
+		local difficulty_event_id
+		for _, diff_data in ipairs(heist_difficulties) do
+			if table.contains(diff_data[1], difficulty_id) then
+				difficulty_event_id = diff_data[2]
+				break
+			end
+		end
+		difficulty_event_id = difficulty_event_id or "n"
+		sound_event = "Play_btl_hcr_" .. level_event_id .. difficulty_event_id .. "_01"
+		print("[ButlerMirroringManager] queued sound event for heist: ", level_id, sound_event)
+	else
+		print("[ButlerMirroringManager] no sound_event for heist: ", level_id)
 	end
-end
-
-function ButlerMirroringManager:_on_heist_complete(level_id)
+	if not sound_event then
+		return
+	end
 	local inc = 1.1
 	if self._global._queue[Message.OnHeistComplete] then
+		self._global._queue[Message.OnHeistComplete].snd_events = {sound_event}
 		_increase_priority(self._global._queue[Message.OnHeistComplete], inc, __max_priority)
 	else
 		self._global._queue[Message.OnHeistComplete] = {
-			snd_events = {
-				"Play_btl_hst_any"
-			},
+			snd_events = {sound_event},
 			priority = 5.8,
 			debug = "On heist complete VO"
-		}
-	end
-end
-
-function ButlerMirroringManager:_on_weapon_bought()
-	local inc = 1.1
-	if self._global._queue[Message.OnWeaponBought] then
-		_increase_priority(self._global._queue[Message.OnWeaponBought], inc, __max_priority)
-	else
-		self._global._queue[Message.OnWeaponBought] = {
-			snd_events = {
-				"pln_esc_requirement_01_bags"
-			},
-			priority = 0.8,
-			debug = "On weapon bought VO"
 		}
 	end
 end
@@ -154,35 +222,5 @@ function ButlerMirroringManager:_on_level_up()
 				debug = "On level up VO"
 			}
 		end
-	end
-end
-
-function ButlerMirroringManager:_on_side_job_complete()
-	local inc = 1.1
-	if self._global._queue[Message.OnSideJobComplete] then
-		_increase_priority(self._global._queue[Message.OnSideJobComplete], inc, __max_priority)
-	else
-		self._global._queue[Message.OnSideJobComplete] = {
-			snd_events = {
-				"play_pln_gen_snip_01"
-			},
-			priority = 0.8,
-			debug = "on side job complete VO"
-		}
-	end
-end
-
-function ButlerMirroringManager:_on_safe_house_upgrade()
-	local inc = 1.1
-	if self._global._queue[Message.OnSafeHouseUpgrade] then
-		_increase_priority(self._global._queue[Message.OnSafeHouseUpgrade], inc, __max_priority)
-	else
-		self._global._queue[Message.OnSafeHouseUpgrade] = {
-			snd_events = {
-				"pln_esc_07_to_departure"
-			},
-			priority = 10.8,
-			debug = "on safehouse upgrade VO"
-		}
 	end
 end

@@ -1106,6 +1106,19 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.rota.track = true
 	self.global_values.rota.sort_number = 115
 	self.global_values.rota.category = "dlc"
+	self.global_values.tango = {}
+	self.global_values.tango.name_id = "bm_global_value_tango"
+	self.global_values.tango.desc_id = "menu_l_global_value_tango"
+	self.global_values.tango.unlock_id = "bm_global_value_tango_unlock"
+	self.global_values.tango.color = Color(255, 255, 212, 0) / 255
+	self.global_values.tango.dlc = true
+	self.global_values.tango.chance = 1
+	self.global_values.tango.value_multiplier = 1
+	self.global_values.tango.durability_multiplier = 1
+	self.global_values.tango.drops = true
+	self.global_values.tango.track = true
+	self.global_values.tango.sort_number = 116
+	self.global_values.tango.category = "dlc"
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.global_values.sweettooth = {}
 		self.global_values.sweettooth.name_id = "bm_global_value_sweettooth"
@@ -1163,7 +1176,8 @@ function LootDropTweakData:init(tweak_data)
 		"wild",
 		"born",
 		"sparkle",
-		"rota"
+		"rota",
+		"tango"
 	}
 	self:_create_global_value_list_map()
 end

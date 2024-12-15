@@ -737,6 +737,22 @@ function CustomSafehouseManager:disable_in_game_menu()
 		managers.hud:set_enabled()
 	end
 	managers.menu:close_menu("custom_safehouse_menu")
+	if self._equip_data then
+		managers.blackmarket:equip_weapon_in_game(self._equip_data.category, self._equip_data.slot)
+		self._equip_data = nil
+	end
+end
+
+function CustomSafehouseManager:open_in_game_loadout(category)
+	if not managers.menu:active_menu() or managers.menu:active_menu().name ~= "custom_safehouse_menu" then
+		self:enable_in_game_menu(true)
+	end
+	category = category or "primaries"
+	managers.menu:open_node("loadout_" .. category)
+end
+
+function CustomSafehouseManager:register_equipped_weapon(data)
+	self._equip_data = data
 end
 
 function CustomSafehouseManager:_on_enter_safe_house()
