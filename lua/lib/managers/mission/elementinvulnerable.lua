@@ -9,7 +9,7 @@ function ElementInvulnerable:on_executed(instigator)
 	if not self._values.enabled then
 		return
 	end
-	self:perform_invulnerable()
+	self:perform_invulnerable(instigator)
 	ElementInvulnerable.super.on_executed(self, instigator)
 end
 
@@ -17,7 +17,7 @@ function ElementInvulnerable:client_on_executed(instigator)
 	self:make_unit_invulnerable(instigator)
 end
 
-function ElementInvulnerable:perform_invulnerable()
+function ElementInvulnerable:perform_invulnerable(instigator)
 	self:make_unit_invulnerable(instigator)
 	for _, id in ipairs(self._values.elements) do
 		local element = self:get_mission_element(id)
