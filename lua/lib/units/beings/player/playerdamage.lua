@@ -1520,7 +1520,7 @@ function PlayerDamage:_send_set_health()
 		local hp = math.round(self:get_real_health() / self:_max_health() * 100)
 		local max_mul = math.min(self:_max_health() / 100, 1)
 		self._unit:network():send("set_health", math.clamp(hp, 0, 100), max_mul)
-		if hp ~= 100 then
+		if self:get_real_health() - self:_max_health() > 0.001 then
 			managers.mission:call_global_event("player_damaged")
 		end
 	end

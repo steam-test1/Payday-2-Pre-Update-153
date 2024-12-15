@@ -400,6 +400,10 @@ function CustomSafehouseGuiPageTrophies:set_trophy_info(trophy, update_size)
 		progress_header:set_top(objective_text:bottom() + PANEL_PADDING)
 		self._progress_items = {}
 		for idx, objective in ipairs(data.objectives) do
+			if data.completed then
+				objective.completed = true
+				objective.progress = objective.max_progress
+			end
 			local item = CustomSafehouseGuiProgressItem:new(info_panel, objective)
 			table.insert(self._progress_items, item)
 			local pos = progress_header:bottom() + CustomSafehouseGuiProgressItem.h * (idx - 1)

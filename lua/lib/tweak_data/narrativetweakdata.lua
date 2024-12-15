@@ -3851,7 +3851,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.short.briefing_id = "heist_short1_stage1_crimenet"
 	self.jobs.short.contact = "bain"
 	self.jobs.short.region = "street"
-	self.jobs.short.jc = 30
+	self.jobs.short.jc = 10
 	self.jobs.short.chain = {
 		{
 			level_id = "short1_stage1",
@@ -3900,7 +3900,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.short1.briefing_id = "heist_short1_crimenet"
 	self.jobs.short1.contact = "bain"
 	self.jobs.short1.region = "street"
-	self.jobs.short1.jc = 30
+	self.jobs.short1.jc = 10
 	self.jobs.short1.chain = {
 		{
 			level_id = "short1_stage1",
@@ -3939,7 +3939,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.short2.briefing_id = "heist_short2_crimenet"
 	self.jobs.short2.contact = "bain"
 	self.jobs.short2.region = "street"
-	self.jobs.short2.jc = 30
+	self.jobs.short2.jc = 10
 	self.jobs.short2.chain = {
 		{
 			level_id = "short2_stage1",

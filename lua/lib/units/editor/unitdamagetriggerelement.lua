@@ -4,7 +4,9 @@ function UnitDamageTriggerUnitElement:init(unit)
 	UnitDamageTriggerUnitElement.super.init(self, unit)
 	self._units = {}
 	self._hed.unit_ids = {}
+	self._hed.damage_types = ""
 	table.insert(self._save_values, "unit_ids")
+	table.insert(self._save_values, "damage_types")
 end
 
 function UnitDamageTriggerUnitElement:layer_finished()
@@ -163,8 +165,23 @@ function UnitDamageTriggerUnitElement:_build_panel(panel, panel_sizer)
 	self._btn_toolbar:connect("REMOVE_UNIT_LIST", "EVT_COMMAND_MENU_SELECTED", callback(self, self, "remove_unit_list_btn"), nil)
 	self._btn_toolbar:realize()
 	panel_sizer:add(self._btn_toolbar, 0, 1, "EXPAND,LEFT")
+	local dmg_sizer = EWS:BoxSizer("HORIZONTAL")
+	dmg_sizer:add(EWS:StaticText(panel, "Damage Types Filter:", 0, ""), 1, 0, "ALIGN_CENTER_VERTICAL")
+	local dmg_types = EWS:TextCtrl(panel, self._hed.damage_types, "", "TE_PROCESS_ENTER")
+	dmg_types:connect("EVT_COMMAND_TEXT_ENTER", callback(self, self, "set_element_data"), {
+		ctrlr = dmg_types,
+		value = "damage_types"
+	})
+	dmg_types:connect("EVT_KILL_FOCUS", callback(self, self, "set_element_data"), {
+		ctrlr = dmg_types,
+		value = "damage_types"
+	})
+	dmg_sizer:add(dmg_types, 2, 0, "ALIGN_CENTER_VERTICAL")
+	panel_sizer:add(dmg_sizer, 0, 0, "EXPAND")
 	self:add_help_text({
-		text = "logic_counter_operator elements will use the reported <damage> as the amount to add/subtract/set.",
+		text = [[
+logic_counter_operator elements will use the reported <damage> as the amount to add/subtract/set.
+Damage types can be filtered by specifying specific damage types separated by spaces.]],
 		panel = panel,
 		sizer = panel_sizer
 	})

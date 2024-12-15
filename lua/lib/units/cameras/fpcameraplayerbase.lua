@@ -687,7 +687,6 @@ function FPCameraPlayerBase:play_redirect(redirect_name, speed, offset_time)
 	self._anim_empty_state_wanted = false
 	local result = self._unit:play_redirect(redirect_name, offset_time)
 	if result == self.IDS_NOSTRING then
-		Application:stack_dump_error("This is where it's from yo")
 		return false
 	end
 	if speed then

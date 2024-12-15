@@ -2674,6 +2674,45 @@ function CoreEditor:do_save(path, dir, save_continents)
 		Application:error("No path or dir specified when trying to save")
 		return
 	end
+	local path_parts = string.split(dir, "\\")
+	local invalid_chars = {
+		"A",
+		"B",
+		"C",
+		"D",
+		"E",
+		"F",
+		"G",
+		"H",
+		"I",
+		"J",
+		"K",
+		"L",
+		"M",
+		"N",
+		"O",
+		"P",
+		"Q",
+		"R",
+		"S",
+		"T",
+		"U",
+		"V",
+		"W",
+		"X",
+		"Y",
+		"Z"
+	}
+	if path_parts[#path_parts] then
+		local last = path_parts[#path_parts]
+		for i = 1, #last do
+			local char = string.sub(last, i, i)
+			if table.contains(invalid_chars, char) then
+				Application:error("Save folder can not contain uppercase characters!")
+				return
+			end
+		end
+	end
 	self._world_package_table = {}
 	self._world_init_package_table = {}
 	self._continent_package_table = {}

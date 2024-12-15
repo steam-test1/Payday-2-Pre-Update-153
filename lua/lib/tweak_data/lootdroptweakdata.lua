@@ -11,13 +11,19 @@ function LootDropTweakData:init(tweak_data)
 		0,
 		0,
 		0,
+		0,
+		0,
+		0,
 		0
 	}
 	self.risk_infamous_multiplier = {
 		1,
 		2,
 		3,
-		5
+		5,
+		7,
+		9,
+		11
 	}
 	self.PC_CHANCE = {}
 	self.PC_CHANCE[1] = 0.7

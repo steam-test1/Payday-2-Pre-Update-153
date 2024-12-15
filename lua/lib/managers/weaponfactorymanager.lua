@@ -1110,8 +1110,16 @@ function WeaponFactoryManager:get_stats(factory_id, blueprint)
 		if not forbidden[part_id] and factory.parts[part_id].stats then
 			local part = self:_part_data(part_id, factory_id)
 			for stat_type, value in pairs(part.stats) do
-				stats[stat_type] = stats[stat_type] or 0
-				stats[stat_type] = stats[stat_type] + value
+				if type(value) == "number" then
+					stats[stat_type] = stats[stat_type] or 0
+					stats[stat_type] = stats[stat_type] + value
+				elseif type(value) == "table" then
+					stats[stat_type] = stats[stat_type] or {}
+					for i = 1, #value do
+						stats[stat_type][i] = stats[stat_type][i] or 0
+						stats[stat_type][i] = stats[stat_type][i] + value[i]
+					end
+				end
 			end
 		end
 	end

@@ -295,7 +295,7 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 	self.projectiles.wpn_prj_target.dlc = "pim"
 	self.projectiles.wpn_prj_target.max_amount = 6
 	self.projectiles.wpn_prj_target.anim_global_param = "projectile_target"
-	self.projectiles.wpn_prj_target.throw_allowed_expire_t = 0.4
+	self.projectiles.wpn_prj_target.throw_allowed_expire_t = 0.1
 	self.projectiles.wpn_prj_target.expire_t = 0.8
 	self.projectiles.wpn_prj_target.repeat_expire_t = 0.6
 	self.projectiles.frag_com = {}

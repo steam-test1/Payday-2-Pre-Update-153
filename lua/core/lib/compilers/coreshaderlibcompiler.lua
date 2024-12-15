@@ -6,11 +6,11 @@ CoreShaderLibCompiler.SHADER_PATH = "core\\shader_sources\\"
 CoreShaderLibCompiler.RT_PATH = "shaders\\"
 CoreShaderLibCompiler.ROOT_PATH = "..\\"
 
-function CoreShaderLibCompiler:compile(file, dest, force_recompile)
+function CoreShaderLibCompiler:compile(file, dest, force_recompile, force_skip)
 	if file.name ~= "shaders/base" or file.type ~= "render_template_database" then
 		return false
 	end
-	if not force_recompile and self:up_to_date(file, dest) then
+	if force_skip or not force_recompile and self:up_to_date(file, dest) then
 		dest:skip_update("render_template_database", file.name, file.properties)
 		if target() == "win32" then
 			dest:skip_update("shaders", "core/temp/" .. self.SHADER_NAME, {"d3d9"})

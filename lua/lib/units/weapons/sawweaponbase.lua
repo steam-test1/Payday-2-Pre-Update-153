@@ -144,7 +144,6 @@ local mvec_spread_direction = Vector3()
 function SawWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, shoot_player, spread_mul, autohit_mul, suppr_mul)
 	local result = {}
 	local hit_unit
-	local spread = self:_get_spread(user_unit)
 	from_pos = self._obj_fire:position()
 	direction = self._obj_fire:rotation():y()
 	mvec3_add(from_pos, direction * -30)

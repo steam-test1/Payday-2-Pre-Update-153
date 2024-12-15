@@ -567,6 +567,63 @@ function EconomyTweakData:init()
 		}
 	}
 	self.contents.lones_01_legendary_02.rarity = "legendary"
+	self.contents.smosh_01 = {}
+	self.contents.smosh_01.def_id = 10031
+	self.contents.smosh_01.contains = {
+		weapon_skins = {
+			"scar_smosh",
+			"colt_1911_smosh",
+			"scorpion_smosh",
+			"deagle_smosh",
+			"r870_smosh",
+			"m32_smosh",
+			"x_1911_smosh",
+			"hs2000_smosh",
+			"saw_smosh",
+			"m37_smosh",
+			"m1928_smosh",
+			"mateba_smosh",
+			"polymer_smosh",
+			"new_m4_smosh",
+			"aug_smosh"
+		},
+		contents = {
+			"smosh_01_legendary"
+		}
+	}
+	self.contents.smosh_01_legendary = {}
+	self.contents.smosh_01_legendary.def_id = 10032
+	self.contents.smosh_01_legendary.contains = {
+		weapon_skins = {
+			"new_raging_bull_smosh"
+		}
+	}
+	self.contents.smosh_01_legendary.rarity = "legendary"
+	self.bundles.smosh_01 = {}
+	self.bundles.smosh_01.def_id = 30001
+	self.bundles.smosh_01.dlc_id = "558270"
+	self.bundles.smosh_01.quality = "mint"
+	self.bundles.smosh_01.bonus = false
+	self.bundles.smosh_01.contains = {
+		weapon_skins = {
+			"scar_smosh",
+			"colt_1911_smosh",
+			"scorpion_smosh",
+			"deagle_smosh",
+			"r870_smosh",
+			"m32_smosh",
+			"x_1911_smosh",
+			"hs2000_smosh",
+			"saw_smosh",
+			"m37_smosh",
+			"m1928_smosh",
+			"mateba_smosh",
+			"polymer_smosh",
+			"new_m4_smosh",
+			"aug_smosh",
+			"new_raging_bull_smosh"
+		}
+	}
 	self.safes.overkill_01 = {}
 	self.safes.overkill_01.def_id = 50000
 	self.safes.overkill_01.promo = true
@@ -694,6 +751,15 @@ function EconomyTweakData:init()
 	self.safes.lones_01.unit_name = "units/payday2_cash/safes/lones/safe/eco_safe_lones"
 	self.safes.lones_01.texture_bundle_folder = "cash/safes/lones"
 	self.safes.lones_01.market_link = "https://steamcommunity.com/market/listings/218620/Hoxton%20Safe"
+	self.safes.smosh_01 = {}
+	self.safes.smosh_01.free = true
+	self.safes.smosh_01.drill = "smosh_01"
+	self.safes.smosh_01.content = "smosh_01"
+	self.safes.smosh_01.bundle = "smosh_01"
+	self.safes.smosh_01.name_id = "bm_menu_safe_smosh_01"
+	self.safes.smosh_01.unit_name = "units/payday2_cash/safes/smosh/safe/eco_safe_smosh"
+	self.safes.smosh_01.texture_bundle_folder = "cash/safes/smosh"
+	self.safes.smosh_01.market_link = "https://steamcommunity.com/market/listings/218620/Community%20Safe%202"
 	self.drills.overkill_01 = {}
 	self.drills.overkill_01.safe = "overkill_01"
 	self.drills.overkill_01.def_id = 70000
@@ -807,6 +873,9 @@ function EconomyTweakData:init()
 	self.drills.lones_01 = {}
 	self.drills.lones_01.safe = "lones_01"
 	self.drills.lones_01.unit_name = "units/payday2_cash/safes/lones/drill/eco_drill_lones"
+	self.drills.smosh_01 = {}
+	self.drills.smosh_01.safe = "smosh_01"
+	self.drills.smosh_01.unit_name = "units/payday2_cash/safes/smosh/drill/eco_drill_smosh"
 	self.bonuses = {}
 	self.bonuses.concealment_p1 = {}
 	self.bonuses.concealment_p1.name_id = "bm_menu_bonus_concealment"

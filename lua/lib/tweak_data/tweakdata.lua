@@ -3811,7 +3811,7 @@ Play the full version soon to get your full PAYDAY!]],
 	}
 	self.achievement.job_list.locke = {"pbr", "pbr2"}
 	self.achievement.job_list.jimmy = {"mad", "dark"}
-	self.achievement.job_list.events = {"nail"}
+	self.achievement.job_list.events = {"nail", "help"}
 	local jobs = {}
 	local job_data
 	local available_jobs = {}

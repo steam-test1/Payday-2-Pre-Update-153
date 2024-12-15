@@ -45,12 +45,16 @@ function ShotgunBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, shoo
 		end
 	end
 	
+	local right = direction:cross(Vector3(0, 0, 1)):normalized()
+	local up = direction:cross(right):normalized()
 	for i = 1, 6 do
-		local spread = self:_get_spread(user_unit)
+		local spread_x, spread_y = self:_get_spread(user_unit)
+		local theta = math.random() * 360
+		local ax = math.sin(theta) * (math.random() * spread_x) * (spread_mul or 1)
+		local ay = math.cos(theta) * (math.random() * spread_y) * (spread_mul or 1)
 		mvector3.set(mvec_spread_direction, direction)
-		if spread then
-			mvector3.spread(mvec_spread_direction, spread * (spread_mul or 1))
-		end
+		mvector3.add(mvec_spread_direction, right * math.rad(ax))
+		mvector3.add(mvec_spread_direction, up * math.rad(ay))
 		mvector3.set(mvec_to, mvec_spread_direction)
 		mvector3.multiply(mvec_to, 20000)
 		mvector3.add(mvec_to, from_pos)

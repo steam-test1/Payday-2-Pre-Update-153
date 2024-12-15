@@ -336,7 +336,7 @@ function BlackMarketTweakData:_init_cash()
 	self.cash.cash_preorder.value_id = "cash_preorder"
 	self.cash.cash_preorder.multiplier = 1.2
 	self.cash.cash_preorder.dlc = "preorder"
-	if SystemInfo:platform() == Idstring("XB1") then
+	if is_nextgen_console then
 		self.cash.xone_bonus = {}
 		self.cash.xone_bonus.name_id = "bm_csh_cash_xone"
 		self.cash.xone_bonus.value_id = "xone_bonus"

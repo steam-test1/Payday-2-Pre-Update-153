@@ -4,6 +4,14 @@ ElementUnitDamage = ElementUnitDamage or class(CoreMissionScriptElement.MissionS
 function ElementUnitDamage:init(...)
 	ElementUnitDamage.super.init(self, ...)
 	self._units = {}
+	local dmg_filter = self:value("damage_types")
+	if dmg_filter and dmg_filter ~= "" then
+		self._allow_damage_types = {}
+		local dmgs = string.split(dmg_filter, " ")
+		for _, dmg_type in ipairs(dmgs) do
+			table.insert(self._allow_damage_types, dmg_type)
+		end
+	end
 end
 
 function ElementUnitDamage:destroy()
@@ -57,9 +65,15 @@ function ElementUnitDamage:on_executed(instigator, damage_type, damage)
 	if not self._values.enabled then
 		return
 	end
-	damage = math.floor(damage * tweak_data.gui.stats_present_multiplier)
-	self:override_value_on_element_type("ElementCounterOperator", "amount", damage)
-	ElementUnitDamage.super.on_executed(self, instigator)
+	local allow = true
+	if self._allow_damage_types and not table.contains(self._allow_damage_types, damage_type) then
+		allow = false
+	end
+	if allow then
+		damage = math.floor(damage * tweak_data.gui.stats_present_multiplier)
+		self:override_value_on_element_type("ElementCounterOperator", "amount", damage)
+		ElementUnitDamage.super.on_executed(self, instigator)
+	end
 end
 
 function ElementUnitDamage:client_on_executed(...)

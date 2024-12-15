@@ -413,7 +413,7 @@ function NewRaycastWeaponBase:_update_stats_values()
 	self._current_stats_indices = stats
 	self._current_stats = {}
 	for stat, i in pairs(stats) do
-		self._current_stats[stat] = stats_tweak_data[stat][i]
+		self._current_stats[stat] = stats_tweak_data[stat] and stats_tweak_data[stat][i] or 1
 		if modifier_stats and modifier_stats[stat] then
 			self._current_stats[stat] = self._current_stats[stat] * modifier_stats[stat]
 		end
@@ -923,9 +923,60 @@ end
 function NewRaycastWeaponBase:_get_spread(user_unit)
 	local current_state = user_unit:movement()._current_state
 	if not current_state then
-		return 0
+		return 0, 0
 	end
+	local spread_values = tweak_data.weapon[self._name_id].spread
+	if not spread_values then
+		return 0, 0
+	end
+	local current_spread_value = spread_values[current_state:get_movement_state()]
+	local spread_x, spread_y
+	if type(current_spread_value) == "number" then
+		spread_x = self:_get_spread_from_number(user_unit, current_state, current_spread_value)
+		spread_y = spread_x
+	else
+		spread_x, spread_y = self:_get_spread_from_table(user_unit, current_state, current_spread_value)
+	end
+	if current_state:in_steelsight() then
+		local steelsight_tweak = spread_values.steelsight
+		local multi_x, multi_y
+		if type(steelsight_tweak) == "number" then
+			multi_x = 1 + (1 - steelsight_tweak)
+			multi_y = multi_x
+		else
+			multi_x = 1 + (1 - steelsight_tweak[1])
+			multi_y = 1 + (1 - steelsight_tweak[2])
+		end
+		spread_x = spread_x * multi_x
+		spread_y = spread_y * multi_y
+	end
+	return spread_x, spread_y
+end
+
+function NewRaycastWeaponBase:_get_spread_from_number(user_unit, current_state, current_spread_value)
+	local spread = self:_get_spread_indices(current_state)
+	return math.max(spread * current_spread_value, 0)
+end
+
+function NewRaycastWeaponBase:_get_spread_from_table(user_unit, current_state, current_spread_value)
+	local spread_idx_x, spread_idx_y = self:_get_spread_indices(current_state)
+	return math.max(spread_idx_x * current_spread_value[1], 0), math.max(spread_idx_y * current_spread_value[2], 0)
+end
+
+function NewRaycastWeaponBase:_get_spread_indices(current_state)
 	local spread_index = self._current_stats_indices and self._current_stats_indices.spread or 1
+	local spread_idx_x, spread_idx_y
+	if type(spread_index) == "number" then
+		spread_idx_x = self:_get_spread_index(current_state, spread_index)
+		spread_idx_y = spread_idx_x
+	else
+		spread_idx_x = self:_get_spread_index(current_state, spread_index[1])
+		spread_idx_y = self:_get_spread_index(current_state, spread_index[2])
+	end
+	return spread_idx_x, spread_idx_y
+end
+
+function NewRaycastWeaponBase:_get_spread_index(current_state, spread_index)
 	local cond_spread_addend = self:conditional_accuracy_addend(current_state)
 	local spread_multiplier = 1
 	spread_multiplier = spread_multiplier - (1 - self:spread_multiplier(current_state))
@@ -934,14 +985,7 @@ function NewRaycastWeaponBase:_get_spread(user_unit)
 	local spread_addend = self:spread_index_addend(current_state) + cond_spread_addend
 	spread_index = math.ceil((spread_index + spread_addend) * spread_multiplier)
 	spread_index = math.clamp(spread_index, 1, #tweak_data.weapon.stats.spread)
-	local spread = tweak_data.weapon.stats.spread[spread_index]
-	local stance_mul = current_state:get_movement_modifier(tweak_data.weapon[self._name_id].spread)
-	stance_mul = self:_convert_add_to_mul(stance_mul)
-	spread = spread * stance_mul
-	if current_state:in_steelsight() then
-		spread = spread * (1 + (1 - tweak_data.weapon[self._name_id].spread.steelsight))
-	end
-	return math.max(spread, 0)
+	return tweak_data.weapon.stats.spread[spread_index]
 end
 
 function NewRaycastWeaponBase:conditional_accuracy_addend(current_state)
@@ -1077,7 +1121,8 @@ function NewRaycastWeaponBase:reload_speed_multiplier()
 	end
 	multiplier = multiplier + (1 - managers.player:get_property("shock_and_awe_reload_multiplier", 1))
 	multiplier = multiplier + (1 - managers.player:get_temporary_property("bloodthirst_reload_speed", 1))
-	return self:_convert_add_to_mul(multiplier)
+	multiplier = self:_convert_add_to_mul(multiplier)
+	return multiplier
 end
 
 function NewRaycastWeaponBase:_debug_bipod()

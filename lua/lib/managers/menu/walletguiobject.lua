@@ -170,6 +170,9 @@ function WalletGuiObject.set_object_visible(object, visible)
 		bg_blur:set_w(Global.wallet_panel:child("wallet_money_text"):right())
 	elseif Global.wallet_panel:child("wallet_coins_icon"):visible() then
 		bg_blur:set_w(Global.wallet_panel:child("wallet_coins_text"):right())
+		if not managers.custom_safehouse:unlocked() then
+			Global.wallet_panel:child("wallet_coins_icon"):set_visible(false)
+		end
 	else
 		bg_blur:set_w(0)
 	end

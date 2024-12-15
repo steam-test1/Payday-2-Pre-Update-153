@@ -7542,7 +7542,7 @@ function WeaponFactoryTweakData:_init_serbu()
 		},
 		wpn_fps_upg_a_custom_free = {
 			desc_id = "bm_wp_upg_a_custom2_desc",
-			custom_stats = {ammo_pickup_min_mul = 0.7, ammo_pickup_max_mul = 0.7}
+			custom_stats = {}
 		}
 	}
 	self.wpn_fps_shot_serbu.adds = {
@@ -11950,7 +11950,7 @@ function WeaponFactoryTweakData:_init_striker()
 		},
 		wpn_fps_upg_a_custom_free = {
 			desc_id = "bm_wp_upg_a_custom2_desc",
-			custom_stats = {ammo_pickup_min_mul = 0.7, ammo_pickup_max_mul = 0.7}
+			custom_stats = {}
 		}
 	}
 	self.wpn_fps_sho_striker.default_blueprint = {
@@ -25368,6 +25368,7 @@ function WeaponFactoryTweakData:_init_x_sr2()
 	self.wpn_fps_smg_x_sr2 = {}
 	self.wpn_fps_smg_x_sr2.unit = "units/pd2_dlc_coco/weapons/wpn_fps_smg_x_sr2/wpn_fps_smg_x_sr2"
 	self.wpn_fps_smg_x_sr2.optional_types = {"gadget", "barrel_ext"}
+	self.wpn_fps_smg_x_sr2.override = {}
 	self.wpn_fps_smg_x_sr2.default_blueprint = {
 		"wpn_fps_smg_sr2_body_lower",
 		"wpn_fps_smg_sr2_b_standard",

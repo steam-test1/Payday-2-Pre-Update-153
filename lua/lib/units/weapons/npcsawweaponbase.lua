@@ -57,6 +57,23 @@ function NPCSawWeaponBase:fire_blank(direction, impact)
 	end
 end
 
+function NPCSawWeaponBase:_sound_autofire_start(nr_shots)
+	local tweak_sound = tweak_data.weapon[self._name_id].sounds or {}
+	self._sound_fire:stop()
+	local sound = self._sound_fire:post_event(tweak_sound.fire, callback(self, self, "_on_auto_fire_stop"), nil, "end_of_event")
+	sound = sound or self._sound_fire:post_event(tweak_sound.fire)
+end
+
+function NPCSawWeaponBase:_sound_autofire_end()
+	local tweak_sound = tweak_data.weapon[self._name_id].sounds or {}
+	local sound = self._sound_fire:post_event(tweak_sound.stop_fire)
+	sound = sound or self._sound_fire:post_event(tweak_sound.stop_fire)
+end
+
+function NPCSawWeaponBase:third_person_important()
+	return SawWeaponBase.third_person_important(self)
+end
+
 function NPCSawWeaponBase:destroy(...)
 	NPCSawWeaponBase.super.destroy(self, ...)
 	SawWeaponBase._stop_sawing_effect(self)

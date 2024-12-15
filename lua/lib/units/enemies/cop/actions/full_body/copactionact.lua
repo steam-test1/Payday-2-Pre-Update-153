@@ -358,6 +358,12 @@ CopActionAct._act_redirects.SO = {
 	"e_nl_down_8_5m_rappel",
 	"e_nl_dwn_3_75m",
 	"e_nl_down_7m_swing_in",
+	"e_nl_down_6m_swing_in",
+	"e_nl_down_5m_swing_in",
+	"e_nl_down_4_1m_swing_in",
+	"e_nl_down_8m_swing_in",
+	"e_nl_down_9m_swing_in",
+	"e_nl_down_9_3m_rappel",
 	"e_nl_down_4m_roll",
 	"e_nl_jump_over_0_5m",
 	"e_nl_jump_over_2_5m",
@@ -1014,11 +1020,18 @@ function CopActionAct:_ik_update_func(t)
 			mvec3_set(target_vec, self._ik_data:movement():m_head_pos())
 			mvec3_sub(target_vec, look_from_pos)
 		end
+		local disable_ik
+		mvec3_set(tmp_vec1, target_vec)
+		mvec3_norm(tmp_vec1)
+		local up_dot = mvector3.dot(tmp_vec1, math.UP)
+		if math.abs(up_dot) > 0.6 then
+			disable_ik = true
+		end
 		mvec3_set(tmp_vec1, target_vec)
 		mvec3_set_z(tmp_vec1, 0)
 		mvec3_norm(tmp_vec1)
 		local fwd_dot = mvector3.dot(self._common_data.fwd, tmp_vec1)
-		if fwd_dot < 0.2 then
+		if fwd_dot < 0.25 or disable_ik then
 			if self._modifier_on then
 				self._modifier_on = nil
 				self._machine:forbid_modifier(self._modifier_name)

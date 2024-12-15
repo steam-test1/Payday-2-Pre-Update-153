@@ -317,12 +317,16 @@ local mvec1 = Vector3()
 function RaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, shoot_player, spread_mul, autohit_mul, suppr_mul, shoot_through_data)
 	local result = {}
 	local hit_unit
-	local spread = self:_get_spread(user_unit)
-	mvector3.set(mvec_spread_direction, direction)
-	if spread then
-		mvector3.spread(mvec_spread_direction, spread * (spread_mul or 1))
-	end
+	local spread_x, spread_y = self:_get_spread(user_unit)
 	local ray_distance = shoot_through_data and shoot_through_data.ray_distance or self._weapon_range or 20000
+	local right = direction:cross(Vector3(0, 0, 1)):normalized()
+	local up = direction:cross(right):normalized()
+	local theta = math.random() * 360
+	local ax = math.sin(theta) * (math.random() * spread_x) * (spread_mul or 1)
+	local ay = math.cos(theta) * (math.random() * spread_y) * (spread_mul or 1)
+	mvector3.set(mvec_spread_direction, direction)
+	mvector3.add(mvec_spread_direction, right * math.rad(ax))
+	mvector3.add(mvec_spread_direction, up * math.rad(ay))
 	mvector3.set(mvec_to, mvec_spread_direction)
 	mvector3.multiply(mvec_to, ray_distance)
 	mvector3.add(mvec_to, from_pos)
@@ -1201,7 +1205,10 @@ function RaycastWeaponBase:enabled()
 end
 
 function RaycastWeaponBase:play_tweak_data_sound(event, alternative_event)
-	local str_name = self._name_id:gsub("_npc", "")
+	local str_name = self._name_id
+	if not self.third_person_important or not self:third_person_important() then
+		str_name = self._name_id:gsub("_npc", "")
+	end
 	local sounds = tweak_data.weapon[str_name].sounds
 	local event = sounds and (sounds[event] or sounds[alternative_event])
 	if event then

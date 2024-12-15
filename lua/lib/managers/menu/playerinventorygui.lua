@@ -2018,7 +2018,7 @@ function PlayerInventoryGui:_update_stats(name)
 	self:set_info_text("")
 	self._info_panel:clear()
 	if name == "primary" or name == "secondary" then
-		self:set_weapon_stats(self._info_panel, {
+		local stats = {
 			{
 				name = "magazine",
 				stat_name = "extra_ammo",
@@ -2052,7 +2052,8 @@ function PlayerInventoryGui:_update_stats(name)
 				offset = true,
 				percent = false
 			}
-		})
+		}
+		self:set_weapon_stats(self._info_panel, stats)
 		self:_update_info_weapon(name)
 	elseif name == "armor" then
 		self:_update_info_armor(name)
@@ -2101,86 +2102,53 @@ function PlayerInventoryGui:_update_stats(name)
 		self:_update_info_deployable(name, 2)
 	else
 		local box = self._boxes_by_name[name]
+		local stats = {
+			{
+				name = "magazine",
+				stat_name = "extra_ammo",
+				round_value = true
+			},
+			{
+				name = "totalammo",
+				stat_name = "total_ammo_mod",
+				round_value = true
+			},
+			{name = "fire_rate", round_value = true},
+			{name = "damage"},
+			{
+				name = "spread",
+				offset = true,
+				revert = true,
+				percent = true
+			},
+			{
+				name = "recoil",
+				offset = true,
+				revert = true,
+				percent = true
+			},
+			{
+				name = "concealment",
+				index = true
+			},
+			{
+				name = "suppression",
+				offset = true,
+				percent = false
+			}
+		}
 		if box and box.params and box.params.mod_data then
 			if box.params.mod_data.selected_tab == "weapon_cosmetics" then
 				local cosmetics = managers.blackmarket:get_weapon_cosmetics(box.params.mod_data.category, box.params.mod_data.slot)
 				if cosmetics then
 					local c_td = tweak_data.blackmarket.weapon_skins[cosmetics.id] or {}
 					if c_td.default_blueprint then
-						self:set_weapon_stats(self._info_panel, {
-							{
-								name = "magazine",
-								stat_name = "extra_ammo",
-								round_value = true
-							},
-							{
-								name = "totalammo",
-								stat_name = "total_ammo_mod",
-								round_value = true
-							},
-							{name = "fire_rate", round_value = true},
-							{name = "damage"},
-							{
-								name = "spread",
-								offset = true,
-								revert = true,
-								percent = true
-							},
-							{
-								name = "recoil",
-								offset = true,
-								revert = true,
-								percent = true
-							},
-							{
-								name = "concealment",
-								index = true
-							},
-							{
-								name = "suppression",
-								offset = true,
-								percent = false
-							}
-						})
+						self:set_weapon_stats(self._info_panel, stats)
 					end
 					self:_update_info_weapon_cosmetics(name, cosmetics)
 				end
 			else
-				self:set_weapon_mods_stats(self._info_panel, {
-					{
-						name = "magazine",
-						stat_name = "extra_ammo",
-						round_value = true
-					},
-					{
-						name = "totalammo",
-						stat_name = "total_ammo_mod",
-						round_value = true
-					},
-					{name = "fire_rate", round_value = true},
-					{name = "damage"},
-					{
-						name = "spread",
-						offset = true,
-						revert = true,
-						percent = true
-					},
-					{
-						name = "recoil",
-						offset = true,
-						revert = true,
-						percent = true
-					},
-					{
-						name = "concealment",
-						index = true
-					},
-					{
-						name = "suppression",
-						offset = true,
-						percent = false
-					}
-				})
+				self:set_weapon_mods_stats(self._info_panel, stats)
 				self:_update_info_weapon_mod(box)
 			end
 		else
@@ -2368,9 +2336,9 @@ function PlayerInventoryGui:_update_info_weapon_mod(box)
 		self._stats_texts[stat.name].equip:set_text(equip == 0 and "" or (0 < equip and "+" or "") .. format_round(equip, stat.round_value))
 		self._stats_texts[stat.name].total:set_text(format_round(total_value, stat.round_value))
 		if 0 < value then
-			self._stats_texts[stat.name].equip:set_color(tweak_data.screen_colors.stats_positive)
+			self._stats_texts[stat.name].equip:set_color(stat.inverted and tweak_data.screen_colors.stats_negative or tweak_data.screen_colors.stats_positive)
 		elseif value < 0 then
-			self._stats_texts[stat.name].equip:set_color(tweak_data.screen_colors.stats_negative)
+			self._stats_texts[stat.name].equip:set_color(stat.inverted and tweak_data.screen_colors.stats_positive or tweak_data.screen_colors.stats_negative)
 		else
 			self._stats_texts[stat.name].equip:set_color(tweak_data.screen_colors.text)
 		end
@@ -2416,9 +2384,9 @@ function PlayerInventoryGui:_update_info_weapon(name)
 		self._stats_texts[stat.name].mods:set_text(mods_stats[stat.name].value == 0 and "" or (mods_stats[stat.name].value > 0 and "+" or "") .. format_round(mods_stats[stat.name].value, stat.round_valuee))
 		self._stats_texts[stat.name].skill:set_text(skill_stats[stat.name].skill_in_effect and (skill_stats[stat.name].value > 0 and "+" or "") .. format_round(skill_stats[stat.name].value, stat.round_value) or "")
 		if value > base then
-			self._stats_texts[stat.name].total:set_color(tweak_data.screen_colors.stats_positive)
+			self._stats_texts[stat.name].total:set_color(stat.inverted and tweak_data.screen_colors.stats_negative or tweak_data.screen_colors.stats_positive)
 		elseif value < base then
-			self._stats_texts[stat.name].total:set_color(tweak_data.screen_colors.stats_negative)
+			self._stats_texts[stat.name].total:set_color(stat.inverted and tweak_data.screen_colors.stats_positive or tweak_data.screen_colors.stats_negative)
 		else
 			self._stats_texts[stat.name].total:set_color(tweak_data.screen_colors.text)
 		end
@@ -2478,9 +2446,9 @@ function PlayerInventoryGui:_update_info_weapon_cosmetics(name, cosmetics)
 			self._stats_texts[stat.name].mods:set_text(mods_stats[stat.name].value == 0 and "" or (mods_stats[stat.name].value > 0 and "+" or "") .. format_round(mods_stats[stat.name].value, stat.round_valuee))
 			self._stats_texts[stat.name].skill:set_text(skill_stats[stat.name].skill_in_effect and (skill_stats[stat.name].value > 0 and "+" or "") .. format_round(skill_stats[stat.name].value, stat.round_value) or "")
 			if value > base then
-				self._stats_texts[stat.name].total:set_color(tweak_data.screen_colors.stats_positive)
+				self._stats_texts[stat.name].total:set_color(stat.inverted and tweak_data.screen_colors.stats_negative or tweak_data.screen_colors.stats_positive)
 			elseif value < base then
-				self._stats_texts[stat.name].total:set_color(tweak_data.screen_colors.stats_negative)
+				self._stats_texts[stat.name].total:set_color(stat.inverted and tweak_data.screen_colors.stats_positive or tweak_data.screen_colors.stats_negative)
 			else
 				self._stats_texts[stat.name].total:set_color(tweak_data.screen_colors.text)
 			end

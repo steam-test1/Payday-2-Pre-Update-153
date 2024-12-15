@@ -241,9 +241,6 @@ function PlayerStandard:bleed_out_blocked()
 end
 
 function PlayerStandard:update(t, dt)
-	if self.debug_bipod then
-		self._equipped_unit:base():_debug_bipod()
-	end
 	PlayerMovementState.update(self, t, dt)
 	self:_calculate_standard_variables(t, dt)
 	self:_update_ground_ray()
@@ -2439,7 +2436,7 @@ function PlayerStandard:_start_action_intimidate(t, secondary)
 		elseif voice_type == "mark_camera" then
 			sound_name = "f39_any"
 			interact_type = "cmd_point"
-			prime_target.unit:contour():add("mark_unit", true)
+			prime_target.unit:contour():add("mark_unit", true, managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1))
 		elseif voice_type == "mark_turret" then
 			sound_name = "f44x_any"
 			interact_type = "cmd_point"
@@ -3422,11 +3419,11 @@ function PlayerStandard:_get_dir_str_from_vec(fwd, dir_vec)
 	end
 end
 
-function PlayerStandard:get_movement_modifier(weapon_spread)
+function PlayerStandard:get_movement_state()
 	if self._state_data.ducking then
-		return 1 - weapon_spread[self._moving and "moving_crouching" or "crouching"]
+		return self._moving and "moving_crouching" or "crouching"
 	else
-		return 1 - weapon_spread[self._moving and "moving_standing" or "standing"]
+		return self._moving and "moving_standing" or "standing"
 	end
 end
 

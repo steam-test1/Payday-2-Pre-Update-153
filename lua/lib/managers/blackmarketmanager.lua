@@ -1908,7 +1908,17 @@ function BlackMarketManager:_get_weapon_stats(weapon_id, blueprint, cosmetics)
 		bonus_stats = tweak_data:get_raw_value("economy", "bonuses", tweak_data.blackmarket.weapon_skins[cosmetics.id].bonus, "stats") or {}
 	end
 	for stat, value in pairs(weapon_tweak_data.stats) do
-		weapon_stats[stat] = (weapon_stats[stat] or 0) + weapon_tweak_data.stats[stat]
+		local _stat = weapon_tweak_data.stats[stat]
+		if type(_stat) == "number" then
+			weapon_stats[stat] = (weapon_stats[stat] or 0) + _stat
+		elseif type(_stat) == "table" then
+			local total = 0
+			for _, v in ipairs(_stat) do
+				total = total + v
+			end
+			total = total / #_stat
+			weapon_stats[stat] = (weapon_stats[stat] or 0) + total
+		end
 	end
 	for stat, value in pairs(bonus_stats) do
 		weapon_stats[stat] = (weapon_stats[stat] or 0) + value

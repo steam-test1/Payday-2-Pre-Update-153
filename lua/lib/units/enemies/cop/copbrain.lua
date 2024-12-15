@@ -415,7 +415,7 @@ function CopBrain:abort_detailed_pathing(search_id)
 end
 
 function CopBrain:clbk_damage(my_unit, damage_info)
-	if damage_info.attacker_unit and damage_info.attacker_unit:in_slot(self._slotmask_enemies) then
+	if alive(damage_info.attacker_unit) and damage_info.attacker_unit:in_slot(self._slotmask_enemies) then
 		self._current_logic.damage_clbk(self._logic_data, damage_info)
 	end
 end

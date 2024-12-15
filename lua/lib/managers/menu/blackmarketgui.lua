@@ -2805,6 +2805,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			Global.test_text = test_text
 		end
 		self._real_medium_font_size = real_medium_font_size
+		self._info_box_panel_y = info_box_panel:y()
 		self._weapon_info_panel = self._panel:panel({
 			x = info_box_panel:x(),
 			y = info_box_panel:y(),
@@ -2953,11 +2954,11 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			self._btns[btn] = new_btn
 		end
 		self._info_texts = {}
-		self._info_texts_panel = self._panel:panel({
-			x = info_box_panel:x() + 10,
-			y = info_box_panel:y() + 10,
-			w = info_box_panel:w() - 20,
-			h = info_box_panel:h() - 20 - real_small_font_size * 3
+		self._info_texts_panel = self._weapon_info_panel:panel({
+			x = 10,
+			y = 10,
+			w = self._weapon_info_panel:w() - 20,
+			h = self._weapon_info_panel:h() - 20 - real_small_font_size * 3
 		})
 		table.insert(self._info_texts, self._info_texts_panel:text({
 			name = "info_text_1",
@@ -3109,12 +3110,12 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 					percent = false
 				}
 			}
-			self._stats_panel = self._panel:panel({
+			self._stats_panel = self._weapon_info_panel:panel({
 				layer = 1,
-				x = info_box_panel:x() + 10,
-				y = info_box_panel:y() + 58,
-				w = info_box_panel:w() - 20,
-				h = info_box_panel:h() - 84
+				x = 10,
+				y = 58,
+				w = self._weapon_info_panel:w() - 20,
+				h = self._weapon_info_panel:h() - 84
 			})
 			local panel = self._stats_panel:panel({
 				layer = 1,
@@ -3752,6 +3753,12 @@ function BlackMarketGui:_update_borders()
 	self._btn_panel:set_h(20 * self._button_count + 16)
 	local info_box_panel = self._panel:child("info_box_panel")
 	local weapon_info_height = info_box_panel:h() - (self._button_count > 0 and self._btn_panel:h() + 8 or 0) - (self._detection_panel:visible() and self._detection_panel:h() + 8 or 0)
+	if self._node:parameters() and self._node:parameters().scene_state == "blackmarket_crafting" then
+		weapon_info_height = weapon_info_height + self._info_box_panel_y
+		self._weapon_info_panel:set_y(0)
+	else
+		self._weapon_info_panel:set_y(self._info_box_panel_y)
+	end
 	self._weapon_info_panel:set_h(weapon_info_height)
 	self._info_texts_panel:set_h(weapon_info_height - 20)
 	if self._detection_panel:visible() then
@@ -4271,9 +4278,9 @@ function BlackMarketGui:show_stats()
 			self._stats_texts[stat.name].mods:set_alpha(0.75)
 			self._stats_texts[stat.name].skill:set_alpha(0.75)
 			if value > base then
-				self._stats_texts[stat.name].equip:set_color(tweak_data.screen_colors.stats_positive)
+				self._stats_texts[stat.name].equip:set_color(stat.inverted and tweak_data.screen_colors.stats_negative or tweak_data.screen_colors.stats_positive)
 			elseif value < base then
-				self._stats_texts[stat.name].equip:set_color(tweak_data.screen_colors.stats_negative)
+				self._stats_texts[stat.name].equip:set_color(stat.inverted and tweak_data.screen_colors.stats_positive or tweak_data.screen_colors.stats_negative)
 			else
 				self._stats_texts[stat.name].equip:set_color(tweak_data.screen_colors.text)
 			end
@@ -4354,9 +4361,9 @@ function BlackMarketGui:show_stats()
 				self._stats_texts[stat.name].mods:set_alpha(0.75)
 				self._stats_texts[stat.name].skill:set_alpha(0.75)
 				if value > base then
-					self._stats_texts[stat.name].equip:set_color(tweak_data.screen_colors.stats_positive)
+					self._stats_texts[stat.name].equip:set_color(stat.inverted and tweak_data.screen_colors.stats_negative or tweak_data.screen_colors.stats_positive)
 				elseif value < base then
-					self._stats_texts[stat.name].equip:set_color(tweak_data.screen_colors.stats_negative)
+					self._stats_texts[stat.name].equip:set_color(stat.inverted and tweak_data.screen_colors.stats_positive or tweak_data.screen_colors.stats_negative)
 				else
 					self._stats_texts[stat.name].equip:set_color(tweak_data.screen_colors.text)
 				end
@@ -4387,9 +4394,9 @@ function BlackMarketGui:show_stats()
 				self._stats_texts[stat.name].skill:set_text("")
 				self._stats_texts[stat.name].total:set_text(format_round(value, stat.round_value))
 				if value > equip then
-					self._stats_texts[stat.name].total:set_color(tweak_data.screen_colors.stats_positive)
+					self._stats_texts[stat.name].total:set_color(stat.inverted and tweak_data.screen_colors.stats_negative or tweak_data.screen_colors.stats_positive)
 				elseif value < equip then
-					self._stats_texts[stat.name].total:set_color(tweak_data.screen_colors.stats_negative)
+					self._stats_texts[stat.name].total:set_color(stat.inverted and tweak_data.screen_colors.stats_positive or tweak_data.screen_colors.stats_negative)
 				else
 					self._stats_texts[stat.name].total:set_color(tweak_data.screen_colors.text)
 				end
@@ -4790,11 +4797,11 @@ function BlackMarketGui:show_stats()
 			end
 			equip = equip + math.round(remove_stats[stat.name] or 0)
 			if total_value > unaltered_total_value then
-				self._stats_texts[stat.name].skill:set_color(tweak_data.screen_colors.stats_positive)
-				self._stats_texts[stat.name].equip:set_color(tweak_data.screen_colors.stats_positive)
+				self._stats_texts[stat.name].skill:set_color(stat.inverted and tweak_data.screen_colors.stats_negative or tweak_data.screen_colors.stats_positive)
+				self._stats_texts[stat.name].equip:set_color(stat.inverted and tweak_data.screen_colors.stats_negative or tweak_data.screen_colors.stats_positive)
 			elseif total_value < unaltered_total_value then
-				self._stats_texts[stat.name].skill:set_color(tweak_data.screen_colors.stats_negative)
-				self._stats_texts[stat.name].equip:set_color(tweak_data.screen_colors.stats_negative)
+				self._stats_texts[stat.name].skill:set_color(stat.inverted and tweak_data.screen_colors.stats_positive or tweak_data.screen_colors.stats_negative)
+				self._stats_texts[stat.name].equip:set_color(stat.inverted and tweak_data.screen_colors.stats_positive or tweak_data.screen_colors.stats_negative)
 			else
 				self._stats_texts[stat.name].skill:set_color(tweak_data.screen_colors.text)
 				self._stats_texts[stat.name].equip:set_color(tweak_data.screen_colors.text)
@@ -5613,53 +5620,18 @@ function BlackMarketGui:update_info_text()
 		if slot_data.weapon_id then
 			updated_texts[2].text = managers.weapon_factory:get_weapon_name_by_weapon_id(slot_data.weapon_id)
 		end
-		if not slot_data.unlocked then
-			local safe
-			for safe_id, safe_data in pairs(tweak_data.economy.contents) do
-				if safe_data.contains.weapon_skins then
-					for _, skin_id in ipairs(safe_data.contains.weapon_skins) do
-						if slot_data.name == skin_id then
-							safe = safe_id
-							break
-						end
-					end
-				end
-				if safe_data.contains.contents then
-					for _, skin_id in ipairs(safe_data.contains.contents) do
-						if slot_data.name == skin_id then
-							safe = safe_id
-							break
-						end
-					end
-				end
-			end
-			if safe then
-				safe = tweak_data.economy.safes[safe]
-				safe = safe and safe.name_id or "invalid skin"
-			end
-			local macros = {
-				safe = managers.localization:text(safe)
-			}
-			updated_texts[3].text = managers.localization:text("bm_menu_wcc_not_owned", macros)
-		end
 		updated_texts[4].resource_color = {}
-		if slot_data.cosmetic_quality and slot_data.cosmetic_rarity then
-			updated_texts[4].text = managers.localization:to_upper_text("bm_menu_steam_item_quality_rarity", {
-				rarity = managers.localization:text(tweak_data.economy.rarities[slot_data.cosmetic_rarity].name_id),
-				quality = managers.localization:text(tweak_data.economy.qualities[slot_data.cosmetic_quality].name_id)
-			})
-			table.insert(updated_texts[4].resource_color, tweak_data.economy.qualities[slot_data.cosmetic_quality].color or tweak_data.screen_colors.text)
-			table.insert(updated_texts[4].resource_color, tweak_data.economy.rarities[slot_data.cosmetic_rarity].color or tweak_data.screen_colors.text)
-		elseif slot_data.cosmetic_quality then
-			updated_texts[4].text = managers.localization:to_upper_text("bm_menu_steam_item_quality", {
-				quality = managers.localization:text(tweak_data.economy.qualities[slot_data.cosmetic_quality].name_id)
-			})
-			table.insert(updated_texts[4].resource_color, tweak_data.economy.qualities[slot_data.cosmetic_quality].color or tweak_data.screen_colors.text)
-		elseif slot_data.cosmetic_rarity then
-			updated_texts[4].text = updated_texts[4].text .. (slot_data.cosmetic_quality and "\n" or "") .. managers.localization:to_upper_text("bm_menu_steam_item_rarity", {
+		if slot_data.cosmetic_rarity then
+			updated_texts[4].text = updated_texts[4].text .. managers.localization:to_upper_text("bm_menu_steam_item_rarity", {
 				rarity = managers.localization:text(tweak_data.economy.rarities[slot_data.cosmetic_rarity].name_id)
 			})
 			table.insert(updated_texts[4].resource_color, tweak_data.economy.rarities[slot_data.cosmetic_rarity].color or tweak_data.screen_colors.text)
+		end
+		if slot_data.cosmetic_quality then
+			updated_texts[4].text = updated_texts[4].text .. (slot_data.cosmetic_rarity and "\n" or "") .. managers.localization:to_upper_text("bm_menu_steam_item_quality", {
+				quality = managers.localization:text(tweak_data.economy.qualities[slot_data.cosmetic_quality].name_id)
+			})
+			table.insert(updated_texts[4].resource_color, tweak_data.economy.qualities[slot_data.cosmetic_quality].color or tweak_data.screen_colors.text)
 		end
 		if slot_data.cosmetic_bonus then
 			local bonus = tweak_data.blackmarket.weapon_skins[slot_data.cosmetic_id] and tweak_data.blackmarket.weapon_skins[slot_data.cosmetic_id].bonus
@@ -5671,7 +5643,7 @@ function BlackMarketGui:update_info_text()
 				})
 			end
 		end
-		if slot_data.desc_id then
+		if slot_data.desc_id and slot_data.unlocked then
 			updated_texts[4].text = updated_texts[4].text .. "\n" .. managers.localization:text(slot_data.desc_id)
 		end
 		updated_texts[4].below_stats = true

@@ -243,12 +243,16 @@ function MissionAssetsManager:unlock_asset(asset_id)
 end
 
 function MissionAssetsManager:_on_asset_unlocked(asset_id)
-	local asset_tweak_data = self._tweak_data[asset_id]
-	if asset_tweak_data and asset_tweak_data.award_achievement then
-		managers.achievment:award(asset_tweak_data.award_achievement)
-	end
-	if asset_tweak_data and asset_tweak_data.progress_stat then
-		managers.achievment:award_progress(asset_tweak_data.progress_stat)
+	self._awarded_assets = self._awarded_assets or {}
+	if not table.contains(self._awarded_assets, asset_id) then
+		local asset_tweak_data = self._tweak_data[asset_id]
+		if asset_tweak_data and asset_tweak_data.award_achievement then
+			managers.achievment:award(asset_tweak_data.award_achievement)
+		end
+		if asset_tweak_data and asset_tweak_data.progress_stat then
+			managers.achievment:award_progress(asset_tweak_data.progress_stat)
+		end
+		table.insert(self._awarded_assets, asset_id)
 	end
 end
 

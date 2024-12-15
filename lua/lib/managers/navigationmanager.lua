@@ -145,7 +145,7 @@ function NavigationManager:update(t, dt)
 			if options.quads then
 				self:_draw_rooms(progress)
 			end
-			if options.boundaries and not Application:editor() then
+			if options.boundaries then
 				self:_draw_room_boundaries(progress)
 			end
 			if options.doors then

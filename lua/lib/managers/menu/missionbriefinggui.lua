@@ -3539,8 +3539,14 @@ function MissionBriefingGui:special_btn_pressed(button)
 	if button == Idstring("menu_toggle_ready") then
 		self:on_ready_pressed()
 		return true
-	elseif button == Idstring("menu_toggle_pp_breakdown") and managers.preplanning:has_current_level_preplanning() and self._assets_item and self._items[self._selected_item] == self._assets_item then
-		self._assets_item:open_preplanning()
+	elseif button == Idstring("menu_toggle_pp_breakdown") then
+		if managers.preplanning:has_current_level_preplanning() and self._assets_item and self._items[self._selected_item] == self._assets_item then
+			self._assets_item:open_preplanning()
+		end
+	elseif button == Idstring("menu_change_profile_right") and managers.multi_profile:has_next() then
+		managers.multi_profile:next_profile()
+	elseif button == Idstring("menu_change_profile_left") and managers.multi_profile:has_previous() then
+		managers.multi_profile:previous_profile()
 	end
 	return false
 end

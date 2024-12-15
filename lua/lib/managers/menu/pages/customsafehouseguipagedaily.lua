@@ -42,6 +42,7 @@ function CustomSafehouseGuiPageDaily:set_active(active)
 end
 
 function CustomSafehouseGuiPageDaily:select_challenge(id, skip_sound)
+	self:finish_animation()
 	self:_setup_challenge(id)
 	self._current_challenge = id
 	self:_update_buttons()
@@ -52,14 +53,11 @@ function CustomSafehouseGuiPageDaily:select_challenge(id, skip_sound)
 end
 
 function CustomSafehouseGuiPageDaily:_setup_side_menu()
-	self._side_panel = self:daily_panel():panel({
-		name = "SidePanel",
-		layer = 10,
-		x = PANEL_PADDING,
-		y = PANEL_PADDING
-	})
-	self._side_panel:set_w((self:daily_panel():w() - PANEL_PADDING * 2) * 0.25)
-	self._side_panel:set_h(self:daily_panel():h() - PANEL_PADDING * 2)
+	local side_panel_parent = self:daily_panel():panel({name = "SidePanel", layer = 10})
+	side_panel_parent:set_w((self:daily_panel():w() - PANEL_PADDING * 2) * 0.25)
+	side_panel_parent:set_h(self:daily_panel():h() - PANEL_PADDING * 2)
+	self._side_panel = ScrollablePanel:new(side_panel_parent, "SidePanel", {padding = PANEL_PADDING})
+	table.insert(self._scrollable_panels, self._side_panel)
 	local categories = {
 		"menu",
 		"safehouse_daily",
@@ -130,7 +128,7 @@ function CustomSafehouseGuiPageDaily:_setup_side_menu()
 	for _, category in ipairs(categories) do
 		if challenges[category] then
 			local category_item = {}
-			category_item.text = self._side_panel:text({
+			category_item.text = self._side_panel:canvas():text({
 				y = current_y,
 				text = managers.localization:to_upper_text(challenges[category].category_id),
 				font = small_font,
@@ -153,7 +151,7 @@ function CustomSafehouseGuiPageDaily:_setup_side_menu()
 					color = color or tweak_data.screen_colors.button_stage_3,
 					selected_color = color or tweak_data.screen_colors.button_stage_2
 				}
-				local button = CustomSafehouseGuiButtonItemWithIcon:new(self._side_panel, button_data, 0, i)
+				local button = CustomSafehouseGuiButtonItemWithIcon:new(self._side_panel:canvas(), button_data, 0, i)
 				self:make_fine_text(button._btn_text)
 				current_y = current_y + button._btn_text:h()
 				table.insert(self._side_panel_buttons, button)
@@ -167,6 +165,7 @@ function CustomSafehouseGuiPageDaily:_setup_side_menu()
 			end
 		end
 	end
+	self._side_panel:update_canvas_size()
 end
 
 function CustomSafehouseGuiPageDaily:_update_buttons()
@@ -311,8 +310,8 @@ end
 
 function CustomSafehouseGuiPageDaily:challenge_panel()
 	if not self._challenge_panel then
-		local challenge_panel_w = self:daily_panel():w() - self._side_panel:w()
-		local side_right = self._side_panel:right()
+		local challenge_panel_w = self:daily_panel():w() - self._side_panel:panel():w()
+		local side_right = self._side_panel:panel():right()
 		self._challenge_panel = self:daily_panel():panel({
 			h = self:daily_panel():h() - PANEL_PADDING * 2,
 			w = challenge_panel_w - PANEL_PADDING * 2,
@@ -395,7 +394,7 @@ function CustomSafehouseGuiPageDaily:_setup_challenge(id)
 	local _, _, _, h = description_text:text_rect()
 	description_text:set_h(h)
 	current_y = description_text:bottom()
-	if daily_info.objective_id then
+	if daily_info.objective_id or daily_info.objectives then
 		local objective_title = scroll:canvas():text({
 			name = "ObjectiveHeader",
 			font_size = small_font_size,
@@ -421,26 +420,37 @@ function CustomSafehouseGuiPageDaily:_setup_challenge(id)
 			end
 			macros.max_progress = tostring(max)
 		end
-		local objective_text = scroll:canvas():text({
-			name = "ObjectiveText",
-			font_size = small_font_size,
-			font = small_font,
-			layer = 1,
-			blend_mode = "add",
-			color = tweak_data.screen_colors.title,
-			text = managers.localization:text(daily_info.objective_id, macros),
-			w = scroll:canvas():w(),
-			wrap = true,
-			word_wrap = true,
-			align = "left",
-			vertical = "top",
-			halign = "scale",
-			valign = "scale"
-		})
-		objective_text:set_top(current_y)
-		local _, _, _, h = objective_text:text_rect()
-		objective_text:set_h(h)
-		current_y = objective_text:bottom()
+		local objective_count = daily_info.objectives and #daily_info.objectives or 1
+		for i = 1, objective_count do
+			if daily_info.objectives and daily_info.objectives[i] then
+				local max = daily_info.objectives[i].max_progress
+				local current = daily_info.objectives[i].progress
+				if max and current then
+					macros.max_progress = tostring(max)
+					macros.progress = tostring(current)
+				end
+			end
+			local objective_text = scroll:canvas():text({
+				name = "ObjectiveText",
+				font_size = small_font_size,
+				font = small_font,
+				layer = 1,
+				blend_mode = "add",
+				color = tweak_data.screen_colors.title,
+				text = managers.localization:text(daily_info.objective_id or daily_info.objectives[i].desc_id, macros),
+				w = scroll:canvas():w(),
+				wrap = true,
+				word_wrap = true,
+				align = "left",
+				vertical = "top",
+				halign = "scale",
+				valign = "scale"
+			})
+			objective_text:set_top(current_y)
+			local _, _, _, h = objective_text:text_rect()
+			objective_text:set_h(h)
+			current_y = objective_text:bottom()
+		end
 	end
 	if daily_info.show_progress then
 		local progress_title = scroll:canvas():text({
@@ -461,10 +471,11 @@ function CustomSafehouseGuiPageDaily:_setup_challenge(id)
 		self:make_fine_text(progress_title)
 		current_y = progress_title:bottom()
 		self._progress_items = {}
-		for idx, objective in ipairs(daily_challenge.trophy.objectives) do
+		local objectives = daily_challenge.trophy and daily_challenge.trophy.objectives or daily_challenge.objectives
+		for idx, objective in ipairs(objectives) do
 			local item = CustomSafehouseGuiProgressItem:new(scroll:canvas(), objective)
 			table.insert(self._progress_items, item)
-			local pos = current_y + CustomSafehouseGuiProgressItem.h * (idx - 1)
+			local pos = current_y
 			item:set_top(pos)
 			current_y = item:bottom()
 		end
@@ -577,10 +588,12 @@ function CustomSafehouseGuiPageDaily:_update_daily_panel_size(new_width)
 	end
 	if self._progress_items then
 		local progress_title = canvas:child("ProgressHeader")
-		progress_title:set_top(objective_text:bottom() + h + PANEL_PADDING * 2)
-		for idx, item in ipairs(self._progress_items) do
-			item:set_w(new_width - (self._challenge_scroll:is_scrollable() and PANEL_PADDING * 2 or 0))
-			item:set_top(idx == 1 and progress_title:bottom() or self._progress_items[idx - 1]:bottom())
+		if progress_title then
+			progress_title:set_top(objective_text:bottom() + h + PANEL_PADDING * 2)
+			for idx, item in ipairs(self._progress_items) do
+				item:set_w(new_width - (self._challenge_scroll:is_scrollable() and PANEL_PADDING * 2 or 0))
+				item:set_top(idx == 1 and progress_title:bottom() or self._progress_items[idx - 1]:bottom())
+			end
 		end
 	end
 end
@@ -889,6 +902,12 @@ function CustomSafehouseGuiPageDaily:_update_hide_daily(t, dt)
 end
 
 function CustomSafehouseGuiPageDaily:_update_show_complete(t, dt)
+	local title = self._challenge_scroll:canvas():child("DailyCompleteTitle")
+	local info = self._challenge_scroll:canvas():child("DailyCompleteInfo")
+	local panel = self._challenge_scroll:canvas():child("DailyRenewPanel")
+	if not (title and info) or not panel then
+		return
+	end
 	if not self._complete_panel then
 		self:_setup_safehouse_daily_complete()
 		self._challenge_scroll:canvas():child("DailyCompleteTitle"):set_visible(false)
@@ -896,9 +915,6 @@ function CustomSafehouseGuiPageDaily:_update_show_complete(t, dt)
 		self._challenge_scroll:canvas():child("DailyRenewPanel"):set_visible(false)
 		self._renew_timer:set_visible(false)
 	end
-	local title = self._challenge_scroll:canvas():child("DailyCompleteTitle")
-	local info = self._challenge_scroll:canvas():child("DailyCompleteInfo")
-	local panel = self._challenge_scroll:canvas():child("DailyRenewPanel")
 	self._complete_t = (self._complete_t or 0) + dt
 	local base_time = 0.8
 	local step_time = 0.5
@@ -923,6 +939,7 @@ function CustomSafehouseGuiPageDaily:set_animation_state(state)
 end
 
 function CustomSafehouseGuiPageDaily:finish_animation()
+	self:challenge_panel():set_h(self:daily_panel():h() - PANEL_PADDING * 2)
 	self:set_animation_state(nil)
 end
 
