@@ -1198,7 +1198,7 @@ function CopLogicBase.on_attention_obj_identified(data, attention_u_key, attenti
 				if alive(u_data.unit) then
 					u_data.unit:brain():clbk_group_member_attention_identified(data.unit, attention_u_key)
 				else
-					debug_pause_unit(data.unit, "[CopLogicBase.on_attention_obj_identified] destroyed group member", data.unit, inspect(data.group), inspect(u_data), u_key)
+					Application:error("[CopLogicBase.on_attention_obj_identified] destroyed group member", data.unit, inspect(data.group), inspect(u_data), u_key)
 				end
 			end
 		end

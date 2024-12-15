@@ -197,7 +197,14 @@ function SecurityCamera:_upd_acquire_new_attention_objects(t)
 				if self:_detection_angle_and_dis_chk(my_pos, my_fwd, attention_info.handler, settings, attention_pos) then
 					local vis_ray = self._unit:raycast("ray", my_pos, attention_pos, "slot_mask", self._visibility_slotmask, "ray_type", "ai_vision")
 					if not vis_ray or vis_ray.unit:key() == u_key then
-						detected_obj[u_key] = self:_create_detected_attention_object_data(t, u_key, attention_info, settings)
+						local in_cone = true
+						if self._cone_angle ~= nil then
+							local dir = (attention_pos - my_pos):normalized()
+							in_cone = my_fwd:angle(dir) <= self._cone_angle * 0.5
+						end
+						if in_cone then
+							detected_obj[u_key] = self:_create_detected_attention_object_data(t, u_key, attention_info, settings)
+						end
 					end
 				end
 			end
@@ -369,6 +376,8 @@ end
 
 function SecurityCamera:_create_detected_attention_object_data(t, u_key, attention_info, settings)
 	attention_info.handler:add_listener("sec_cam_" .. tostring(self._u_key), callback(self, self, "on_detected_attention_obj_modified"))
+	print("[SecurityCamera] _create_detected_attention_object_data ", t, u_key, attention_info.unit)
+	print(inspect(attention_info))
 	local att_unit = attention_info.unit
 	local m_pos = attention_info.handler:get_ground_m_pos()
 	local m_head_pos = attention_info.handler:get_detection_m_pos()

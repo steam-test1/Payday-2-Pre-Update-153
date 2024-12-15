@@ -97,8 +97,14 @@ function PlayerMovement:pos_rsrv_id()
 	return self._pos_rsrv_id
 end
 
-function PlayerMovement:warp_to(pos, rot)
+function PlayerMovement:warp_to(pos, rot, velocity)
 	self._unit:warp_to(rot, pos)
+	if velocity then
+		self:push(velocity)
+	end
+	local camera_base = self:current_state()._camera_unit:base()
+	camera_base._camera_properties.spin = rot:yaw() + 90
+	camera_base._camera_properties.pitch = rot:pitch()
 end
 
 function PlayerMovement:_setup_states()

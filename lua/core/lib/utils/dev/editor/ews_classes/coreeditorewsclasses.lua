@@ -1877,57 +1877,58 @@ end
 
 UnitDuality = UnitDuality or class(CoreEditorEwsDialog)
 
+function UnitDuality:create_panel(orientation)
+	self._scrolled_window = EWS:ScrolledWindow(self._dialog, "", "VSCROLL")
+	self._scrolled_window:set_scroll_rate(Vector3(0, 1, 0))
+	self._scrolled_window:set_virtual_size_hints(Vector3(0, 0, 0), Vector3(1, -1, -1))
+	self._scrolled_main_sizer = EWS:StaticBoxSizer(self._scrolled_window, "VERTICAL", "")
+	self._scrolled_window:set_sizer(self._scrolled_main_sizer)
+	self._dialog_sizer:add(self._scrolled_window, 1, 0, "EXPAND")
+	self._panel = EWS:Panel(self._scrolled_window, "", "TAB_TRAVERSAL")
+	self._panel_sizer = EWS:BoxSizer("HORIZONTAL")
+	self._panel:set_sizer(self._panel_sizer)
+end
+
 function UnitDuality:init(collisions, pos)
 	pos = pos or Vector3(120, 130, 0)
 	CoreEditorEwsDialog.init(self, nil, "Unit Duality", "", pos, Vector3(760, 620, 0), "DEFAULT_DIALOG_STYLE,RESIZE_BORDER,STAY_ON_TOP")
 	self:create_panel("VERTICAL")
-	local y_size = 0
-	local complete_sizer = EWS:StaticBoxSizer(self._panel, "VERTICAL", "Collisions with both position and rotation")
+	local complete_sizer = EWS:StaticBoxSizer(self._scrolled_window, "VERTICAL", "Collisions with both position and rotation")
 	if 0 < #collisions.complete then
 		for _, collision in ipairs(collisions.complete) do
 			complete_sizer:add(self:build_collision(collision), 0, 0, "EXPAND")
 		end
 	else
-		complete_sizer:add(EWS:StaticText(self._panel, "No collisions found. Great!", 0, ""), 0, 5, "ALIGN_CENTER_HORIZONTAL,TOP,BOTTOM")
-		y_size = y_size + 25
+		complete_sizer:add(EWS:StaticText(self._scrolled_window, "No collisions found. Great!", 0, ""), 0, 5, "ALIGN_CENTER_HORIZONTAL,TOP,BOTTOM")
 	end
-	self._panel_sizer:add(complete_sizer, 0, 0, "EXPAND")
-	local position_sizer = EWS:StaticBoxSizer(self._panel, "VERTICAL", "Collisions with only position")
+	self._scrolled_main_sizer:add(complete_sizer, 0, 0, "EXPAND")
+	local position_sizer = EWS:StaticBoxSizer(self._scrolled_window, "VERTICAL", "Collisions with only position")
 	if 0 < #collisions.only_positions then
 		for _, collision in ipairs(collisions.only_positions) do
 			position_sizer:add(self:build_collision(collision), 0, 0, "EXPAND")
 		end
 	else
-		position_sizer:add(EWS:StaticText(self._panel, "No collisions found. Great!", 0, ""), 0, 5, "ALIGN_CENTER_HORIZONTAL,TOP,BOTTOM")
-		y_size = y_size + 25
+		position_sizer:add(EWS:StaticText(self._scrolled_window, "No collisions found. Great!", 0, ""), 0, 5, "ALIGN_CENTER_HORIZONTAL,TOP,BOTTOM")
 	end
-	self._panel_sizer:add(position_sizer, 0, 0, "EXPAND")
+	self._scrolled_main_sizer:add(position_sizer, 0, 0, "EXPAND")
 	local button_sizer = EWS:BoxSizer("HORIZONTAL")
-	self._check_btn = EWS:Button(self._panel, "Check Again", "", "")
+	self._check_btn = EWS:Button(self._scrolled_window, "Check Again", "", "")
 	button_sizer:add(self._check_btn, 0, 2, "RIGHT,LEFT")
 	self._check_btn:connect("EVT_COMMAND_BUTTON_CLICKED", callback(self, self, "on_check_again"), "")
 	self._check_btn:connect("EVT_KEY_DOWN", callback(self, self, "key_cancel"), "")
-	self._cancel_btn = EWS:Button(self._panel, "Close", "", "")
+	self._cancel_btn = EWS:Button(self._scrolled_window, "Close", "", "")
 	button_sizer:add(self._cancel_btn, 0, 2, "RIGHT,LEFT")
 	self._cancel_btn:connect("EVT_COMMAND_BUTTON_CLICKED", callback(self, self, "on_cancel"), "")
 	self._cancel_btn:connect("EVT_KEY_DOWN", callback(self, self, "key_cancel"), "")
-	self._panel_sizer:add(button_sizer, 0, 0, "ALIGN_RIGHT")
-	self._dialog_sizer:add(self._panel, 1, 0, "EXPAND")
-	self:calc_size(collisions, y_size)
+	self._scrolled_main_sizer:add(button_sizer, 0, 0, "ALIGN_RIGHT")
 	self._dialog:set_visible(true)
-end
-
-function UnitDuality:calc_size(collisions, y_size)
-	local size = self._dialog:get_size()
-	local y = (#collisions.complete + #collisions.only_positions) * 25 + 50 + 40 + y_size
-	self._dialog:set_size(Vector3(size.x, y, 0))
 end
 
 function UnitDuality:build_collision(collision)
 	local u1 = collision.u1
 	local u2 = collision.u2
 	local pos = collision.pos
-	local panel = EWS:Panel(self._panel, "", "TAB_TRAVERSAL")
+	local panel = EWS:Panel(self._scrolled_window, "", "TAB_TRAVERSAL")
 	local sizer = EWS:BoxSizer("HORIZONTAL")
 	panel:set_sizer(sizer)
 	local text1 = EWS:TextCtrl(panel, u1:unit_data().name_id, "", "ALIGN_CENTER_HORIZONTAL,TE_READONLY")

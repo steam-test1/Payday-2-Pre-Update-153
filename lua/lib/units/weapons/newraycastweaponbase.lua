@@ -321,7 +321,6 @@ function NewRaycastWeaponBase:_update_stats_values(disallow_replenish)
 	self:_check_sound_switch()
 	self._silencer = managers.weapon_factory:has_perk("silencer", self._factory_id, self._blueprint)
 	self._locked_fire_mode = (not managers.weapon_factory:has_perk("fire_mode_auto", self._factory_id, self._blueprint) or not ids_auto) and managers.weapon_factory:has_perk("fire_mode_single", self._factory_id, self._blueprint) and ids_single
-	print("self:weapon_tweak_data().FIRE_MODE: ", self:_weapon_tweak_data_id(), self:weapon_tweak_data().FIRE_MODE)
 	self._fire_mode = self._locked_fire_mode or self:get_recorded_fire_mode(self:_weapon_tweak_data_id()) or Idstring(self:weapon_tweak_data().FIRE_MODE or "single")
 	self._ammo_data = managers.weapon_factory:get_ammo_data_from_weapon(self._factory_id, self._blueprint) or {}
 	self._can_shoot_through_shield = tweak_data.weapon[self._name_id].can_shoot_through_shield

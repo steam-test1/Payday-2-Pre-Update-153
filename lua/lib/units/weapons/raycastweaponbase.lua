@@ -1214,10 +1214,19 @@ function RaycastWeaponBase:can_reload()
 end
 
 function RaycastWeaponBase:add_ammo_in_bullets(bullets)
-	local ammo_max = self:ammo_base():get_ammo_max()
-	local ammo_total = self:ammo_base():get_ammo_total()
-	local ammo = math.clamp(ammo_total + bullets, 0, ammo_max)
-	self:ammo_base():set_ammo_total(ammo)
+	local add_ammo = function(ammo_base, bullets)
+		local ammo_max = ammo_base:get_ammo_max()
+		local ammo_total = ammo_base:get_ammo_total()
+		local ammo = math.clamp(ammo_total + bullets, 0, ammo_max)
+		ammo_base:set_ammo_total(ammo)
+		return bullets - (ammo - ammo_total)
+	end
+	bullets = add_ammo(self, bullets)
+	for _, gadget in ipairs(self:get_all_override_weapon_gadgets()) do
+		if gadget and gadget.ammo_base then
+			bullets = add_ammo(gadget:ammo_base(), bullets)
+		end
+	end
 end
 
 function RaycastWeaponBase:add_ammo(ratio, add_amount_override)

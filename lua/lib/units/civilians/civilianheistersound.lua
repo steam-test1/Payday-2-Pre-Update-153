@@ -38,3 +38,20 @@ function CivilianHeisterSound:anim_clbk_stop_sound(unit, source_name)
 	end
 	self:stop(source_name)
 end
+
+function CivilianHeisterSound:_play(sound_name, source_name)
+	local source
+	if source_name then
+		source = Idstring(source_name)
+	end
+	return self._unit:sound_source(source):post_event(sound_name, self.sound_callback, self._unit, "marker", "end_of_event")
+end
+
+function CivilianHeisterSound:sound_callback(instance, event_type, unit, sound_source, label, identifier, position)
+	if not alive(unit) then
+		return
+	end
+	if event_type == "end_of_event" and unit:interaction() and unit:interaction()._reenable_ext then
+		unit:interaction():_reenable_ext()
+	end
+end

@@ -451,7 +451,7 @@ function PlayerDamage:recover_health()
 end
 
 function PlayerDamage:replenish()
-	if managers.platform:presence() == "Playing" and (self:arrested() or self:need_revive()) then
+	if (Application:editor() or managers.platform:presence() == "Playing") and (self:arrested() or self:need_revive()) then
 		self:revive(true)
 	end
 	self:_regenerated()

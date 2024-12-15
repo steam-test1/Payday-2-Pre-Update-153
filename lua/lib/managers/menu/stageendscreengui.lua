@@ -620,14 +620,24 @@ function StageEndScreenGui:play_bain_debrief()
 	local outro_event = level_data and (variant == 0 and level_data.outro_event or level_data.outro_event[variant])
 	Application:debug("StageEndScreenGui:play_bain_debrief()", outro_event)
 	if outro_event then
-		if outro_event ~= "---" then
-			managers.briefing:post_event(outro_event, {
+		local snd_event
+		local tactic = managers.groupai:state():enemy_weapons_hot() and "loud" or "stealth"
+		if type(outro_event) == "table" then
+			snd_event = outro_event[tactic]
+		else
+			snd_event = outro_event
+		end
+		if snd_event then
+			print("[StageEndScreenGui] ", snd_event)
+			managers.briefing:post_event(snd_event, {
 				show_subtitle = false,
 				listener = {
 					end_of_event = true,
 					clbk = callback(self, self, "bain_debrief_end_callback")
 				}
 			})
+		else
+			debug_pause(string.format("[StageEndScreenGui] Attempting to play outro_event that doesn't exist! %s", tostring(outro_event), tactic))
 		end
 		if managers.menu:is_console() then
 			managers.briefing:add_listener({

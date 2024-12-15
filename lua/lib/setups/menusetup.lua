@@ -49,9 +49,7 @@ function MenuSetup:load_packages()
 	if platform == Idstring("XB1") or platform == Idstring("PS4") then
 		if not PackageManager:loaded("packages/game_base_init") then
 			PackageManager:load("packages/game_base_init")
-			if 1 <= Application:installer():get_progress() then
-				PackageManager:load("packages/game_base")
-			end
+			PackageManager:load("packages/game_base")
 			Global._game_base_package_loaded = true
 		end
 	elseif not PackageManager:loaded("packages/game_base_init") then

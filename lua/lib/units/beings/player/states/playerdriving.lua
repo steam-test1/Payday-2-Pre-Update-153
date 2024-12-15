@@ -176,6 +176,7 @@ function PlayerDriving:update(t, dt)
 		self:_update_check_actions_passenger_no_shoot(t, dt, input)
 	end
 	self._ext_movement:set_m_pos(self._unit:position())
+	self:_upd_stance_switch_delay(t, dt)
 end
 
 function PlayerDriving:set_tweak_data(name)
@@ -216,6 +217,7 @@ function PlayerDriving:_update_check_actions_passenger_no_shoot(t, dt, input)
 		self._unit:base():set_stats_screen_visible(false)
 	end
 	self:_check_action_shooting_stance(t, input)
+	self:_check_action_deploy_underbarrel(t, input)
 end
 
 function PlayerDriving:_check_action_jump(t, input)

@@ -829,10 +829,10 @@ function PlayerManager:num_connected_players()
 	return #self._player_list
 end
 
-function PlayerManager:warp_to(pos, rot, id)
+function PlayerManager:warp_to(pos, rot, id, velocity)
 	local player = self._players[id or 1]
 	if alive(player) then
-		player:movement():warp_to(pos, rot)
+		player:movement():warp_to(pos, rot, velocity)
 	end
 end
 
@@ -2578,6 +2578,56 @@ function PlayerManager:set_synced_equipment_possession(peer_id, equipment, amoun
 			})
 		end
 	end
+end
+
+function PlayerManager:transfer_from_custody_special_equipment_to(target_id)
+	local local_peer = managers.network:session():local_peer()
+	local local_peer_id = local_peer:id()
+	for id, possessions in pairs(self._global.synced_equipment_possession) do
+		if id ~= target_id and managers.trade:is_peer_in_custody(id) then
+			for name, amount in pairs(possessions) do
+				local equipment_data = tweak_data.equipments.specials[name]
+				if equipment_data and not equipment_data.avoid_tranfer then
+					local max_amount = equipment_data.transfer_quantity or 1
+					local amount_to_transfer = amount
+					local targets_amount = self._global.synced_equipment_possession[target_id] and self._global.synced_equipment_possession[target_id][name] or 0
+					if max_amount > targets_amount then
+						local transfer_amount = math.min(amount_to_transfer, max_amount - targets_amount)
+						amount_to_transfer = amount_to_transfer - transfer_amount
+						if Network:is_server() then
+							if target_id == local_peer_id then
+								managers.player:add_special({
+									name = name,
+									amount = transfer_amount,
+									transfer = true
+								})
+							else
+								local peer = managers.network:session():peer(target_id)
+								if peer then
+									peer:send("give_equipment", name, transfer_amount, true)
+								else
+									transfer_amount = 0
+									debug_pause("[PlayerManager:transfer_from_custody_special_equipment_to] Failed to get peer from id!")
+								end
+							end
+						end
+						if id == local_peer_id then
+							for i = 1, amount - amount_to_transfer do
+								self:remove_special(name)
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end
+
+function PlayerManager:on_sole_criminal_respawned(peer_id)
+	if managers.groupai:state():num_alive_criminals() > 1 or managers.trade:is_peer_in_custody(peer_id) then
+		return
+	end
+	self:transfer_from_custody_special_equipment_to(peer_id)
 end
 
 function PlayerManager:transfer_special_equipment(peer_id, include_custody)

@@ -4546,9 +4546,7 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.coco = {}
-	self.coco.free = true
 	self.coco.content = {}
-	self.coco.content.loot_global_value = "infamous"
 	self.coco.content.loot_drops = {
 		{
 			type_items = "masks",
@@ -4556,9 +4554,11 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.coco.free = true
+	self.coco.content.loot_global_value = "infamous"
 	self.mad = {}
-	self.mad.free = true
 	self.mad.content = {}
+	self.mad.free = true
 	self.mad.content.loot_drops = {
 		{
 			type_items = "weapon_mods",

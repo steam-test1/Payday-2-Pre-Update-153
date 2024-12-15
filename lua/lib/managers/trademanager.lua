@@ -792,12 +792,17 @@ function TradeManager:criminal_respawn(pos, rotation, respawn_criminal)
 		spawned_unit = managers.groupai:state():spawn_one_teamAI(false, respawn_criminal.id, pos, rotation)
 	else
 		print("RC: respawn human", respawn_criminal.id)
+		local lone_survivor = managers.groupai:state():num_alive_criminals() == 0
 		local sp_id = "clbk_respawn_criminal"
 		local spawn_point = {position = pos, rotation = rotation}
 		managers.network:register_spawn_point(sp_id, spawn_point)
 		local peer_id = managers.criminals:character_peer_id_by_name(respawn_criminal.id)
 		spawned_unit = managers.network:session():spawn_member_by_id(peer_id, sp_id, true)
 		managers.network:unregister_spawn_point(sp_id)
+		if lone_survivor then
+			managers.network:session():send_to_peers("on_sole_criminal_respawned", peer_id)
+			managers.player:on_sole_criminal_respawned(peer_id)
+		end
 	end
 	managers.mission:call_global_event("player_release_ai")
 	self:_remove_criminal_respawn(respawn_criminal)

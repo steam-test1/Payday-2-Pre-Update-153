@@ -516,10 +516,6 @@ end
 
 function CopDamage:_check_damage_achievements(attack_data, head)
 	local attack_weapon = attack_data.weapon_unit
-	if alive(attack_weapon) and attack_weapon:base() and attack_weapon:base().thrower_unit then
-		GrenadeBase._check_achievements(attack_weapon:base(), self._unit, true, 1, 1, 1)
-		return
-	end
 	if alive(attack_weapon) and attack_weapon:base() and attack_weapon:base().weapon_tweak_data and not CopDamage.is_civilian(self._unit:base()._tweak_table) then
 		if managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.pump_action.mask and attack_weapon:base():weapon_tweak_data().category == "shotgun" then
 			managers.achievment:award_progress(tweak_data.achievement.pump_action.stat)

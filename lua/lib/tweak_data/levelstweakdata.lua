@@ -1177,6 +1177,7 @@ function LevelsTweakData:init()
 	self.mad.package = "packages/lvl_mad"
 	self.mad.cube = "cube_apply_heist_bank"
 	self.mad.ai_group_type = russia
+	self.spawn_dis_limit = 150
 	self.biker_train = {}
 	self.biker_train.name_id = "heist_biker_train_hl"
 	self.biker_train.briefing_id = "heist_biker_train_briefing"

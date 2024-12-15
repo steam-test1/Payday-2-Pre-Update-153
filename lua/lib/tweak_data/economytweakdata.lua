@@ -624,6 +624,38 @@ function EconomyTweakData:init()
 			"new_raging_bull_smosh"
 		}
 	}
+	self.contents.sfs_01 = {}
+	self.contents.sfs_01.def_id = 10033
+	self.contents.sfs_01.contains = {
+		weapon_skins = {
+			"peacemaker_sfs",
+			"x_akmsu_sfs",
+			"china_sfs",
+			"olympic_sfs",
+			"desertfox_sfs",
+			"msr_sfs",
+			"hk21_sfs",
+			"m16_sfs",
+			"uzi_sfs",
+			"spas12_sfs",
+			"mateba_sfs",
+			"colt_1911_sfs",
+			"r870_sfs",
+			"mac10_sfs",
+			"galil_sfs"
+		},
+		contents = {
+			"sfs_01_legendary"
+		}
+	}
+	self.contents.sfs_01_legendary = {}
+	self.contents.sfs_01_legendary.def_id = 10034
+	self.contents.sfs_01_legendary.contains = {
+		weapon_skins = {
+			"contraband_sfs"
+		}
+	}
+	self.contents.sfs_01_legendary.rarity = "legendary"
 	self.safes.overkill_01 = {}
 	self.safes.overkill_01.def_id = 50000
 	self.safes.overkill_01.promo = true
@@ -760,6 +792,14 @@ function EconomyTweakData:init()
 	self.safes.smosh_01.unit_name = "units/payday2_cash/safes/smosh/safe/eco_safe_smosh"
 	self.safes.smosh_01.texture_bundle_folder = "cash/safes/smosh"
 	self.safes.smosh_01.market_link = "https://steamcommunity.com/market/listings/218620/Community%20Safe%202"
+	self.safes.sfs_01 = {}
+	self.safes.sfs_01.free = true
+	self.safes.sfs_01.drill = "sfs_01"
+	self.safes.sfs_01.content = "sfs_01"
+	self.safes.sfs_01.name_id = "bm_menu_safe_sfs_01"
+	self.safes.sfs_01.unit_name = "units/payday2_cash/safes/sfs/safe/eco_safe_sfs"
+	self.safes.sfs_01.texture_bundle_folder = "cash/safes/sfs"
+	self.safes.sfs_01.market_link = "https://steamcommunity.com/market/listings/218620/Scarface%20Safe"
 	self.drills.overkill_01 = {}
 	self.drills.overkill_01.safe = "overkill_01"
 	self.drills.overkill_01.def_id = 70000
@@ -876,6 +916,9 @@ function EconomyTweakData:init()
 	self.drills.smosh_01 = {}
 	self.drills.smosh_01.safe = "smosh_01"
 	self.drills.smosh_01.unit_name = "units/payday2_cash/safes/smosh/drill/eco_drill_smosh"
+	self.drills.sfs_01 = {}
+	self.drills.sfs_01.safe = "sfs_01"
+	self.drills.sfs_01.unit_name = "units/payday2_cash/safes/sfs/drill/eco_drill_sfs"
 	self.bonuses = {}
 	self.bonuses.concealment_p1 = {}
 	self.bonuses.concealment_p1.name_id = "bm_menu_bonus_concealment"

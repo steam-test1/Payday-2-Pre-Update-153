@@ -2425,7 +2425,7 @@ function NewLoadoutTab:populate_category(data)
 			new_data.global_value = tweak_data.weapon[new_data.name] and tweak_data.weapon[new_data.name].global_value or "normal"
 			new_data.dlc_locked = tweak_data.lootdrop.global_values[new_data.global_value].unlock_id or nil
 			new_data.lock_texture = BlackMarketGui.get_lock_icon(self, new_data)
-			new_data.name_color = crafted.customize_locked and crafted.cosmetics and tweak_data.economy.rarities[tweak_data.blackmarket.weapon_skins[crafted.cosmetics.id].rarity or "common"].color
+			new_data.name_color = crafted.locked_name and crafted.cosmetics and tweak_data.economy.rarities[tweak_data.blackmarket.weapon_skins[crafted.cosmetics.id].rarity or "common"].color
 			if not new_data.equipped and new_data.unlocked then
 				table.insert(new_data, "lo_w_equip")
 			end

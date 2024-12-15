@@ -6254,7 +6254,7 @@ function BlackMarketGui:mouse_moved(o, x, y)
 	if self._rename_info_text then
 		local text_button = self._info_texts and self._info_texts[self._rename_info_text]
 		if text_button then
-			if self._slot_data and not self._slot_data.customize_locked and text_button:inside(x, y) then
+			if self._slot_data and not self._slot_data.locked_name and text_button:inside(x, y) then
 				if not self._rename_highlight then
 					self._rename_highlight = true
 					text_button:set_blend_mode("add")
@@ -6467,7 +6467,7 @@ function BlackMarketGui:mouse_pressed(button, x, y)
 	end
 	if self._rename_info_text then
 		local text_button = self._info_texts and self._info_texts[self._rename_info_text]
-		if self._slot_data and not self._slot_data.customize_locked and text_button and text_button:inside(x, y) then
+		if self._slot_data and not self._slot_data.locked_name and text_button and text_button:inside(x, y) then
 			if managers.menu:is_steam_controller() then
 				self:rename_item_with_gamepad_callback(self._slot_data)
 			else
@@ -8680,7 +8680,8 @@ function BlackMarketGui:populate_weapon_category_new(data)
 			new_data.bitmap_texture = bitmap_texture
 			new_data.bg_texture = not new_data.ignore_slot and bg_texture
 			new_data.customize_locked = crafted.customize_locked
-			new_data.name_color = new_data.customize_locked and crafted.cosmetics and tweak_data.economy.rarities[tweak_data.blackmarket.weapon_skins[crafted.cosmetics.id].rarity or "common"].color
+			new_data.locked_name = crafted.locked_name
+			new_data.name_color = new_data.locked_name and crafted.cosmetics and tweak_data.economy.rarities[tweak_data.blackmarket.weapon_skins[crafted.cosmetics.id].rarity or "common"].color
 			new_data.stream = true
 			new_data.comparision_data = not new_data.ignore_slot and managers.blackmarket:get_weapon_stats(category, index)
 			new_data.global_value = part_dlc_lock or tweak_data.weapon[new_data.name] and tweak_data.weapon[new_data.name].global_value or "normal"

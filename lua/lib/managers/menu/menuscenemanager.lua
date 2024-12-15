@@ -273,7 +273,7 @@ function MenuSceneManager:_set_up_templates()
 	self._scene_templates.blackmarket_mask.fov = 40
 	self._scene_templates.blackmarket_mask.can_change_fov = true
 	self._scene_templates.blackmarket_mask.use_item_grab = true
-	self._scene_templates.blackmarket_mask.camera_pos = offset:rotate_with(Rotation(90)) + Vector3(0, 0, 200)
+	self._scene_templates.blackmarket_mask.camera_pos = offset:rotate_with(Rotation(90)) + Vector3(0, 0, 202)
 	self._scene_templates.blackmarket_mask.target_pos = target_pos + Vector3(0, 0, 200)
 	self._scene_templates.blackmarket_mask.character_pos = c_ref:position() + Vector3(0, 500, 0)
 	local l_pos = self._scene_templates.blackmarket_mask.camera_pos

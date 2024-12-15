@@ -3498,7 +3498,8 @@ Play the full version soon to get your full PAYDAY!]],
 				"kenaz",
 				"mus",
 				"framing_frame",
-				"dark"
+				"dark",
+				"friend"
 			}
 		},
 		trophy_bank_heists = {

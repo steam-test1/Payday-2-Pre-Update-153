@@ -2206,7 +2206,7 @@ end
 
 function DrivingInteractionExt:can_interact(player)
 	local can_interact = DrivingInteractionExt.super.can_interact(self, player)
-	if can_interact and managers.player:is_berserker() then
+	if can_interact and managers.player:is_berserker() and self._action ~= VehicleDrivingExt.INTERACT_LOOT and self._action ~= VehicleDrivingExt.INTERACT_TRUNK then
 		can_interact = false
 		managers.hud:show_hint({
 			text = managers.localization:text("hud_vehicle_no_enter_berserker"),
@@ -2340,7 +2340,6 @@ function CivilianHeisterInteractionExt:update_character()
 	local character_name = CriminalsManager.convert_new_to_old_character_workname(self.character)
 	local character_tier = managers.custom_safehouse:get_room_current_tier(character_name)
 	if self._unit:damage() and self.heister_data.character_material then
-		print("Switching material to", self.heister_data.character_material)
 		self._unit:damage():run_sequence_simple(self.heister_data.character_material)
 	end
 	self._unit:sound():set_voice(self.heister_data.voice)
@@ -2415,12 +2414,10 @@ function CivilianHeisterInteractionExt:_play_idle_line()
 end
 
 function CivilianHeisterInteractionExt:_play_voice_line(snd_event)
-	self._unit:sound():say(snd_event)
 	self:set_active(false)
 	self._is_speaking = true
-	local unit_id = self._unit:unit_data().unit_id
-	local delay = 2
-	managers.enemy:add_delayed_clbk(string.format("civilian_heister_%s", tostring(unit_id)), callback(self, self, "_reenable_ext"), TimerManager:game():time() + delay)
+	self._unit:sound():stop()
+	self._unit:sound():_play(snd_event)
 end
 
 function CivilianHeisterInteractionExt:_reenable_ext()

@@ -1846,7 +1846,7 @@ end
 
 function BlackMarketManager:set_crafted_custom_name(category, slot, custom_name)
 	local crafted_slot = self:get_crafted_category_slot(category, slot)
-	if crafted_slot.customize_locked then
+	if crafted_slot.locked_name then
 		return
 	end
 	crafted_slot.custom_name = custom_name ~= "" and custom_name
@@ -1880,7 +1880,7 @@ function BlackMarketManager:get_weapon_name_by_category_slot(category, slot)
 		local cosmetics = crafted_slot.cosmetics
 		local cosmetic_name = cosmetics and cosmetics.id and tweak_data.blackmarket.weapon_skins[cosmetics.id] and tweak_data.blackmarket.weapon_skins[cosmetics.id].unique_name_id and managers.localization:text(tweak_data.blackmarket.weapon_skins[cosmetics.id].unique_name_id)
 		local custom_name = cosmetic_name or crafted_slot.custom_name
-		if cosmetic_name and crafted_slot.customize_locked then
+		if cosmetic_name and crafted_slot.locked_name then
 			return utf8.to_upper(cosmetic_name)
 		end
 		if custom_name then
@@ -2621,7 +2621,7 @@ function BlackMarketManager:player_loadout_data(show_all_icons)
 		local equipped_weapon = self:equipped_primary()
 		local equipped_slot = self:equipped_weapon_slot("primaries")
 		primary_string = self:get_weapon_name_by_category_slot("primaries", equipped_slot)
-		primary_color = equipped_weapon.customize_locked and equipped_weapon.cosmetics and tweak_data.economy.rarities[tweak_data.blackmarket.weapon_skins[equipped_weapon.cosmetics.id].rarity or "common"].color
+		primary_color = equipped_weapon.locked_name and equipped_weapon.cosmetics and tweak_data.economy.rarities[tweak_data.blackmarket.weapon_skins[equipped_weapon.cosmetics.id].rarity or "common"].color
 		if equipped_weapon and equipped_slot then
 			local icon_list = {}
 			for i, icon in ipairs(managers.menu_component:create_weapon_mod_icon_list(equipped_weapon.weapon_id, "primaries", equipped_weapon.factory_id, equipped_slot)) do
@@ -2637,7 +2637,7 @@ function BlackMarketManager:player_loadout_data(show_all_icons)
 		local equipped_weapon = self:equipped_secondary()
 		local equipped_slot = self:equipped_weapon_slot("secondaries")
 		secondary_string = self:get_weapon_name_by_category_slot("secondaries", equipped_slot)
-		secondary_color = equipped_weapon.customize_locked and equipped_weapon.cosmetics and tweak_data.economy.rarities[tweak_data.blackmarket.weapon_skins[equipped_weapon.cosmetics.id].rarity or "common"].color
+		secondary_color = equipped_weapon.locked_name and equipped_weapon.cosmetics and tweak_data.economy.rarities[tweak_data.blackmarket.weapon_skins[equipped_weapon.cosmetics.id].rarity or "common"].color
 		if equipped_weapon and equipped_slot then
 			local icon_list = {}
 			for i, icon in ipairs(managers.menu_component:create_weapon_mod_icon_list(equipped_weapon.weapon_id, "secondaries", equipped_weapon.factory_id, equipped_slot)) do
@@ -4914,6 +4914,7 @@ function BlackMarketManager:on_equip_weapon_cosmetics(category, slot, instance_i
 	local weapon_skin = tweak_data.blackmarket.weapon_skins[item_data.entry]
 	local blueprint = weapon_skin.default_blueprint
 	local customize_locked = weapon_skin.locked
+	local locked_name = weapon_skin.rarity == "legendary"
 	local bonus = item_data.bonus
 	local quality = item_data.quality
 	if blueprint then
@@ -4924,6 +4925,7 @@ function BlackMarketManager:on_equip_weapon_cosmetics(category, slot, instance_i
 		crafted.blueprint = deep_clone(managers.weapon_factory:get_default_blueprint_by_factory_id(crafted.factory_id))
 	end
 	crafted.customize_locked = customize_locked
+	crafted.locked_name = locked_name
 	crafted.cosmetics = {
 		id = item_data.entry,
 		instance_id = instance_id,

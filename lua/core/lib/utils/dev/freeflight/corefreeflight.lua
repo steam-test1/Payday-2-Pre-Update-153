@@ -269,6 +269,14 @@ function FreeFlight:enable()
 		if managers.enemy then
 			managers.enemy:set_gfx_lod_enabled(false)
 		end
+		if managers.player and managers.player:player_unit() and not self._has_setup_toggle_noclip then
+			local connection_name = "toggle_noclip"
+			local clone_controller = managers.player:player_unit():base():controller()
+			local connection = clone_controller._setup._connection_map[connection_name]
+			self._con:setup_connection("toggle_noclip", connection, "keyboard", clone_controller._controller_map.keyboard)
+			self._con:add_trigger("toggle_noclip", callback(self, self, "_toggle_noclip_pressed"))
+			self._has_setup_toggle_noclip = true
+		end
 	end
 end
 
@@ -287,6 +295,12 @@ end
 
 function FreeFlight:enabled()
 	return self._state ~= FF_OFF
+end
+
+function FreeFlight:quick_enable()
+	if not self._disable_quick_enable then
+		self:enable()
+	end
 end
 
 function FreeFlight:_on_F9()
@@ -349,7 +363,7 @@ end
 
 function FreeFlight:_drop_player()
 	local rot_new = Rotation(self._camera_rot:yaw(), 0, 0)
-	self._gsm:current_state():freeflight_drop_player(self._camera_pos, rot_new)
+	self._gsm:current_state():freeflight_drop_player(self._camera_pos, rot_new, self._camera_vel)
 end
 
 function FreeFlight:_position_debug()
@@ -482,9 +496,26 @@ function FreeFlight:update(t, dt)
 		self:_update_camera(main_t, main_dt)
 		self:_update_frustum_debug_box(main_t, main_dt)
 	end
+	if self._disable_quick_enable ~= nil then
+		self._disable_quick_enable = self._disable_quick_enable - main_dt
+		if self._disable_quick_enable <= 0 then
+			self._disable_quick_enable = nil
+		end
+	end
 end
 
 function FreeFlight:_update_controller(t, dt)
+	if managers.player and managers.player:player_unit() then
+		local ply_controller = managers.player:player_unit():base():controller()
+		if ply_controller then
+		end
+	end
+end
+
+function FreeFlight:_toggle_noclip_pressed()
+	self._gsm:current_state():freeflight_drop_player(self._camera_pos, self._camera_rot, self._camera_vel)
+	self:disable()
+	self._disable_quick_enable = 0.2
 end
 
 function FreeFlight:_update_gui(t, dt)
@@ -516,6 +547,7 @@ function FreeFlight:_update_camera(t, dt)
 	move_dir = move_dir + btn_move_up * Vector3(0, 0, 1) + btn_move_down * Vector3(0, 0, -1)
 	local move_delta = move_dir * self._move_speed:value() * MOVEMENT_SPEED_BASE * dt
 	local pos_new = self._camera_pos + move_delta
+	self._camera_vel = move_dir * self._move_speed:value() * MOVEMENT_SPEED_BASE
 	local turn_speed = self._turn_speed:value() * TURN_SPEED_BASE
 	local turn_speed_roll = turn_speed * 0.1
 	local yaw_new = self._camera_rot:yaw() + axis_look.x * -1 * turn_speed

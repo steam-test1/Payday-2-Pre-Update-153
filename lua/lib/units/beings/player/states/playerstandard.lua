@@ -1726,7 +1726,7 @@ function PlayerStandard:_do_melee_damage(t, bayonet_melee, melee_hit_ray)
 				})
 			end
 			self._camera_unit:base():play_anim_melee_item("hit_body")
-		elseif self._on_melee_restart_drill and hit_unit:base() and hit_unit:base().is_drill then
+		elseif self._on_melee_restart_drill and hit_unit:base() and (hit_unit:base().is_drill or hit_unit:base().is_saw) then
 			hit_unit:base():on_melee_hit(managers.network:session():local_peer():id())
 		else
 			if bayonet_melee then

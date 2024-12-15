@@ -176,7 +176,9 @@ function CustomSafehouseManager:add_coins(amount)
 	Global.custom_safehouse_manager.total = Application:digest_value(new_current, true)
 	Global.custom_safehouse_manager.total_collected = Application:digest_value(new_total, true)
 	print("[Safehouse] adding coins to safehouse: ", amount, Application:digest_value(self._global.total, false))
-	managers.statistics:aquired_coins(amount)
+	if managers.statistics then
+		managers.statistics:aquired_coins(amount)
+	end
 end
 
 function CustomSafehouseManager:deduct_coins(amount)

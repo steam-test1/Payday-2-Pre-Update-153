@@ -1879,7 +1879,7 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.pitchfork.anim_global_param = "melee_pitchfork"
 	self.melee_weapons.pitchfork.dlc = "peta"
 	self.melee_weapons.pitchfork.texture_bundle_folder = "peta"
-	self.melee_weapons.pitchfork.type = "knife"
+	self.melee_weapons.pitchfork.type = "flag"
 	self.melee_weapons.pitchfork.align_objects = {
 		"a_weapon_left"
 	}
@@ -1980,6 +1980,7 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.nin.melee_damage_delay = 0.1
 	self.melee_weapons.ballistic = deep_clone(self.melee_weapons.kabar)
 	self.melee_weapons.ballistic.name_id = "bm_melee_ballistic"
+	self.melee_weapons.ballistic.dlc = "nil"
 	self.melee_weapons.ballistic.texture_bundle_folder = "coco"
 	self.melee_weapons.ballistic.free = nil
 	self.melee_weapons.ballistic.anim_global_param = "melee_ballistic"
@@ -2005,7 +2006,6 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.ballistic.sounds.charge = "twin_charge"
 	self.melee_weapons.ballistic.repeat_expire_t = 0.6
 	self.melee_weapons.ballistic.stats.concealment = 29
-	self.melee_weapons.ballistic.dlc = nil
 	self.melee_weapons.zeus = deep_clone(self.melee_weapons.fists)
 	self.melee_weapons.zeus.name_id = "bm_melee_zeus"
 	self.melee_weapons.zeus.type = "fists"

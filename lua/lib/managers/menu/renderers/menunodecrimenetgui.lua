@@ -1482,11 +1482,9 @@ function MenuNodeCrimenetContactShortGui:mouse_released(button, x, y)
 end
 
 function MenuNodeCrimenetContactShortGui:previous_page()
-	self:change_file(-1)
 end
 
 function MenuNodeCrimenetContactShortGui:next_page()
-	self:change_file(1)
 end
 
 function MenuNodeCrimenetContactShortGui:input_focus()

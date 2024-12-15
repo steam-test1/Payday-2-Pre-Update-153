@@ -1968,6 +1968,9 @@ function InteractionTweakData:init(tweak_data)
 	self.rewire_timelock.text_id = "hud_int_rewire_timelock"
 	self.rewire_timelock.action_text_id = "hud_action_rewiring_timelock"
 	self.rewire_timelock.axis = "x"
+	self.rewire_timelock.sound_start = "bar_wire_cut"
+	self.rewire_timelock.sound_interupt = "bar_wire_cut_cancel"
+	self.rewire_timelock.sound_done = "bar_wire_cut_finished"
 	self.pick_lock_x_axis = deep_clone(self.pick_lock_hard_no_skill)
 	self.pick_lock_x_axis.axis = "x"
 	self.money_wrap_single_bundle_active = deep_clone(self.money_wrap_single_bundle)
@@ -3805,6 +3808,11 @@ function InteractionTweakData:init(tweak_data)
 	self.hold_open_coke_bag.sound_start = "bar_bag_generic"
 	self.hold_open_coke_bag.sound_interupt = "bar_bag_generic_cancel"
 	self.hold_open_coke_bag.sound_done = "bar_bag_generic_finished"
+	self.hold_remove_bug = {}
+	self.hold_remove_bug.text_id = "hud_mil_hold_remove_bug"
+	self.hold_remove_bug.action_text_id = "hud_action_removing_bug"
+	self.hold_remove_bug.timer = 1
+	self.hold_remove_bug.interact_distance = 150
 	self.hold_open_lid = {}
 	self.hold_open_lid.text_id = "hud_int_hold_open_lid"
 	self.hold_open_lid.action_text_id = "hud_action_opening_lid"
