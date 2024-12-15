@@ -431,7 +431,7 @@ function PlayerDamage:_update_armor_grinding(t, dt)
 	self._armor_grinding.elapsed = self._armor_grinding.elapsed + dt
 	if self._armor_grinding.elapsed >= self._armor_grinding.target_tick then
 		self._armor_grinding.elapsed = 0
-		self:set_armor(self:get_real_armor() + self._armor_grinding.armor_value)
+		self:change_armor(self._armor_grinding.armor_value)
 	end
 end
 
@@ -645,6 +645,10 @@ function PlayerDamage:set_health(health)
 	return prev_health ~= Application:digest_value(self._health, false)
 end
 
+function PlayerDamage:change_armor(change)
+	self:set_armor(self:get_real_armor() + change)
+end
+
 function PlayerDamage:set_armor(armor)
 	armor = math.clamp(armor, 0, self:_max_armor())
 	if self._armor then
@@ -675,7 +679,7 @@ function PlayerDamage:health_ratio_100()
 end
 
 function PlayerDamage:_max_health()
-	local base_max_health = self._HEALTH_INIT + managers.player:thick_skin_value()
+	local base_max_health = self._HEALTH_INIT + managers.player:health_skill_addend()
 	local mul = managers.player:health_skill_multiplier()
 	return base_max_health * mul
 end
@@ -913,7 +917,7 @@ function PlayerDamage:_calc_armor_damage(attack_data)
 	local health_subtracted = 0
 	if 0 < self:get_real_armor() then
 		health_subtracted = self:get_real_armor()
-		self:set_armor(self:get_real_armor() - attack_data.damage)
+		self:change_armor(-attack_data.damage)
 		health_subtracted = health_subtracted - self:get_real_armor()
 		self:_damage_screen()
 		SoundDevice:set_rtpc("shield_status", self:get_real_armor() / self:_total_armor() * 100)
@@ -1091,7 +1095,7 @@ function PlayerDamage:damage_fall(data)
 	if die then
 		self:set_armor(0)
 	else
-		self:set_armor(self:get_real_armor() - max_armor * managers.player:upgrade_value("player", "fall_damage_multiplier", 1))
+		self:change_armor(-max_armor * managers.player:upgrade_value("player", "fall_damage_multiplier", 1))
 	end
 	SoundDevice:set_rtpc("shield_status", 0)
 	self:_send_set_armor()
@@ -1752,10 +1756,9 @@ function PlayerDamage:_upd_health_regen(t, dt)
 		end
 	end
 	if not self._health_regen_update_timer then
-		local regen_rate = managers.player:health_regen()
 		local max_health = self:_max_health()
-		if 0 < regen_rate and max_health > self:get_real_health() then
-			self:restore_health(regen_rate, false)
+		if max_health > self:get_real_health() then
+			self:restore_health(managers.player:health_regen(), false)
 			self._health_regen_update_timer = 5
 		end
 	end

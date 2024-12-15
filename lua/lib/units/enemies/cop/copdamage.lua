@@ -1566,7 +1566,7 @@ end
 function CopDamage:_check_friend_4(attack_data)
 	if tweak_data:difficulty_to_index(Global.game_settings.difficulty) >= 5 then
 		local weapon_unit = attack_data.weapon_unit or attack_data.attacker_unit
-		local projectile_entry = weapon_unit and weapon_unit:base()._projectile_entry
+		local projectile_entry = alive(weapon_unit) and weapon_unit:base()._projectile_entry
 		if (self._unit:base()._tweak_table == "drug_lord_boss" or self._unit:base()._tweak_table == "drug_lord_boss_stealth") and projectile_entry == "rocket_ray_frag" then
 			managers.achievment:award("friend_4")
 		end

@@ -323,7 +323,7 @@ function UpgradesTweakData:_init_pd2_values()
 	}
 	self.values.weapon.passive_damage_multiplier = {1.05}
 	self.values.weapon.knock_down = {0.05, 0.2}
-	self.values.weapon.automatic_head_shot_add = {0.33, 1}
+	self.values.weapon.automatic_head_shot_add = {0.2, 0.6}
 	self.values.assault_rifle.enter_steelsight_speed_multiplier = {2}
 	self.values.assault_rifle.zoom_increase = {2}
 	self.values.player.crafting_weapon_multiplier = {0.9}

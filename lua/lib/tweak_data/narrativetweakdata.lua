@@ -1473,6 +1473,7 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.arm_cro = {
 		level_id = "arm_cro",
+		dlc = "armored_transport",
 		type_id = "heist_type_assault",
 		type = "d",
 		mission_filter = {4},
@@ -1545,6 +1546,7 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.arm_und = {
 		level_id = "arm_und",
+		dlc = "armored_transport",
 		type_id = "heist_type_assault",
 		type = "d",
 		mission_filter = {4},
@@ -1617,6 +1619,7 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.arm_hcm = {
 		level_id = "arm_hcm",
+		dlc = "armored_transport",
 		type_id = "heist_type_assault",
 		type = "d",
 		mission_filter = {4},
@@ -1689,6 +1692,7 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.arm_par = {
 		level_id = "arm_par",
+		dlc = "armored_transport",
 		type_id = "heist_type_assault",
 		type = "d",
 		mission_filter = {4},
@@ -1761,6 +1765,7 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.arm_fac = {
 		level_id = "arm_fac",
+		dlc = "armored_transport",
 		type_id = "heist_type_assault",
 		type = "d",
 		mission_filter = {4},
@@ -1833,6 +1838,7 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.arm_for = {
 		level_id = "arm_for",
+		dlc = "armored_transport",
 		type_id = "heist_type_assault",
 		type = "d",
 		mission_filter = {4},
@@ -2041,6 +2047,7 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.big = {
 		level_id = "big",
+		dlc = "big_bank",
 		type_id = "heist_type_assault",
 		type = "d",
 		mission_filter = {1},
@@ -2255,11 +2262,13 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.mia_1 = {
 		level_id = "mia_1",
+		dlc = "hl_miami",
 		type_id = "heist_type_assault",
 		type = "d"
 	}
 	self.stages.mia_2 = {
 		level_id = "mia_2",
+		dlc = "hl_miami",
 		type_id = "heist_type_assault",
 		type = "d"
 	}
@@ -2334,6 +2343,7 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.gallery = {
 		level_id = "gallery",
+		dlc = "pd2_clan",
 		type_id = "heist_type_knockover",
 		type = "e",
 		mission_filter = {2}
@@ -2398,11 +2408,13 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.hox_1 = {
 		level_id = "hox_1",
+		dlc = "pd2_clan",
 		type_id = "heist_type_assault",
 		type = "d"
 	}
 	self.stages.hox_2 = {
 		level_id = "hox_2",
+		dlc = "pd2_clan",
 		type_id = "heist_type_assault",
 		type = "d"
 	}
@@ -2547,6 +2559,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.pines.is_christmas_heist = true
 	self.stages.mus = {
 		level_id = "mus",
+		dlc = "hope_diamond",
 		type_id = "heist_type_assault",
 		type = "d"
 	}
@@ -2745,6 +2758,7 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.crojob1 = {
 		level_id = "crojob2",
+		dlc = "the_bomb",
 		type_id = "heist_type_assault",
 		type = "d",
 		mission_filter = {1}
@@ -2886,12 +2900,14 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.crojob_wrapper.dlc = "the_bomb"
 	self.stages.crojob2_d = {
 		level_id = "crojob3",
+		dlc = "the_bomb",
 		type_id = "heist_type_survive",
 		type = "d",
 		world_setting = "day"
 	}
 	self.stages.crojob2_n = {
 		level_id = "crojob3_night",
+		dlc = "the_bomb",
 		type_id = "heist_type_survive",
 		type = "d",
 		world_setting = "night"
@@ -2969,6 +2985,7 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.arena = {
 		level_id = "arena",
+		dlc = "arena",
 		type_id = "heist_type_assault",
 		type = "d"
 	}
@@ -3031,6 +3048,7 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.kenaz = {
 		level_id = "kenaz",
+		dlc = "kenaz",
 		type_id = "heist_type_assault",
 		type = "e",
 		mission_filter = {1}
@@ -3289,6 +3307,7 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.pbr = {
 		level_id = "pbr",
+		dlc = "berry",
 		type_id = "heist_type_assault",
 		type = "d"
 	}
@@ -3350,6 +3369,7 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.pbr2 = {
 		level_id = "pbr2",
+		dlc = "berry",
 		type_id = "heist_type_assault",
 		type = "d"
 	}
@@ -3411,6 +3431,7 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.pal = {
 		level_id = "pal",
+		dlc = "pal",
 		type_id = "heist_type_assault",
 		type = "d"
 	}
@@ -3600,11 +3621,13 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.peta_1 = {
 		level_id = "peta",
+		dlc = "peta",
 		type_id = "heist_type_assault",
 		type = "d"
 	}
 	self.stages.peta_2 = {
 		level_id = "peta2",
+		dlc = "peta",
 		type_id = "heist_type_assault",
 		type = "d"
 	}
@@ -3671,6 +3694,7 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.man = {
 		level_id = "man",
+		dlc = "pal",
 		type_id = "heist_type_assault",
 		type = "d"
 	}
@@ -3847,11 +3871,13 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.born = {
 		level_id = "born",
+		dlc = "born",
 		type_id = "heist_type_assault",
 		type = "d"
 	}
 	self.stages.chew = {
 		level_id = "chew",
+		dlc = "born",
 		type_id = "heist_type_assault",
 		type = "d"
 	}
@@ -4121,6 +4147,7 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.friend = {
 		level_id = "friend",
+		dlc = "friend",
 		type_id = "heist_type_assault",
 		type = "d"
 	}
@@ -4248,6 +4275,7 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.spa = {
 		level_id = "spa",
+		dlc = "spa",
 		type_id = "heist_type_assault",
 		type = "d"
 	}
@@ -4313,6 +4341,7 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.stages.fish = {
 		level_id = "fish",
+		dlc = "spa",
 		type_id = "heist_type_assault",
 		type = "d"
 	}

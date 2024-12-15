@@ -1287,8 +1287,8 @@ function UnitNetworkHandler:sentrygun_ammo(unit, ammo_ratio, owner_id)
 	unit:weapon():sync_ammo(ammo_ratio)
 end
 
-function UnitNetworkHandler:sentrygun_sync_state(unit)
-	unit:weapon():switch_fire_mode_net()
+function UnitNetworkHandler:sentrygun_sync_armor_piercing(unit, use_armor_piercing)
+	unit:weapon():set_fire_mode_net(use_armor_piercing)
 end
 
 function UnitNetworkHandler:sync_fire_mode_interaction(unit, fire_mode_unit, owner_id)

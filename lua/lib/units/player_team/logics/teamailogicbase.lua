@@ -27,6 +27,18 @@ function TeamAILogicBase._get_logic_state_from_reaction(data, reaction)
 	end
 end
 
+function TeamAILogicBase.actually_revive(data, revive_unit)
+	if revive_unit:interaction() then
+		if revive_unit:interaction():active() then
+			revive_unit:interaction():interact(data.unit)
+		end
+	elseif revive_unit:character_damage() and (revive_unit:character_damage():need_revive() or revive_unit:character_damage():arrested()) then
+		local hint = revive_unit:character_damage():need_revive() and 2 or 3
+		managers.network:session():send_to_peers_synched("sync_teammate_helped_hint", hint, revive_unit, data.unit)
+		revive_unit:character_damage():revive(data.unit)
+	end
+end
+
 function TeamAILogicBase._set_attention_obj(data, new_att_obj, new_reaction)
 	local old_att_obj = data.attention_obj
 	data.attention_obj = new_att_obj

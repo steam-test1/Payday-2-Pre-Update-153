@@ -4685,7 +4685,7 @@ function PlayerInventoryGui:_get_armor_stats(name)
 			}
 		elseif stat.name == "health" then
 			local base = tweak_data.player.damage.HEALTH_INIT
-			local mod = managers.player:thick_skin_value()
+			local mod = managers.player:health_skill_addend()
 			base_stats[stat.name] = {
 				value = (base + mod) * tweak_data.gui.stats_present_multiplier
 			}

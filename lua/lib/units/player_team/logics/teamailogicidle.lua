@@ -666,15 +666,7 @@ function TeamAILogicIdle.clbk_revive_complete(ignore_this, data)
 	my_data.reviving = nil
 	if alive(revive_unit) then
 		data.objective_complete_clbk(data.unit, my_data.performing_act_objective)
-		if revive_unit:interaction() then
-			if revive_unit:interaction():active() then
-				revive_unit:interaction():interact(data.unit)
-			end
-		elseif revive_unit:character_damage() and (revive_unit:character_damage():need_revive() or revive_unit:character_damage():arrested()) then
-			local hint = revive_unit:character_damage():need_revive() and 2 or 3
-			managers.network:session():send_to_peers_synched("sync_teammate_helped_hint", hint, revive_unit, data.unit)
-			revive_unit:character_damage():revive(data.unit)
-		end
+		TeamAILogicIdle.actually_revive(data, revive_unit)
 	else
 		print("[TeamAILogicIdle.clbk_revive_complete] Revive unit dead.", revive_unit, data.unit)
 		data.objective_failed_clbk(data.unit, data.performing_act_objective)

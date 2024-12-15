@@ -362,7 +362,7 @@ function GamePlayCentralManager:_play_bullet_hit(params)
 				normal = col_ray.normal
 			}
 		end
-		sound_switch_name = need_sound and material_name
+		sound_switch_name = need_sound and (params.sound_switch_name or material_name)
 	else
 		if need_effect then
 			local generic_effect = effect or idstr_fallback
@@ -372,9 +372,11 @@ function GamePlayCentralManager:_play_bullet_hit(params)
 				normal = col_ray.normal
 			}
 		end
-		sound_switch_name = need_sound and idstr_no_material
+		sound_switch_name = need_sound and (params.sound_switch_name or idstr_no_material)
 	end
-	table.insert(self._play_effects, effect)
+	if effect and effect.effect then
+		table.insert(self._play_effects, effect)
+	end
 	if need_sound then
 		table.insert(self._play_sounds, {
 			sound_switch_name = sound_switch_name,

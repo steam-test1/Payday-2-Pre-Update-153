@@ -14,7 +14,7 @@ function MenuItemMultiChoice:init(data_node, parameters)
 			local type = c._meta
 			if type == "option" then
 				local option = CoreMenuItemOption.ItemOption:new(c)
-				self:add_option(option)
+				table.insert(self._all_options, option)
 				local visible_callback = c.visible_callback
 				if visible_callback then
 					option.visible_callback_names = string.split(visible_callback, " ")
@@ -65,6 +65,7 @@ end
 
 function MenuItemMultiChoice:add_option(option)
 	table.insert(self._all_options, option)
+	table.insert(self._options, option)
 end
 
 function MenuItemMultiChoice:clear_options()

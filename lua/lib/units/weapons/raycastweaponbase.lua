@@ -1429,6 +1429,7 @@ function RaycastWeaponBase:set_timer(timer)
 end
 
 InstantBulletBase = InstantBulletBase or class()
+InstantBulletBase.id = "instant"
 
 function InstantBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage, blank, no_sound)
 	local hit_unit = col_ray.unit
@@ -1515,8 +1516,19 @@ function InstantBulletBase:blank_slotmask()
 	return managers.slot:get_mask("bullet_blank_impact_targets")
 end
 
+function InstantBulletBase:_get_sound_and_effects_params(col_ray, no_sound)
+	local bullet_tweak = self.id and (tweak_data.blackmarket.bullets[self.id] or {}) or {}
+	local params = {
+		col_ray = col_ray,
+		no_sound = no_sound,
+		effect = bullet_tweak.effect,
+		sound_switch_name = bullet_tweak.sound_switch_name
+	}
+	return params
+end
+
 function InstantBulletBase:play_impact_sound_and_effects(col_ray, no_sound)
-	managers.game_play_central:play_impact_sound_and_effects({col_ray = col_ray, no_sound = no_sound})
+	managers.game_play_central:play_impact_sound_and_effects(self:_get_sound_and_effects_params(col_ray, no_sound))
 end
 
 function InstantBulletBase:give_impact_damage(col_ray, weapon_unit, user_unit, damage, armor_piercing, shield_knock, knock_down, stagger, variant)
@@ -1547,6 +1559,7 @@ function InstantBulletBase._get_vector_sync_yaw_pitch(dir, yaw_resolution, pitch
 end
 
 InstantExplosiveBulletBase = InstantExplosiveBulletBase or class(InstantBulletBase)
+InstantExplosiveBulletBase.id = "explosive"
 InstantExplosiveBulletBase.CURVE_POW = tweak_data.upgrades.explosive_bullet.curve_pow
 InstantExplosiveBulletBase.PLAYER_DMG_MUL = tweak_data.upgrades.explosive_bullet.player_dmg_mul
 InstantExplosiveBulletBase.RANGE = tweak_data.upgrades.explosive_bullet.range
@@ -1570,7 +1583,7 @@ function InstantExplosiveBulletBase:blank_slotmask()
 end
 
 function InstantExplosiveBulletBase:play_impact_sound_and_effects(col_ray)
-	managers.game_play_central:play_impact_sound_and_effects({col_ray = col_ray, no_decal = true})
+	managers.game_play_central:play_impact_sound_and_effects(self:_get_sound_and_effects_params(col_ray, false))
 end
 
 function InstantExplosiveBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage, blank)
@@ -1671,6 +1684,7 @@ function InstantExplosiveBulletBase:on_collision_client(position, normal, damage
 end
 
 FlameBulletBase = FlameBulletBase or class(InstantExplosiveBulletBase)
+FlameBulletBase.id = "flame"
 FlameBulletBase.EFFECT_PARAMS = {
 	sound_event = "round_explode",
 	feedback_range = tweak_data.upgrades.flame_bullet.feedback_range,
@@ -1718,8 +1732,8 @@ function FlameBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage, b
 	end
 	if play_impact_flesh then
 		managers.game_play_central:play_impact_flesh({col_ray = col_ray, no_sound = true})
-		self:play_impact_sound_and_effects(col_ray)
 	end
+	self:play_impact_sound_and_effects(col_ray)
 	return result
 end
 
@@ -1761,7 +1775,12 @@ function FlameBulletBase:give_fire_damage_dot(col_ray, weapon_unit, attacker_uni
 	return defense_data
 end
 
+function FlameBulletBase:play_impact_sound_and_effects(col_ray, no_sound)
+	managers.game_play_central:play_impact_sound_and_effects(self:_get_sound_and_effects_params(col_ray, no_sound))
+end
+
 DragonBreathBulletBase = DragonBreathBulletBase or class(InstantBulletBase)
+DragonBreathBulletBase.id = "dragons_breath"
 
 function DragonBreathBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage, blank)
 	local hit_unit = col_ray.unit
@@ -1888,4 +1907,71 @@ function ProjectilesPoisonBulletBase:on_collision(col_ray, weapon_unit, user_uni
 		})
 	end
 	return result
+end
+
+InstantRicochetBulletBase = InstantRicochetBulletBase or class(InstantBulletBase)
+InstantRicochetBulletBase.TRAIL_EFFECT = Idstring("effects/payday2/particles/weapons/trail_adam")
+local idstr_trail = Idstring("trail")
+local idstr_simulator_length = Idstring("simulator_length")
+local idstr_size = Idstring("size")
+local reflect_result = Vector3()
+
+function InstantRicochetBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage, blank, no_sound)
+	local from_pos, to_pos, ignore_unit, latest_data
+	from_pos = user_unit:position() + Vector3(0, 0, 150)
+	to_pos = col_ray.hit_position
+	ignore_unit = user_unit
+	for i = 1, tweak_data.ammo.ricochet.max_ricochets + 1 do
+		if 1 < i then
+			local weapon_base = alive(weapon_unit) and weapon_unit:base()
+			if weapon_base and weapon_base.check_autoaim then
+				local autoaim = weapon_base:check_autoaim(from_pos, reflect_result, nil, nil, tweak_data.ammo.ricochet.autohit)
+				if autoaim then
+					mvector3.set(reflect_result, autoaim.ray)
+					col_ray = autoaim
+				end
+			end
+			if not self._trail_length then
+				self._trail_length = World:effect_manager():get_initial_simulator_var_vector2(self.TRAIL_EFFECT, idstr_trail, idstr_simulator_length, idstr_size)
+			end
+			local trail = World:effect_manager():spawn({
+				effect = self.TRAIL_EFFECT,
+				position = from_pos,
+				normal = reflect_result
+			})
+			if col_ray then
+				mvector3.set_y(self._trail_length, col_ray.distance)
+				World:effect_manager():set_simulator_var_vector2(trail, idstr_trail, idstr_simulator_length, idstr_size, self._trail_length)
+			end
+		end
+		mvector3.set_zero(reflect_result)
+		mvector3.set(reflect_result, col_ray.ray)
+		mvector3.add(reflect_result, -2 * col_ray.ray:dot(col_ray.normal) * col_ray.normal)
+		local ang = math.abs(mvector3.angle(col_ray.ray, reflect_result))
+		local can_ricochet = not (ang < tweak_data.ammo.ricochet.angles[1]) and not (ang > tweak_data.ammo.ricochet.angles[2])
+		mvector3.spread(reflect_result, math.random(tweak_data.ammo.ricochet.spread_angle[1], tweak_data.ammo.ricochet.spread_angle[2]))
+		from_pos = col_ray.hit_position + col_ray.normal
+		ignore_unit = col_ray.unit
+		latest_data = InstantRicochetBulletBase.super.on_collision(self, col_ray, weapon_unit, user_unit, damage, blank, no_sound)
+		managers.game_play_central:play_impact_sound_and_effects({col_ray = col_ray, no_sound = no_sound})
+		if not can_ricochet then
+			return latest_data
+		end
+		if alive(col_ray.unit) and col_ray.unit:character_damage() then
+			return latest_data
+		else
+			local ray_data = World:raycast("ray", from_pos, from_pos + reflect_result * 50000, "slot_mask", self:bullet_slotmask())
+			if ray_data then
+				col_ray = ray_data
+				to_pos = col_ray.hit_position
+			else
+				to_pos = false
+				break
+			end
+		end
+	end
+	return latest_data
+end
+
+function InstantRicochetBulletBase:play_impact_sound_and_effects(col_ray, no_sound)
 end

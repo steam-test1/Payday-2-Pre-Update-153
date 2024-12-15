@@ -1238,6 +1238,14 @@ function PlayerManager:aquire_incremental_upgrade(upgrade)
 	local val = self._global.upgrades[upgrade.category][upgrade.upgrade]
 	self._global.upgrades[upgrade.category][upgrade.upgrade] = (val or 0) + 1
 	local value = tweak_data.upgrades.values[upgrade.category][upgrade.upgrade][self._global.upgrades[upgrade.category][upgrade.upgrade]]
+	local last_value = tweak_data.upgrades.values[upgrade.category][upgrade.upgrade][val or 0]
+	if last_value and not value then
+		if Application:production_build() then
+			debug_pause("Trying to increment upgrade'" .. upgrade.category .. "." .. upgrade.upgrade .. "' beyond what is specified in tweak data!")
+		end
+		value = last_value
+		tweak_data.upgrades.values[upgrade.category][upgrade.upgrade][self._global.upgrades[upgrade.category][upgrade.upgrade]] = last_value
+	end
 	if upgrade.synced then
 		self._global.synced_upgrades[upgrade.category] = self._global.synced_upgrades[upgrade.category] or {}
 		self._global.synced_upgrades[upgrade.category][upgrade.upgrade] = true
@@ -1259,13 +1267,14 @@ function PlayerManager:unaquire_incremental_upgrade(upgrade)
 	local val = self._global.upgrades[upgrade.category][upgrade.upgrade]
 	val = val - 1
 	self._global.upgrades[upgrade.category][upgrade.upgrade] = 0 < val and val or nil
+	local value
 	if self._global.upgrades[upgrade.category][upgrade.upgrade] then
-		local value = tweak_data.upgrades.values[upgrade.category][upgrade.upgrade][self._global.upgrades[upgrade.category][upgrade.upgrade]]
-		if self[upgrade.upgrade] then
-			self[upgrade.upgrade](self, value)
-		end
+		value = tweak_data.upgrades.values[upgrade.category][upgrade.upgrade][self._global.upgrades[upgrade.category][upgrade.upgrade]]
 	elseif upgrade.synced and self._global.synced_upgrades[upgrade.category] then
 		self._global.synced_upgrades[upgrade.category][upgrade.upgrade] = nil
+	end
+	if self[upgrade.upgrade] then
+		self[upgrade.upgrade](self, value)
 	end
 end
 
@@ -1785,7 +1794,7 @@ function PlayerManager:body_armor_skill_addend(override_armor)
 	addend = addend + self:upgrade_value("player", tostring(override_armor or managers.blackmarket:equipped_armor(true, true)) .. "_armor_addend", 0)
 	if self:has_category_upgrade("player", "armor_increase") then
 		local health_multiplier = self:health_skill_multiplier()
-		local max_health = (PlayerDamage._HEALTH_INIT + self:thick_skin_value()) * health_multiplier
+		local max_health = (PlayerDamage._HEALTH_INIT + self:health_skill_addend()) * health_multiplier
 		addend = addend + max_health * self:upgrade_value("player", "armor_increase", 1)
 	end
 	return addend
@@ -1877,7 +1886,7 @@ end
 
 function PlayerManager:max_health()
 	local base_health = PlayerDamage._HEALTH_INIT
-	local health = (base_health + self:thick_skin_value()) * self:health_skill_multiplier()
+	local health = (base_health + self:health_skill_addend()) * self:health_skill_multiplier()
 	return health
 end
 
@@ -1913,14 +1922,12 @@ function PlayerManager:damage_reduction_skill_multiplier(damage_type)
 	return multiplier
 end
 
-function PlayerManager:thick_skin_value()
-	if not self:has_category_upgrade("player", "thick_skin") then
-		return 0
+function PlayerManager:health_skill_addend()
+	local addend = 0
+	if table.contains(self._global.kit.equipment_slots, "thick_skin") then
+		addend = addend + self:upgrade_value("player", "thick_skin", 0)
 	end
-	if not table.contains(self._global.kit.equipment_slots, "thick_skin") then
-		return 0
-	end
-	return self:upgrade_value("player", "thick_skin")
+	return addend
 end
 
 function PlayerManager:toolset_value()

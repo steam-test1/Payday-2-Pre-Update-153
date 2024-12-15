@@ -3244,7 +3244,16 @@ function CrimeNetGui:check_job_pressed(x, y)
 			}
 			managers.menu_component:post_event("menu_enter")
 			if not data.dlc or managers.dlc:is_dlc_unlocked(data.dlc) then
-				local node = job.special_node or Global.game_settings.single_player and "crimenet_contract_singleplayer" or job.server and "crimenet_contract_join" or "crimenet_contract_host"
+				local node = job.special_node
+				if not node then
+					if Global.game_settings.single_player then
+						node = "crimenet_contract_singleplayer"
+					elseif job.server then
+						node = "crimenet_contract_join"
+					else
+						node = "crimenet_contract_host"
+					end
+				end
 				managers.menu:open_node(node, {data})
 			elseif is_win32 then
 				local dlc_data = Global.dlc_manager.all_dlc_data[data.dlc]

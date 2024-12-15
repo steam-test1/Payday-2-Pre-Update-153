@@ -875,8 +875,7 @@ function WeaponFactoryTweakData:_init_sights()
 		forbids = {
 			"wpn_fps_amcar_uupg_body_upperreciever",
 			"wpn_fps_ass_m16_os_frontsight",
-			"wpn_fps_ass_scar_o_flipups_up",
-			"wpn_fps_upg_o_xpsg33_magnifier"
+			"wpn_fps_ass_scar_o_flipups_up"
 		},
 		texture_switch = {
 			material = "sight",
@@ -901,8 +900,7 @@ function WeaponFactoryTweakData:_init_sights()
 		forbids = {
 			"wpn_fps_amcar_uupg_body_upperreciever",
 			"wpn_fps_ass_m16_os_frontsight",
-			"wpn_fps_ass_scar_o_flipups_up",
-			"wpn_fps_upg_o_xpsg33_magnifier"
+			"wpn_fps_ass_scar_o_flipups_up"
 		},
 		texture_switch = {
 			material = "sight",
@@ -933,8 +931,7 @@ function WeaponFactoryTweakData:_init_sights()
 		forbids = {
 			"wpn_fps_amcar_uupg_body_upperreciever",
 			"wpn_fps_ass_m16_os_frontsight",
-			"wpn_fps_ass_scar_o_flipups_up",
-			"wpn_fps_upg_o_xpsg33_magnifier"
+			"wpn_fps_ass_scar_o_flipups_up"
 		},
 		texture_switch = {
 			material = "sight",
@@ -1198,9 +1195,6 @@ function WeaponFactoryTweakData:_init_sights()
 		texture_bundle_folder = "gage_pack_snp",
 		dlc = "gage_pack_snp",
 		is_a_unlockable = true,
-		forbids = {
-			"wpn_fps_upg_o_xpsg33_magnifier"
-		},
 		texture_switch = {
 			material = "gfx_reddot1",
 			channel = "diffuse_texture"
@@ -1253,9 +1247,6 @@ function WeaponFactoryTweakData:_init_sights()
 		texture_bundle_folder = "gage_pack_snp",
 		dlc = "gage_pack_snp",
 		is_a_unlockable = true,
-		forbids = {
-			"wpn_fps_upg_o_xpsg33_magnifier"
-		},
 		texture_switch = {
 			material = "gfx_reddot1",
 			channel = "diffuse_texture"
@@ -1644,8 +1635,7 @@ function WeaponFactoryTweakData:_init_content_dlc2_dec16()
 		forbids = {
 			"wpn_fps_amcar_uupg_body_upperreciever",
 			"wpn_fps_ass_m16_os_frontsight",
-			"wpn_fps_ass_scar_o_flipups_up",
-			"wpn_fps_upg_o_xpsg33_magnifier"
+			"wpn_fps_ass_scar_o_flipups_up"
 		},
 		texture_switch = {
 			material = "gfx_reddot",
@@ -2362,8 +2352,7 @@ function WeaponFactoryTweakData:_init_content_jobs()
 		forbids = {
 			"wpn_fps_amcar_uupg_body_upperreciever",
 			"wpn_fps_ass_m16_os_frontsight",
-			"wpn_fps_ass_scar_o_flipups_up",
-			"wpn_fps_upg_o_xpsg33_magnifier"
+			"wpn_fps_ass_scar_o_flipups_up"
 		},
 		texture_switch = {
 			material = "gfx_reddot",
@@ -15341,6 +15330,62 @@ function WeaponFactoryTweakData:create_ammunition()
 			table.insert(self[factory_id .. "_npc"].uses_parts, "wpn_fps_upg_a_grenade_launcher_incendiary_arbiter")
 		end
 	end
+	self.parts.wpn_fps_upg_pis_adam = {
+		pcs = {},
+		type = "ammo",
+		name_id = "bm_wp_upg_a_ricochet",
+		a_obj = "a_body",
+		unit = "units/payday2/weapons/wpn_upg_dummy/wpn_upg_dummy",
+		third_unit = "units/payday2/weapons/wpn_upg_dummy/wpn_upg_dummy",
+		texture_bundle_folder = "mmo",
+		is_a_unlockable = false,
+		stats = {},
+		custom_stats = {
+			bullet_class = "InstantRicochetBulletBase"
+		},
+		internal_part = true,
+		sub_type = "adam"
+	}
+	local weapons = {
+		"wpn_fps_pis_rage",
+		"wpn_fps_pis_peacemaker",
+		"wpn_fps_pis_2006m",
+		"wpn_fps_pis_usp",
+		"wpn_fps_pis_g22c",
+		"wpn_fps_pis_g26",
+		"wpn_fps_pis_g17",
+		"wpn_fps_pis_1911",
+		"wpn_fps_pis_beretta",
+		"wpn_fps_pis_pl14",
+		"wpn_fps_pis_g18c",
+		"wpn_fps_pis_deagle",
+		"wpn_fps_pis_ppk",
+		"wpn_fps_pis_p226",
+		"wpn_fps_pis_c96",
+		"wpn_fps_pis_hs2000",
+		"wpn_fps_pis_sparrow",
+		"wpn_fps_pis_packrat",
+		"wpn_fps_jowi",
+		"wpn_fps_x_1911",
+		"wpn_fps_smg_x_akmsu",
+		"wpn_fps_x_b92fs",
+		"wpn_fps_x_deagle",
+		"wpn_fps_pis_x_g17",
+		"wpn_fps_pis_x_g22c",
+		"wpn_fps_smg_x_mp5",
+		"wpn_fps_smg_x_sr2",
+		"wpn_fps_pis_x_usp",
+		"wpn_fps_x_packrat",
+		"wpn_fps_lmg_m134"
+	}
+	for _, factory_id in ipairs(weapons) do
+		if self[factory_id] then
+			if not self[factory_id].forced_parts then
+				self[factory_id].forced_parts = {}
+			end
+			table.insert(self[factory_id].forced_parts, "wpn_fps_upg_pis_adam")
+		end
+	end
 end
 
 function WeaponFactoryTweakData:_init_g26()
@@ -18488,6 +18533,9 @@ function WeaponFactoryTweakData:_init_modpack_m4_ak()
 		adds = {
 			"wpn_fps_upg_ak_ns_ak105"
 		},
+		forbids = {
+			"wpn_fps_ammo_type"
+		},
 		override = {
 			wpn_fps_upg_ns_ass_smg_large = {
 				forbids = {
@@ -19724,6 +19772,9 @@ function WeaponFactoryTweakData:_init_modpack_m4_ak()
 			concealment = -4
 		},
 		custom_stats = {ammo_pickup_min_mul = 0.5, ammo_pickup_max_mul = 0.5},
+		forbids = {
+			"wpn_fps_ammo_type"
+		},
 		sound_switch = {suppressed = "regular_b"},
 		is_a_unlockable = true,
 		texture_bundle_folder = "dlc_akm4",
@@ -28016,8 +28067,7 @@ function WeaponFactoryTweakData:_init_tng()
 		forbids = {
 			"wpn_fps_amcar_uupg_body_upperreciever",
 			"wpn_fps_ass_m16_os_frontsight",
-			"wpn_fps_ass_scar_o_flipups_up",
-			"wpn_fps_upg_o_xpsg33_magnifier"
+			"wpn_fps_ass_scar_o_flipups_up"
 		},
 		texture_switch = {
 			material = "gfx_reddot1",
@@ -28073,9 +28123,6 @@ function WeaponFactoryTweakData:_init_tng()
 		texture_bundle_folder = "tng",
 		dlc = "tango",
 		is_a_unlockable = true,
-		forbids = {
-			"wpn_fps_upg_o_xpsg33_magnifier"
-		},
 		texture_switch = {
 			material = "gfx_reddot1",
 			channel = "diffuse_texture"

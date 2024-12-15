@@ -29,3 +29,11 @@ function ElementPlayerSpawner:on_executed(instigator)
 	})
 	ElementPlayerSpawner.super.on_executed(self, self._unit or instigator)
 end
+
+function ElementPlayerSpawner:execute_on_all_units(func)
+	for _, data in ipairs(managers.criminals:characters()) do
+		if alive(data.unit) then
+			func(data.unit)
+		end
+	end
+end

@@ -229,6 +229,8 @@ function PlayerMovement:update_stamina(t, dt, ignore_running)
 				self._regenerate_timer = nil
 			end
 		end
+	elseif self._stamina < self:_max_stamina() then
+		self:_restart_stamina_regen_timer()
 	end
 end
 
@@ -857,6 +859,10 @@ end
 
 function PlayerMovement:set_running(running)
 	self._is_running = running
+	self:_restart_stamina_regen_timer()
+end
+
+function PlayerMovement:_restart_stamina_regen_timer()
 	self._regenerate_timer = (tweak_data.player.movement_state.stamina.REGENERATE_TIME or 5) * managers.player:upgrade_value("player", "stamina_regen_timer_multiplier", 1)
 end
 

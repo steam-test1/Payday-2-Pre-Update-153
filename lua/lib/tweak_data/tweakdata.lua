@@ -624,6 +624,19 @@ function TweakData:init()
 	self.ai_carry = {}
 	self.ai_carry.throw_distance = 500
 	self.ai_carry.throw_force = 100
+	self.ammo = {}
+	self.ammo.ricochet = {}
+	self.ammo.ricochet.max_ricochets = 5
+	self.ammo.ricochet.angles = {0, 175}
+	self.ammo.ricochet.spread_angle = {10, 30}
+	self.ammo.ricochet.autohit = {
+		MIN_RATIO = 0.6,
+		MAX_RATIO = 1,
+		INIT_RATIO = 0.6,
+		far_dis = 50000,
+		far_angle = 60,
+		near_angle = 60
+	}
 	self.EFFECT_QUALITY = 0.5
 	if SystemInfo:platform() == Idstring("X360") then
 		self.EFFECT_QUALITY = 0.5
@@ -6191,7 +6204,7 @@ function TweakData:get_controller_help_coords()
 			align = "left"
 		}
 		coords.normal.r2_trigger = {
-			id = "menu_button_shout",
+			id = "menu_button_shout_and_stop",
 			x = 511,
 			y = 55,
 			align = "left"
@@ -6408,7 +6421,7 @@ function TweakData:get_controller_help_coords()
 			align = "left"
 		}
 		coords.normal.right_shoulder = {
-			id = "menu_button_shout",
+			id = "menu_button_shout_and_stop",
 			x = 390,
 			y = -10,
 			align = "center"
@@ -6631,7 +6644,7 @@ function TweakData:get_controller_help_coords()
 			align = "left"
 		}
 		coords.normal.right_shoulder = {
-			id = "menu_button_shout",
+			id = "menu_button_shout_and_stop",
 			x = 512,
 			y = 49,
 			align = "left"

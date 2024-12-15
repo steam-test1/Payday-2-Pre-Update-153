@@ -133,7 +133,14 @@ function Item:dirty()
 	end
 end
 
+function Item:set_visible(visible)
+	self._visible = visible
+end
+
 function Item:visible()
+	if self._visible == false then
+		return false
+	end
 	if self._visible_callback_list then
 		for _, visible_callback in pairs(self._visible_callback_list) do
 			if not visible_callback(self) then

@@ -5745,4 +5745,30 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.bny_bundle = {}
+	self.bny_bundle.free = true
+	self.bny_bundle.content = {}
+	self.bny_bundle.content.loot_global_value = "normal"
+	self.bny_bundle.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "bny_01",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "bny_02",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "bny_03",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "bny_04",
+			amount = 1
+		}
+	}
 end

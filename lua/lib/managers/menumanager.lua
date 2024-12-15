@@ -2886,7 +2886,6 @@ end
 function MenuCallbackHandler:choice_choose_color_grading(item)
 	managers.user:set_setting("video_color_grading", item:value())
 	if managers.environment_controller then
-		managers.environment_controller:set_default_color_grading(item:value())
 		managers.environment_controller:refresh_render_settings()
 	end
 end
@@ -7980,9 +7979,6 @@ function MenuOptionInitiator:modify_adv_video(node)
 		node:item("choose_anti_alias"):set_value(managers.user:get_setting("video_anti_alias"))
 	end
 	node:item("choose_anim_lod"):set_value(managers.user:get_setting("video_animation_lod"))
-	if node:item("choose_color_grading") then
-		node:item("choose_color_grading"):set_value(managers.user:get_setting("video_color_grading"))
-	end
 	node:item("use_lightfx"):set_value(managers.user:get_setting("use_lightfx") and "on" or "off")
 	node:item("choose_texture_quality"):set_value(RenderSettings.texture_quality_default)
 	node:item("choose_shadow_quality"):set_value(RenderSettings.shadow_quality_default)

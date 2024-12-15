@@ -209,7 +209,7 @@ function IngameAccessCamera:at_enter(old_state, ...)
 	managers.hud:show(self.GUI_FULLSCREEN)
 	managers.hud:start_access_camera()
 	self._saved_default_color_grading = managers.environment_controller:default_color_grading()
-	managers.environment_controller:set_default_color_grading("color_sin")
+	managers.environment_controller:set_default_color_grading("color_sin", true)
 	self._cam_unit = CoreUnit.safe_spawn_unit("units/gui/background_camera_01/access_camera", Vector3(), Rotation())
 	self:_get_cameras()
 	self._camera_data = {}

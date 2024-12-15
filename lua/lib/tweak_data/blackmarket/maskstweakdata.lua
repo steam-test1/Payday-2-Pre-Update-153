@@ -3521,6 +3521,357 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 			Rotation(0, 0, 0)
 		}
 	}
+	self.masks.bny_01_bonnie = {}
+	self.masks.bny_01_bonnie.unit = "units/pd2_dlc_bny/masks/bny_01/msk_bny_01_bonnie"
+	self.masks.bny_01_bonnie.name_id = "bm_msk_bny_01a"
+	self.masks.bny_01_bonnie.type = "helmet"
+	self.masks.bny_01_bonnie.inaccessible = true
+	self.masks.bny_01_bonnie.offsets = {
+		wolf = {
+			Vector3(0, 3.41641, 0.435254),
+			Rotation(0, -3.73476, 0)
+		},
+		sydney = {
+			Vector3(0, 3.53566, 0.435254),
+			Rotation(0, -4.59333, 0)
+		},
+		chico = {
+			Vector3(0, 3.65491, -1.47269),
+			Rotation(0.558107, -0.300467, -0.041893)
+		},
+		jimmy = {
+			Vector3(0, 4.48963, -2.06892),
+			Rotation(0, 2.27525, 0)
+		},
+		bonnie = {
+			Vector3(0, 3.77415, 0),
+			Rotation(0, -8.02763, 0)
+		}
+	}
+	self.masks.bny_01_bodhi = {}
+	self.masks.bny_01_bodhi.unit = "units/pd2_dlc_bny/masks/bny_01/msk_bny_01_bodhi"
+	self.masks.bny_01_bodhi.name_id = "bm_msk_bny_01b"
+	self.masks.bny_01_bodhi.type = "helmet"
+	self.masks.bny_01_bodhi.inaccessible = true
+	self.masks.bny_01_bodhi.offsets = {
+		dragon = {
+			Vector3(0, 3.8934, -0.637963),
+			Rotation(0, -5.45191, 0)
+		},
+		hoxton = {
+			Vector3(0, 3.41641, 0.435254),
+			Rotation(0, -11.4619, 0)
+		},
+		wild = {
+			Vector3(0, 3.77415, -0.518717),
+			Rotation(0, -8.8862, 0)
+		},
+		sokol = {
+			Vector3(0, 2.82018, 0.316008),
+			Rotation(0, -4.59333, 0)
+		},
+		old_hoxton = {
+			Vector3(0, 4.25114, -2.54591),
+			Rotation(0, 8.28527, 0)
+		},
+		bodhi = {
+			Vector3(0, 4.48963, -0.637963),
+			Rotation(0, -4.59333, 0)
+		},
+		jowi = {
+			Vector3(0, 4.13189, -1.59193),
+			Rotation(0, 3.13383, 0)
+		},
+		chains = {
+			Vector3(0, 3.41641, 1.03149),
+			Rotation(0, -12.3205, 0)
+		},
+		dragan = {
+			Vector3(0, 4.13189, -0.0417315),
+			Rotation(0, -6.31048, 0)
+		}
+	}
+	self.masks.bny_01_clover = {}
+	self.masks.bny_01_clover.unit = "units/pd2_dlc_bny/masks/bny_01/msk_bny_01_clover"
+	self.masks.bny_01_clover.name_id = "bm_msk_bny_01c"
+	self.masks.bny_01_clover.type = "helmet"
+	self.masks.bny_01_clover.inaccessible = true
+	self.masks.bny_01_clover.offsets = {
+		chico = {
+			Vector3(0.00826851, 1.74696, -1.59193),
+			Rotation(-0.300467, 5.70955, -0.300467)
+		},
+		dallas = {
+			Vector3(0, 1.38922, 2.1047),
+			Rotation(0, -16.6134, 0)
+		},
+		jacket = {
+			Vector3(0, 1.03149, -1.2342),
+			Rotation(0.0409595, 5.70955, -4.16882E-10)
+		}
+	}
+	self.masks.bny_01_clover_b = {}
+	self.masks.bny_01_clover_b.unit = "units/pd2_dlc_bny/masks/bny_01/msk_bny_01_clover_b"
+	self.masks.bny_01_clover_b.name_id = "bm_msk_bny_01d"
+	self.masks.bny_01_clover_b.type = "helmet"
+	self.masks.bny_01_clover_b.inaccessible = true
+	self.masks.bny_01 = {}
+	self.masks.bny_01.name_id = "bm_msk_bny_01"
+	self.masks.bny_01.value = 0
+	self.masks.bny_01.pcs = {}
+	self.masks.bny_01.type = "helmet"
+	self.masks.bny_01.texture_bundle_folder = "bny"
+	self.masks.bny_01.sort_number = 46
+	self.masks.bny_01.characters = {
+		dallas = "bny_01_clover",
+		wolf = "bny_01_bonnie",
+		hoxton = "bny_01_bodhi",
+		chains = "bny_01_bodhi",
+		jowi = "bny_01_bodhi",
+		old_hoxton = "bny_01_bodhi",
+		female_1 = "bny_01_clover_b",
+		dragan = "bny_01_bodhi",
+		jacket = "bny_01_clover",
+		sokol = "bny_01_bodhi",
+		dragon = "bny_01_bodhi",
+		jimmy = "bny_01_bonnie",
+		sydney = "bny_01_bonnie",
+		wild = "bny_01_bodhi",
+		chico = "bny_01_bonnie",
+		bodhi = "bny_01_bodhi",
+		bonnie = "bny_01_bonnie"
+	}
+	self.masks.bny_02_bonnie = {}
+	self.masks.bny_02_bonnie.unit = "units/pd2_dlc_bny/masks/bny_02/msk_bny_02_bonnie"
+	self.masks.bny_02_bonnie.name_id = "bm_msk_bny_02a"
+	self.masks.bny_02_bonnie.type = "helmet"
+	self.masks.bny_02_bonnie.inaccessible = true
+	self.masks.bny_02_bonnie.offsets = {
+		jacket = {
+			Vector3(0, 2.22395, -0.518717),
+			Rotation(-4.6676E-4, -8.8862, -3.25689E-12)
+		},
+		sydney = {
+			Vector3(0, 2.3432, -0.0417315),
+			Rotation(1.0422E-10, -6.31048, 0.030943)
+		},
+		dragon = {
+			Vector3(0, 1.86621, -0.399471),
+			Rotation(0, -9.74478, 0)
+		},
+		wild = {
+			Vector3(0, 2.46244, 0.5545),
+			Rotation(0, -14.8962, 0)
+		},
+		dragan = {
+			Vector3(0, 1.86621, -0.0417315),
+			Rotation(0, -8.02763, 0)
+		},
+		wolf = {
+			Vector3(0, 1.98546, -0.637963),
+			Rotation(0, -3.73476, 0)
+		},
+		sokol = {
+			Vector3(0, 0.792993, -0.0417315),
+			Rotation(0, -8.8862, 0)
+		},
+		chico = {
+			Vector3(0, 1.74696, 0.5545),
+			Rotation(0, -15.7548, 0)
+		},
+		jimmy = {
+			Vector3(0, 2.82018, -0.876456),
+			Rotation(-0.041893, -9.74478, 4.16882E-10)
+		},
+		jowi = {
+			Vector3(0, 2.22395, -0.160978),
+			Rotation(0, -8.02763, 0)
+		},
+		bonnie = {
+			Vector3(0, 2.58169, -0.637963),
+			Rotation(0, -5.45191, 0)
+		}
+	}
+	self.masks.bny_02_bodhi = {}
+	self.masks.bny_02_bodhi.unit = "units/pd2_dlc_bny/masks/bny_02/msk_bny_02_bodhi"
+	self.masks.bny_02_bodhi.name_id = "bm_msk_bny_02b"
+	self.masks.bny_02_bodhi.type = "helmet"
+	self.masks.bny_02_bodhi.inaccessible = true
+	self.masks.bny_02_bodhi.offsets = {
+		dallas = {
+			Vector3(0, 2.58169, -0.0417315),
+			Rotation(-0.041893, -4.59334, 1.0422E-10)
+		},
+		chains = {
+			Vector3(0, 2.3432, -0.637963),
+			Rotation(0, -2.87619, 0)
+		},
+		hoxton = {
+			Vector3(0, 2.3432, -0.995702),
+			Rotation(0, 0, 0)
+		},
+		bodhi = {
+			Vector3(0, 1.98546, 0.792993),
+			Rotation(-0.041893, -8.8862, -2.08441E-10)
+		},
+		old_hoxton = {
+			Vector3(0, 2.1047, -1.83043),
+			Rotation(0, 3.9924, 0)
+		}
+	}
+	self.masks.bny_02_clover = {}
+	self.masks.bny_02_clover.unit = "units/pd2_dlc_bny/masks/bny_02/msk_bny_02_clover"
+	self.masks.bny_02_clover.name_id = "bm_msk_bny_02c"
+	self.masks.bny_02_clover.type = "helmet"
+	self.masks.bny_02_clover.inaccessible = true
+	self.masks.bny_02_clover.offsets = {
+		female_1 = {
+			Vector3(0, 0, 0),
+			Rotation(0, -3.73476, 0)
+		}
+	}
+	self.masks.bny_02 = {}
+	self.masks.bny_02.name_id = "bm_msk_bny_02"
+	self.masks.bny_02.value = 0
+	self.masks.bny_02.pcs = {}
+	self.masks.bny_02.type = "helmet"
+	self.masks.bny_02.texture_bundle_folder = "bny"
+	self.masks.bny_02.sort_number = 46
+	self.masks.bny_02.characters = {
+		dallas = "bny_02_bodhi",
+		wolf = "bny_02_bonnie",
+		hoxton = "bny_02_bodhi",
+		chains = "bny_02_bodhi",
+		jowi = "bny_02_bonnie",
+		old_hoxton = "bny_02_bodhi",
+		female_1 = "bny_02_clover",
+		dragan = "bny_02_bonnie",
+		jacket = "bny_02_bonnie",
+		sokol = "bny_02_bonnie",
+		dragon = "bny_02_bonnie",
+		jimmy = "bny_02_bonnie",
+		sydney = "bny_02_bonnie",
+		wild = "bny_02_bonnie",
+		chico = "bny_02_bonnie",
+		bodhi = "bny_02_bodhi",
+		bonnie = "bny_02_bonnie"
+	}
+	self.masks.bny_03_clover = {}
+	self.masks.bny_03_clover.unit = "units/pd2_dlc_bny/masks/bny_03/msk_bny_03_clover"
+	self.masks.bny_03_clover.name_id = "bm_msk_bny_03a"
+	self.masks.bny_03_clover.type = "helmet"
+	self.masks.bny_03_clover.inaccessible = true
+	self.masks.bny_03_clover.offsets = {
+		jacket = {
+			Vector3(0, 2.1047, -2.18817),
+			Rotation(0, 7.4267, 0)
+		},
+		dallas = {
+			Vector3(0, 1.50847, -0.399471),
+			Rotation(0, 0, 0)
+		},
+		female_1 = {
+			Vector3(0.5545, 2.46244, -3.49988),
+			Rotation(0, 11.7196, 0)
+		}
+	}
+	self.masks.bny_03_bodhi = {}
+	self.masks.bny_03_bodhi.unit = "units/pd2_dlc_bny/masks/bny_03/msk_bny_03_bodhi"
+	self.masks.bny_03_bodhi.name_id = "bm_msk_bny_03b"
+	self.masks.bny_03_bodhi.type = "helmet"
+	self.masks.bny_03_bodhi.inaccessible = true
+	self.masks.bny_03_bodhi.offsets = {
+		dragan = {
+			Vector3(0, 2.1047, 0.792993),
+			Rotation(0, 0, 0)
+		},
+		sydney = {
+			Vector3(0, 3.65491, 1.86621),
+			Rotation(0, -6.31048, 0)
+		},
+		chains = {
+			Vector3(0, 1.62772, 1.15073),
+			Rotation(0, -3.73476, 0)
+		},
+		dragon = {
+			Vector3(0, 2.46244, 1.15073),
+			Rotation(-0.0347619, -6.31048, -2.08441E-10)
+		},
+		jowi = {
+			Vector3(0, 2.70093, -0.876456),
+			Rotation(0, 3.13383, 0)
+		},
+		old_hoxton = {
+			Vector3(0, 3.17792, -1.94967),
+			Rotation(0, 7.4267, 0)
+		},
+		sokol = {
+			Vector3(0, 2.1047, 0.912239),
+			Rotation(0, -5.45191, 0)
+		},
+		chico = {
+			Vector3(0, 1.74696, 0.792993),
+			Rotation(0, -2.87619, 0)
+		},
+		wolf = {
+			Vector3(0, 2.1047, 1.38922),
+			Rotation(0, 0, 0)
+		},
+		wild = {
+			Vector3(0, 2.46244, -0.160978),
+			Rotation(0, 0, 0)
+		},
+		bodhi = {
+			Vector3(0, 1.74696, 1.15073),
+			Rotation(0.0409595, -5.45191, 6.25322E-10)
+		},
+		jimmy = {
+			Vector3(0, 3.8934, -0.876456),
+			Rotation(0, 0, 0)
+		},
+		hoxton = {
+			Vector3(0, 1.50847, 1.98546),
+			Rotation(0, -11.4619, 0)
+		},
+		bonnie = {
+			Vector3(0, 3.17792, 0.316008),
+			Rotation(0, 0, 0)
+		}
+	}
+	self.masks.bny_03 = {}
+	self.masks.bny_03.name_id = "bm_msk_bny_03"
+	self.masks.bny_03.value = 0
+	self.masks.bny_03.pcs = {}
+	self.masks.bny_03.type = "helmet"
+	self.masks.bny_03.texture_bundle_folder = "bny"
+	self.masks.bny_03.sort_number = 46
+	self.masks.bny_03.characters = {
+		dallas = "bny_03_clover",
+		wolf = "bny_03_bodhi",
+		hoxton = "bny_03_bodhi",
+		chains = "bny_03_bodhi",
+		jowi = "bny_03_bodhi",
+		old_hoxton = "bny_03_bodhi",
+		female_1 = "bny_03_clover",
+		dragan = "bny_03_bodhi",
+		jacket = "bny_03_clover",
+		sokol = "bny_03_bodhi",
+		dragon = "bny_03_bodhi",
+		jimmy = "bny_03_bodhi",
+		sydney = "bny_03_bodhi",
+		wild = "bny_03_bodhi",
+		chico = "bny_03_bodhi",
+		bodhi = "bny_03_bodhi",
+		bonnie = "bny_03_bodhi"
+	}
+	self.masks.bny_04 = {}
+	self.masks.bny_04.unit = "units/pd2_dlc_bny/masks/bny_04/msk_bny_04"
+	self.masks.bny_04.name_id = "bm_msk_bny_04"
+	self.masks.bny_04.pcs = {}
+	self.masks.bny_04.value = 0
+	self.masks.bny_04.texture_bundle_folder = "bny"
+	self.masks.bny_04.sort_number = 46
+	self.masks.bny_04.type = "helmet"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.masks) do
 		if free_dlcs[data.dlc] then

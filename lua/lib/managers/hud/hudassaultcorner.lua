@@ -343,8 +343,11 @@ function HUDAssaultCorner:_animate_text(text_panel, bg_box, color, color_functio
 		if type(text_id) == "string" then
 			text_string = managers.localization:to_upper_text(text_id)
 		elseif text_id == Idstring("risk") then
-			for i = 1, managers.job:current_difficulty_stars() do
-				text_string = text_string .. managers.localization:get_default_macro("BTN_SKULL")
+			local use_stars = true
+			if use_stars then
+				for i = 1, managers.job:current_difficulty_stars() do
+					text_string = text_string .. managers.localization:get_default_macro("BTN_SKULL")
+				end
 			end
 		end
 		local mod_color = color_function and color_function() or color or self._assault_color

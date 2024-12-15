@@ -1,6 +1,9 @@
+function BlackMarketTweakData:_init_bullets(tweak_data)
+	self.bullets = {}
+end
+
 function BlackMarketTweakData:_init_projectiles(tweak_data)
 	self.projectiles = {}
-	
 	self.projectiles.frag = {}
 	self.projectiles.frag.name_id = "bm_grenade_frag"
 	self.projectiles.frag.unit = "units/payday2/weapons/wpn_frag_grenade/wpn_frag_grenade"

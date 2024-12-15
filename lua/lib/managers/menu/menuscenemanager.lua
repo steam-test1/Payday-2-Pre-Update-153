@@ -515,7 +515,7 @@ function MenuSceneManager:_use_environment(name)
 		managers.viewport:set_default_environment(setting.environment, nil, nil)
 	end
 	if managers.environment_controller:default_color_grading() ~= setting.color_grading then
-		managers.environment_controller:set_default_color_grading(setting.color_grading)
+		managers.environment_controller:set_default_color_grading(setting.color_grading, true)
 		managers.environment_controller:refresh_render_settings()
 	end
 	self:_set_sky_rotation_angle(setting.angle)
@@ -568,7 +568,6 @@ function MenuSceneManager:update(t, dt)
 		local target_pos = math.lerp(self._camera_values.target_pos_current, self._camera_values.target_pos_target, bezier_value)
 		local fov = math.lerp(self._camera_values.fov_current, self._camera_values.fov_target, bezier_value)
 		self._current_fov = fov
-		local speed = dt * 5
 		self:_set_camera_position(camera_pos)
 		self:_set_target_position(target_pos)
 		if self._character_values and not self._transition_time and 0 < #self._character_dynamic_bodies then
@@ -595,27 +594,21 @@ function MenuSceneManager:update(t, dt)
 			self._item_offset = math.lerp(self._item_offset_current, self._item_offset_target, bezier_value)
 		end
 	end
-	if self._item_unit and self._item_unit.unit and not self._disable_item_updates then
-		if not self._item_grabbed then
-			if not managers.blackmarket:currently_customizing_mask() and not self._disable_rotate then
-				self._item_yaw = (self._item_yaw + 5 * dt) % 360
-			end
-			self._item_pitch = math.lerp(self._item_pitch, 0, 10 * dt)
-			self._item_roll = math.lerp(self._item_roll, 0, 10 * dt)
-			mrotation.set_yaw_pitch_roll(self._item_rot_temp, self._item_yaw, self._item_pitch, self._item_roll)
-			mrotation.set_zero(self._item_rot)
-			mrotation.multiply(self._item_rot, self._camera_object:rotation())
-			mrotation.multiply(self._item_rot, self._item_rot_temp)
-			mrotation.multiply(self._item_rot, self._item_rot_mod)
-			self._item_unit.unit:set_rotation(self._item_rot)
-			local new_pos = self._item_rot_pos + self._item_offset:rotate_with(self._item_rot)
-			self._item_unit.unit:set_position(new_pos)
-			self._item_unit.unit:set_moving(2)
+	if self._item_unit and self._item_unit.unit and not self._disable_item_updates and not self._item_grabbed then
+		if not managers.blackmarket:currently_customizing_mask() and not self._disable_rotate then
+			self._item_yaw = (self._item_yaw + 5 * dt) % 360
 		end
-		if alive(self._temp_upgrade_object) then
-		end
-	end
-	if not self._character_grabbed then
+		self._item_pitch = math.lerp(self._item_pitch, 0, 10 * dt)
+		self._item_roll = math.lerp(self._item_roll, 0, 10 * dt)
+		mrotation.set_yaw_pitch_roll(self._item_rot_temp, self._item_yaw, self._item_pitch, self._item_roll)
+		mrotation.set_zero(self._item_rot)
+		mrotation.multiply(self._item_rot, self._camera_object:rotation())
+		mrotation.multiply(self._item_rot, self._item_rot_temp)
+		mrotation.multiply(self._item_rot, self._item_rot_mod)
+		self._item_unit.unit:set_rotation(self._item_rot)
+		local new_pos = self._item_rot_pos + self._item_offset:rotate_with(self._item_rot)
+		self._item_unit.unit:set_position(new_pos)
+		self._item_unit.unit:set_moving(2)
 	end
 	if self._fade_down_lights then
 		for _, light in ipairs(self._fade_down_lights) do
@@ -2393,12 +2386,10 @@ function MenuSceneManager:mouse_moved(o, x, y)
 			local yaw_sin = math.sin(self._item_yaw)
 			local yaw_cos = math.cos(self._item_yaw)
 			local treshhold = math.sin(45)
-			if yaw_cos > -treshhold and yaw_cos < treshhold then
-			else
+			if not (yaw_cos > -treshhold) or not (yaw_cos < treshhold) then
 				self._item_pitch = math.clamp(self._item_pitch + diff * yaw_cos, -30, 30)
 			end
-			if yaw_sin > -treshhold and yaw_sin < treshhold then
-			else
+			if not (yaw_sin > -treshhold) or not (yaw_sin < treshhold) then
 				self._item_roll = math.clamp(self._item_roll - diff * yaw_sin, -30, 30)
 			end
 			mrotation.set_yaw_pitch_roll(self._item_rot_temp, self._item_yaw, self._item_pitch, self._item_roll)

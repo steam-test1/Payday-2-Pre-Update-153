@@ -2658,12 +2658,7 @@ function BlackMarketManager:player_loadout_data(show_all_icons)
 		deployable_string = managers.localization:text(tweak_data.upgrades.definitions[deployable].name_id)
 	end
 	if mask then
-		local guis_catalog = "guis/"
-		local bundle_folder = tweak_data.blackmarket.masks[mask.mask_id] and tweak_data.blackmarket.masks[mask.mask_id].texture_bundle_folder
-		if bundle_folder then
-			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
-		end
-		mask_texture = guis_catalog .. "textures/pd2/blackmarket/icons/masks/" .. tostring(mask.mask_id)
+		mask_texture = self:get_mask_icon(mask.mask_id)
 		local equipped_slot = self:equipped_weapon_slot("masks")
 		mask_string = self:get_mask_name_by_category_slot("masks", equipped_slot)
 	end
@@ -2745,6 +2740,26 @@ function BlackMarketManager:player_loadout_data(show_all_icons)
 		character = character
 	}
 	return data
+end
+
+function BlackMarketManager:get_mask_icon(mask_id)
+	local guis_catalog = "guis/"
+	local bundle_folder = tweak_data.blackmarket.masks[mask_id] and tweak_data.blackmarket.masks[mask_id].texture_bundle_folder
+	if bundle_folder then
+		guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+	end
+	return guis_catalog .. "textures/pd2/blackmarket/icons/masks/" .. tostring(mask_id)
+end
+
+function BlackMarketManager:get_character_icon(character)
+	local character_name = CriminalsManager.convert_old_to_new_character_workname(character)
+	local guis_catalog = "guis/"
+	local character_table = tweak_data.blackmarket.characters[character] or tweak_data.blackmarket.characters.locked[character_name]
+	local bundle_folder = character_table and character_table.texture_bundle_folder
+	if bundle_folder then
+		guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+	end
+	return guis_catalog .. "textures/pd2/blackmarket/icons/characters/" .. character_name
 end
 
 function BlackMarketManager:equip_previous_weapon(category)

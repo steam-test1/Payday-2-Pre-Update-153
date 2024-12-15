@@ -2622,16 +2622,16 @@ function GroupAITweakData:_init_task_data(difficulty_index, difficulty)
 		end
 	elseif difficulty_index <= 2 then
 		self.besiege.assault.force_balance_mul = {
-			0.5,
 			1,
-			1.5,
-			2
+			2,
+			3,
+			4
 		}
 		self.besiege.assault.force_pool_balance_mul = {
-			0.5,
 			1,
-			1.5,
-			2
+			2,
+			3,
+			4
 		}
 	elseif difficulty_index == 3 then
 		self.besiege.assault.force_balance_mul = {

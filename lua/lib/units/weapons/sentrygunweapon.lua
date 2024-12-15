@@ -1,11 +1,11 @@
 SentryGunWeapon = SentryGunWeapon or class()
 SentryGunWeapon._AP_ROUNDS_FIRE_RATE = 3.5
+SentryGunWeapon._AP_ROUNDS_DAMAGE_MULTIPLIER = 2.5
 local tmp_rot1 = Rotation()
 
 function SentryGunWeapon:init(unit)
 	self._unit = unit
 	self._current_damage_mul = 1
-	self._damage_multiplier = 1
 	self._timer = TimerManager:game()
 	self._character_slotmask = managers.slot:get_mask("raycastable_characters")
 	self._next_fire_allowed = -1000
@@ -47,31 +47,27 @@ function SentryGunWeapon:unit()
 	return self._unit
 end
 
-function SentryGunWeapon:get_damage_multiplier()
-	return self._damage_multiplier or 1
-end
-
 function SentryGunWeapon:switch_fire_mode()
-	self:_switch_fire_mode()
+	self:_set_fire_mode(not self._use_armor_piercing)
 	if self._use_armor_piercing then
 		managers.hint:show_hint("sentry_set_ap_rounds")
 	else
 		managers.hint:show_hint("sentry_normal_ammo")
 	end
-	managers.network:session():send_to_peers_synched("sentrygun_sync_state", self._unit)
+	self._unit:network():send("sentrygun_sync_armor_piercing", self._use_armor_piercing)
 	self._unit:sound_source():post_event("wp_sentrygun_swap_ammo")
 	self._unit:event_listener():call("on_switch_fire_mode", self._use_armor_piercing)
 end
 
-function SentryGunWeapon:_switch_fire_mode()
-	self._use_armor_piercing = not self._use_armor_piercing
-	self._fire_rate_reduction = self._use_armor_piercing and self._AP_ROUNDS_FIRE_RATE or not self._use_armor_piercing and 1
-	self._current_damage_mul = self._use_armor_piercing and self._damage_multiplier or not self._use_armor_piercing and 1
+function SentryGunWeapon:_set_fire_mode(use_armor_piercing)
+	self._use_armor_piercing = use_armor_piercing
+	self._fire_rate_reduction = self._use_armor_piercing and self._AP_ROUNDS_FIRE_RATE or 1
+	self._current_damage_mul = self._use_armor_piercing and self._AP_ROUNDS_DAMAGE_MULTIPLIER or 1
 	self:flip_fire_sound()
 end
 
-function SentryGunWeapon:switch_fire_mode_net()
-	self:_switch_fire_mode()
+function SentryGunWeapon:set_fire_mode_net(use_armor_piercing)
+	self:_set_fire_mode(use_armor_piercing)
 end
 
 function SentryGunWeapon:flip_fire_sound()
@@ -491,7 +487,7 @@ function SentryGunWeapon:save(save_data)
 	my_save_data.foe_teams = self._foe_teams
 	my_save_data.auto_reload = self._auto_reload
 	my_save_data.alert = self._alert_events and true or nil
-	my_save_data.damage_multiplier = self._damage_multiplier
+	my_save_data.use_armor_piercing = self._use_armor_piercing
 end
 
 function SentryGunWeapon:load(save_data)
@@ -502,7 +498,7 @@ function SentryGunWeapon:load(save_data)
 	self._spread_mul = my_save_data.spread_mul or 1
 	self._foe_teams = my_save_data.foe_teams
 	self._auto_reload = my_save_data.auto_reload
-	self._damage_multiplier = my_save_data.damage_multiplier
+	self:_set_fire_mode(my_save_data.use_armor_piercing)
 	self._setup = {
 		ignore_units = {
 			self._unit

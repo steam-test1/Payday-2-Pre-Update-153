@@ -129,6 +129,9 @@ function LightningEffect:_update_wait_start()
 end
 
 function LightningEffect:_update(t, dt)
+	if not self._started then
+		return
+	end
 	if not self._sky_material or not self._sky_material:alive() then
 		self._sky_material = Underlay:material(Idstring("sky"))
 	end
@@ -156,6 +159,8 @@ function LightningEffect:start()
 		self.update = self._update_wait_start
 		return
 	end
+	print("[LightningEffect] Start")
+	self._started = true
 	self.update = self._update
 	self._sky_material = Underlay:material(Idstring("sky"))
 	self._original_color0 = self._sky_material:get_variable(Idstring("color0"))
@@ -168,6 +173,13 @@ function LightningEffect:start()
 end
 
 function LightningEffect:stop()
+	print("[LightningEffect] Stop")
+	self._started = false
+	if self._soundsource then
+		self._soundsource:stop()
+		self._soundsource:delete()
+		self._soundsource = nil
+	end
 	self:_set_original_values()
 end
 

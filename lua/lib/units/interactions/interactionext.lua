@@ -83,7 +83,9 @@ function BaseInteractionExt:set_tweak_data(id)
 	end
 	if id then
 		self.tweak_data = id
-		self._tweak_data = tweak_data.interaction[id]
+		self._tweak_data = tweak_data.interaction[id] or {}
+	else
+		self._tweak_data = {}
 	end
 	if self._active and self._tweak_data.contour_preset then
 		self._contour_id = self._unit:contour():add(self._tweak_data.contour_preset)

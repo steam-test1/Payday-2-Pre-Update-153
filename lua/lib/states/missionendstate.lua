@@ -23,6 +23,7 @@ function MissionEndState:set_controller_enabled(enabled)
 end
 
 function MissionEndState:at_enter(old_state, params)
+	managers.environment_effects:stop_all()
 	local is_safe_house = managers.job:current_job_data() and managers.job:current_job_id() == "safehouse"
 	managers.platform:set_presence("Mission_end")
 	if not is_safe_house then
