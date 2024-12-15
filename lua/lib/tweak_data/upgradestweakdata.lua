@@ -2217,7 +2217,8 @@ function UpgradesTweakData:init(tweak_data)
 			"frag",
 			"dynamite",
 			"molotov",
-			"concussion"
+			"concussion",
+			"fir_com"
 		}
 	}
 	self.level_tree[2] = {
@@ -2411,7 +2412,8 @@ function UpgradesTweakData:init(tweak_data)
 			"new_m14",
 			"saiga",
 			"sandsteel",
-			"packrat"
+			"packrat",
+			"lemming"
 		}
 	}
 	self.level_tree[27] = {
@@ -2903,6 +2905,7 @@ function UpgradesTweakData:init(tweak_data)
 	self:_siltstone_weapon_definitions()
 	self:_flint_weapon_definitions()
 	self:_coal_weapon_definitions()
+	self:_lemming_weapon_definitions()
 	self:_melee_weapon_definitions()
 	self:_grenades_definitions()
 	self:_carry_definitions()
@@ -8641,6 +8644,7 @@ function UpgradesTweakData:_grenades_definitions()
 	self.definitions.frag_com = {category = "grenade", dlc = "pd2_clan"}
 	self.definitions.concussion = {category = "grenade"}
 	self.definitions.chico_injector = {category = "grenade", dlc = "chico"}
+	self.definitions.fir_com = {category = "grenade", dlc = "pd2_clan"}
 end
 
 function UpgradesTweakData:_weapon_definitions()
@@ -11707,5 +11711,14 @@ function UpgradesTweakData:_coal_weapon_definitions()
 		weapon_id = "coal",
 		factory_id = "wpn_fps_smg_coal",
 		dlc = "grv"
+	}
+end
+
+function UpgradesTweakData:_lemming_weapon_definitions()
+	self.definitions.lemming = {
+		category = "weapon",
+		weapon_id = "lemming",
+		factory_id = "wpn_fps_pis_lemming",
+		dlc = "pd2_clan"
 	}
 end

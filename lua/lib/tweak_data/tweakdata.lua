@@ -5406,6 +5406,21 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.launcher_incendiary_arbiter.name_id = "bm_launcher_incendiary"
 	self.projectiles.launcher_incendiary_arbiter.burn_duration = 3
 	self.projectiles.launcher_incendiary_arbiter.burn_tick_period = 0.5
+	self.projectiles.fir_com = {}
+	self.projectiles.fir_com.damage = 3
+	self.projectiles.fir_com.curve_pow = 0.1
+	self.projectiles.fir_com.player_damage = 3
+	self.projectiles.fir_com.fire_dot_data = {
+		dot_damage = 25,
+		dot_trigger_max_distance = 3000,
+		dot_trigger_chance = 100,
+		dot_length = 2.1,
+		dot_tick_period = 0.5
+	}
+	self.projectiles.fir_com.range = 500
+	self.projectiles.fir_com.name_id = "bm_grenade_fir_com"
+	self.projectiles.fir_com.sound_event = "white_explosion"
+	self.projectiles.fir_com.effect_name = "effects/payday2/particles/explosions/grenade_incendiary_explosion"
 	self.projectiles.rocket_frag = {}
 	self.projectiles.rocket_frag.launch_speed = 2500
 	self.projectiles.rocket_frag.adjust_z = 0

@@ -211,6 +211,13 @@ function MusicManager:jukebox_heist_specific()
 			return self:track_attachment(track_data) or "all"
 		end
 	end
+	if managers.crime_spree:_is_active() then
+		local narrative_data, day, variant = managers.crime_spree:get_narrative_tweak_data_for_mission_level(managers.crime_spree:current_mission())
+		if narrative_data then
+			local track_data = narrative_data.name_id .. (narrative_data.stages > 1 and tostring(day) or "")
+			return self:track_attachment(track_data) or "all"
+		end
+	end
 	return "all"
 end
 

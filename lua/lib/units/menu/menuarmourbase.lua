@@ -197,18 +197,18 @@ function MenuArmourBase:_set_material_textures()
 end
 
 function MenuArmourBase:_get_cc_material_config()
-	local ids_config = self._unit:material_config()
-	for orig_config, cc_config in pairs(tweak_data.economy.armor_skins_configs) do
-		if orig_config == ids_config then
+	local ids_config_key = self._unit:material_config():key()
+	for orig_config_key, cc_config in pairs(tweak_data.economy.armor_skins_configs) do
+		if orig_config_key == ids_config_key then
 			return cc_config
 		end
 	end
 end
 
 function MenuArmourBase:_get_original_material_config()
-	local ids_config = self._unit:material_config()
-	for orig_config, cc_config in pairs(tweak_data.economy.armor_skins_configs) do
-		if cc_config == ids_config then
+	local ids_config_key = self._unit:material_config():key()
+	for cc_config_key, orig_config in pairs(tweak_data.economy.armor_skins_configs_map) do
+		if cc_config_key == ids_config_key then
 			return orig_config
 		end
 	end

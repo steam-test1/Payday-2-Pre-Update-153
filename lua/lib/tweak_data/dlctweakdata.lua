@@ -62,6 +62,7 @@ function DLCTweakData:init(tweak_data)
 			lxy = true,
 			grv = true,
 			mrm = 1,
+			fir = true,
 			rip = true,
 			pd2_goty = 1,
 			pd2_hw_boxing = true,
@@ -5781,6 +5782,48 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "masks",
 			item_entry = "mrm",
+			amount = 1
+		}
+	}
+	self.mp2_bundle = {}
+	self.mp2_bundle.free = true
+	self.mp2_bundle.content = {}
+	self.mp2_bundle.content.loot_global_value = "normal"
+	self.mp2_bundle.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "mp2_01",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "mp2_02",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "mp2_03",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "mp2_04",
+			amount = 1
+		}
+	}
+	self.flip_bundle = {}
+	self.flip_bundle.free = true
+	self.flip_bundle.content = {}
+	self.flip_bundle.content.loot_global_value = "normal"
+	self.flip_bundle.content.loot_drops = {
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_o_xpsg33_magnifier",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_o_45rds_v2",
 			amount = 1
 		}
 	}

@@ -3521,6 +3521,50 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 			Rotation(0, 0, 0)
 		}
 	}
+	self.masks.mp2_01 = {}
+	self.masks.mp2_01.unit = "units/pd2_dlc_mp2/masks/mp2_01/msk_mp2_01"
+	self.masks.mp2_01.name_id = "bm_msk_mp2_01"
+	self.masks.mp2_01.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.mp2_01.value = 0
+	self.masks.mp2_01.texture_bundle_folder = "mp2"
+	self.masks.mp2_01.sort_number = 44
+	self.masks.mp2_01.offsets = {
+		female_1 = {
+			Vector3(0, 0.435252, 0),
+			Rotation(0, 0, 0)
+		}
+	}
+	self.masks.mp2_02 = {}
+	self.masks.mp2_02.unit = "units/pd2_dlc_mp2/masks/mp2_02/msk_mp2_02"
+	self.masks.mp2_02.name_id = "bm_msk_mp2_02"
+	self.masks.mp2_02.pcs = {}
+	self.masks.mp2_02.value = 0
+	self.masks.mp2_02.texture_bundle_folder = "mp2"
+	self.masks.mp2_02.sort_number = 44
+	self.masks.mp2_03 = {}
+	self.masks.mp2_03.unit = "units/pd2_dlc_mp2/masks/mp2_03/msk_mp2_03"
+	self.masks.mp2_03.name_id = "bm_msk_mp2_03"
+	self.masks.mp2_03.pcs = {}
+	self.masks.mp2_03.value = 0
+	self.masks.mp2_03.texture_bundle_folder = "mp2"
+	self.masks.mp2_03.sort_number = 44
+	self.masks.mp2_04 = {}
+	self.masks.mp2_04.unit = "units/pd2_dlc_mp2/masks/mp2_04/msk_mp2_04"
+	self.masks.mp2_04.name_id = "bm_msk_mp2_04"
+	self.masks.mp2_04.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.mp2_04.value = 0
+	self.masks.mp2_04.texture_bundle_folder = "mp2"
+	self.masks.mp2_04.sort_number = 44
 	self.masks.mrm = {}
 	self.masks.mrm.unit = "units/pd2_dlc_mrm/masks/msk_mrm"
 	self.masks.mrm.name_id = "bm_msk_mrm"

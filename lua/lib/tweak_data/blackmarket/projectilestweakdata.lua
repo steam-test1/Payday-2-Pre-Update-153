@@ -340,6 +340,23 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 	self.projectiles.frag_com.repeat_expire_t = 1.5
 	self.projectiles.frag_com.is_a_grenade = true
 	self.projectiles.frag_com.dlc = "pd2_clan"
+	self.projectiles.fir_com = {}
+	self.projectiles.fir_com.name_id = "bm_grenade_fir_com"
+	self.projectiles.fir_com.desc_id = "bm_grenade_fir_com_desc"
+	self.projectiles.fir_com.unit = "units/pd2_dlc_fir/weapons/wpn_fps_gre_white/wpn_third_gre_white"
+	self.projectiles.fir_com.unit_dummy = "units/pd2_dlc_fir/weapons/wpn_fps_gre_white/wpn_fps_gre_white_husk"
+	self.projectiles.fir_com.sprint_unit = "units/pd2_dlc_fir/weapons/wpn_fps_gre_white/wpn_third_gre_white_sprint"
+	self.projectiles.fir_com.icon = "concussion_grenade"
+	self.projectiles.fir_com.throwable = true
+	self.projectiles.fir_com.max_amount = 6
+	self.projectiles.fir_com.animation = "throw_concussion"
+	self.projectiles.fir_com.anim_global_param = "projectile_frag"
+	self.projectiles.fir_com.throw_allowed_expire_t = 0.1
+	self.projectiles.fir_com.expire_t = 1.1
+	self.projectiles.fir_com.repeat_expire_t = 1.5
+	self.projectiles.fir_com.is_a_grenade = true
+	self.projectiles.fir_com.dlc = "pd2_clan"
+	self.projectiles.fir_com.texture_bundle_folder = "fir"
 	self.projectiles.chico_injector = {}
 	self.projectiles.chico_injector.name_id = "bm_ability_chico_injector"
 	self.projectiles.chico_injector.desc_id = "bm_ability_chico_injector_desc"
@@ -396,7 +413,8 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 		"launcher_incendiary_arbiter",
 		"chico_injector",
 		"launcher_m203",
-		"rocket_ray_frag"
+		"rocket_ray_frag",
+		"fir_com"
 	}
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.projectiles) do

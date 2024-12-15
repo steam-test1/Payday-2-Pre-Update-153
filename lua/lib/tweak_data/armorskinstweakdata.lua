@@ -13,25 +13,31 @@ end
 function EconomyTweakData:_init_armor_skins()
 	local ids_big = Idstring("units/payday2/characters/shared_textures/vest_big_01_df")
 	local ids_small = Idstring("units/payday2/characters/shared_textures/vest_small_01_df")
-	self.armor_skins_configs = {
-		[Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_bodhi")] = Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_bodhi_cc"),
-		[Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_chains")] = Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_chains_cc"),
-		[Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_dallas")] = Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_dallas_cc"),
-		[Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_dragan")] = Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_dragan_cc"),
-		[Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_hoxton")] = Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_hoxton_cc"),
-		[Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_jacket")] = Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_jacket_cc"),
-		[Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_jimmy")] = Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_jimmy_cc"),
-		[Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_jiro")] = Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_jiro_cc"),
-		[Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_john_wick")] = Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_john_wick_cc"),
-		[Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_old_hoxton")] = Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_old_hoxton_cc"),
-		[Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_sokol")] = Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_sokol_cc"),
-		[Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_wolf")] = Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_wolf_cc"),
-		[Idstring("units/payday2/characters/npc_criminal_female_1/mtr_fem1")] = Idstring("units/payday2/characters/npc_criminal_female_1/mtr_fem1_cc"),
-		[Idstring("units/pd2_dlc_bonnie/characters/npc_criminal_bonnie/mtr_bonnie")] = Idstring("units/pd2_dlc_bonnie/characters/npc_criminal_bonnie/mtr_bonnie_cc"),
-		[Idstring("units/pd2_dlc_chico/characters/npc_criminals_terry/mtr_criminal_terry")] = Idstring("units/pd2_dlc_chico/characters/npc_criminals_terry/mtr_criminal_terry_cc"),
-		[Idstring("units/pd2_dlc_opera/characters/npc_criminals_fem_3/mtr_criminal_sydney")] = Idstring("units/pd2_dlc_opera/characters/npc_criminals_fem_3/mtr_criminal_sydney_cc"),
-		[Idstring("units/pd2_dlc_wild/characters/npc_criminals_wild_1/mtr_criminal_wild_1")] = Idstring("units/pd2_dlc_wild/characters/npc_criminals_wild_1/mtr_criminal_wild_1_cc")
+	local armor_skins_configs = {
+		["units/payday2/characters/npc_criminals_suit_1/mtr_bodhi"] = "units/payday2/characters/npc_criminals_suit_1/mtr_bodhi_cc",
+		["units/payday2/characters/npc_criminals_suit_1/mtr_chains"] = "units/payday2/characters/npc_criminals_suit_1/mtr_chains_cc",
+		["units/payday2/characters/npc_criminals_suit_1/mtr_dallas"] = "units/payday2/characters/npc_criminals_suit_1/mtr_dallas_cc",
+		["units/payday2/characters/npc_criminals_suit_1/mtr_dragan"] = "units/payday2/characters/npc_criminals_suit_1/mtr_dragan_cc",
+		["units/payday2/characters/npc_criminals_suit_1/mtr_hoxton"] = "units/payday2/characters/npc_criminals_suit_1/mtr_hoxton_cc",
+		["units/payday2/characters/npc_criminals_suit_1/mtr_jacket"] = "units/payday2/characters/npc_criminals_suit_1/mtr_jacket_cc",
+		["units/payday2/characters/npc_criminals_suit_1/mtr_jimmy"] = "units/payday2/characters/npc_criminals_suit_1/mtr_jimmy_cc",
+		["units/payday2/characters/npc_criminals_suit_1/mtr_jiro"] = "units/payday2/characters/npc_criminals_suit_1/mtr_jiro_cc",
+		["units/payday2/characters/npc_criminals_suit_1/mtr_john_wick"] = "units/payday2/characters/npc_criminals_suit_1/mtr_john_wick_cc",
+		["units/payday2/characters/npc_criminals_suit_1/mtr_old_hoxton"] = "units/payday2/characters/npc_criminals_suit_1/mtr_old_hoxton_cc",
+		["units/payday2/characters/npc_criminals_suit_1/mtr_sokol"] = "units/payday2/characters/npc_criminals_suit_1/mtr_sokol_cc",
+		["units/payday2/characters/npc_criminals_suit_1/mtr_wolf"] = "units/payday2/characters/npc_criminals_suit_1/mtr_wolf_cc",
+		["units/payday2/characters/npc_criminal_female_1/mtr_fem1"] = "units/payday2/characters/npc_criminal_female_1/mtr_fem1_cc",
+		["units/pd2_dlc_bonnie/characters/npc_criminal_bonnie/mtr_bonnie"] = "units/pd2_dlc_bonnie/characters/npc_criminal_bonnie/mtr_bonnie_cc",
+		["units/pd2_dlc_chico/characters/npc_criminals_terry/mtr_criminal_terry"] = "units/pd2_dlc_chico/characters/npc_criminals_terry/mtr_criminal_terry_cc",
+		["units/pd2_dlc_opera/characters/npc_criminals_fem_3/mtr_criminal_sydney"] = "units/pd2_dlc_opera/characters/npc_criminals_fem_3/mtr_criminal_sydney_cc",
+		["units/pd2_dlc_wild/characters/npc_criminals_wild_1/mtr_criminal_wild_1"] = "units/pd2_dlc_wild/characters/npc_criminals_wild_1/mtr_criminal_wild_1_cc"
 	}
+	self.armor_skins_configs = {}
+	self.armor_skins_configs_map = {}
+	for orig, cc in pairs(armor_skins_configs) do
+		self.armor_skins_configs[Idstring(orig):key()] = Idstring(cc)
+		self.armor_skins_configs_map[Idstring(cc):key()] = Idstring(orig)
+	end
 	self.character_cc_configs = {
 		american = Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_hoxton_cc"),
 		german = Idstring("units/payday2/characters/npc_criminals_suit_1/mtr_wolf_cc"),

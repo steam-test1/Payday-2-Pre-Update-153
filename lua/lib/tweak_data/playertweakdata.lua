@@ -1050,6 +1050,7 @@ function PlayerTweakData:_init_new_stances()
 	self:_init_siltstone()
 	self:_init_flint()
 	self:_init_coal()
+	self:_init_lemming()
 end
 
 function PlayerTweakData:_init_hs2000()
@@ -3734,4 +3735,32 @@ function PlayerTweakData:_init_coal()
 	self.stances.coal.crouched.vel_overshot.yaw_pos = 4
 	self.stances.coal.crouched.vel_overshot.pitch_neg = 5
 	self.stances.coal.crouched.vel_overshot.pitch_pos = -5
+end
+
+function PlayerTweakData:_init_lemming()
+	self.stances.lemming = deep_clone(self.stances.default)
+	local pivot_shoulder_translation = Vector3(8.44788, 38.6251, -5.22182)
+	local pivot_shoulder_rotation = Rotation(0.100018, -0.688258, 0.629664)
+	local pivot_head_translation = Vector3(10, 32, -5)
+	local pivot_head_rotation = Rotation(0, 0, 0)
+	self.stances.lemming.standard.shoulders.translation = pivot_head_translation - pivot_shoulder_translation:rotate_with(pivot_shoulder_rotation:inverse()):rotate_with(pivot_head_rotation)
+	self.stances.lemming.standard.shoulders.rotation = pivot_head_rotation * pivot_shoulder_rotation:inverse()
+	self.stances.lemming.standard.vel_overshot.pivot = pivot_shoulder_translation + Vector3(0, -20, 0)
+	self.stances.lemming.steelsight.vel_overshot.pitch_neg = -17
+	self.stances.lemming.steelsight.vel_overshot.pitch_pos = 17
+	local pivot_head_translation = Vector3(0, 29, 0)
+	local pivot_head_rotation = Rotation(0, 0, 0)
+	self.stances.lemming.steelsight.shoulders.translation = pivot_head_translation - pivot_shoulder_translation:rotate_with(pivot_shoulder_rotation:inverse()):rotate_with(pivot_head_rotation)
+	self.stances.lemming.steelsight.shoulders.rotation = pivot_head_rotation * pivot_shoulder_rotation:inverse()
+	self.stances.lemming.steelsight.FOV = self.stances.lemming.standard.FOV
+	self.stances.lemming.steelsight.vel_overshot.pivot = pivot_shoulder_translation + Vector3(0, -7, 0)
+	self.stances.lemming.steelsight.vel_overshot.yaw_neg = 1
+	self.stances.lemming.steelsight.vel_overshot.yaw_pos = -1
+	self.stances.lemming.steelsight.vel_overshot.pitch_neg = -5
+	self.stances.lemming.steelsight.vel_overshot.pitch_pos = 5
+	local pivot_head_translation = Vector3(9, 31, -6)
+	local pivot_head_rotation = Rotation(0, 0, 0)
+	self.stances.lemming.crouched.shoulders.translation = pivot_head_translation - pivot_shoulder_translation:rotate_with(pivot_shoulder_rotation:inverse()):rotate_with(pivot_head_rotation)
+	self.stances.lemming.crouched.shoulders.rotation = pivot_head_rotation * pivot_shoulder_rotation:inverse()
+	self.stances.lemming.crouched.vel_overshot.pivot = pivot_shoulder_translation + Vector3(0, -20, 0)
 end

@@ -431,6 +431,10 @@ function GenericDLCManager:has_grv()
 	return self:is_dlc_unlocked("grv")
 end
 
+function GenericDLCManager:has_mp2()
+	return self:is_dlc_unlocked("mp2")
+end
+
 function GenericDLCManager:has_goty_all_dlc_bundle_2014()
 	return self:has_goty_weapon_bundle_2014() and self:has_goty_heist_bundle_2014() and self:is_dlcs_unlocked({
 		"character_pack_clover"
@@ -1173,7 +1177,8 @@ function WINDLCManager:init()
 			yor_bundle = {app_id = "218620", no_install = true},
 			sha = {app_id = "218620", no_install = true},
 			spa = {app_id = "591710", no_install = true},
-			grv = {app_id = "612900", no_install = true}
+			grv = {app_id = "612900", no_install = true},
+			mp2 = {app_id = "218620", no_install = true}
 		}
 		self:_verify_dlcs()
 	end

@@ -366,6 +366,45 @@ function CrimeSpreeManager:can_refund_entry_fee()
 	return self._global.refund_allowed
 end
 
+function CrimeSpreeManager:get_narrative_tweak_data_for_mission_level(mission_id)
+	local mission = self:get_mission(mission_id)
+	local narrative_id, narrative_data, day, variant
+	for job_id, data in pairs(tweak_data.narrative.jobs) do
+		for idx, level_data in ipairs(data.chain or {}) do
+			if type(level_data) == "table" and not level_data.level_id then
+				local found = false
+				for variant_idx, level_data in ipairs(level_data) do
+					if level_data == mission.level then
+						narrative_id = job_id
+						narrative_data = data
+						day = idx
+						variant = variant_idx
+						found = true
+						break
+					end
+				end
+				if found then
+					break
+				end
+			elseif level_data == mission.level then
+				narrative_id = job_id
+				narrative_data = data
+				day = idx
+				break
+			end
+		end
+	end
+	if narrative_data then
+		for job_id, data in pairs(tweak_data.narrative.jobs) do
+			if data.job_wrapper and table.contains(data.job_wrapper, narrative_id) then
+				narrative_data = data
+				break
+			end
+		end
+	end
+	return narrative_data, day, variant
+end
+
 function CrimeSpreeManager:get_mission(mission_id)
 	mission_id = mission_id or self:current_mission()
 	for category, tbl in pairs(tweak_data.crime_spree.missions) do

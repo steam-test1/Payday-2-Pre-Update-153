@@ -17,7 +17,7 @@ end
 
 function WeaponSecondSight:_check_state(current_state)
 	if current_state and current_state.in_steelsight and current_state:in_steelsight() then
-		current_state:_start_action_steelsight(Application:time())
+		current_state:_start_action_steelsight(Application:time(), self._on)
 	end
 	if self._use_anims and self._anim_state ~= self._on then
 		self._anim_state = self._on

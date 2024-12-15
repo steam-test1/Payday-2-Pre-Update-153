@@ -128,6 +128,7 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_siltstone_npc()
 	self:_init_data_flint_npc()
 	self:_init_data_coal_npc()
+	self:_init_data_lemming_npc()
 	self:_precalculate_values()
 end
 
@@ -2285,6 +2286,20 @@ function WeaponTweakData:_init_data_coal_npc()
 	self.coal_npc.hold = "rifle"
 	self.coal_npc.alert_size = 5000
 	self.coal_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_lemming_npc()
+	self.lemming_npc.sounds.prefix = "lemming_npc"
+	self.lemming_npc.use_data.selection_index = 1
+	self.lemming_npc.DAMAGE = 1
+	self.lemming_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.lemming_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.lemming_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.lemming_npc.CLIP_AMMO_MAX = 10
+	self.lemming_npc.NR_CLIPS_MAX = 5
+	self.lemming_npc.hold = "pistol"
+	self.lemming_npc.alert_size = 2500
+	self.lemming_npc.suppression = 1
 end
 
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
@@ -13503,6 +13518,93 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		value = 1,
 		reload = 11
 	}
+	self.lemming = {}
+	self.lemming.category = "pistol"
+	self.lemming.damage_melee = damage_melee_default
+	self.lemming.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.lemming.sounds = {}
+	self.lemming.sounds.fire = "lemming_fire"
+	self.lemming.sounds.enter_steelsight = "pistol_steel_sight_enter"
+	self.lemming.sounds.leave_steelsight = "pistol_steel_sight_exit"
+	self.lemming.sounds.dryfire = "secondary_dryfire"
+	self.lemming.timers = {}
+	self.lemming.timers.reload_not_empty = 1.52
+	self.lemming.timers.reload_empty = 2.32
+	self.lemming.timers.unequip = 0.5
+	self.lemming.timers.equip = 0.35
+	self.lemming.name_id = "bm_w_lemming"
+	self.lemming.desc_id = "bm_w_lemming_desc"
+	self.lemming.description_id = "des_lemming"
+	self.lemming.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.lemming.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.lemming.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.lemming.use_data = {}
+	self.lemming.use_data.selection_index = 1
+	self.lemming.DAMAGE = 1
+	self.lemming.CLIP_AMMO_MAX = 15
+	self.lemming.NR_CLIPS_MAX = 2
+	self.lemming.AMMO_MAX = self.lemming.CLIP_AMMO_MAX * self.lemming.NR_CLIPS_MAX
+	self.lemming.AMMO_PICKUP = {0.3, 0.4}
+	self.lemming.FIRE_MODE = "single"
+	self.lemming.fire_mode_data = {}
+	self.lemming.fire_mode_data.fire_rate = 0.1
+	self.lemming.single = {}
+	self.lemming.single.fire_rate = 0.1
+	self.lemming.spread = {}
+	self.lemming.spread.standing = self.new_m4.spread.standing
+	self.lemming.spread.crouching = self.new_m4.spread.crouching
+	self.lemming.spread.steelsight = self.new_m4.spread.steelsight
+	self.lemming.spread.moving_standing = self.new_m4.spread.moving_standing
+	self.lemming.spread.moving_crouching = self.new_m4.spread.moving_crouching
+	self.lemming.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.lemming.kick = {}
+	self.lemming.kick.standing = self.glock_17.kick.standing
+	self.lemming.kick.crouching = self.lemming.kick.standing
+	self.lemming.kick.steelsight = self.lemming.kick.standing
+	self.lemming.crosshair = {}
+	self.lemming.crosshair.standing = {}
+	self.lemming.crosshair.crouching = {}
+	self.lemming.crosshair.steelsight = {}
+	self.lemming.crosshair.standing.offset = 0.2
+	self.lemming.crosshair.standing.moving_offset = 0.4
+	self.lemming.crosshair.standing.kick_offset = 0.3
+	self.lemming.crosshair.crouching.offset = 0.1
+	self.lemming.crosshair.crouching.moving_offset = 0.5
+	self.lemming.crosshair.crouching.kick_offset = 0.2
+	self.lemming.crosshair.steelsight.hidden = true
+	self.lemming.crosshair.steelsight.offset = 0
+	self.lemming.crosshair.steelsight.moving_offset = 0
+	self.lemming.crosshair.steelsight.kick_offset = 0.1
+	self.lemming.shake = {}
+	self.lemming.shake.fire_multiplier = 1
+	self.lemming.shake.fire_steelsight_multiplier = -1
+	self.lemming.autohit = autohit_pistol_default
+	self.lemming.aim_assist = aim_assist_pistol_default
+	self.lemming.weapon_hold = "packrat"
+	self.lemming.animations = {}
+	self.lemming.animations.equip_id = "equip_packrat"
+	self.lemming.animations.recoil_steelsight = true
+	self.lemming.global_value = "pd2_clan"
+	self.lemming.texture_bundle_folder = "fi7"
+	self.lemming.panic_suppression_chance = 0.2
+	self.lemming.can_shoot_through_enemy = true
+	self.lemming.can_shoot_through_shield = true
+	self.lemming.can_shoot_through_wall = true
+	self.lemming.stats = {
+		damage = 120,
+		spread = 17,
+		recoil = 12,
+		spread_moving = 18,
+		zoom = 3,
+		concealment = 29,
+		suppression = 15,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 4,
+		reload = 11
+	}
+	self.lemming.armor_piercing_chance = 1
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -14345,6 +14447,12 @@ function WeaponTweakData:_create_table_structure()
 	}
 	self.coal_npc = {
 		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.lemming_npc = {
+		usage = "c45",
 		sounds = {},
 		use_data = {},
 		auto = {}

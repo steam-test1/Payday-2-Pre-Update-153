@@ -105,7 +105,8 @@ function StatisticsTweakData:statistics_table()
 		"moon",
 		"friend",
 		"spa",
-		"fish"
+		"fish",
+		"run"
 	}
 	local job_list = {
 		"jewelry_store",
@@ -180,7 +181,8 @@ function StatisticsTweakData:statistics_table()
 		"moon",
 		"friend",
 		"spa",
-		"fish"
+		"fish",
+		"run"
 	}
 	local mask_list = {
 		"character_locked",
@@ -542,7 +544,25 @@ function StatisticsTweakData:statistics_table()
 		"grv_03",
 		"grv_04",
 		"grv_01_bodhi",
-		"grv_01_bonnie"
+		"grv_01_bonnie",
+		"bny_01",
+		"bny_02",
+		"bny_03",
+		"bny_04",
+		"bny_01_bonnie",
+		"bny_01_clover",
+		"bny_01_clover_b",
+		"bny_01_bodhi",
+		"bny_02_clover",
+		"bny_02_bonnie",
+		"bny_02_bodhi",
+		"bny_03_clover",
+		"bny_03_bodhi",
+		"mp2_01",
+		"mp2_02",
+		"mp2_03",
+		"mp2_04",
+		"mrm"
 	}
 	local weapon_list = {
 		"ak5",
@@ -661,7 +681,8 @@ function StatisticsTweakData:statistics_table()
 		"tti",
 		"siltstone",
 		"flint",
-		"coal"
+		"coal",
+		"lemming"
 	}
 	local melee_list = {
 		"weapon",
@@ -756,7 +777,8 @@ function StatisticsTweakData:statistics_table()
 		"frag_com",
 		"wpn_prj_hur",
 		"wpn_prj_target",
-		"concussion"
+		"concussion",
+		"fir_com"
 	}
 	local enemy_list = {
 		"civilian",
