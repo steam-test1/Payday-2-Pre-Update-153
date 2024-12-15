@@ -593,7 +593,7 @@ function BlackMarketManager:_check_achievements(category)
 	end
 end
 
-function BlackMarketManager:equip_weapon(category, slot)
+function BlackMarketManager:equip_weapon(category, slot, skip_outfit)
 	if not Global.blackmarket_manager.crafted_items[category] then
 		return false
 	end
@@ -607,9 +607,11 @@ function BlackMarketManager:equip_weapon(category, slot)
 		local data = category == "primaries" and self:equipped_primary() or self:equipped_secondary()
 		managers.menu_scene:set_character_equipped_weapon(nil, data.factory_id, data.blueprint, category == "primaries" and "primary" or "secondary", data.cosmetics)
 	end
-	MenuCallbackHandler:_update_outfit_information()
-	if SystemInfo:distribution() == Idstring("STEAM") then
-		managers.statistics:publish_equipped_to_steam()
+	if not skip_outfit then
+		MenuCallbackHandler:_update_outfit_information()
+		if SystemInfo:distribution() == Idstring("STEAM") then
+			managers.statistics:publish_equipped_to_steam()
+		end
 	end
 	if managers.hud then
 		managers.hud:recreate_weapon_firemode(HUDManager.PLAYER_PANEL)
@@ -620,7 +622,7 @@ end
 function BlackMarketManager:equip_deployable(data, loading)
 	local deployable_id = data.name
 	local slot = data.target_slot
-	if not table.contains(managers.player:availible_equipment(1), deployable_id) then
+	if deployable_id and not table.contains(managers.player:availible_equipment(1), deployable_id) then
 		return
 	end
 	Global.player_manager.kit.equipment_slots[slot] = deployable_id
@@ -3593,6 +3595,7 @@ end
 function BlackMarketManager:view_weapon_platform(weapon_id, open_node_cb)
 	local factory_id = managers.weapon_factory:get_factory_id_by_weapon_id(weapon_id)
 	local blueprint = deep_clone(managers.weapon_factory:get_default_blueprint_by_factory_id(factory_id))
+	self._last_viewed_cosmetic_id = nil
 	self:preload_weapon_blueprint("preview", factory_id, blueprint)
 	table.insert(self._preloading_list, {
 		done_cb = function()
@@ -3608,6 +3611,7 @@ function BlackMarketManager:view_weapon(category, slot, open_node_cb, spawn_work
 		return
 	end
 	local weapon = self._global.crafted_items[category][slot]
+	self._last_viewed_cosmetic_id = nil
 	local texture_switches = self:get_weapon_texture_switches(category, slot, weapon)
 	self:preload_weapon_blueprint("preview", weapon.factory_id, weapon.blueprint, spawn_workbench)
 	if spawn_workbench then
@@ -3633,6 +3637,7 @@ function BlackMarketManager:view_weapon_with_mod(category, slot, part_id, open_n
 	local weapon = self._global.crafted_items[category][slot]
 	local blueprint = deep_clone(weapon.blueprint)
 	local texture_switches = self:get_weapon_texture_switches(category, slot, weapon)
+	self._last_viewed_cosmetic_id = nil
 	managers.weapon_factory:change_part_blueprint_only(weapon.factory_id, part_id, blueprint)
 	self:preload_weapon_blueprint("preview", weapon.factory_id, blueprint, spawn_workbench)
 	if spawn_workbench then
@@ -3658,6 +3663,7 @@ function BlackMarketManager:view_weapon_without_mod(category, slot, part_id, ope
 	local weapon = self._global.crafted_items[category][slot]
 	local blueprint = deep_clone(weapon.blueprint)
 	local texture_switches = self:get_weapon_texture_switches(category, slot, weapon)
+	self._last_viewed_cosmetic_id = nil
 	managers.weapon_factory:change_part_blueprint_only(weapon.factory_id, part_id, blueprint, true)
 	self:preload_weapon_blueprint("preview", weapon.factory_id, blueprint, spawn_workbench)
 	if spawn_workbench then
@@ -3688,6 +3694,7 @@ function BlackMarketManager:view_weapon_with_cosmetics(category, slot, cosmetics
 		elseif weapon.cosmetics and weapon.cosmetics.id and tweak_data.blackmarket.weapon_skins[weapon.cosmetics.id] and tweak_data.blackmarket.weapon_skins[weapon.cosmetics.id].default_blueprint then
 			blueprint = deep_clone(managers.weapon_factory:get_default_blueprint_by_factory_id(weapon.factory_id))
 		end
+		self._last_viewed_cosmetic_id = cosmetics.id
 	end
 	local texture_switches = self:get_weapon_texture_switches(category, slot, weapon)
 	self:preload_weapon_blueprint("preview", weapon.factory_id, blueprint, spawn_workbench)
@@ -3709,8 +3716,11 @@ end
 function BlackMarketManager:view_weapon_platform_with_cosmetics(weapon_id, cosmetics, open_node_cb, spawn_workbench, custom_data)
 	local factory_id = managers.weapon_factory:get_factory_id_by_weapon_id(weapon_id)
 	local blueprint = deep_clone(managers.weapon_factory:get_default_blueprint_by_factory_id(factory_id))
-	if cosmetics and tweak_data.blackmarket.weapon_skins[cosmetics.id] and tweak_data.blackmarket.weapon_skins[cosmetics.id].default_blueprint then
-		blueprint = tweak_data.blackmarket.weapon_skins[cosmetics.id].default_blueprint
+	if cosmetics and tweak_data.blackmarket.weapon_skins[cosmetics.id] then
+		if tweak_data.blackmarket.weapon_skins[cosmetics.id].default_blueprint then
+			blueprint = tweak_data.blackmarket.weapon_skins[cosmetics.id].default_blueprint
+		end
+		self._last_viewed_cosmetic_id = cosmetics.id
 	end
 	local texture_switches
 	self:preload_weapon_blueprint("preview", factory_id, blueprint, spawn_workbench)
@@ -6159,6 +6169,15 @@ function BlackMarketManager:accuracy_addend(name, category, sub_category, spread
 		if current_state and current_state._moving then
 			index = index + managers.player:upgrade_value(category, "move_spread_index_addend", 0)
 		end
+		if fire_mode == "single" and table.contains({
+			"assault_rifle",
+			"smg",
+			"snp"
+		}, category) then
+			index = index + managers.player:upgrade_value("weapon", "single_spread_index_addend", 0)
+		elseif fire_mode == "auto" then
+			index = index + managers.player:upgrade_value("weapon", "auto_spread_index_addend", 0)
+		end
 		if sub_category then
 			index = index + managers.player:upgrade_value(sub_category, "spread_index_addend", 0)
 			if silencer then
@@ -6184,6 +6203,15 @@ function BlackMarketManager:accuracy_index_addend(name, category, sub_category, 
 	end
 	if current_state and current_state._moving then
 		index = index + managers.player:upgrade_value(category, "move_spread_index_addend", 0)
+	end
+	if fire_mode == "single" and table.contains({
+		"assault_rifle",
+		"smg",
+		"snp"
+	}, category) then
+		index = index + managers.player:upgrade_value("weapon", "single_spread_index_addend", 0)
+	elseif fire_mode == "auto" then
+		index = index + managers.player:upgrade_value("weapon", "auto_spread_index_addend", 0)
 	end
 	if sub_category then
 		index = index + managers.player:upgrade_value(sub_category, "spread_index_addend", 0)

@@ -109,7 +109,7 @@ function SentryGunDamage:damage_bullet(attack_data)
 		dmg_shield = true
 	end
 	local result = {type = "dmg_rcv", variant = "bullet"}
-	local damage_sync = self:_apply_damage(dmg_adjusted, dmg_shield, not dmg_shield, true)
+	local damage_sync = self:_apply_damage(dmg_adjusted, dmg_shield, not dmg_shield, true, attack_data.attacker_unit, attack_data.variant)
 	if self._ignore_client_damage then
 		local health_percent = math.ceil(self._health / self._HEALTH_INIT_PERCENT)
 		self._unit:network():send("sentrygun_health", health_percent)
@@ -157,7 +157,7 @@ function SentryGunDamage:damage_fire(attack_data)
 	local damage = attack_data.damage * tweak_data.weapon[self._unit:base():get_name_id()].FIRE_DMG_MUL
 	damage = damage * (self._marked_dmg_mul or 1)
 	damage = damage + self._sync_dmg_leftover
-	local damage_sync = self:_apply_damage(damage, true, true, true)
+	local damage_sync = self:_apply_damage(damage, true, true, true, attacker_unit, "fire")
 	if self._ignore_client_damage then
 		local health_percent = math.ceil(self._health / self._HEALTH_INIT_PERCENT)
 		self._unit:network():send("sentrygun_health", health_percent)
@@ -208,7 +208,7 @@ function SentryGunDamage:damage_explosion(attack_data)
 	end
 	damage = damage * (self._marked_dmg_mul or 1)
 	damage = damage + self._sync_dmg_leftover
-	local damage_sync = self:_apply_damage(damage, true, true, true)
+	local damage_sync = self:_apply_damage(damage, true, true, true, attacker_unit, "explosion")
 	if self._ignore_client_damage then
 		local health_percent = math.ceil(self._health / self._HEALTH_INIT_PERCENT)
 		self._unit:network():send("sentrygun_health", health_percent)
@@ -267,7 +267,15 @@ function SentryGunDamage:focus_delay_mul()
 	return 1
 end
 
-function SentryGunDamage:die()
+function SentryGunDamage:die(attacker_unit, variant)
+	if self._stats_name and attacker_unit == managers.player:player_unit() then
+		local data = {
+			name = self._stats_name,
+			stats_name = self._stats_name,
+			variant = variant
+		}
+		managers.statistics:killed(data)
+	end
 	self._health = 0
 	self._dead = true
 	self._unit:weapon():remove_fire_mode_interaction()
@@ -304,14 +312,14 @@ function SentryGunDamage:sync_damage_bullet(attacker_unit, damage_percent, i_bod
 		return
 	end
 	if death then
-		self:die()
+		self:die(attacker_unit, variant)
 		return
 	end
 	local hit_body = self._unit:body(i_body)
 	local hit_shield = hit_body:name() == self._shield_body_name_ids
 	local dmg_shield = hit_shield and self._shield_health > 0
 	local damage = death and "death" or damage_percent * (dmg_shield and self._SHIELD_HEALTH_INIT_PERCENT or self._HEALTH_INIT_PERCENT)
-	self:_apply_damage(damage, dmg_shield, not dmg_shield, false)
+	self:_apply_damage(damage, dmg_shield, not dmg_shield, false, attacker_unit, variant)
 	if not self._dead then
 		self._unit:brain():on_damage_received(attacker_unit)
 	end
@@ -322,11 +330,11 @@ function SentryGunDamage:sync_damage_fire(attacker_unit, damage_percent, death, 
 		return
 	end
 	if death then
-		self:die()
+		self:die(attacker_unit, "fire")
 		return
 	end
 	local damage = death and "death" or damage_percent * self._HEALTH_INIT_PERCENT
-	self:_apply_damage(damage, true, true, false)
+	self:_apply_damage(damage, true, true, false, attacker_unit, "fire")
 	if not self._dead then
 		self._unit:brain():on_damage_received(attacker_unit)
 	end
@@ -337,18 +345,18 @@ function SentryGunDamage:sync_damage_explosion(attacker_unit, damage_percent, i_
 		return
 	end
 	if death then
-		self:die()
+		self:die(attacker_unit, "explosion")
 		return
 	end
 	local variant = self._ATTACK_VARIANTS[i_attack_variant]
 	local damage = death and "death" or damage_percent * self._HEALTH_INIT_PERCENT
-	self:_apply_damage(damage, true, true, false)
+	self:_apply_damage(damage, true, true, false, attacker_unit, "explosion")
 	if not self._dead then
 		self._unit:brain():on_damage_received(attacker_unit)
 	end
 end
 
-function SentryGunDamage:_apply_damage(damage, dmg_shield, dmg_body, is_local)
+function SentryGunDamage:_apply_damage(damage, dmg_shield, dmg_body, is_local, attacker_unit, variant)
 	self._sync_dmg_leftover = 0
 	if dmg_shield and 0 < self._shield_health then
 		local damage_percent
@@ -406,7 +414,7 @@ function SentryGunDamage:_apply_damage(damage, dmg_shield, dmg_body, is_local)
 		end
 		local previous_health_ratio = self:health_ratio()
 		if body_damage >= self._health then
-			self:die()
+			self:die(attacker_unit, variant)
 		else
 			self._health = self._health - body_damage
 		end

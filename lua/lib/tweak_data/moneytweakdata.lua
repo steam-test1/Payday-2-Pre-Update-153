@@ -81,6 +81,9 @@ function MoneyTweakData:init(tweak_data)
 	self.bag_values.drk_bomb_part = 9000
 	self.bag_values.drone_control_helmet = 18000
 	self.bag_values.toothbrush = 18000
+	self.bag_values.cloaker_gold = 2000
+	self.bag_values.cloaker_money = 1750
+	self.bag_values.cloaker_cocaine = 1500
 	self.bag_value_multiplier = self._create_value_table(self.cut_lootbag_bonus / 5 / self.offshore_rate / self.bag_values.default, self.cut_lootbag_bonus / self.offshore_rate / self.bag_values.default, 7, true, 0.85)
 	self.stage_completion = self._create_value_table(self.cut_stage_complete / 7 / self.offshore_rate, self.cut_stage_complete / self.offshore_rate, 7, true, 1)
 	self.job_completion = self._create_value_table(self.cut_job_complete / 7 / self.offshore_rate, self.cut_job_complete / self.offshore_rate, 7, true, 1)
@@ -206,6 +209,7 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_multipliers.bobblehead = 1
 	self.global_value_multipliers.dragon = 1
 	self.global_value_multipliers.pdcon_2015 = 1
+	self.global_value_multipliers.pdcon_2016 = 1
 	self.global_value_multipliers.steel = 1
 	self.global_value_multipliers.berry = 1
 	self.global_value_multipliers.peta = 1
@@ -278,6 +282,7 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_bonus_multiplier.bobblehead = 0.2
 	self.global_value_bonus_multiplier.dragon = 0.2
 	self.global_value_bonus_multiplier.pdcon_2015 = 0.2
+	self.global_value_bonus_multiplier.pdcon_2016 = 0.2
 	self.global_value_bonus_multiplier.steel = 0.2
 	self.global_value_bonus_multiplier.berry = 0.2
 	self.global_value_bonus_multiplier.peta = 0.2

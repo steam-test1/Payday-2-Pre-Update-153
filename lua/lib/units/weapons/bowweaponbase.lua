@@ -171,3 +171,14 @@ end
 function CrossbowWeaponBase:charge_fail()
 	return false
 end
+
+function CrossbowWeaponBase:add_damage_result(unit, attacker, is_dead, damage_percent)
+	if not alive(attacker) or attacker ~= managers.player:player_unit() then
+		return
+	end
+	managers.statistics:shot_fired({
+		hit = true,
+		weapon_unit = self._unit,
+		skip_bullet_count = true
+	})
+end

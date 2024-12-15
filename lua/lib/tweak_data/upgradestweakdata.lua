@@ -1062,7 +1062,7 @@ function UpgradesTweakData:_init_pd2_values()
 			{
 				"4",
 				"50%",
-				"80%"
+				"33%"
 			},
 			{"100%", "8"}
 		},
@@ -1412,7 +1412,7 @@ function UpgradesTweakData:_init_pd2_values()
 		},
 		up_you_go = {
 			{"30%", "10"},
-			{"15%"}
+			{"40%"}
 		},
 		feign_death = {
 			{"15%"},
@@ -1493,7 +1493,7 @@ function UpgradesTweakData:_init_pd2_values()
 			{"1", "50%"}
 		},
 		optic_illusions = {
-			{"45%"},
+			{"35%"},
 			{"1", "2"}
 		},
 		more_fire_power = {

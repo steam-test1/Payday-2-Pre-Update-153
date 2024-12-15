@@ -135,6 +135,7 @@ function MissionManager:init(...)
 	self:add_area_instigator_categories("player_not_in_vehicle")
 	self:add_area_instigator_categories("hostages")
 	self:add_area_instigator_categories("equipment")
+	self:add_area_instigator_categories("intimidated_enemies")
 	self:set_default_area_instigator("player")
 	self:set_global_event_list({
 		"bankmanager_key",
@@ -187,7 +188,8 @@ function MissionManager:init(...)
 		"ai_in_custody",
 		"turret_destroyed",
 		"pku_toothbrush",
-		"tripmine_exploded"
+		"tripmine_exploded",
+		"cloaker_loot"
 	})
 	self._mission_filter = {}
 	if not Global.mission_manager then

@@ -46,8 +46,9 @@ function PlayerMovement:init(unit)
 		chk_interval_active = 6,
 		chk_interval_inactive = 1,
 		chk_t = 6,
-		nr_enemies = 2,
+		nr_enemies = 3,
 		max_dis_sq = 3240000,
+		max_vert_dis = 1000,
 		has_dmg_dampener = managers.player:has_category_upgrade("temporary", "dmg_dampener_outnumbered") or managers.player:has_category_upgrade("temporary", "dmg_dampener_outnumbered_strong"),
 		has_dmg_mul = managers.player:has_category_upgrade("temporary", "dmg_multiplier_outnumbered")
 	}
@@ -637,7 +638,7 @@ function PlayerMovement:_upd_underdog_skill(t)
 		end
 		local attacker_pos = attacker_unit:movement():m_pos()
 		local dis_sq = mvector3.distance_sq(attacker_pos, my_pos)
-		if dis_sq < data.max_dis_sq and math.abs(attacker_pos.z - my_pos.z) < 250 then
+		if dis_sq < data.max_dis_sq and math.abs(attacker_pos.z - my_pos.z) < data.max_vert_dis then
 			nr_guys = nr_guys + 1
 			if nr_guys >= data.nr_enemies then
 				activated = true

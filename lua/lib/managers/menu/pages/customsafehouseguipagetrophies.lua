@@ -57,7 +57,7 @@ function CustomSafehouseGuiPageTrophies:_setup_trophies_list()
 	end
 	scroll:set_canvas_size(nil, canvas_h)
 	if #self._trophies > 0 then
-		self:_set_selected(self._trophies[1])
+		self:_set_selected(self._trophies[1], true)
 	end
 end
 
@@ -429,7 +429,7 @@ function CustomSafehouseGuiPageTrophies:_hide_all_trophies()
 	self:refresh()
 end
 
-function CustomSafehouseGuiPageTrophies:_set_selected(trophy)
+function CustomSafehouseGuiPageTrophies:_set_selected(trophy, skip_sound)
 	if not trophy then
 		return false
 	end
@@ -437,7 +437,7 @@ function CustomSafehouseGuiPageTrophies:_set_selected(trophy)
 		self._selected_trophy:set_selected(false)
 	end
 	self._selected_trophy = trophy
-	self._selected_trophy:set_selected(true)
+	self._selected_trophy:set_selected(true, not skip_sound)
 	self:set_trophy_info(self._selected_trophy, true)
 	local scroll_panel = self._trophies_scroll:scroll_panel()
 	local y = self._trophies_scroll:canvas():y() + trophy:bottom()
@@ -463,7 +463,7 @@ end
 
 function CustomSafehouseGuiPageTrophies:refresh()
 	CustomSafehouseGuiPageTrophies.super.refresh(self)
-	self:_set_selected(self._selected_trophy)
+	self:_set_selected(self._selected_trophy, true)
 end
 
 function CustomSafehouseGuiPageTrophies:update_info_panel_size()
@@ -761,7 +761,7 @@ function CustomSafehouseGuiTrophyItem:show()
 	self._select_rect:set_visible(true)
 	self._complete_checkbox_highlight:set_visible(true)
 	self._btn_text:set_alpha(1)
-	if not self:trophy_data().displayed then
+	if self:trophy_data().completed and not self:trophy_data().displayed then
 		self._btn_text:set_color(tweak_data.screen_colors.important_1)
 	else
 		self._btn_text:set_color(tweak_data.screen_colors.button_stage_2)
@@ -772,7 +772,7 @@ function CustomSafehouseGuiTrophyItem:hide()
 	self._select_rect:set_visible(false)
 	self._complete_checkbox_highlight:set_visible(false)
 	self._btn_text:set_alpha(1)
-	if not self:trophy_data().displayed then
+	if self:trophy_data().completed and not self:trophy_data().displayed then
 		self._btn_text:set_color(tweak_data.screen_colors.important_1)
 		self._btn_text:set_alpha(0.8)
 	else

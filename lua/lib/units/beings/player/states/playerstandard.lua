@@ -575,7 +575,7 @@ function PlayerStandard:_update_check_actions(t, dt, paused)
 	self:_check_action_ladder(t, input)
 	self:_check_action_zipline(t, input)
 	self:_check_action_cash_inspect(t, input)
-	self:_check_action_deploy_bipod(t, input)
+	new_action = new_action or self:_check_action_deploy_bipod(t, input)
 	self:_check_action_change_equipment(input)
 	self:_check_action_duck(t, input)
 	self:_check_action_steelsight(t, input)
@@ -2011,7 +2011,7 @@ function PlayerStandard:_check_change_weapon(t, input)
 	if action_wanted then
 		local action_forbidden = self:_changing_weapon()
 		action_forbidden = action_forbidden or self:_is_meleeing() or self._use_item_expire_t or self._change_item_expire_t
-		action_forbidden = action_forbidden or self._unit:inventory():num_selections() == 1 or self:_interacting() or self:_is_throwing_projectile()
+		action_forbidden = action_forbidden or self._unit:inventory():num_selections() == 1 or self:_interacting() or self:_is_throwing_projectile() or self:_is_deploying_bipod()
 		if not action_forbidden then
 			local data = {}
 			data.next = true
@@ -2745,18 +2745,22 @@ function PlayerStandard:_on_zipline()
 end
 
 function PlayerStandard:_check_action_deploy_bipod(t, input)
+	local new_action
+	local action_forbidden = false
 	if not input.btn_deploy_bipod then
-		return
+		return new_action
 	end
-	if self:in_steelsight() or self:_on_zipline() or self:_is_throwing_projectile() or self:_is_meleeing() then
-		return
+	action_forbidden = self:in_steelsight() or self:_on_zipline() or self:_is_throwing_projectile() or self:_is_meleeing() or self:is_equipping() or self:_changing_weapon()
+	if not action_forbidden then
+		local weapon = self._equipped_unit:base()
+		local bipod_part = managers.weapon_factory:get_parts_from_weapon_by_perk("bipod", weapon._parts)
+		if bipod_part and bipod_part[1] then
+			local bipod_unit = bipod_part[1].unit:base()
+			bipod_unit:check_state()
+			new_action = true
+		end
 	end
-	local weapon = self._equipped_unit:base()
-	local bipod_part = managers.weapon_factory:get_parts_from_weapon_by_perk("bipod", weapon._parts)
-	if bipod_part and bipod_part[1] then
-		local bipod_unit = bipod_part[1].unit:base()
-		bipod_unit:check_state()
-	end
+	return new_action
 end
 
 function PlayerStandard:_check_action_cash_inspect(t, input)

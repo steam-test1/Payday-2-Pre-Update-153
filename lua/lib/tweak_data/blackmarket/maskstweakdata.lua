@@ -1,4 +1,6 @@
 local is_nextgen_console = SystemInfo:platform() == Idstring("PS4") or SystemInfo:platform() == Idstring("XB1")
+local allow_halloween_lootdrop = is_nextgen_console
+allow_halloween_lootdrop = true
 
 function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks = {}
@@ -605,7 +607,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.pumpkin_king = {}
 	self.masks.pumpkin_king.unit = "units/payday2/masks/msk_pumpkin_king/msk_pumpkin_king"
 	self.masks.pumpkin_king.name_id = "bm_msk_pumpkin_king"
-	if is_nextgen_console then
+	if allow_halloween_lootdrop then
 		self.masks.pumpkin_king.pcs = {
 			10,
 			20,
@@ -624,7 +626,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.witch = {}
 	self.masks.witch.unit = "units/payday2/masks/msk_witch/msk_witch"
 	self.masks.witch.name_id = "bm_msk_witch"
-	if is_nextgen_console then
+	if allow_halloween_lootdrop then
 		self.masks.witch.pcs = {
 			10,
 			20,
@@ -643,7 +645,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.venomorph = {}
 	self.masks.venomorph.unit = "units/payday2/masks/msk_venomorph/msk_venomorph"
 	self.masks.venomorph.name_id = "bm_msk_venomorph"
-	if is_nextgen_console then
+	if allow_halloween_lootdrop then
 		self.masks.venomorph.pcs = {
 			10,
 			20,
@@ -662,7 +664,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.frank = {}
 	self.masks.frank.unit = "units/payday2/masks/msk_frank/msk_frank"
 	self.masks.frank.name_id = "bm_msk_frank"
-	if is_nextgen_console then
+	if allow_halloween_lootdrop then
 		self.masks.frank.pcs = {
 			10,
 			20,
@@ -2964,6 +2966,46 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.urf_seal.value = 0
 	self.masks.urf_seal.texture_bundle_folder = "urf"
 	self.masks.urf_seal.sort_number = 31
+	self.masks.hwl_dallas_zombie = {}
+	self.masks.hwl_dallas_zombie.unit = "units/pd2_dlc_howl/masks/dallas_zombie/msk_hwl_dallas_zombie"
+	self.masks.hwl_dallas_zombie.name_id = "bm_dallas_rising"
+	self.masks.hwl_dallas_zombie.pcs = {}
+	self.masks.hwl_dallas_zombie.value = 0
+	self.masks.hwl_dallas_zombie.texture_bundle_folder = "howl"
+	self.masks.hwl_dallas_zombie.sort_number = 32
+	self.masks.hwl_dallas_zombie.global_value = "halloween"
+	self.masks.hwl_wolf_zombie = {}
+	self.masks.hwl_wolf_zombie.unit = "units/pd2_dlc_howl/masks/wolf_zombie/msk_hwl_wolf_zombie"
+	self.masks.hwl_wolf_zombie.name_id = "bm_wolf_rising"
+	self.masks.hwl_wolf_zombie.pcs = {}
+	self.masks.hwl_wolf_zombie.value = 0
+	self.masks.hwl_wolf_zombie.texture_bundle_folder = "howl"
+	self.masks.hwl_wolf_zombie.sort_number = 32
+	self.masks.hwl_wolf_zombie.global_value = "halloween"
+	self.masks.hwl_hoxton_zombie = {}
+	self.masks.hwl_hoxton_zombie.unit = "units/pd2_dlc_howl/masks/hoxton_zombie/msk_hwl_hoxton_zombie"
+	self.masks.hwl_hoxton_zombie.name_id = "bm_hoxton_rising"
+	self.masks.hwl_hoxton_zombie.pcs = {}
+	self.masks.hwl_hoxton_zombie.value = 0
+	self.masks.hwl_hoxton_zombie.texture_bundle_folder = "howl"
+	self.masks.hwl_hoxton_zombie.sort_number = 32
+	self.masks.hwl_hoxton_zombie.global_value = "halloween"
+	self.masks.howl_chains_zombie = {}
+	self.masks.howl_chains_zombie.unit = "units/pd2_dlc_howl/masks/chains_zombie/msk_howl_chains_zombie"
+	self.masks.howl_chains_zombie.name_id = "bm_chains_rising"
+	self.masks.howl_chains_zombie.pcs = {}
+	self.masks.howl_chains_zombie.value = 0
+	self.masks.howl_chains_zombie.texture_bundle_folder = "howl"
+	self.masks.howl_chains_zombie.sort_number = 32
+	self.masks.howl_chains_zombie.global_value = "halloween"
+	self.masks.pdc16_clover = {}
+	self.masks.pdc16_clover.unit = "units/pd2_dlc_paydaycon2016/masks/msk_pdc16_clover"
+	self.masks.pdc16_clover.name_id = "bm_mega_clover"
+	self.masks.pdc16_clover.pcs = {}
+	self.masks.pdc16_clover.value = 0
+	self.masks.pdc16_clover.texture_bundle_folder = "pdc16"
+	self.masks.pdc16_clover.sort_number = 33
+	self.masks.pdc16_clover.global_value = "pdcon_2016"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.masks) do
 		if free_dlcs[data.dlc] then

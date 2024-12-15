@@ -1,5 +1,6 @@
 CarryData = CarryData or class()
 CarryData.EVENT_IDS = {will_explode = 1, explode = 2}
+CarryData.EVENT_IDS.poof = 3
 
 function CarryData:init(unit)
 	self._unit = unit
@@ -101,6 +102,11 @@ function CarryData:can_explode()
 	return tweak_data.carry.types[tweak_info.type].can_explode
 end
 
+function CarryData:can_poof()
+	local tweak_info = tweak_data.carry[self._carry_id]
+	return tweak_data.carry.types[tweak_info.type].can_poof
+end
+
 function CarryData:start_explosion(instant)
 	if self._explode_t then
 		return
@@ -184,6 +190,28 @@ function CarryData:_explode()
 	self._unit:set_slot(0)
 end
 
+CarryData.POOF_SETTINGS = {range = 1000, curve_pow = 3}
+CarryData.POOF_CUSTOM_PARAMS = {
+	effect = "effects/payday2/environment/nail_green_smoke_explosion",
+	camera_shake_mul = 4,
+	sound_event = "hlp_poof_small"
+}
+
+function CarryData:poof()
+	if not self:can_poof() then
+		return
+	end
+	self:_unregister_steal_SO()
+	managers.mission:call_global_event("loot_exploded")
+	local pos = self._unit:position()
+	local normal = math.UP
+	local range = CarryData.POOF_SETTINGS.range
+	local effect = CarryData.POOF_CUSTOM_PARAMS.effect
+	managers.explosion:play_sound_and_effects(pos, normal, range, CarryData.POOF_CUSTOM_PARAMS)
+	managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "carry_data", CarryData.EVENT_IDS.poof)
+	self._unit:set_slot(0)
+end
+
 function CarryData:_local_player_explosion_damage()
 	local pos = self._unit:position()
 	local range = CarryData.EXPLOSION_SETTINGS.range
@@ -200,6 +228,8 @@ function CarryData:sync_net_event(event_id)
 		managers.explosion:explode_on_client(self._unit:position(), math.UP, nil, CarryData.EXPLOSION_SETTINGS.damage, range, CarryData.EXPLOSION_SETTINGS.curve_pow, CarryData.EXPLOSION_CUSTOM_PARAMS)
 	elseif event_id == CarryData.EVENT_IDS.will_explode then
 		self:_start_explosion()
+	elseif event_id == CarryData.EVENT_IDS.poof then
+		self:poof()
 	end
 end
 

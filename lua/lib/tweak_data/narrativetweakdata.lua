@@ -3528,6 +3528,7 @@ function NarrativeTweakData:init(tweak_data)
 		3785000,
 		3785000
 	}
+	self.jobs.nail.is_halloween_level = true
 	self.jobs.peta = {}
 	self.jobs.peta.name_id = "heist_peta"
 	self.jobs.peta.briefing_id = "heist_peta_crimenet"
@@ -4112,6 +4113,126 @@ function NarrativeTweakData:init(tweak_data)
 		30500,
 		30500
 	}
+	self.jobs.help = {}
+	self.jobs.help.name_id = "heist_help"
+	self.jobs.help.briefing_id = "heist_help_crimenet"
+	self.jobs.help.contact = "events"
+	self.jobs.help.region = "street"
+	self.jobs.help.jc = 30
+	self.jobs.help.chain = {
+		{
+			level_id = "help",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.help.briefing_event = "pln_hlp_cbf_01"
+	self.jobs.help.debrief_event = nil
+	self.jobs.help.crimenet_callouts = {
+		"pln_hlp_cnc_01_01"
+	}
+	self.jobs.help.crimenet_videos = {
+		"cn_branchbank1",
+		"cn_branchbank2",
+		"cn_branchbank3"
+	}
+	self.jobs.help.payout = {
+		6000,
+		12000,
+		30000,
+		50000,
+		60000,
+		60000,
+		60000
+	}
+	self.jobs.help.contract_cost = {
+		70000,
+		150000,
+		350307,
+		700000,
+		900000,
+		900000,
+		900000
+	}
+	self.jobs.help.contract_visuals = {}
+	self.jobs.help.contract_visuals.min_mission_xp = {
+		14000,
+		14000,
+		14000,
+		14000,
+		14000,
+		14000,
+		14000
+	}
+	self.jobs.help.contract_visuals.max_mission_xp = {
+		8507150,
+		8507150,
+		8507150,
+		8507150,
+		8507150,
+		8507150,
+		8507150
+	}
+	self.jobs.help.objective_stinger = "hlp_stinger_objectivecomplete"
+	self.jobs.help.is_halloween_level = true
+	self.jobs.haunted = {}
+	self.jobs.haunted.name_id = "heist_haunted"
+	self.jobs.haunted.briefing_id = "heist_haunted_crimenet"
+	self.jobs.haunted.contact = "events"
+	self.jobs.haunted.region = "street"
+	self.jobs.haunted.jc = 10
+	self.jobs.haunted.chain = {
+		{
+			level_id = "haunted",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.haunted.briefing_event = nil
+	self.jobs.haunted.debrief_event = nil
+	self.jobs.haunted.crimenet_videos = {
+		"cn_branchbank1",
+		"cn_branchbank2",
+		"cn_branchbank3"
+	}
+	self.jobs.haunted.payout = {
+		20000,
+		30000,
+		40000,
+		70000,
+		80000,
+		90000,
+		100000
+	}
+	self.jobs.haunted.contract_cost = {
+		16000,
+		32000,
+		80000,
+		160000,
+		200000,
+		240000,
+		280000
+	}
+	self.jobs.haunted.contract_visuals = {}
+	self.jobs.haunted.contract_visuals.min_mission_xp = {
+		10000,
+		10000,
+		10000,
+		10000,
+		10000,
+		10000,
+		10000
+	}
+	self.jobs.haunted.contract_visuals.max_mission_xp = {
+		10000,
+		10000,
+		10000,
+		10000,
+		10000,
+		10000,
+		10000
+	}
+	self.jobs.haunted.is_halloween_level = true
 	self._jobs_index = {
 		"jewelry_store",
 		"four_stores",
@@ -4171,7 +4292,9 @@ function NarrativeTweakData:init(tweak_data)
 		"born",
 		"chill",
 		"chill_combat",
-		"flat"
+		"flat",
+		"help",
+		"haunted"
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self._jobs_index, "roberts")

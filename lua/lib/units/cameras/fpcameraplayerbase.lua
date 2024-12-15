@@ -47,6 +47,7 @@ function FPCameraPlayerBase:init(unit)
 	self._tweak_data.look_speed_transition_occluder = 0.95
 	self._tweak_data.uses_keyboard = true
 	self._tweak_data.aim_assist_speed = 200
+	self._tweak_data.aim_assist_use_sticky_aim = false
 	self._camera_properties.look_speed_current = self._tweak_data.look_speed_standard
 	self._camera_properties.look_speed_transition_timer = 0
 	self._camera_properties.target_tilt = 0
@@ -85,6 +86,9 @@ function FPCameraPlayerBase:reset_properties()
 end
 
 function FPCameraPlayerBase:update(unit, t, dt)
+	if self._tweak_data.aim_assist_use_sticky_aim then
+		self:_update_aim_assist(t, dt)
+	end
 	self._parent_unit:base():controller():get_input_axis_clbk("look", callback(self, self, "_update_rot"))
 	self:_update_stance(t, dt)
 	self:_update_movement(t, dt)
@@ -252,7 +256,10 @@ function FPCameraPlayerBase:_update_movement(t, dt)
 	self._parent_unit:m_position(new_head_pos)
 	mvector3.add(new_head_pos, self._head_stance.translation)
 	local stick_input_x, stick_input_y = 0, 0
-	local aim_assist_x, aim_assist_y = self:_get_aim_assist(t, dt)
+	local aim_assist_x, aim_assist_y = 0, 0
+	if not self._tweak_data.aim_assist_use_sticky_aim then
+		aim_assist_x, aim_assist_y = self:_get_aim_assist(t, dt, self._tweak_data.aim_assist_speed)
+	end
 	stick_input_x = stick_input_x + self:_horizonatal_recoil_kick(t, dt) + aim_assist_x
 	stick_input_y = stick_input_y + self:_vertical_recoil_kick(t, dt) + aim_assist_y
 	local look_polar_spin = data.spin - stick_input_x
@@ -465,13 +472,22 @@ function FPCameraPlayerBase:_set_camera_position_in_vehicle()
 	end
 end
 
-function FPCameraPlayerBase:_get_aim_assist(t, dt)
+function FPCameraPlayerBase:_get_aim_assist(t, dt, speed)
 	if self._aim_assist.distance == 0 then
 		return 0, 0
 	end
-	local s_value = math.step(0, self._aim_assist.distance, self._tweak_data.aim_assist_speed * dt)
+	local s_value = math.step(0, self._aim_assist.distance, speed * dt)
 	local r_value_x = mvector3.x(self._aim_assist.direction) * s_value
 	local r_value_y = mvector3.y(self._aim_assist.direction) * s_value
+	if self._tweak_data.aim_assist_use_sticky_aim then
+		local strength = 1 - math.min(1, (self._aim_assist.distance_to_aim_line or 0) / 100)
+		local mx = 1 - self._tweak_data.aim_assist_gradient_max
+		local mn = 1 - self._tweak_data.aim_assist_gradient_min
+		local min_strength = math.lerp(mn, mx, math.min(1, (self._aim_assist.target_distance or 0) / self._tweak_data.aim_assist_gradient_max_distance))
+		strength = math.max(0, strength - min_strength) / (1 - min_strength)
+		r_value_x = r_value_x * strength
+		r_value_y = r_value_y * strength
+	end
 	self._aim_assist.distance = self._aim_assist.distance - s_value
 	if self._aim_assist.distance <= 0 then
 		self:clbk_stop_aim_assist()
@@ -835,6 +851,19 @@ function FPCameraPlayerBase:clbk_stance_entered(new_shoulder_stance, new_head_st
 	end
 end
 
+function FPCameraPlayerBase:_update_aim_assist(t, dt)
+	if managers.controller:get_default_wrapper_type() ~= "pc" and managers.user:get_setting("aim_assist") then
+		local weapon = self._parent_unit:inventory():equipped_unit()
+		local player_state = self._parent_unit:movement():current_state()
+		if weapon then
+			local closest_ray = weapon:base():get_aim_assist(player_state:get_fire_weapon_position(), player_state:get_fire_weapon_direction(), nil, true)
+			self:clbk_aim_assist(closest_ray)
+		else
+			self:clbk_stop_aim_assist()
+		end
+	end
+end
+
 function FPCameraPlayerBase:clbk_aim_assist(col_ray)
 	if col_ray then
 		local ray = col_ray.ray
@@ -855,12 +884,16 @@ function FPCameraPlayerBase:clbk_aim_assist(col_ray)
 		end
 		mvector3.set_static(self._aim_assist.direction, yaw, -pitch, 0)
 		self._aim_assist.distance = mvector3.normalize(self._aim_assist.direction)
+		self._aim_assist.target_distance = col_ray.distance
+		self._aim_assist.distance_to_aim_line = col_ray.distance_to_aim_line
 	end
 end
 
 function FPCameraPlayerBase:clbk_stop_aim_assist()
 	mvector3.set_static(self._aim_assist.direction, 0, 0, 0)
 	self._aim_assist.distance = 0
+	self._aim_assist.target_distance = 0
+	self._aim_assist.distance_to_aim_line = 0
 end
 
 function FPCameraPlayerBase:animate_fov(new_fov, duration_multiplier)

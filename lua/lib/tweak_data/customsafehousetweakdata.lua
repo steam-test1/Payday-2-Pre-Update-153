@@ -655,7 +655,7 @@ function CustomSafehouseTweakData:_init_trophies(tweak_data)
 		desc_id = "trophy_tiara_desc",
 		objective_id = "trophy_tiara_objective",
 		objectives = {
-			self:_progress("trophy_ukranian_dw", 1)
+			self:_progress("trophy_tiara", 1)
 		},
 		image_id = "safehouse_trophies_preview_tiara"
 	})
@@ -703,7 +703,7 @@ function CustomSafehouseTweakData:_init_trophies(tweak_data)
 		desc_id = "trophy_golden_grin_desc",
 		objective_id = "trophy_golden_grin_objective",
 		objectives = {
-			self:_progress("trophy_stealth_grin_dw", 1)
+			self:_progress("trophy_golden_grin", 1)
 		},
 		image_id = "safehouse_trophies_preview_golden_grin"
 	})
@@ -1054,6 +1054,16 @@ function CustomSafehouseTweakData:_init_trophies(tweak_data)
 			self:_achievement("flat_3")
 		},
 		image_id = "safehouse_trophies_preview_toothbrush"
+	})
+	table.insert(self.trophies, {
+		id = "trophy_spooky",
+		name_id = "trophy_spooky",
+		desc_id = "trophy_spooky_desc",
+		objective_id = "trophy_spooky_objective",
+		objectives = {
+			self:_progress("trophy_spooky", 1)
+		},
+		image_id = "safehouse_trophies_preview_spooky"
 	})
 end
 

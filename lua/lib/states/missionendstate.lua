@@ -215,7 +215,8 @@ function MissionEndState:play_finishing_sound(success)
 		return
 	end
 	if not success and managers.groupai:state():bain_state() then
-		managers.dialog:queue_dialog("Play_ban_g01x", {})
+		local level_data = Global.level_data.level_id and tweak_data.levels[Global.level_data.level_id]
+		managers.dialog:queue_dialog(level_data.failure_event or "Play_ban_g01x", {})
 	end
 end
 
@@ -960,6 +961,9 @@ function MissionEndState:chk_complete_heist_achievements()
 						end
 					end
 				end
+				if achievement_data.equipped_outfit then
+					equipped_pass = managers.challenge:check_equipped(achievement_data)
+				end
 				equipped_team_pass = managers.challenge:check_equipped(achievement_data) and managers.challenge:check_equipped_team(achievement_data)
 				all_pass = job_pass and jobs_pass and level_pass and levels_pass and contract_pass and diff_pass and mask_pass and no_shots_pass and stealth_pass and loud_pass and equipped_pass and equipped_team_pass and num_players_pass and pass_skills and timer_pass and killed_by_weapons_pass and killed_by_melee_pass and killed_by_grenade_pass and complete_job_pass and job_value_pass and memory_pass and phalanx_vip_alive_pass and used_weapon_category_pass and is_host_pass and character_pass and converted_cops_pass and total_accuracy_pass and weapons_used_pass and everyone_killed_by_weapons_pass and everyone_killed_by_melee_pass and everyone_killed_by_grenade_pass and everyone_weapons_used_pass and everyone_used_weapon_category_pass and enemy_killed_pass and everyone_killed_by_weapon_category_pass and everyone_killed_by_projectile_pass and killed_pass and shots_by_weapon_pass and mutators_pass
 				if all_pass and achievement_data.need_full_job and managers.job:has_active_job() then
@@ -1014,19 +1018,7 @@ function MissionEndState:chk_complete_heist_achievements()
 					end
 				end
 				if all_pass then
-					if achievement_data.stat then
-						managers.achievment:award_progress(achievement_data.stat)
-					elseif achievement_data.award then
-						managers.achievment:award(achievement_data.award)
-					elseif achievement_data.challenge_stat then
-						managers.challenge:award_progress(achievement_data.challenge_stat)
-					elseif achievement_data.trophy_stat then
-						managers.custom_safehouse:award(achievement_data.trophy_stat)
-					elseif achievement_data.challenge_award then
-						managers.challenge:award(achievement_data.challenge_award)
-					else
-						Application:debug("[MissionEndState] complete_heist_achievements:", achievement)
-					end
+					managers.achievment:_award_achievement(achievement_data, achievement)
 				end
 			end
 			if managers.blackmarket:check_frog_1() and managers.job:on_last_stage() then

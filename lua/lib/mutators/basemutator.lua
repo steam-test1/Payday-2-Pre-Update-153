@@ -7,6 +7,7 @@ BaseMutator.categories = {}
 BaseMutator.incompatiblities = {}
 BaseMutator.incompatibility_tags = {}
 BaseMutator.icon_coords = {1, 1}
+BaseMutator.load_priority = 0
 BaseMutator.reductions = {money = 0, exp = 0}
 BaseMutator.disables_achievements = true
 

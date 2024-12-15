@@ -463,7 +463,7 @@ function NewRaycastWeaponBase:_check_reticle_obj()
 	if part then
 		local part_id = managers.weapon_factory:get_part_id_from_weapon_by_type("sight", self._blueprint)
 		local part_tweak = tweak_data.weapon.factory.parts[part_id]
-		if part_tweak and part_tweak.reticle_obj then
+		if part_tweak and part_tweak.reticle_obj and alive(part.unit) then
 			self._reticle_obj = part.unit:get_object(Idstring(part_tweak.reticle_obj))
 		end
 	end

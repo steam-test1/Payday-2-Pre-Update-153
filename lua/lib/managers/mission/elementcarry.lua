@@ -62,6 +62,11 @@ function ElementCarry:on_executed(instigator)
 		else
 			debug_pause("[ElementCarry:on_executed] instigator missing carry_data extension", instigator)
 		end
+	elseif self._values.operation == "poof" then
+		local carry_ext = instigator:carry_data()
+		if carry_ext and carry_ext:can_poof() then
+			carry_ext:poof()
+		end
 	end
 	if execute then
 		ElementCarry.super.on_executed(self, instigator)

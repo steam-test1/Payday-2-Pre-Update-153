@@ -2805,8 +2805,8 @@ end
 function MenuComponentManager:create_weapon_mod_icon_list(weapon, category, factory_id, slot)
 	local icon_list = {}
 	local mods_all = managers.blackmarket:get_dropable_mods_by_weapon_id(weapon)
-	local instance_ids = managers.blackmarket:get_cosmetics_instances_by_weapon_id(weapon)
 	local crafted = managers.blackmarket:get_crafted_category(category)[slot]
+	local instance_ids = managers.blackmarket:get_cosmetics_instances_by_weapon_id(weapon)
 	if table.size(mods_all) > 0 then
 		local weapon_factory_tweak_data = tweak_data.weapon.factory.parts
 		local mods_equip = deep_clone(managers.blackmarket:get_weapon_blueprint(category, slot))

@@ -151,6 +151,7 @@ function GenericUserManager:reset_controls_setting_map()
 		"camera_sensitivity",
 		"camera_zoom_sensitivity",
 		"enable_camera_zoom_sensitivity",
+		"enable_fov_based_sensitivity",
 		"invert_camera_y",
 		"southpaw",
 		"hold_to_steelsight",

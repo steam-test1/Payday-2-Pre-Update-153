@@ -2302,6 +2302,11 @@ Play the full version soon to get your full PAYDAY!]],
 			difficulty = easywish_and_above,
 			job = "born"
 		},
+		easywish_help = {
+			award = "orange_1",
+			difficulty = easywish_and_above,
+			job = "help"
+		},
 		complete_pines_easywish = {
 			award = "pick_59",
 			difficulty = easywish_and_above,
@@ -2579,6 +2584,11 @@ Play the full version soon to get your full PAYDAY!]],
 			difficulty = deathwish_and_above,
 			job = "born"
 		},
+		death_help = {
+			award = "orange_2",
+			difficulty = deathwish_and_above,
+			job = "help"
+		},
 		complete_pines_deathwish = {
 			award = "deer_5",
 			difficulty = deathwish_and_above,
@@ -2850,6 +2860,11 @@ Play the full version soon to get your full PAYDAY!]],
 			award = "axe_57",
 			difficulty = sm_wish_and_above,
 			job = "born"
+		},
+		sm_wish_help = {
+			award = "orange_3",
+			difficulty = sm_wish_and_above,
+			job = "help"
 		},
 		complete_pines_sm_wish = {
 			award = "axe_59",
@@ -3180,6 +3195,18 @@ Play the full version soon to get your full PAYDAY!]],
 			everyone_killed_by_melee = 0,
 			everyone_killed_by_grenade = 0
 		},
+		orange_6 = {
+			award = "orange_6",
+			job = "help",
+			need_full_job = true,
+			difficulty = hard_and_above,
+			characters = {"old_hoxton"},
+			equipped_team = {
+				melee_weapons = {"toothbrush"}
+			},
+			everyone_killed_by_grenade = 0,
+			everyone_killed_by_weapons = 0
+		},
 		bain_jobs = {
 			challenge_stat = "bain_jobs",
 			complete_job = true,
@@ -3315,11 +3342,10 @@ Play the full version soon to get your full PAYDAY!]],
 			trophy_stat = "trophy_car_shop",
 			job = "cage"
 		},
-		trophy_stealth_grin_dw = {
-			trophy_stat = "trophy_stealth_grin_dw",
+		trophy_golden_grin = {
+			trophy_stat = "trophy_golden_grin",
 			difficulty = deathwish_and_above,
 			jobs = {"kenaz"},
-			stealth = true,
 			used_weapon_category = "pistol",
 			equipped = {
 				secondaries = {
@@ -3334,11 +3360,10 @@ Play the full version soon to get your full PAYDAY!]],
 			job = "nightclub",
 			stealth = true
 		},
-		trophy_ukranian_dw = {
-			trophy_stat = "trophy_ukranian_dw",
+		trophy_tiara = {
+			trophy_stat = "trophy_tiara",
 			difficulty = deathwish_and_above,
 			job = "ukrainian_job_prof",
-			stealth = true,
 			equipped_team = {deployable = "ecm_jammer", reverse_deployable = true}
 		},
 		trophy_train_bomb = {
@@ -3383,7 +3408,8 @@ Play the full version soon to get your full PAYDAY!]],
 				"firestarter",
 				"kenaz",
 				"mus",
-				"framing_frame"
+				"framing_frame",
+				"dark"
 			}
 		},
 		trophy_bank_heists = {
@@ -3443,6 +3469,7 @@ Play the full version soon to get your full PAYDAY!]],
 			job = "nightclub",
 			killed_by_weapons = 0,
 			killed_by_melee = 0,
+			killed_by_grenade = 0,
 			equipped_team = {deployable = "trip_mine"}
 		},
 		trophy_fbi = {
@@ -4520,6 +4547,7 @@ Play the full version soon to get your full PAYDAY!]],
 		{
 			track = "track_47_gen"
 		},
+		{track = "track_48"},
 		{
 			track = "track_32_lcv"
 		},

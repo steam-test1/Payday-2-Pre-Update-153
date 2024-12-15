@@ -1100,7 +1100,7 @@ function BlackMarketGuiSlotItem:init(main_panel, data, x, y, w, h)
 			blend_mode = "add",
 			halign = "scale",
 			valign = "scale",
-			alpha = 1
+			alpha = data.bg_alpha ~= nil and data.bg_alpha or 1
 		})
 		local texture_width = bg_image:texture_width()
 		local texture_height = bg_image:texture_height()
@@ -1171,11 +1171,11 @@ function BlackMarketGuiSlotItem:init(main_panel, data, x, y, w, h)
 			for _, bitmap in pairs(self._extra_textures) do
 				bitmap:set_color(bitmap:color():with_alpha(0.6))
 			end
-			self._bitmap:set_blend_mode("sub")
+			self._bitmap:set_blend_mode(data.bitmap_locked_blend_mode or "sub")
 		end
 		if self._loading_texture then
 			self._post_load_alpha = 0.6
-			self._post_load_blend_mode = "sub"
+			self._post_load_blend_mode = data.bitmap_locked_blend_mode or "sub"
 		end
 		if (not data.unlocked or data.can_afford ~= false) and data.lock_texture ~= true then
 			self._lock_bitmap = self._panel:bitmap({
@@ -5613,6 +5613,35 @@ function BlackMarketGui:update_info_text()
 		if slot_data.weapon_id then
 			updated_texts[2].text = managers.weapon_factory:get_weapon_name_by_weapon_id(slot_data.weapon_id)
 		end
+		if not slot_data.unlocked then
+			local safe
+			for safe_id, safe_data in pairs(tweak_data.economy.contents) do
+				if safe_data.contains.weapon_skins then
+					for _, skin_id in ipairs(safe_data.contains.weapon_skins) do
+						if slot_data.name == skin_id then
+							safe = safe_id
+							break
+						end
+					end
+				end
+				if safe_data.contains.contents then
+					for _, skin_id in ipairs(safe_data.contains.contents) do
+						if slot_data.name == skin_id then
+							safe = safe_id
+							break
+						end
+					end
+				end
+			end
+			if safe then
+				safe = tweak_data.economy.safes[safe]
+				safe = safe and safe.name_id or "invalid skin"
+			end
+			local macros = {
+				safe = managers.localization:text(safe)
+			}
+			updated_texts[3].text = managers.localization:text("bm_menu_wcc_not_owned", macros)
+		end
 		updated_texts[4].resource_color = {}
 		if slot_data.cosmetic_quality and slot_data.cosmetic_rarity then
 			updated_texts[4].text = managers.localization:to_upper_text("bm_menu_steam_item_quality_rarity", {
@@ -6489,6 +6518,11 @@ function BlackMarketGui:press_first_btn(button)
 	local first_btn_prio = 999
 	local first_btn_visible = false
 	if button == Idstring("0") then
+		if self._slot_data.invalid_double_click then
+			self:flash()
+			managers.menu_component:post_event("menu_error")
+			return true
+		end
 		if self._slot_data.double_click_btn then
 			local btn = self._btns[self._slot_data.double_click_btn]
 			if btn then
@@ -8666,13 +8700,13 @@ function BlackMarketGui:populate_weapon_category_new(data)
 					table.insert(new_data, "i_stop_move")
 				else
 					local has_mods = managers.weapon_factory:has_weapon_more_than_default_parts(crafted.factory_id)
-					if has_mods and active then
+					if data.allow_modify ~= false and has_mods and active then
 						table.insert(new_data, "w_mod")
 					end
-					if has_mods and active and managers.workshop and managers.workshop:enabled() and not table.contains(managers.blackmarket:skin_editor():get_excluded_weapons(), new_data.name) then
+					if data.allow_skinning ~= false and has_mods and active and managers.workshop and managers.workshop:enabled() and not table.contains(managers.blackmarket:skin_editor():get_excluded_weapons(), new_data.name) then
 						table.insert(new_data, "w_skin")
 					end
-					if not new_data.last_weapon then
+					if data.allow_sell ~= false and not new_data.last_weapon then
 						table.insert(new_data, "w_sell")
 					end
 					if active and not new_data.equipped and new_data.unlocked then
@@ -8681,7 +8715,7 @@ function BlackMarketGui:populate_weapon_category_new(data)
 					if new_data.equipped and new_data.unlocked then
 						table.insert(new_data, "w_move")
 					end
-					if active then
+					if data.allow_preview ~= false and active then
 						table.insert(new_data, "w_preview")
 					end
 				end
@@ -8691,93 +8725,109 @@ function BlackMarketGui:populate_weapon_category_new(data)
 	end
 	for i = 1, max_items do
 		if not data[i] then
-			local can_buy_weapon = managers.blackmarket:is_weapon_slot_unlocked(category, data.on_create_data[i])
 			new_data = {}
-			if can_buy_weapon then
-				new_data.name = "bm_menu_btn_buy_new_weapon"
-				new_data.name_localized = managers.localization:text("bm_menu_empty_weapon_slot")
-				new_data.mid_text = {}
-				new_data.mid_text.noselected_text = new_data.name_localized
-				new_data.mid_text.noselected_color = tweak_data.screen_colors.button_stage_3
-				new_data.mid_text.selected_text = currently_holding and new_data.mid_text.noselected_text or managers.localization:text("bm_menu_btn_buy_new_weapon")
-				new_data.mid_text.selected_color = currently_holding and new_data.mid_text.noselected_color or tweak_data.screen_colors.button_stage_2
-				new_data.empty_slot = true
-				new_data.category = category
-				new_data.slot = data.on_create_data[i]
-				new_data.unlocked = true
-				new_data.equipped = false
-				if data.equip_weapon_cosmetics then
-					if managers.money:can_afford_weapon(data.equip_weapon_cosmetics.weapon_id) then
-						table.insert(new_data, "wcc_buy_equip_weapon")
-						new_data.equip_weapon_cosmetics = data.equip_weapon_cosmetics
+			if data.allow_buy ~= false then
+				local can_buy_weapon = managers.blackmarket:is_weapon_slot_unlocked(category, data.on_create_data[i])
+				if can_buy_weapon then
+					new_data.name = "bm_menu_btn_buy_new_weapon"
+					new_data.name_localized = managers.localization:text("bm_menu_empty_weapon_slot")
+					new_data.mid_text = {}
+					new_data.mid_text.noselected_text = new_data.name_localized
+					new_data.mid_text.noselected_color = tweak_data.screen_colors.button_stage_3
+					new_data.mid_text.selected_text = currently_holding and new_data.mid_text.noselected_text or managers.localization:text("bm_menu_btn_buy_new_weapon")
+					new_data.mid_text.selected_color = currently_holding and new_data.mid_text.noselected_color or tweak_data.screen_colors.button_stage_2
+					new_data.empty_slot = true
+					new_data.category = category
+					new_data.slot = data.on_create_data[i]
+					new_data.unlocked = true
+					new_data.equipped = false
+					if data.equip_weapon_cosmetics then
+						if managers.money:can_afford_weapon(data.equip_weapon_cosmetics.weapon_id) then
+							table.insert(new_data, "wcc_buy_equip_weapon")
+							new_data.equip_weapon_cosmetics = data.equip_weapon_cosmetics
+						else
+							new_data.mid_text.selected_text = managers.localization:text("bm_menu_cannot_buy_weapon_slot")
+							new_data.mid_text.selected_color = tweak_data.screen_colors.important_1
+							new_data.dlc_locked = managers.localization:to_upper_text("bm_menu_cannot_buy_weapon_slot")
+							new_data.mid_text.lock_noselected_color = tweak_data.screen_colors.important_1
+							new_data.cannot_buy = true
+						end
+					else
+						if currently_holding then
+							new_data.selected_text = managers.localization:to_upper_text("bm_menu_btn_place_weapon")
+							table.insert(new_data, "w_place")
+							table.insert(new_data, "i_stop_move")
+						else
+							table.insert(new_data, "ew_buy")
+						end
+						if managers.blackmarket:got_new_drop(new_data.category, "weapon_buy_empty", nil) then
+							new_data.mini_icons = new_data.mini_icons or {}
+							table.insert(new_data.mini_icons, {
+								name = "new_drop",
+								texture = "guis/textures/pd2/blackmarket/inv_newdrop",
+								right = 0,
+								top = 0,
+								layer = 1,
+								w = 16,
+								h = 16,
+								stream = false,
+								visible = false
+							})
+							new_data.new_drop_data = {}
+						end
+					end
+				else
+					new_data.name = "bm_menu_btn_buy_weapon_slot"
+					new_data.name_localized = managers.localization:text("bm_menu_locked_weapon_slot")
+					new_data.empty_slot = true
+					new_data.category = category
+					new_data.slot = data.on_create_data[i]
+					new_data.unlocked = true
+					new_data.equipped = false
+					new_data.lock_texture = "guis/textures/pd2/blackmarket/money_lock"
+					new_data.lock_color = tweak_data.screen_colors.button_stage_3
+					new_data.lock_shape = {
+						w = 32,
+						h = 32,
+						x = 0,
+						y = -32
+					}
+					new_data.locked_slot = true
+					new_data.dlc_locked = managers.experience:cash_string(managers.money:get_buy_weapon_slot_price())
+					new_data.mid_text = {}
+					new_data.mid_text.noselected_text = new_data.name_localized
+					new_data.mid_text.noselected_color = tweak_data.screen_colors.button_stage_3
+					new_data.mid_text.is_lock_same_color = true
+					if currently_holding then
+						new_data.mid_text.selected_text = new_data.mid_text.noselected_text
+						new_data.mid_text.selected_color = new_data.mid_text.noselected_color
+						table.insert(new_data, "i_stop_move")
+					elseif managers.money:can_afford_buy_weapon_slot() then
+						new_data.mid_text.selected_text = managers.localization:text("bm_menu_btn_buy_weapon_slot")
+						new_data.mid_text.selected_color = tweak_data.screen_colors.button_stage_2
+						table.insert(new_data, "ew_unlock")
 					else
 						new_data.mid_text.selected_text = managers.localization:text("bm_menu_cannot_buy_weapon_slot")
 						new_data.mid_text.selected_color = tweak_data.screen_colors.important_1
-						new_data.dlc_locked = managers.localization:to_upper_text("bm_menu_cannot_buy_weapon_slot")
+						new_data.dlc_locked = new_data.dlc_locked .. "  " .. managers.localization:to_upper_text("bm_menu_cannot_buy_weapon_slot")
 						new_data.mid_text.lock_noselected_color = tweak_data.screen_colors.important_1
 						new_data.cannot_buy = true
 					end
-				else
-					if currently_holding then
-						new_data.selected_text = managers.localization:to_upper_text("bm_menu_btn_place_weapon")
-						table.insert(new_data, "w_place")
-						table.insert(new_data, "i_stop_move")
-					else
-						table.insert(new_data, "ew_buy")
-					end
-					if managers.blackmarket:got_new_drop(new_data.category, "weapon_buy_empty", nil) then
-						new_data.mini_icons = new_data.mini_icons or {}
-						table.insert(new_data.mini_icons, {
-							name = "new_drop",
-							texture = "guis/textures/pd2/blackmarket/inv_newdrop",
-							right = 0,
-							top = 0,
-							layer = 1,
-							w = 16,
-							h = 16,
-							stream = false,
-							visible = false
-						})
-						new_data.new_drop_data = {}
-					end
 				end
 			else
-				new_data.name = "bm_menu_btn_buy_weapon_slot"
-				new_data.name_localized = managers.localization:text("bm_menu_locked_weapon_slot")
+				new_data.name = "bm_menu_btn_unavailable"
+				new_data.name_localized = managers.localization:text("bm_menu_btn_unavailable")
+				new_data.mid_text = {}
+				new_data.mid_text.noselected_text = new_data.name_localized
+				new_data.mid_text.noselected_color = tweak_data.screen_colors.button_stage_3
+				new_data.mid_text.selected_text = currently_holding and new_data.mid_text.noselected_text or managers.localization:text("bm_menu_btn_unavailable")
+				new_data.mid_text.selected_color = currently_holding and new_data.mid_text.noselected_color or tweak_data.screen_colors.button_stage_2
 				new_data.empty_slot = true
+				new_data.is_loadout = true
 				new_data.category = category
 				new_data.slot = data.on_create_data[i]
 				new_data.unlocked = true
 				new_data.equipped = false
-				new_data.lock_texture = "guis/textures/pd2/blackmarket/money_lock"
-				new_data.lock_color = tweak_data.screen_colors.button_stage_3
-				new_data.lock_shape = {
-					w = 32,
-					h = 32,
-					x = 0,
-					y = -32
-				}
-				new_data.locked_slot = true
-				new_data.dlc_locked = managers.experience:cash_string(managers.money:get_buy_weapon_slot_price())
-				new_data.mid_text = {}
-				new_data.mid_text.noselected_text = new_data.name_localized
-				new_data.mid_text.noselected_color = tweak_data.screen_colors.button_stage_3
-				new_data.mid_text.is_lock_same_color = true
-				if currently_holding then
-					new_data.mid_text.selected_text = new_data.mid_text.noselected_text
-					new_data.mid_text.selected_color = new_data.mid_text.noselected_color
-					table.insert(new_data, "i_stop_move")
-				elseif managers.money:can_afford_buy_weapon_slot() then
-					new_data.mid_text.selected_text = managers.localization:text("bm_menu_btn_buy_weapon_slot")
-					new_data.mid_text.selected_color = tweak_data.screen_colors.button_stage_2
-					table.insert(new_data, "ew_unlock")
-				else
-					new_data.mid_text.selected_text = managers.localization:text("bm_menu_cannot_buy_weapon_slot")
-					new_data.mid_text.selected_color = tweak_data.screen_colors.important_1
-					new_data.dlc_locked = new_data.dlc_locked .. "  " .. managers.localization:to_upper_text("bm_menu_cannot_buy_weapon_slot")
-					new_data.mid_text.lock_noselected_color = tweak_data.screen_colors.important_1
-					new_data.cannot_buy = true
-				end
 			end
 			data[i] = new_data
 		end
@@ -8840,7 +8890,7 @@ function BlackMarketGui:populate_melee_weapons_new(data)
 			table.insert(new_data.extra_bitmaps, icon_texture_path)
 			table.insert(new_data.extra_bitmaps_shape, {
 				x = 0,
-				y = -0.1,
+				y = -0.2,
 				w = 0.75,
 				h = 0.75
 			})
@@ -8850,7 +8900,7 @@ function BlackMarketGui:populate_melee_weapons_new(data)
 			table.insert(new_data.extra_bitmaps, icon_texture_path)
 			table.insert(new_data.extra_bitmaps_shape, {
 				x = 0,
-				y = 0.1,
+				y = 0.2,
 				w = 0.75,
 				h = 0.75
 			})
@@ -8938,7 +8988,9 @@ function BlackMarketGui:populate_weapon_cosmetics(data)
 	local crafted = managers.blackmarket:get_crafted_category(data.category)[data.prev_node_data and data.prev_node_data.slot]
 	local inventory_tradable = managers.blackmarket:get_inventory_tradable()
 	local cosmetic_id
-	for index, instance_id in ipairs(data.on_create_data) do
+	local cosmetics_instances = data.on_create_data.instances
+	local index_i = 1
+	for _, instance_id in ipairs(cosmetics_instances) do
 		if inventory_tradable[instance_id] then
 			cosmetic_id = inventory_tradable[instance_id].entry
 			my_cd = cosmetics_data[cosmetic_id]
@@ -8991,11 +9043,13 @@ function BlackMarketGui:populate_weapon_cosmetics(data)
 					x = x + 17
 				end
 			end
-			data[index] = new_data
+			data[index_i] = new_data
+			index_i = index_i + 1
 		end
 	end
 	local new_data
-	for i = 1, math.ceil(#data.on_create_data / 6) * 6 do
+	local count = table.size(cosmetics_instances)
+	for i = 1, math.ceil(count / 6) * 6 do
 		if not data[i] then
 			new_data = {}
 			new_data.name = "empty"
@@ -9123,6 +9177,7 @@ function BlackMarketGui:populate_mods(data)
 				new_data.mid_text.vertical = "center"
 				new_data.mid_text.font = small_font
 				new_data.mid_text.font_size = small_font_size
+				new_data.invalid_double_click = true
 			end
 			if mod_name then
 				local forbid = managers.blackmarket:can_modify_weapon(new_data.category, new_data.slot, new_data.name)
@@ -10017,11 +10072,11 @@ function BlackMarketGui:choose_weapon_mods_callback(data)
 		table.sort(cosmetics_instances, sort_func)
 		table.insert(new_node_data, {
 			name = "weapon_cosmetics",
+			name_localized = managers.localization:text("bm_menu_weapon_cosmetics"),
 			category = data.category,
 			prev_node_data = data,
-			name_localized = managers.localization:text("bm_menu_weapon_cosmetics"),
 			on_create_func_name = "populate_weapon_cosmetics",
-			on_create_data = cosmetics_instances,
+			on_create_data = {instances = cosmetics_instances},
 			override_slots = {6, 1},
 			identifier = BlackMarketGui.identifiers.weapon_cosmetic
 		})
@@ -10449,6 +10504,7 @@ function BlackMarketGui:preview_cosmetic_on_weapon_callback(data)
 		id = data.cosmetic_id,
 		quality = data.cosmetic_quality
 	}, callback(self, self, "_update_crafting_node"), nil, BlackMarketGui.get_crafting_custom_data())
+	self:reload()
 end
 
 function BlackMarketGui:choose_weapon_cosmetics_callback(data)

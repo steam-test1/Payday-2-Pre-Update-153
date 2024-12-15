@@ -113,7 +113,6 @@ function HUDAssaultCorner:init(hud, full_hud, tweak_hud)
 	if self._hud_panel:child("wave_panel") then
 		self._hud_panel:remove(self._hud_panel:child("wave_panel"))
 	end
-	self._completed_waves = 0
 	self._max_waves = tweak_data.safehouse.combat.waves[Global.game_settings.difficulty or "normal"]
 	if self:is_safehouse_raid() then
 		self._wave_panel_size = {250, 38}
@@ -452,11 +451,9 @@ function HUDAssaultCorner:sync_start_assault(assault_number)
 	self:_update_assault_hud_color(color)
 	self._start_assault_after_hostage_offset = true
 	self:_set_hostage_offseted(true)
-	self._completed_waves = (assault_number or 1) - 1
 end
 
 function HUDAssaultCorner:set_assault_wave_number(assault_number)
-	self._completed_waves = (assault_number or 1) - 1
 	if alive(self._wave_bg_box) then
 		local wave_text = panel:child("num_waves")
 		wave_text:set_text(self:get_completed_waves_string())
@@ -596,7 +593,6 @@ function HUDAssaultCorner:_start_assault(text_list)
 	box_text_panel:stop()
 	box_text_panel:animate(callback(self, self, "_animate_text"), nil, nil, callback(self, self, "assault_attention_color_function"))
 	self:_set_feedback_color(self._assault_color)
-	self._completed_waves = self._completed_waves + 1
 	if alive(self._wave_bg_box) then
 		self._wave_bg_box:stop()
 		self._wave_bg_box:animate(callback(self, self, "_animate_wave_started"), self)
@@ -988,7 +984,7 @@ end
 
 function HUDAssaultCorner:get_completed_waves_string()
 	local macro = {
-		current = self._completed_waves or 0,
+		current = managers.groupai:state():get_assault_number() or 0,
 		max = self._max_waves or 0
 	}
 	return managers.localization:to_upper_text("hud_assault_waves", macro)

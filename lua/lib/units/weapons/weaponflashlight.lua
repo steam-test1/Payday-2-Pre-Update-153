@@ -6,7 +6,7 @@ function WeaponFlashLight:init(unit)
 	self._on_event = "gadget_flashlight_on"
 	self._off_event = "gadget_flashlight_off"
 	self._a_flashlight_obj = self._unit:get_object(Idstring("a_flashlight"))
-	local is_haunted = managers.job and (managers.job:current_job_id() == "haunted" or managers.job:current_job_id() == "nail")
+	local is_haunted = self:is_haunted()
 	self._g_light = self._unit:get_object(Idstring("g_light"))
 	local texture = is_haunted and "units/lights/spot_light_projection_textures/spotprojection_22_flashlight_df" or "units/lights/spot_light_projection_textures/spotprojection_11_flashlight_df"
 	self._light = World:create_light("spot|specular|plane_projection", texture)
@@ -27,12 +27,18 @@ function WeaponFlashLight:init(unit)
 	World:effect_manager():set_hidden(self._light_effect, true)
 end
 
+function WeaponFlashLight:is_haunted()
+	local job_id = managers.job and managers.job:current_job_id()
+	local tweak = job_id and tweak_data.narrative.jobs[job_id]
+	return tweak and tweak.is_halloween_level
+end
+
 function WeaponFlashLight:set_npc()
 	if self._light_effect then
 		World:effect_manager():kill(self._light_effect)
 	end
 	local obj = self._unit:get_object(Idstring("a_flashlight"))
-	local is_haunted = managers.job and (managers.job:current_job_id() == "haunted" or managers.job:current_job_id() == "nail")
+	local is_haunted = self:is_haunted()
 	local effect_path = is_haunted and "effects/particles/weapons/flashlight_spooky/flashlight" or "effects/particles/weapons/flashlight/flashlight"
 	self._light_effect = World:effect_manager():spawn({
 		effect = Idstring(effect_path),
@@ -47,7 +53,7 @@ function WeaponFlashLight:_check_state(current_state)
 	self._light:set_enable(self._on)
 	self._g_light:set_visibility(self._on)
 	World:effect_manager():set_hidden(self._light_effect, not self._on)
-	self._is_haunted = managers.job and (managers.job:current_job_id() == "haunted" or managers.job:current_job_id() == "nail")
+	self._is_haunted = self:is_haunted()
 	self._unit:set_extension_update_enabled(Idstring("base"), self._on)
 end
 
@@ -72,7 +78,7 @@ WeaponFlashLight.HALLOWEEN_SPOOC = 4
 WeaponFlashLight.HALLOWEEN_WARP = 5
 
 function WeaponFlashLight:sync_net_event(event_id)
-	if not managers.job or managers.job:current_job_id() ~= "haunted" and managers.job:current_job_id() ~= "nail" then
+	if not self:is_haunted() then
 		return
 	end
 	local t = Application:time()

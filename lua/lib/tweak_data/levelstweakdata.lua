@@ -1337,6 +1337,7 @@ function LevelsTweakData:init()
 	self.chill_combat.outro_event = "Play_pln_sfr_end"
 	self.chill_combat.package = "packages/narr_chill"
 	self.chill_combat.cube = "cube_apply_heist_bank"
+	self.chill.ghost_bonus = 0.15
 	self.chill_combat.max_bags = 28
 	self.chill_combat.team_ai_off = false
 	self.chill_combat.group_ai_state = "safehouse"
@@ -1356,6 +1357,28 @@ function LevelsTweakData:init()
 	self.flat.music_overrides = {
 		track_47_gen = "track_47_flat"
 	}
+	self.help = {}
+	self.help.name_id = "heist_help_hl"
+	self.help.briefing_id = "heist_help_hl_briefing"
+	self.help.briefing_dialog = "Play_big_clk_hlp_brf"
+	self.help.world_name = "narratives/bain/help"
+	self.help.intro_event = "Play_big_clk_hlp_intro"
+	self.help.outro_event = "Play_big_clk_hlp_end"
+	self.help.failure_event = "Play_big_clk_hlp_fal"
+	self.help.package = "packages/lvl_help"
+	self.help.cube = "cube_apply_heist_bank"
+	self.help.ghost_bonus = nil
+	self.help.max_bags = 9999
+	self.haunted = {}
+	self.haunted.name_id = "heist_haunted_hl"
+	self.haunted.briefing_id = "heist_haunted_briefing"
+	self.haunted.world_name = "narratives/haunted_safehouse"
+	self.haunted.intro_event = "lol"
+	self.haunted.outro_event = {"lol", "lolo"}
+	self.haunted.music = "heist"
+	self.haunted.package = "packages/narr_haunted"
+	self.haunted.cube = "cube_apply_heist_bank"
+	self.haunted.max_bags = 4
 	self._level_index = {
 		"welcome_to_the_jungle_1",
 		"welcome_to_the_jungle_1_night",
@@ -1442,7 +1465,9 @@ function LevelsTweakData:init()
 		"chew",
 		"chill",
 		"chill_combat",
-		"flat"
+		"flat",
+		"help",
+		"haunted"
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self._level_index, "roberts")

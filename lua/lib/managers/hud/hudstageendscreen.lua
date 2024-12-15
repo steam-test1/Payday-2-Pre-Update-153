@@ -1319,13 +1319,10 @@ end
 
 function HUDStageEndScreen:stage_money_counter_count(t, dt)
 	if self:perform_income_count(t, dt, self._money_panel, self._money_stage, self._money, self.get_count_speed_fast, self.display_as_cash) then
-		repeat
-			WalletGuiObject.refresh()
-			WalletGuiObject.set_object_visible("wallet_money_icon", true)
-			WalletGuiObject.set_object_visible("wallet_money_text", true)
-			do break end -- pseudo-goto
-			managers.menu_component:show_endscreen_cash_summary()
-		until true
+		WalletGuiObject.refresh()
+		WalletGuiObject.set_object_visible("wallet_money_icon", true)
+		WalletGuiObject.set_object_visible("wallet_money_text", true)
+		managers.menu_component:show_endscreen_cash_summary()
 		self._wait_t = t + 1.25
 		self:step_stage_up()
 	end
@@ -1470,42 +1467,47 @@ function HUDStageEndScreen:safehouse_currency_init(t, dt)
 	self._coins_circle:set_alpha(0)
 	self._coins_backpanel:child("bg_progress_circle"):set_alpha(0)
 	self._coins_text:set_alpha(0)
-	local income = managers.custom_safehouse:coins() - managers.custom_safehouse:previous_coins()
-	self._safehouse_data = {
-		income = income,
-		remaining_income = income,
-		current = managers.custom_safehouse:coins(),
-		trophies = {}
-	}
+	local total_income = managers.custom_safehouse:coins() - managers.custom_safehouse:previous_coins()
+	local exp_income = total_income
+	local trophies = {}
 	for idx, trophy_data in ipairs(managers.custom_safehouse:completed_trophies()) do
 		if trophy_data.type == "trophy" then
-			table.insert(self._safehouse_data.trophies, {
+			table.insert(trophies, {
 				trophy_data.name,
 				trophy_data.reward,
 				tweak_data.screen_colors.challenge_completed_color
 			})
+			exp_income = exp_income - trophy_data.reward
 		end
 	end
 	local is_success = game_state_machine:current_state().is_success and game_state_machine:current_state():is_success()
 	local has_completed_daily = managers.custom_safehouse:has_completed_daily() and not managers.custom_safehouse:has_rewarded_daily()
 	local was_safehouse_raid = managers.job:current_job_id() == "chill_combat"
 	if has_completed_daily then
-		table.insert(self._safehouse_data.trophies, {
+		table.insert(trophies, {
 			"menu_es_safehouse_income_daily",
 			tweak_data.safehouse.rewards.daily_complete,
 			tweak_data.screen_colors.heat_warm_color
 		})
+		exp_income = exp_income - tweak_data.safehouse.rewards.daily_complete
 	end
 	if was_safehouse_raid and is_success then
-		table.insert(self._safehouse_data.trophies, {
+		table.insert(trophies, {
 			"menu_es_safehouse_raid",
 			tweak_data.safehouse.rewards.raid,
 			tweak_data.screen_colors.important_1
 		})
+		exp_income = exp_income - tweak_data.safehouse.rewards.raid
 	end
+	self._safehouse_data = {
+		income = exp_income,
+		remaining_income = exp_income,
+		current = managers.custom_safehouse:coins() - total_income,
+		trophies = trophies
+	}
 	local partial_coins = self._safehouse_data.current % 1
 	self._coins_circle:set_color(Color(partial_coins, 1, 1))
-	self:set_coin_text(managers.custom_safehouse:coins())
+	self:set_coin_text(self._safehouse_data.current)
 	self._bonuses_panel = self._lp_forepanel:panel({
 		x = self._lp_xp_gained:x(),
 		y = 10,
@@ -1673,16 +1675,24 @@ function HUDStageEndScreen:safehouse_currency_count(t, dt)
 			end
 			data.remaining_income = data.remaining_income - total_next_coin_xp
 			self._next_coin_xp = nil
-			managers.menu_component:post_event("count_1_finished")
-			self._playing_sound = nil
+			self:_end_count_up_sound()
 		end
 	else
 		self._wait_t = t + 0.5
+		self:_end_count_up_sound()
 		self:step_stage_up()
 	end
 end
 
+function HUDStageEndScreen:_end_count_up_sound()
+	if self._playing_sound then
+		managers.menu_component:post_event("count_1_finished")
+		self._playing_sound = nil
+	end
+end
+
 function HUDStageEndScreen:safehouse_currency_trophies(t, dt)
+	self:_end_count_up_sound()
 	local data = self._safehouse_data
 	self._trophy_bonuses = self._trophy_bonuses or {}
 	if #data.trophies > 0 then

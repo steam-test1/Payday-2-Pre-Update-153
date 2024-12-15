@@ -34,7 +34,8 @@ function MutatorsManager:init()
 		MutatorEnemyReplacer:new(self),
 		MutatorMediDozer:new(self),
 		MutatorCloakerEffect:new(self),
-		MutatorShieldDozers:new(self)
+		MutatorShieldDozers:new(self),
+		MutatorTitandozers:new(self)
 	}
 	self._active_mutators = {}
 	if Global.mutators and Global.mutators.active_on_load then
@@ -54,8 +55,14 @@ function MutatorsManager:init()
 			end
 		end
 	end
+	local setup_mutators = {}
 	for _, active_mutator in pairs(self:active_mutators()) do
-		local mutator = active_mutator.mutator
+		table.insert(setup_mutators, active_mutator.mutator)
+	end
+	table.sort(setup_mutators, function(a, b)
+		return a.load_priority > b.load_priority
+	end)
+	for _, mutator in pairs(setup_mutators) do
 		print("[Mutators] Setting up active mutator: ", mutator:id())
 		mutator:setup(self)
 	end

@@ -497,6 +497,26 @@ function MenuManager:set_mouse_sensitivity(zoomed)
 	managers.controller:rebind_connections()
 end
 
+function MenuManager:camera_sensitivity_x_changed(name, old_value, new_value)
+	local setup = self._controller:get_setup()
+	local look_connection = setup:get_connection("look")
+	local look_multiplier = look_connection:get_multiplier()
+	mvector3.set_x(look_multiplier, self._look_multiplier.x * new_value)
+	look_connection:set_multiplier(look_multiplier)
+	managers.controller:rebind_connections()
+	print("[MenuManager]:camera_sensitivity_x_changed")
+end
+
+function MenuManager:camera_sensitivity_y_changed(name, old_value, new_value)
+	local setup = self._controller:get_setup()
+	local look_connection = setup:get_connection("look")
+	local look_multiplier = look_connection:get_multiplier()
+	mvector3.set_y(look_multiplier, self._look_multiplier.y * new_value)
+	look_connection:set_multiplier(look_multiplier)
+	managers.controller:rebind_connections()
+	print("[MenuManager]:camera_sensitivity_y_changed")
+end
+
 function MenuManager:camera_sensitivity_changed(name, old_value, new_value)
 	if self:is_console() then
 		local setup = self._controller:get_setup()
@@ -1632,6 +1652,10 @@ end
 
 function MenuCallbackHandler:is_level_50()
 	return managers.experience:current_level() >= 50
+end
+
+function MenuCallbackHandler:is_new_gamepad_input()
+	return false
 end
 
 function MenuCallbackHandler:is_win32()
@@ -3248,6 +3272,35 @@ function MenuCallbackHandler:set_camera_sensitivity(item)
 			item_other_sens:trigger()
 		end
 	end
+end
+
+function MenuCallbackHandler:set_camera_sensitivity_x(item)
+	local value = item:value()
+	managers.user:set_setting("camera_sensitivity_x", value)
+	if not managers.user:get_setting("enable_camera_sensitivity_separate") then
+		local item_other_sens = managers.menu:active_menu().logic:selected_node():item("camera_sensitivity_vertical")
+		if item_other_sens and item_other_sens:visible() and math.abs(value - item_other_sens:value()) > 0.001 then
+			item_other_sens:set_value(value)
+			item_other_sens:trigger()
+		end
+	end
+end
+
+function MenuCallbackHandler:set_camera_sensitivity_y(item)
+	local value = item:value()
+	managers.user:set_setting("camera_sensitivity_y", value)
+	if not managers.user:get_setting("enable_camera_sensitivity_separate") then
+		local item_other_sens = managers.menu:active_menu().logic:selected_node():item("camera_sensitivity_horizontal")
+		if item_other_sens and item_other_sens:visible() and math.abs(value - item_other_sens:value()) > 0.001 then
+			item_other_sens:set_value(value)
+			item_other_sens:trigger()
+		end
+	end
+end
+
+function MenuCallbackHandler:toggle_camera_sensitivity_separate(item)
+	local value = item:value() == "on"
+	managers.user:set_setting("enable_camera_sensitivity_separate", value)
 end
 
 function MenuCallbackHandler:set_camera_zoom_sensitivity(item)
@@ -5208,6 +5261,9 @@ function MenuCrimeNetContactShortInitiator:create_item(node, data)
 end
 
 function MenuCallbackHandler:play_chill_combat(item)
+	if managers.job:has_active_job() then
+		self:_dialog_leave_lobby_yes()
+	end
 	item:parameters().gui_node:remove_blur()
 	local job_data = {
 		job_id = "chill_combat",
@@ -7945,6 +8001,20 @@ function MenuOptionInitiator:modify_controls(node)
 		cs_item:set_step((tweak_data.player.camera.MAX_SENSITIVITY - tweak_data.player.camera.MIN_SENSITIVITY) * 0.1)
 		cs_item:set_value(managers.user:get_setting("camera_sensitivity"))
 	end
+	local cs_item = node:item("camera_sensitivity_horizontal")
+	if cs_item then
+		cs_item:set_min(tweak_data.player.camera.MIN_SENSITIVITY)
+		cs_item:set_max(tweak_data.player.camera.MAX_SENSITIVITY)
+		cs_item:set_step((tweak_data.player.camera.MAX_SENSITIVITY - tweak_data.player.camera.MIN_SENSITIVITY) * 0.1)
+		cs_item:set_value(managers.user:get_setting("camera_sensitivity_x"))
+	end
+	local cs_item = node:item("camera_sensitivity_vertical")
+	if cs_item then
+		cs_item:set_min(tweak_data.player.camera.MIN_SENSITIVITY)
+		cs_item:set_max(tweak_data.player.camera.MAX_SENSITIVITY)
+		cs_item:set_step((tweak_data.player.camera.MAX_SENSITIVITY - tweak_data.player.camera.MIN_SENSITIVITY) * 0.1)
+		cs_item:set_value(managers.user:get_setting("camera_sensitivity_y"))
+	end
 	local czs_item = node:item("camera_zoom_sensitivity")
 	if czs_item then
 		czs_item:set_min(tweak_data.player.camera.MIN_SENSITIVITY)
@@ -7953,6 +8023,10 @@ function MenuOptionInitiator:modify_controls(node)
 		czs_item:set_value(managers.user:get_setting("camera_zoom_sensitivity"))
 	end
 	node:item("toggle_zoom_sensitivity"):set_value(managers.user:get_setting("enable_camera_zoom_sensitivity") and "on" or "off")
+	local cs_item = node:item("toggle_camera_sensitivity_separate")
+	if cs_item then
+		cs_item:set_value(managers.user:get_setting("enable_camera_sensitivity_separate") and "on" or "off")
+	end
 	node:item("toggle_fov_based_zoom"):set_value(managers.user:get_setting("enable_fov_based_sensitivity") and "on" or "off")
 	return node
 end

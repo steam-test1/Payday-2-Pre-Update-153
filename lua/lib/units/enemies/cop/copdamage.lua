@@ -778,7 +778,7 @@ function CopDamage:damage_fire(attack_data)
 		if not attack_data.is_fire_dot_damage or data.is_molotov then
 			managers.statistics:killed_by_anyone(data)
 		end
-		if managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") and attacker_unit == managers.player:player_unit() and attack_data.weapon_unit and not attack_data.weapon_unit:base().thrower_unit then
+		if not is_civilian and managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") and attacker_unit == managers.player:player_unit() and attack_data.weapon_unit and not attack_data.weapon_unit:base().thrower_unit then
 			local weapon_category = attack_data.weapon_unit:base():weapon_tweak_data().category
 			if weapon_category == "shotgun" or weapon_category == "saw" then
 				managers.player:activate_temporary_upgrade("temporary", "overkill_damage_multiplier")
@@ -796,7 +796,7 @@ function CopDamage:damage_fire(attack_data)
 			if not attack_data.is_fire_dot_damage then
 				managers.statistics:killed(data)
 			end
-			if CopDamage.is_civilian(self._unit:base()._tweak_table) then
+			if is_civilian then
 				managers.money:civilian_killed()
 			end
 			self:_check_damage_achievements(attack_data, false)
@@ -1002,7 +1002,7 @@ function CopDamage:damage_explosion(attack_data)
 			attacker_unit = attacker_unit:base():thrower_unit()
 			data.weapon_unit = attack_data.attacker_unit
 		end
-		if managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") and attacker_unit == managers.player:player_unit() and attack_data.weapon_unit and attack_data.weapon_unit:base().weapon_tweak_data and not attack_data.weapon_unit:base().thrower_unit then
+		if not is_civilian and managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") and attacker_unit == managers.player:player_unit() and attack_data.weapon_unit and attack_data.weapon_unit:base().weapon_tweak_data and not attack_data.weapon_unit:base().thrower_unit then
 			local weapon_category = attack_data.weapon_unit:base():weapon_tweak_data().category
 			if weapon_category == "shotgun" or weapon_category == "saw" then
 				managers.player:activate_temporary_upgrade("temporary", "overkill_damage_multiplier")
@@ -1015,7 +1015,7 @@ function CopDamage:damage_explosion(attack_data)
 			end
 			self:_show_death_hint(self._unit:base()._tweak_table)
 			managers.statistics:killed(data)
-			if CopDamage.is_civilian(self._unit:base()._tweak_table) then
+			if is_civilian then
 				managers.money:civilian_killed()
 			end
 			self:_check_damage_achievements(attack_data, false)

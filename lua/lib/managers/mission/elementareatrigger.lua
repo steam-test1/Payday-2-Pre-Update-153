@@ -73,6 +73,15 @@ function ElementAreaTrigger:project_instigators()
 				table.insert(instigators, data.unit)
 			end
 		end
+	elseif self._values.instigator == "intimidated_enemies" then
+		local state = managers.groupai:state()
+		if state:police_hostage_count() > 0 or 0 < state:get_amount_enemies_converted_to_criminals() then
+			for _, data in pairs(managers.enemy:all_enemies()) do
+				if data.unit:anim_data().surrender or data.is_converted then
+					table.insert(instigators, data.unit)
+				end
+			end
+		end
 	elseif self._values.instigator == "criminals" then
 		for _, data in pairs(managers.groupai:state():all_char_criminals()) do
 			table.insert(instigators, data.unit)
@@ -183,7 +192,10 @@ function ElementAreaTrigger:project_instigators()
 					"bike_part_heavy",
 					"toothbrush",
 					"drone_control_helmet",
-					"chl_puck"
+					"chl_puck",
+					"cloaker_gold",
+					"cloaker_money",
+					"cloaker_cocaine"
 				}
 				if table.contains(carry_list, carry_id) then
 					return true

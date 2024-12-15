@@ -50,6 +50,8 @@ function DLCTweakData:init(tweak_data)
 			wild = true,
 			fez1 = true,
 			chill = 1,
+			howl = 1,
+			paydaycon2016 = 1,
 			rip = true,
 			pd2_goty = 1,
 			pd2_hw_boxing = true,
@@ -652,6 +654,90 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "masks",
 			item_entry = "satan",
+			amount = 1
+		}
+	}
+	self.free_halloween_textures = {}
+	self.free_halloween_textures.free = true
+	self.free_halloween_textures.content = {}
+	self.free_halloween_textures.content.loot_global_value = "halloween"
+	self.free_halloween_textures.content.loot_drops = {
+		{
+			type_items = "textures",
+			item_entry = "pumpgrin",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "shout",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "webbed",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "hannibalistic",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "stitches",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "doomweaver",
+			amount = 1
+		}
+	}
+	self.halloween_nightmare_1 = {}
+	self.halloween_nightmare_1.dlc = "has_achievement"
+	self.halloween_nightmare_1.achievement_id = "halloween_nightmare_1"
+	self.halloween_nightmare_1.content = {}
+	self.halloween_nightmare_1.content.loot_global_value = "halloween"
+	self.halloween_nightmare_1.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "baby_happy",
+			amount = 1
+		}
+	}
+	self.halloween_nightmare_2 = {}
+	self.halloween_nightmare_2.dlc = "has_achievement"
+	self.halloween_nightmare_2.achievement_id = "halloween_nightmare_2"
+	self.halloween_nightmare_2.content = {}
+	self.halloween_nightmare_2.content.loot_global_value = "halloween"
+	self.halloween_nightmare_2.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "brazil_baby",
+			amount = 1
+		}
+	}
+	self.halloween_nightmare_3 = {}
+	self.halloween_nightmare_3.dlc = "has_achievement"
+	self.halloween_nightmare_3.achievement_id = "halloween_nightmare_3"
+	self.halloween_nightmare_3.content = {}
+	self.halloween_nightmare_3.content.loot_global_value = "halloween"
+	self.halloween_nightmare_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "baby_angry",
+			amount = 1
+		}
+	}
+	self.halloween_nightmare_4 = {}
+	self.halloween_nightmare_4.dlc = "has_achievement"
+	self.halloween_nightmare_4.achievement_id = "halloween_nightmare_4"
+	self.halloween_nightmare_4.content = {}
+	self.halloween_nightmare_4.content.loot_global_value = "halloween"
+	self.halloween_nightmare_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "baby_cry",
 			amount = 1
 		}
 	}
@@ -4898,6 +4984,15 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.pdcon_2016 = {}
+	self.pdcon_2016.content = {}
+	self.pdcon_2016.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "pdc16_clover",
+			amount = 1
+		}
+	}
 	self.bobblehead = {}
 	self.bobblehead.content = {}
 	self.bobblehead.content.loot_drops = {
@@ -5188,6 +5283,53 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "masks",
 			item_entry = "spk_party",
+			amount = 1
+		}
+	}
+	self.howl = {}
+	self.howl.free = true
+	self.howl.content = {}
+	self.howl.content.loot_global_value = "halloween"
+	self.howl.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "hwl_dallas_zombie",
+			amount = 1
+		}
+	}
+	self.ach_help_4 = {}
+	self.ach_help_4.dlc = "has_achievement"
+	self.ach_help_4.achievement_id = "orange_4"
+	self.ach_help_4.content = {}
+	self.ach_help_4.content.loot_global_value = "halloween"
+	self.ach_help_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "hwl_wolf_zombie",
+			amount = 1
+		}
+	}
+	self.ach_help_5 = {}
+	self.ach_help_5.dlc = "has_achievement"
+	self.ach_help_5.achievement_id = "orange_5"
+	self.ach_help_5.content = {}
+	self.ach_help_5.content.loot_global_value = "halloween"
+	self.ach_help_5.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "howl_chains_zombie",
+			amount = 1
+		}
+	}
+	self.ach_help_6 = {}
+	self.ach_help_6.dlc = "has_achievement"
+	self.ach_help_6.achievement_id = "orange_6"
+	self.ach_help_6.content = {}
+	self.ach_help_6.content.loot_global_value = "halloween"
+	self.ach_help_6.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "hwl_hoxton_zombie",
 			amount = 1
 		}
 	}

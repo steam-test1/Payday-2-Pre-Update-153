@@ -2034,7 +2034,7 @@ function GuiTweakData:init()
 				{
 					desc_id = "menu_wild_desc_codex",
 					videos = {"wild1"},
-					post_event = "pln_contact_wild"
+					post_event = "pln_contact_rust"
 				}
 			}
 		}

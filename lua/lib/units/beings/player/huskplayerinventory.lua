@@ -19,7 +19,7 @@ end
 function HuskPlayerInventory:synch_equipped_weapon(weap_index, blueprint_string, cosmetics_string, peer)
 	local weapon_name = self._get_weapon_name_from_sync_index(weap_index)
 	if type(weapon_name) == "string" then
-		self:add_unit_by_factory_name(weapon_name, true, true, blueprint_string, self:cosmetics_string_from_peer(peer, weapon_name) or cosmetics_string)
+		self:add_unit_by_factory_name(weapon_name, true, true, blueprint_string, cosmetics_string or self:cosmetics_string_from_peer(peer, weapon_name))
 		return
 	end
 	self:add_unit_by_name(weapon_name, true, true)
@@ -67,6 +67,11 @@ function HuskPlayerInventory:add_unit_by_name(new_unit_name, equip, instant)
 end
 
 function HuskPlayerInventory:add_unit_by_factory_name(factory_name, equip, instant, blueprint_string, cosmetics_string)
+	local factory_weapon = tweak_data.weapon.factory[factory_name]
+	local ids_unit_name = Idstring(factory_weapon.unit)
+	if not managers.dyn_resource:is_resource_ready(Idstring("unit"), ids_unit_name, managers.dyn_resource.DYN_RESOURCES_PACKAGE) then
+		managers.dyn_resource:load(Idstring("unit"), ids_unit_name, managers.dyn_resource.DYN_RESOURCES_PACKAGE, nil)
+	end
 	local blueprint = managers.weapon_factory:unpack_blueprint_from_string(factory_name, blueprint_string)
 	local cosmetics
 	local cosmetics_data = string.split(cosmetics_string, "-")

@@ -268,7 +268,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"mad",
 		"born",
 		"chew",
-		"flat"
+		"flat",
+		"help"
 	}
 	self.grenade_crate.visible_if_locked = true
 	self.grenade_crate.unlock_desc_id = "menu_asset_grenade_crate_desc"
@@ -305,7 +306,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"mad",
 		"born",
 		"chew",
-		"flat"
+		"flat",
+		"help"
 	}
 	self.ammo_bag.visible_if_locked = true
 	self.ammo_bag.unlock_desc_id = "menu_asset_ammo_desc"
@@ -339,7 +341,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"mad",
 		"born",
 		"chew",
-		"flat"
+		"flat",
+		"help"
 	}
 	self.health_bag.visible_if_locked = true
 	self.health_bag.unlock_desc_id = "menu_asset_health_desc"
@@ -1043,6 +1046,10 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.flat_panic_room_blueprint.name_id = "menu_asset_flat_panic_room_blueprint"
 	self.flat_panic_room_blueprint.texture = "guis/dlcs/flat/textures/pd2/mission_briefing/assets/flat_panic_room_blueprint"
 	self.flat_panic_room_blueprint.stages = {"flat"}
+	self.flat_recon_photos = {}
+	self.flat_recon_photos.name_id = "menu_asset_recon_photos"
+	self.flat_recon_photos.texture = "guis/dlcs/help/textures/pd2/mission_briefing/assets/recon_photos"
+	self.flat_recon_photos.stages = {"help"}
 end
 
 function AssetsTweakData:_init_debug_assets(tweak_data)

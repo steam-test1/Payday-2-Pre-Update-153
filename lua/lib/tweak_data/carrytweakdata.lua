@@ -46,6 +46,8 @@ function CarryTweakData:init(tweak_data)
 	self.types.coke_light.throw_distance_multiplier = self.types.light.throw_distance_multiplier
 	self.types.explosives = deep_clone(self.types.medium)
 	self.types.explosives.can_explode = true
+	self.types.cloaker_explosives = deep_clone(self.types.medium)
+	self.types.cloaker_explosives.can_poof = true
 	self.small_loot = {}
 	self.small_loot.money_bundle = tweak_data:get_value("money_manager", "small_loot", "money_bundle")
 	self.small_loot.ring_band = tweak_data:get_value("money_manager", "small_loot", "ring_band")
@@ -563,6 +565,28 @@ function CarryTweakData:init(tweak_data)
 	self.toothbrush.unit = "units/payday2/pickups/gen_pku_cage_bag/gen_pku_cage_bag"
 	self.toothbrush.visual_unit_name = "units/payday2/characters/npc_acc_cage_bag_1/npc_acc_cage_bag_1"
 	self.toothbrush.AI_carry = {SO_category = "enemies"}
+	self.cloaker_gold = {}
+	self.cloaker_gold = {}
+	self.cloaker_gold.type = "cloaker_explosives"
+	self.cloaker_gold.name_id = "hud_carry_cloaker_gold"
+	self.cloaker_gold.bag_value = "cloaker_gold"
+	self.cloaker_gold.unit = "units/pd2_dlc_help/pickups/gen_pku_spooky_bag/gen_pku_spooky_bag"
+	self.cloaker_gold.visual_unit_name = "units/pd2_dlc_help/characters/npc_acc_spooky_bag/npc_acc_spooky_bag"
+	self.cloaker_gold.AI_carry = {SO_category = "enemies"}
+	self.cloaker_money = {}
+	self.cloaker_money.type = "cloaker_explosives"
+	self.cloaker_money.name_id = "hud_carry_cloaker_money"
+	self.cloaker_money.bag_value = "cloaker_money"
+	self.cloaker_money.unit = "units/pd2_dlc_help/pickups/gen_pku_spooky_bag/gen_pku_spooky_bag"
+	self.cloaker_money.visual_unit_name = "units/pd2_dlc_help/characters/npc_acc_spooky_bag/npc_acc_spooky_bag"
+	self.cloaker_money.AI_carry = {SO_category = "enemies"}
+	self.cloaker_cocaine = {}
+	self.cloaker_cocaine.type = "cloaker_explosives"
+	self.cloaker_cocaine.name_id = "hud_carry_cloaker_cocaine"
+	self.cloaker_cocaine.bag_value = "cloaker_cocaine"
+	self.cloaker_cocaine.unit = "units/pd2_dlc_help/pickups/gen_pku_spooky_bag/gen_pku_spooky_bag"
+	self.cloaker_cocaine.visual_unit_name = "units/pd2_dlc_help/characters/npc_acc_spooky_bag/npc_acc_spooky_bag"
+	self.cloaker_cocaine.AI_carry = {SO_category = "enemies"}
 end
 
 function CarryTweakData:get_carry_ids()

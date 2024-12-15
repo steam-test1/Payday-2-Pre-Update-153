@@ -29,7 +29,7 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 	self.projectiles.concussion.anim_global_param = "projectile_frag"
 	self.projectiles.concussion.texture_bundle_folder = "fez1"
 	self.projectiles.concussion.throw_allowed_expire_t = 0.1
-	self.projectiles.concussion.expire_t = 1.1
+	self.projectiles.concussion.expire_t = 0.9
 	self.projectiles.concussion.repeat_expire_t = 1.5
 	self.projectiles.concussion.is_a_grenade = true
 	self.projectiles.molotov = {}

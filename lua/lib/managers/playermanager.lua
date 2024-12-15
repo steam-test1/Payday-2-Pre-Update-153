@@ -95,6 +95,7 @@ function PlayerManager:init()
 		jerry1 = "ingame_freefall",
 		jerry2 = "ingame_parachuting"
 	}
+	self._custody_state = "custody"
 	self._DEFAULT_STATE = "mask_off"
 	self._current_state = self._DEFAULT_STATE
 	self._sync_states = {
@@ -677,6 +678,7 @@ function PlayerManager:player_states()
 	for k, _ in pairs(self._player_states) do
 		table.insert(ret, k)
 	end
+	table.insert(ret, self._custody_state)
 	return ret
 end
 
@@ -3944,6 +3946,7 @@ function PlayerManager:on_enter_custody(_player, already_dead)
 		player:network():send("sync_player_movement_state", "dead", player:character_damage():down_time(), player:id())
 		managers.groupai:state():on_player_criminal_death(peer_id)
 	end
+	self._listener_holder:call(self._custody_state, player)
 	game_state_machine:change_state_by_name("ingame_waiting_for_respawn")
 	player:character_damage():set_invulnerable(true)
 	player:character_damage():set_health(0)

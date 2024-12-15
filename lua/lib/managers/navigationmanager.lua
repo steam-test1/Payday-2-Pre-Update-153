@@ -145,6 +145,9 @@ function NavigationManager:update(t, dt)
 			if options.quads then
 				self:_draw_rooms(progress)
 			end
+			if options.boundaries and not Application:editor() then
+				self:_draw_room_boundaries(progress)
+			end
 			if options.doors then
 				self:_draw_doors(progress)
 			end
@@ -583,6 +586,80 @@ function NavigationManager:_draw_rooms(progress)
 	else
 		data.next_draw_i_room = i_room
 	end
+end
+
+function NavigationManager:_draw_room_boundaries(progress)
+	local rooms = self._rooms
+	local nav_rooms = {}
+	local selected_seg = self._selected_segment
+	local room_mask
+	if selected_seg and self._nav_segments[selected_seg] and next(self._nav_segments[selected_seg].vis_groups) then
+		room_mask = {}
+		for _, i_vis_group in ipairs(self._nav_segments[selected_seg].vis_groups) do
+			local vis_group_rooms = self._visibility_groups[i_vis_group].rooms
+			for i_room, _ in pairs(vis_group_rooms) do
+				room_mask[i_room] = true
+			end
+		end
+	end
+	for segment_i, current_segment in pairs(self._nav_segments) do
+		local nav_room = {}
+		for _, i_vis_group in ipairs(current_segment.vis_groups) do
+			local vis_group_rooms = self._visibility_groups[i_vis_group].rooms
+			for room_idx, _ in pairs(vis_group_rooms) do
+				table.insert(nav_room, rooms[room_idx])
+			end
+		end
+		table.insert(nav_rooms, nav_room)
+	end
+	local room_count = #nav_rooms
+	local draw_i = math.clamp(math.ceil(room_count * progress), 1, room_count - 1)
+	for i = draw_i, draw_i + 1 do
+		self:_draw_room_boundary(i, nav_rooms[i])
+	end
+end
+
+function NavigationManager:_draw_room_boundary(index, nav_room_list)
+	if not nav_room_list then
+		return
+	end
+	self._hulls = self._hulls or {}
+	if not self._hulls[index] then
+		print("[NavigationManager] generating boundary hull for room: ", index)
+		local room_hull = self:_compute_room_hull(nav_room_list)
+		local r, g, b = CoreMath.hsv_to_rgb(math.random() * 255, 1, 1)
+		self._hulls[index] = {
+			hull = room_hull,
+			brush = Draw:brush(Color(1, r, g, b), 10)
+		}
+	end
+	local draw = self._draw_data
+	local brushes = draw and draw.brush
+	local hull_data = self._hulls[index]
+	local hull_points = hull_data.hull:hull()
+	for i = 1, #hull_points - 1 do
+		if hull_points[i] and hull_points[i + 1] then
+			hull_data.brush:line(hull_points[i], hull_points[i + 1], 5)
+		end
+	end
+	hull_data.brush:line(hull_points[1], hull_points[#hull_points], 5)
+end
+
+function NavigationManager:_compute_room_hull(nav_room_list)
+	local point_cloud = {}
+	local draw = self._draw_data
+	local offsets = draw and draw.offsets
+	for i, room in ipairs(nav_room_list) do
+		local borders = room.borders
+		local height = room.height
+		table.insert(point_cloud, Vector3(borders.x_pos + offsets[1].x, borders.y_pos + offsets[1].y, height.xp_yp))
+		table.insert(point_cloud, Vector3(borders.x_pos + offsets[2].x, borders.y_neg + offsets[2].y, height.xp_yn))
+		table.insert(point_cloud, Vector3(borders.x_neg + offsets[3].x, borders.y_pos + offsets[3].y, height.xn_yp))
+		table.insert(point_cloud, Vector3(borders.x_neg + offsets[4].x, borders.y_neg + offsets[4].y, height.xn_yn))
+	end
+	local hull = Quickhull:new(point_cloud, #point_cloud)
+	hull:compute()
+	return hull
 end
 
 function NavigationManager:_draw_nav_blockers()

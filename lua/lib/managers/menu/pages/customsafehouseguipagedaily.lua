@@ -41,11 +41,13 @@ function CustomSafehouseGuiPageDaily:set_active(active)
 	return CustomSafehouseGuiPageDaily.super.set_active(self, active)
 end
 
-function CustomSafehouseGuiPageDaily:select_challenge(id)
+function CustomSafehouseGuiPageDaily:select_challenge(id, skip_sound)
 	self:_setup_challenge(id)
 	self._current_challenge = id
 	self:_update_buttons()
-	managers.menu_component:post_event("menu_enter")
+	if not skip_sound then
+		managers.menu_component:post_event("menu_enter")
+	end
 	self._gui:update_legend()
 end
 
@@ -160,7 +162,7 @@ function CustomSafehouseGuiPageDaily:_setup_side_menu()
 					button:set_icon(selected_icon)
 					button:icon():set_rotation(selected_rotation)
 					first = false
-					self:select_challenge(challenge.id)
+					self:select_challenge(challenge.id, true)
 				end
 			end
 		end

@@ -263,6 +263,11 @@ function ElementSpecialObjective:on_executed(instigator)
 			Application:error("[ElementSpecialObjective:on_executed] Ambiguous nav_link/SO. Element id:", self._id)
 		elseif type_name(instigator) == "Unit" and alive(instigator) then
 			if instigator:brain() then
+				if (not instigator:character_damage() or not instigator:character_damage():dead()) and not instigator:brain().SO_access then
+					debug_pause_unit(instigator, "Unit does not have an SO_access function in it's brain!")
+					ElementSpecialObjective.super.on_executed(self, instigator)
+					return
+				end
 				if (not instigator:character_damage() or not instigator:character_damage():dead()) and managers.navigation:check_access(self._values.SO_access, instigator:brain():SO_access(), 0) then
 					local objective = self:get_objective(instigator)
 					if objective then
@@ -303,6 +308,16 @@ function ElementSpecialObjective:on_executed(instigator)
 		end
 	end
 	ElementSpecialObjective.super.on_executed(self, instigator)
+end
+
+function ElementSpecialObjective:on_set_enabled()
+	if self:value("interrupt_objective") then
+		if self:enabled() then
+			self:add_element_objective(nil)
+		else
+			self:operation_remove()
+		end
+	end
 end
 
 function ElementSpecialObjective:operation_remove()
