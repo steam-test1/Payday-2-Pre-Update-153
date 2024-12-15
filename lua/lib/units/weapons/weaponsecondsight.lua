@@ -3,6 +3,10 @@ WeaponSecondSight.GADGET_TYPE = "second_sight"
 
 function WeaponSecondSight:init(unit)
 	WeaponSecondSight.super.init(self, unit)
+	if self._use_sound then
+		self._on_event = self._on_event or "gadget_magnifier_on"
+		self._off_event = self._off_event or "gadget_magnifier_off"
+	end
 	if self._use_anims then
 		self._anim_state = self._on
 		if self.anim then

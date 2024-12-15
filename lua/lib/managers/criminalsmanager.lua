@@ -225,8 +225,8 @@ function CriminalsManager:set_unit(name, unit)
 			managers.hud:remove_mugshot_by_character_name(data.name)
 			data.data.mugshot_id = managers.hud:add_mugshot_by_unit(unit)
 			data.data.mask_id = data.static_data.ai_mask_id
-			data.data.mask_obj = managers.blackmarket:mask_unit_name_by_mask_id(data.data.mask_id, nil, name)
 			data.data.mask_blueprint = nil
+			data.data.mask_obj = managers.blackmarket:mask_unit_name_by_mask_id(data.data.mask_id, nil, name)
 			if not data.data.ai then
 				local peer = managers.network:session():peer(data.peer_id)
 				local mask_id = peer:mask_id()

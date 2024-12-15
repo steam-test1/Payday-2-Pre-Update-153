@@ -1432,6 +1432,16 @@ function LevelsTweakData:init()
 	self.fish.ghost_required = true
 	self.fish.max_bags = 9999
 	self.fish.ai_group_type = america
+	self.run = {}
+	self.run.name_id = "heist_run_hl"
+	self.run.briefing_id = "heist_run_briefing"
+	self.run.briefing_dialog = "Play_pln_run_brf"
+	self.run.world_name = "narratives/classics/run"
+	self.run.intro_event = "Play_pln_run_intro"
+	self.run.outro_event = "Play_loc_run_end"
+	self.run.music = "heist"
+	self.run.package = "packages/narr_run"
+	self.run.cube = "cube_apply_heist_bank"
 	self._level_index = {
 		"welcome_to_the_jungle_1",
 		"welcome_to_the_jungle_1_night",
@@ -1524,7 +1534,8 @@ function LevelsTweakData:init()
 		"help",
 		"moon",
 		"spa",
-		"fish"
+		"fish",
+		"run"
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self._level_index, "roberts")

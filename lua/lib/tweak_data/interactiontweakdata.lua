@@ -4176,4 +4176,23 @@ function InteractionTweakData:init(tweak_data)
 	self.pry_open_door_elevator.start_active = false
 	self.pry_open_door_elevator.sound_start = "bar_elevator_crowbar_open"
 	self.pry_open_door_elevator.sound_interupt = "bar_elevator_crowbar_cancel"
+	self.hold_take_missing_animal_poster = {}
+	self.hold_take_missing_animal_poster.text_id = "hud_int_take_missing_animal_poster"
+	self.hold_take_missing_animal_poster.action_text_id = "hud_action_taking_missing_animal_poster"
+	self.hold_take_missing_animal_poster.timer = 0.5
+	self.hold_take_missing_animal_poster.interact_distance = 200
+	self.hold_take_missing_animal_poster.start_active = false
+	self.hold_take_missing_animal_poster.sound_done = "pick_up_poster"
+	self.hold_pick_up_turtle = {}
+	self.hold_pick_up_turtle.text_id = "hud_int_hold_pick_up_turtle"
+	self.hold_pick_up_turtle.action_text_id = "hud_action_picking_up_turtle"
+	self.hold_pick_up_turtle.start_active = true
+	self.hold_pick_up_turtle.timer = 1
+	self.hold_pick_up_turtle.interact_distance = 90
+	self.hold_help_turtle = {}
+	self.hold_help_turtle.text_id = "hud_int_hold_to_help_turtle"
+	self.hold_help_turtle.action_text_id = "hud_action_helping_turtle"
+	self.hold_help_turtle.start_active = true
+	self.hold_help_turtle.timer = 1
+	self.hold_help_turtle.interact_distance = 150
 end

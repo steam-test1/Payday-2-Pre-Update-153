@@ -4524,6 +4524,66 @@ function NarrativeTweakData:init(tweak_data)
 		8507150,
 		8507150
 	}
+	self.stages.run = {
+		level_id = "run",
+		type_id = "heist_type_survive",
+		type = "d"
+	}
+	self.jobs.run = {}
+	self.jobs.run.name_id = "heist_run"
+	self.jobs.run.briefing_id = "heist_run_crimenet"
+	self.jobs.run.package = "packages/narr_run"
+	self.jobs.run.contact = "classic"
+	self.jobs.run.region = "street"
+	self.jobs.run.jc = 50
+	self.jobs.run.chain = {
+		self.stages.run
+	}
+	self.jobs.run.briefing_event = "Play_loc_run_cbf_01"
+	self.jobs.run.debrief_event = nil
+	self.jobs.run.crimenet_callouts = {
+		"Play_loc_run_cnc_01"
+	}
+	self.jobs.run.crimenet_videos = {
+		"contact_locke1"
+	}
+	self.jobs.run.payout = {
+		110000,
+		220000,
+		550000,
+		1100000,
+		1265000,
+		1430000,
+		1540000
+	}
+	self.jobs.run.contract_cost = {
+		70000,
+		150000,
+		350307,
+		700000,
+		900000,
+		900000,
+		900000
+	}
+	self.jobs.run.contract_visuals = {}
+	self.jobs.run.contract_visuals.min_mission_xp = {
+		26000,
+		26000,
+		26000,
+		26000,
+		26000,
+		26000,
+		26000
+	}
+	self.jobs.run.contract_visuals.max_mission_xp = {
+		26000,
+		26000,
+		26000,
+		26000,
+		260000,
+		26000,
+		26000
+	}
 	self._jobs_index = {
 		"jewelry_store",
 		"four_stores",
@@ -4588,7 +4648,8 @@ function NarrativeTweakData:init(tweak_data)
 		"help",
 		"spa",
 		"fish",
-		"moon"
+		"moon",
+		"run"
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self._jobs_index, "roberts")

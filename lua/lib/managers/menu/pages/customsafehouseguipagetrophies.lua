@@ -35,7 +35,7 @@ function CustomSafehouseGuiPageTrophies:_setup_trophies_list()
 	table.insert(self._scrollable_panels, scroll)
 	local trophies = {}
 	for idx, trophy in ipairs(managers.custom_safehouse:trophies()) do
-		if not trophy.secret or trophy.completed then
+		if (not trophy.secret or trophy.completed) and not trophy.hidden_in_list then
 			table.insert(trophies, trophy)
 		end
 	end

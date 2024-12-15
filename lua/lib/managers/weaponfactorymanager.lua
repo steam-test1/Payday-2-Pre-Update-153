@@ -415,7 +415,7 @@ function WeaponFactoryManager:_get_override_parts(factory_id, blueprint)
 	local override_override = {}
 	for _, part_id in ipairs(blueprint) do
 		local part = self:_part_data(part_id, factory_id)
-		if part.override then
+		if part and part.override then
 			for override_id, override_data in pairs(part.override) do
 				if override_data.override then
 					override_override[override_id] = override_data
@@ -425,7 +425,7 @@ function WeaponFactoryManager:_get_override_parts(factory_id, blueprint)
 	end
 	for _, part_id in ipairs(blueprint) do
 		local part = self:_part_data(part_id, factory_id, override_override)
-		if part.override then
+		if part and part.override then
 			for override_id, override_data in pairs(part.override) do
 				overridden[override_id] = override_data
 			end
@@ -507,7 +507,7 @@ function WeaponFactoryManager:_part_data(part_id, factory_id, override)
 	local factory = tweak_data.weapon.factory
 	if not factory.parts[part_id] then
 		Application:error("[WeaponFactoryManager:_part_data] Part do not exist!", part_id, "factory_id", factory_id)
-		return
+		return {}
 	end
 	local part = deep_clone(factory.parts[part_id])
 	if factory[factory_id].override and factory[factory_id].override[part_id] then

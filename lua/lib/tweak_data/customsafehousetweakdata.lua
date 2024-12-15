@@ -1151,6 +1151,27 @@ function CustomSafehouseTweakData:_init_trophies(tweak_data)
 		},
 		image_id = "safehouse_trophies_preview_yacht"
 	})
+	table.insert(self.trophies, {
+		id = "trophy_run_matt",
+		name_id = "trophy_run_matt",
+		desc_id = "trophy_run_matt_desc",
+		objective_id = "trophy_run_matt_objective",
+		objectives = {
+			self:_progress("trophy_run_matt", 1)
+		},
+		image_id = "safehouse_trophies_preview_yacht",
+		hidden_in_list = true
+	})
+	table.insert(self.trophies, {
+		id = "trophy_run_turtle",
+		name_id = "trophy_run_turtle",
+		desc_id = "trophy_run_turtle_desc",
+		objective_id = "trophy_run_turtle_objective",
+		objectives = {
+			self:_progress("trophy_run_turtle", 1)
+		},
+		image_id = "safehouse_trophies_preview_turtle"
+	})
 end
 
 function CustomSafehouseTweakData:get_trophy_data(id)
