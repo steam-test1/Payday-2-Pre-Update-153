@@ -3138,6 +3138,18 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.chc_terry_begins.dlc = "chico"
 	self.masks.chc_terry_begins.texture_bundle_folder = "chico"
 	self.masks.chc_terry_begins.sort_number = 38
+	self.masks.yor = {}
+	self.masks.yor.unit = "units/pd2_dlc_yor/masks/yor/msk_yor"
+	self.masks.yor.name_id = "bm_msk_yor"
+	self.masks.yor.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.yor.value = 0
+	self.masks.yor.texture_bundle_folder = "yor"
+	self.masks.yor.sort_number = 42
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.masks) do
 		if free_dlcs[data.dlc] then

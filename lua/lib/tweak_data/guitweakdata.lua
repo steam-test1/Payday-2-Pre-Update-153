@@ -4668,6 +4668,11 @@ function GuiTweakData:init()
 		url = "http://www.overkillsoftware.com/games/scarfacesafe/"
 	})
 	table.insert(self.new_heists, {
+		name_id = "menu_nh_winter_sale_2016",
+		texture_path = "guis/textures/pd2/new_heists/winter_sale_2016",
+		url = "http://store.steampowered.com/app/218620"
+	})
+	table.insert(self.new_heists, {
 		name_id = "menu_nh_scarface",
 		texture_path = "guis/textures/pd2/new_heists/scarface",
 		url = "http://www.overkillsoftware.com/games/scarfacepacks/"
@@ -4691,11 +4696,6 @@ function GuiTweakData:init()
 		name_id = "menu_nh_beta_new_difficulty",
 		texture_path = "guis/textures/pd2/new_heists/beta_new_difficulty",
 		url = "http://steamcommunity.com/games/218620/announcements/detail/614007890988731544"
-	})
-	table.insert(self.new_heists, {
-		name_id = "menu_nh_winter_sale_2016",
-		texture_path = "guis/textures/pd2/new_heists/winter_sale_2016",
-		url = "http://store.steampowered.com/app/218620"
 	})
 end
 

@@ -362,7 +362,6 @@ end
 function _name_ctrlr(params)
 	if params.name then
 		params.name_ctrlr = EWS:StaticText(params.panel, params.name, 0, "")
-		params.name_ctrlr:set_min_size(Vector3(0, -1, 0))
 		params.ctrl_sizer:add(params.name_ctrlr, params.name_proportions, 0, "ALIGN_CENTER_VERTICAL")
 	end
 end
@@ -420,11 +419,11 @@ function list_selector(params)
 	local lb_box = EWS:BoxSizer("HORIZONTAL")
 	params.left_list_box = EWS:ListBox(params.panel, "", "LB_SORT,LB_EXTENDED")
 	params.left_list_box:connect("", "EVT_COMMAND_LISTBOX_DOUBLECLICKED", callback(nil, _G, "_list_selector_on_left_box"), params)
-	params.left_list_box:set_min_size(Vector3(-1, params.height, 0))
+	params.left_list_box:set_min_size(Vector3(10, params.height, 0))
 	lb_box:add(params.left_list_box, 1, 4, "ALL,EXPAND")
 	params.right_list_box = EWS:ListBox(params.panel, "", "LB_SORT,LB_EXTENDED")
 	params.right_list_box:connect("", "EVT_COMMAND_LISTBOX_DOUBLECLICKED", callback(nil, _G, "_list_selector_on_right_box"), params)
-	params.right_list_box:set_min_size(Vector3(-1, params.height, 0))
+	params.right_list_box:set_min_size(Vector3(10, params.height, 0))
 	lb_box:add(params.right_list_box, 1, 4, "ALL,EXPAND")
 	params.ctrl_sizer:add(lb_box, 1, 0, "EXPAND")
 	params.sizer:add(params.ctrl_sizer, params.sizer_proportions or 0, 0, "EXPAND")

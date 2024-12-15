@@ -520,7 +520,8 @@ function StatisticsTweakData:statistics_table()
 		"sfm_01",
 		"sfm_02",
 		"chc_terry",
-		"chc_terry_begins"
+		"chc_terry_begins",
+		"yor"
 	}
 	local weapon_list = {
 		"ak5",

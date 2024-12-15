@@ -170,7 +170,9 @@ function Shape:_create_size_ctrl(name, property, value, parent, sizer)
 	local ctrl_sizer = EWS:BoxSizer("HORIZONTAL")
 	ctrl_sizer:add(EWS:StaticText(parent, name, "", "ALIGN_LEFT"), 2, 0, "EXPAND")
 	local ctrl = EWS:TextCtrl(parent, string.format("%.2f", value / 100), "", "TE_PROCESS_ENTER")
+	ctrl:set_min_size(Vector3(-1, 10, 0))
 	local spin = EWS:SpinButton(parent, "", "SP_VERTICAL")
+	spin:set_min_size(Vector3(-1, 10, 0))
 	local slider = EWS:Slider(parent, 100, 1, 200, "", "")
 	ctrl:connect("EVT_CHAR", callback(nil, _G, "verify_number"), ctrl)
 	ctrl:set_tool_tip("Type in property " .. name)
@@ -290,7 +292,7 @@ function ShapeBox:create_panel(parent, sizer)
 	local width = self:_create_size_ctrl("Width [m]", "width", self._properties.width, self._panel, self._panel_sizer)
 	local depth = self:_create_size_ctrl("Depth [m]", "depth", self._properties.depth, self._panel, self._panel_sizer)
 	local height = self:_create_size_ctrl("Height [m]", "height", self._properties.height, self._panel, self._panel_sizer)
-	self._panel:set_min_size(Vector3(-1, 60, 0))
+	self._panel:set_min_size(Vector3(-1, 70, 0))
 	return width, depth, height
 end
 
