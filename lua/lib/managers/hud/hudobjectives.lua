@@ -295,6 +295,7 @@ function HUDObjectives:init(hud)
 end
 
 function HUDObjectives:activate_objective(data)
+	print("[HUDObjectives] activate_objective", data.id, data.amount)
 	self._active_objective_id = data.id
 	local objectives_panel = self._hud_panel:child("objectives_panel")
 	local objective_text = objectives_panel:child("objective_text")
@@ -314,43 +315,48 @@ function HUDObjectives:activate_objective(data)
 end
 
 function HUDObjectives:remind_objective(id)
-	if id ~= self._active_objective_id then
-		return
+	print("[HUDObjectives] remind_objective", id, self._active_objective_id)
+	if id == self._active_objective_id then
+		local objectives_panel = self._hud_panel:child("objectives_panel")
+		objectives_panel:stop()
+		objectives_panel:animate(callback(self, self, "_animate_activate_objective"))
+		local bg = self._bg_box:child("bg")
+		bg:stop()
+		bg:animate(callback(nil, _G, "HUDBGBox_animate_bg_attention"))
 	end
-	local objectives_panel = self._hud_panel:child("objectives_panel")
-	objectives_panel:stop()
-	objectives_panel:animate(callback(self, self, "_animate_activate_objective"))
-	local bg = self._bg_box:child("bg")
-	bg:stop()
-	bg:animate(callback(nil, _G, "HUDBGBox_animate_bg_attention"))
 end
 
 function HUDObjectives:complete_objective(data)
-	if data.id ~= self._active_objective_id then
-		return
+	print("[HUDObjectives] complete_objective", data.id, self._active_objective_id)
+	if data.id == self._active_objective_id then
+		local objectives_panel = self._hud_panel:child("objectives_panel")
+		objectives_panel:stop()
+		objectives_panel:animate(callback(self, self, "_animate_complete_objective"))
 	end
-	local objectives_panel = self._hud_panel:child("objectives_panel")
-	objectives_panel:stop()
-	objectives_panel:animate(callback(self, self, "_animate_complete_objective"))
 end
 
 function HUDObjectives:update_amount_objective(data)
-	if data.id ~= self._active_objective_id then
-		return
+	print("[HUDObjectives] update_amount_objective", data.id, data.current_amount, data.amount)
+	if data.id == self._active_objective_id then
+		local current = data.current_amount or 0
+		local amount = data.amount
+		local objectives_panel = self._hud_panel:child("objectives_panel")
+		local amount_text = objectives_panel:child("amount_text")
+		if alive(amount_text) then
+			amount_text:set_text(current .. "/" .. amount)
+		end
 	end
-	local current = data.current_amount or 0
-	local amount = data.amount
-	local objectives_panel = self._hud_panel:child("objectives_panel")
-	objectives_panel:child("amount_text"):set_text(current .. "/" .. amount)
 end
 
 function HUDObjectives:open_right_done(uses_amount)
 	local objectives_panel = self._hud_panel:child("objectives_panel")
 	local objective_text = objectives_panel:child("objective_text")
-	local amount_text = objectives_panel:child("amount_text")
-	amount_text:set_visible(uses_amount)
 	objective_text:set_visible(true)
 	objective_text:stop()
+	local amount_text = objectives_panel:child("amount_text")
+	if alive(amount_text) then
+		amount_text:set_visible(uses_amount)
+	end
 	objective_text:animate(callback(self, self, "_animate_show_text"), amount_text)
 end
 
@@ -362,10 +368,14 @@ function HUDObjectives:_animate_show_text(objective_text, amount_text)
 		t = t - dt
 		local alpha = math.round(math.abs((math.sin(t * 360 * 3))))
 		objective_text:set_alpha(alpha)
-		amount_text:set_alpha(alpha)
+		if alive(amount_text) then
+			amount_text:set_alpha(alpha)
+		end
 	end
 	objective_text:set_alpha(1)
-	amount_text:set_alpha(1)
+	if alive(amount_text) then
+		amount_text:set_alpha(1)
+	end
 end
 
 function HUDObjectives:_animate_complete_objective(objectives_panel)
@@ -380,12 +390,16 @@ function HUDObjectives:_animate_complete_objective(objectives_panel)
 		t = t - dt
 		local vis = math.round(math.abs((math.cos(t * 360 * 3))))
 		objective_text:set_alpha(vis)
-		amount_text:set_alpha(vis)
+		if alive(amount_text) then
+			amount_text:set_alpha(vis)
+		end
 	end
 	objective_text:set_alpha(1)
-	amount_text:set_alpha(1)
 	objective_text:set_visible(false)
-	amount_text:set_visible(false)
+	if alive(amount_text) then
+		amount_text:set_alpha(1)
+		amount_text:set_visible(false)
+	end
 	
 	local function done_cb()
 		objectives_panel:child("objective_text"):set_text(utf8.to_upper(""))

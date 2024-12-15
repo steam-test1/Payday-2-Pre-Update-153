@@ -9254,7 +9254,13 @@ function BlackMarketGui:populate_mods(data)
 			new_data.can_afford = part_is_from_cosmetic or managers.money:can_afford_weapon_modification(weapon_id, new_data.name, new_data.global_value)
 			local font, font_size
 			local no_upper = false
-			if not new_data.lock_texture and (not new_data.unlocked or new_data.unlocked == 0) then
+			if crafted.previewing then
+				new_data.previewing = true
+				new_data.corner_text = {}
+				new_data.corner_text.selected_text = managers.localization:text("bm_menu_mod_preview")
+				new_data.corner_text.noselected_text = new_data.corner_text.selected_text
+				new_data.corner_text.noselected_color = Color.white
+			elseif not new_data.lock_texture and (not new_data.unlocked or new_data.unlocked == 0) then
 				local selected_text, noselected_text
 				if not new_data.dlc_locked and new_data.unlock_tracker then
 					repeat
@@ -9290,12 +9296,6 @@ function BlackMarketGui:populate_mods(data)
 				new_data.corner_text = {}
 				new_data.corner_text.selected_text = selected_text
 				new_data.corner_text.noselected_text = selected_text
-			elseif crafted.previewing then
-				new_data.previewing = true
-				new_data.corner_text = {}
-				new_data.corner_text.selected_text = managers.localization:text("bm_menu_mod_preview")
-				new_data.corner_text.noselected_text = new_data.corner_text.selected_text
-				new_data.corner_text.noselected_color = Color.white
 			elseif new_data.unlocked and not new_data.can_afford then
 				new_data.corner_text = {}
 				new_data.corner_text.selected_text = managers.localization:text("bm_menu_not_enough_cash")
@@ -9361,7 +9361,7 @@ function BlackMarketGui:populate_mods(data)
 			end
 			local active = true
 			local can_apply = not crafted.previewing
-			local preview_forbidden = managers.blackmarket:preview_mod_forbidden(new_data.category, new_data.slot, new_data.name)
+			local preview_forbidden = managers.blackmarket:is_previewing_legendary_skin() or managers.blackmarket:preview_mod_forbidden(new_data.category, new_data.slot, new_data.name)
 			if mod_name and not crafted.customize_locked and active then
 				if new_data.unlocked and (type(new_data.unlocked) ~= "number" or new_data.unlocked > 0) and can_apply then
 					if new_data.can_afford then
@@ -12253,6 +12253,10 @@ function BlackMarketGui:get_safe_for_cosmetic(cosmetic_id)
 		end
 	end
 	local safe_id = find_safe_name(cosmetic_id)
-	safe_id = string.gsub(safe_id, "_legendary", "")
+	for content_id, safe_data in pairs(tweak_data.economy.contents) do
+		if safe_data.contains.contents and table.contains(safe_data.contains.contents, safe_id) then
+			safe_id = content_id
+		end
+	end
 	return tweak_data.economy.safes[safe_id], safe_id
 end

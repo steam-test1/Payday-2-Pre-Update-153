@@ -349,7 +349,9 @@ function TeamAILogicIdle.on_long_dis_interacted(data, other_unit, secondary)
 		data.unit:sound():say("r02a_sin", true)
 	end
 	data.unit:movement():set_should_stay(should_stay)
-	data.unit:brain():set_objective(objective)
+	if objective then
+		data.unit:brain():set_objective(objective)
+	end
 end
 
 function TeamAILogicIdle.on_new_objective(data, old_objective)

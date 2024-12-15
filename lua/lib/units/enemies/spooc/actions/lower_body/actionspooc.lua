@@ -120,7 +120,7 @@ function ActionSpooc:init(action_desc, common_data)
 	else
 		self:_wait()
 	end
-	if Global.level_data.level_id == "pines" or Global.level_data.level_id == "cane" then
+	if self:_use_christmas_sounds() then
 		self._unit:sound():play("cloaker_detect_christmas_mono", nil, nil)
 	else
 		self._unit:sound():play("cloaker_detect_mono", nil, nil)
@@ -139,7 +139,7 @@ end
 
 function ActionSpooc:on_exit()
 	if self._unit:character_damage():dead() then
-		if Global.level_data.level_id == "pines" or Global.level_data.level_id == "cane" then
+		if self:_use_christmas_sounds() then
 			self._unit:sound():play("cloaker_detect_christmas_stop", nil, nil)
 		else
 			self._unit:sound():play("cloaker_detect_stop", nil, nil)
@@ -1136,4 +1136,9 @@ end
 
 function ActionSpooc:is_flying_strike()
 	return self._action_desc.flying_strike
+end
+
+function ActionSpooc:_use_christmas_sounds()
+	local tweak = tweak_data.narrative.jobs[managers.job:current_real_job_id()]
+	return tweak and tweak.is_christmas_heist
 end

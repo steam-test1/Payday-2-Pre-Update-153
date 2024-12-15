@@ -164,6 +164,7 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.corpse_alarm_pager_bluff = {true}
 	self.values.player.marked_enemy_extra_damage = {true}
 	self.values.player.marked_enemy_damage_mul = 1.15
+	self.values.player.marked_distance_mul = {20}
 	self.values.cable_tie.interact_speed_multiplier = {0.25}
 	self.values.cable_tie.quantity_1 = {4}
 	self.values.cable_tie.can_cable_tie_doors = {true}
@@ -262,7 +263,6 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.team.stamina.passive_multiplier = {1.5, 1.3}
 	self.values.player.passive_intimidate_range_mul = {1.25}
 	self.values.team.health.passive_multiplier = {1.1}
-	self.values.player.passive_convert_enemies_health_multiplier = {0.25}
 	self.values.player.passive_convert_enemies_damage_multiplier = {1.15}
 	self.values.player.convert_enemies_interaction_speed_multiplier = {0.35}
 	self.values.player.empowered_intimidation_mul = {3}
@@ -1116,7 +1116,11 @@ function UpgradesTweakData:_init_pd2_values()
 				"20%",
 				"10"
 			},
-			{"100%", "20"}
+			{
+				"100%",
+				"20",
+				"9"
+			}
 		},
 		insulation = {
 			{"30%"},
@@ -3450,7 +3454,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "camouflage_multiplier",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_uncover_multiplier = {
@@ -3459,7 +3464,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "uncover_multiplier",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_primary_weapon_when_downed = {
@@ -3687,7 +3693,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "passive_convert_enemies_health_multiplier",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_passive_convert_enemies_health_multiplier_2 = {
@@ -3697,7 +3704,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "passive_convert_enemies_health_multiplier",
-			value = 2
+			value = 2,
+			synced = true
 		}
 	}
 	self.definitions.player_counter_strike_melee = {
@@ -4012,7 +4020,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "stand_still_crouch_camouflage_bonus",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_stand_still_crouch_camouflage_bonus_2 = {
@@ -4021,7 +4030,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "stand_still_crouch_camouflage_bonus",
-			value = 2
+			value = 2,
+			synced = true
 		}
 	}
 	self.definitions.player_stand_still_crouch_camouflage_bonus_3 = {
@@ -4030,7 +4040,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "stand_still_crouch_camouflage_bonus",
-			value = 3
+			value = 3,
+			synced = true
 		}
 	}
 	self.definitions.player_pick_lock_speed_multiplier = {
@@ -4421,7 +4432,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "run_speed_multiplier",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_passive_dodge_chance_1 = {
@@ -4476,7 +4488,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "crouch_speed_multiplier",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_crouch_speed_multiplier_2 = {
@@ -4486,7 +4499,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "crouch_speed_multiplier",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_gain_life_per_players = {
@@ -4594,7 +4608,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "passive_concealment_modifier",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_concealment_bonus_1 = {
@@ -4653,7 +4668,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "suspicion_multiplier",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_loose_ammo_restore_health_give_team = {
@@ -4671,7 +4687,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "uncover_progress_mul",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_uncover_progress_decay_mul = {
@@ -4680,7 +4697,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "uncover_progress_decay_mul",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_camouflage_bonus_1 = {
@@ -4689,7 +4707,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "camouflage_bonus",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_camouflage_bonus_2 = {
@@ -4698,7 +4717,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "camouflage_bonus",
-			value = 2
+			value = 2,
+			synced = true
 		}
 	}
 	self.definitions.temporary_damage_speed_multiplier = {
@@ -4824,7 +4844,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "corpse_alarm_pager_bluff",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_buy_bodybags_asset = {
@@ -4923,7 +4944,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "silent_kill",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_armor_carry_bonus_1 = {
@@ -4998,6 +5020,15 @@ function UpgradesTweakData:_player_definitions()
 			value = 1
 		}
 	}
+	self.definitions.player_marked_distance_mul = {
+		category = "feature",
+		name_id = "menu_player_marked_distance_mul",
+		upgrade = {
+			category = "player",
+			upgrade = "marked_distance_mul",
+			value = 1
+		}
+	}
 	self.definitions.player_civ_intimidation_mul = {
 		category = "feature",
 		name_id = "menu_player_civ_intimidation_mul",
@@ -5013,7 +5044,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "civ_harmless_bullets",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_civ_harmless_melee = {
@@ -5022,7 +5054,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "civ_harmless_melee",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_civ_calming_alerts = {
@@ -5031,7 +5064,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "civ_calming_alerts",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_special_enemy_highlight = {
@@ -5049,7 +5083,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "drill_alert_rad",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_silent_drill = {
@@ -5058,7 +5093,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "silent_drill",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_drill_speed_multiplier1 = {
@@ -5067,7 +5103,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "drill_speed_multiplier",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_drill_speed_multiplier2 = {
@@ -5076,7 +5113,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "drill_speed_multiplier",
-			value = 2
+			value = 2,
+			synced = true
 		}
 	}
 	self.definitions.player_drill_melee_hit_restart_chance_1 = {
@@ -5094,7 +5132,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "saw_speed_multiplier",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_saw_speed_multiplier_2 = {
@@ -5103,7 +5142,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "saw_speed_multiplier",
-			value = 2
+			value = 2,
+			synced = true
 		}
 	}
 	self.definitions.player_drill_fix_interaction_speed_multiplier = {
@@ -5193,7 +5233,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "intimidate_enemies",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_intimidate_specials = {
@@ -5202,7 +5243,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "intimidate_specials",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_passive_empowered_intimidation = {
@@ -5211,7 +5253,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "empowered_intimidation_mul",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_intimidation_multiplier = {
@@ -5220,7 +5263,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "intimidation_multiplier",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_sentry_gun_deploy_time_multiplier = {
@@ -5267,7 +5311,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "convert_enemies_max_minions",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_convert_enemies_max_minions_2 = {
@@ -5276,7 +5321,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "convert_enemies_max_minions",
-			value = 2
+			value = 2,
+			synced = true
 		}
 	}
 	self.definitions.player_super_syndrome_1 = {
@@ -5303,16 +5349,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "convert_enemies_health_multiplier",
-			value = 1
-		}
-	}
-	self.definitions.player_passive_convert_enemies_health_multiplier = {
-		category = "feature",
-		name_id = "menu_player_passive_convert_enemies_health_multiplier",
-		upgrade = {
-			category = "player",
-			upgrade = "passive_convert_enemies_health_multiplier",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_convert_enemies_damage_multiplier = {
@@ -5321,7 +5359,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "convert_enemies_damage_multiplier",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_passive_convert_enemies_damage_multiplier = {
@@ -5330,7 +5369,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "passive_convert_enemies_damage_multiplier",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_passive_intimidate_range_mul = {
@@ -5375,7 +5415,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "intimidate_aura",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_civilian_gives_ammo = {
@@ -5384,7 +5425,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "civilian_gives_ammo",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_drill_autorepair_1 = {
@@ -5393,7 +5435,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "drill_autorepair_1",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_drill_autorepair_2 = {
@@ -5402,7 +5445,8 @@ function UpgradesTweakData:_player_definitions()
 		upgrade = {
 			category = "player",
 			upgrade = "drill_autorepair_2",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.player_hostage_trade = {
@@ -6593,7 +6637,8 @@ function UpgradesTweakData:_ecm_jammer_definitions()
 		upgrade = {
 			category = "ecm_jammer",
 			upgrade = "affects_cameras",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.ecm_jammer_affects_pagers = {
@@ -6602,7 +6647,8 @@ function UpgradesTweakData:_ecm_jammer_definitions()
 		upgrade = {
 			category = "ecm_jammer",
 			upgrade = "affects_pagers",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.ecm_jammer_feedback_duration_boost = {
@@ -6611,7 +6657,8 @@ function UpgradesTweakData:_ecm_jammer_definitions()
 		upgrade = {
 			category = "ecm_jammer",
 			upgrade = "feedback_duration_boost",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.ecm_jammer_feedback_duration_boost_2 = {
@@ -6620,7 +6667,8 @@ function UpgradesTweakData:_ecm_jammer_definitions()
 		upgrade = {
 			category = "ecm_jammer",
 			upgrade = "feedback_duration_boost_2",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.ecm_jammer_interaction_speed_multiplier = {
@@ -6638,7 +6686,8 @@ function UpgradesTweakData:_ecm_jammer_definitions()
 		upgrade = {
 			category = "ecm_jammer",
 			upgrade = "can_retrigger",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 end
@@ -6927,7 +6976,8 @@ function UpgradesTweakData:_sentry_gun_definitions()
 		upgrade = {
 			category = "sentry_gun",
 			upgrade = "damage_multiplier",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.sentry_gun_extra_ammo_multiplier_1 = {
@@ -6937,7 +6987,8 @@ function UpgradesTweakData:_sentry_gun_definitions()
 		upgrade = {
 			category = "sentry_gun",
 			upgrade = "extra_ammo_multiplier",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.sentry_gun_extra_ammo_multiplier_2 = {
@@ -6947,7 +6998,8 @@ function UpgradesTweakData:_sentry_gun_definitions()
 		upgrade = {
 			category = "sentry_gun",
 			upgrade = "extra_ammo_multiplier",
-			value = 2
+			value = 2,
+			synced = true
 		}
 	}
 	self.definitions.sentry_gun_armor_multiplier = {
@@ -6956,7 +7008,8 @@ function UpgradesTweakData:_sentry_gun_definitions()
 		upgrade = {
 			category = "sentry_gun",
 			upgrade = "armor_multiplier",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.sentry_gun_armor_multiplier2 = {
@@ -6965,7 +7018,8 @@ function UpgradesTweakData:_sentry_gun_definitions()
 		upgrade = {
 			category = "sentry_gun",
 			upgrade = "armor_multiplier2",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.sentry_gun_spread_multiplier = {
@@ -6974,7 +7028,8 @@ function UpgradesTweakData:_sentry_gun_definitions()
 		upgrade = {
 			category = "sentry_gun",
 			upgrade = "spread_multiplier",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.sentry_gun_rot_speed_multiplier = {
@@ -6983,7 +7038,8 @@ function UpgradesTweakData:_sentry_gun_definitions()
 		upgrade = {
 			category = "sentry_gun",
 			upgrade = "rot_speed_multiplier",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.sentry_gun_shield = {
@@ -6992,7 +7048,8 @@ function UpgradesTweakData:_sentry_gun_definitions()
 		upgrade = {
 			category = "sentry_gun",
 			upgrade = "shield",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.sentry_gun_can_revive = {
@@ -7019,7 +7076,8 @@ function UpgradesTweakData:_sentry_gun_definitions()
 		upgrade = {
 			category = "sentry_gun",
 			upgrade = "armor_piercing_chance",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.sentry_gun_armor_piercing_chance_2 = {
@@ -7028,7 +7086,8 @@ function UpgradesTweakData:_sentry_gun_definitions()
 		upgrade = {
 			category = "sentry_gun",
 			upgrade = "armor_piercing_chance_2",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.sentry_gun_cost_reduction_1 = {
@@ -7064,7 +7123,8 @@ function UpgradesTweakData:_sentry_gun_definitions()
 		upgrade = {
 			category = "sentry_gun",
 			upgrade = "fire_rate_reduction",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 	self.definitions.sentry_gun_ap_bullets = {
@@ -7073,7 +7133,8 @@ function UpgradesTweakData:_sentry_gun_definitions()
 		upgrade = {
 			category = "sentry_gun",
 			upgrade = "ap_bullets",
-			value = 1
+			value = 1,
+			synced = true
 		}
 	}
 end

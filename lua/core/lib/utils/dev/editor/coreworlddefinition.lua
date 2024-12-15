@@ -30,6 +30,7 @@ function WorldDefinition:init(params)
 	self._trigger_units = {}
 	self._use_unit_callbacks = {}
 	self._mission_element_units = {}
+	self._delayed_units = {}
 	self._termination_counter = 0
 end
 
@@ -133,7 +134,18 @@ function WorldDefinition:_load_continent_package(path)
 	end
 	self._continent_packages = self._continent_packages or {}
 	if not PackageManager:loaded(path) then
-		PackageManager:load(path)
+		local reverse = string.reverse(path)
+		local i = string.find(reverse, "/")
+		local name = string.reverse(string.sub(reverse, 1, i - 1))
+		if name == "delayed" then
+			function filter_pred(t, name)
+				return false
+			end
+			
+			PackageManager:load_filtered(path, filter_pred)
+		else
+			PackageManager:load(path)
+		end
 		table.insert(self._continent_packages, path)
 	end
 end
@@ -252,6 +264,7 @@ function WorldDefinition:init_done()
 	self:_unload_package(self._current_world_init_package)
 	self._continent_definitions = nil
 	self._definition = nil
+	self._delayed_units = nil
 end
 
 function WorldDefinition:create(layer, offset)
@@ -371,20 +384,39 @@ function WorldDefinition:create(layer, offset)
 		end
 	end
 	if layer == "statics" or layer == "all" then
+		local is_editor = Application:editor()
 		if self._definition.statics then
 			for _, values in ipairs(self._definition.statics) do
-				local unit = self:_create_statics_unit(values, offset)
-				if unit then
-					table.insert(return_data, unit)
+				local unit_data = values.unit_data
+				if not is_editor and unit_data.continent == "delayed" then
+					self._delayed_units[unit_data.unit_id] = {
+						unit_data,
+						offset,
+						return_data
+					}
+				else
+					local unit = self:_create_statics_unit(values, offset)
+					if unit then
+						table.insert(return_data, unit)
+					end
 				end
 			end
 		end
 		for name, continent in pairs(self._continent_definitions) do
 			if continent.statics then
 				for _, values in ipairs(continent.statics) do
-					local unit = self:_create_statics_unit(values, offset)
-					if unit then
-						table.insert(return_data, unit)
+					local unit_data = values.unit_data
+					if not is_editor and unit_data.continent == "delayed" then
+						self._delayed_units[unit_data.unit_id] = {
+							unit_data,
+							offset,
+							return_data
+						}
+					else
+						local unit = self:_create_statics_unit(values, offset)
+						if unit then
+							table.insert(return_data, unit)
+						end
 					end
 				end
 			end
@@ -655,6 +687,19 @@ function WorldDefinition:_create_wires_unit(data, offset)
 		unit:set_moving()
 	end
 	return unit
+end
+
+function WorldDefinition:create_delayed_unit(new_unit_id)
+	local spawn_data = self._delayed_units[new_unit_id]
+	if spawn_data then
+		local unit_data = spawn_data[1]
+		PackageManager:load_delayed("unit", unit_data.name)
+		self:preload_unit(unit_data.name)
+		local unit = self:make_unit(unit_data, spawn_data[2])
+		if unit then
+			table.insert(spawn_data[3], unit)
+		end
+	end
 end
 
 function WorldDefinition:_create_statics_unit(data, offset)

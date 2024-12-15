@@ -1331,6 +1331,20 @@ function Layer:clone_edited_values(unit, source)
 	if unit:unit_data().material and unit:unit_data().material ~= "default" then
 		unit:set_material_config(unit:unit_data().material, true)
 	end
+	unit:unit_data().disable_shadows = source:unit_data().disable_shadows
+	unit:set_shadows_disabled(unit:unit_data().disable_shadows)
+	unit:unit_data().disable_collision = source:unit_data().disable_collision
+	local collision_enabled = not unit:unit_data().disable_collision
+	for index = 0, unit:num_bodies() - 1 do
+		local body = unit:body(index)
+		if body then
+			body:set_collisions_enabled(collision_enabled)
+			body:set_collides_with_mover(collision_enabled)
+		end
+	end
+	unit:unit_data().delayed_load = source:unit_data().delayed_load
+	unit:unit_data().hide_on_projection_light = source:unit_data().hide_on_projection_light
+	unit:unit_data().disable_on_ai_graph = source:unit_data().disable_on_ai_graph
 	if unit:editable_gui() then
 		unit:editable_gui():set_text(source:editable_gui():text())
 		unit:editable_gui():set_font_size(source:editable_gui():font_size())

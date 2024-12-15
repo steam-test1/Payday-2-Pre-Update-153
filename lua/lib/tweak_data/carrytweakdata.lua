@@ -587,6 +587,48 @@ function CarryTweakData:init(tweak_data)
 	self.cloaker_cocaine.unit = "units/pd2_dlc_help/pickups/gen_pku_spooky_bag/gen_pku_spooky_bag"
 	self.cloaker_cocaine.visual_unit_name = "units/pd2_dlc_help/characters/npc_acc_spooky_bag/npc_acc_spooky_bag"
 	self.cloaker_cocaine.AI_carry = {SO_category = "enemies"}
+	self.diamond_necklace = {}
+	self.diamond_necklace.type = "light"
+	self.diamond_necklace.name_id = "hud_carry_diamond_necklace"
+	self.diamond_necklace.bag_value = "diamond_necklace"
+	self.diamond_necklace.unit = "units/payday2/pickups/gen_pku_cage_bag/gen_pku_cage_bag"
+	self.diamond_necklace.visual_unit_name = "units/payday2/characters/npc_acc_cage_bag_1/npc_acc_cage_bag_1"
+	self.diamond_necklace.AI_carry = {SO_category = "enemies"}
+	self.vr_headset = {}
+	self.vr_headset.type = "light"
+	self.vr_headset.name_id = "hud_carry_vr_headset"
+	self.vr_headset.bag_value = "vr_headset"
+	self.vr_headset.unit = "units/payday2/pickups/gen_pku_cage_bag/gen_pku_cage_bag"
+	self.vr_headset.visual_unit_name = "units/payday2/characters/npc_acc_cage_bag_1/npc_acc_cage_bag_1"
+	self.vr_headset.AI_carry = {SO_category = "enemies"}
+	self.women_shoes = {}
+	self.women_shoes.type = "light"
+	self.women_shoes.name_id = "hud_carry_shoes"
+	self.women_shoes.bag_value = "women_shoes"
+	self.women_shoes.unit = "units/payday2/pickups/gen_pku_cage_bag/gen_pku_cage_bag"
+	self.women_shoes.visual_unit_name = "units/payday2/characters/npc_acc_cage_bag_1/npc_acc_cage_bag_1"
+	self.women_shoes.AI_carry = {SO_category = "enemies"}
+	self.expensive_vine = {}
+	self.expensive_vine.type = "light"
+	self.expensive_vine.name_id = "hud_carry_expensive_wine"
+	self.expensive_vine.bag_value = "expensive_vine"
+	self.expensive_vine.unit = "units/payday2/pickups/gen_pku_cage_bag/gen_pku_cage_bag"
+	self.expensive_vine.visual_unit_name = "units/payday2/characters/npc_acc_cage_bag_1/npc_acc_cage_bag_1"
+	self.expensive_vine.AI_carry = {SO_category = "enemies"}
+	self.ordinary_wine = {}
+	self.ordinary_wine.type = "light"
+	self.ordinary_wine.name_id = "hud_carry_wine"
+	self.ordinary_wine.bag_value = "ordinary_wine"
+	self.ordinary_wine.unit = "units/payday2/pickups/gen_pku_cage_bag/gen_pku_cage_bag"
+	self.ordinary_wine.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
+	self.ordinary_wine.AI_carry = {SO_category = "enemies"}
+	self.robot_toy = {}
+	self.robot_toy.type = "light"
+	self.robot_toy.name_id = "hud_carry_robot_toy"
+	self.robot_toy.bag_value = "robot_toy"
+	self.robot_toy.unit = "units/payday2/pickups/gen_pku_cage_bag/gen_pku_cage_bag"
+	self.robot_toy.visual_unit_name = "units/payday2/characters/npc_acc_cage_bag_1/npc_acc_cage_bag_1"
+	self.robot_toy.AI_carry = {SO_category = "enemies"}
 end
 
 function CarryTweakData:get_carry_ids()

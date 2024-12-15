@@ -197,6 +197,10 @@ function MenuComponentManager:init()
 		create = callback(self, self, "create_mutators_list_gui"),
 		close = callback(self, self, "close_mutators_list_gui")
 	}
+	self._active_components.debug_quicklaunch = {
+		create = callback(self, self, "create_debug_quicklaunch_gui"),
+		close = callback(self, self, "close_debug_quicklaunch_gui")
+	}
 	self._alive_components = {}
 end
 
@@ -2822,6 +2826,8 @@ function MenuComponentManager:get_texture_from_mod_type(type, sub_type, gadget, 
 			texture = "guis/textures/pd2/blackmarket/inv_mod_bonus"
 		end
 		texture = "guis/textures/pd2/blackmarket/inv_mod_" .. tostring(sub_type or type)
+	elseif type == "vertical_grip" then
+		texture = "guis/textures/pd2/blackmarket/inv_mod_vertical_grip"
 	else
 		texture = "guis/textures/pd2/blackmarket/inv_mod_" .. type
 	end
@@ -3864,4 +3870,10 @@ function MenuComponentManager:close_new_heists_gui()
 		self._new_heists_gui = nil
 		self:unregister_component("new_heists")
 	end
+end
+
+function MenuComponentManager:create_debug_quicklaunch_gui(node)
+end
+
+function MenuComponentManager:close_debug_quicklaunch_gui()
 end

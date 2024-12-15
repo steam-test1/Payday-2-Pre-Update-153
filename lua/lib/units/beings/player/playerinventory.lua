@@ -213,26 +213,46 @@ function PlayerInventory:equip_selected_primary(instant)
 	return self:equip_selection(self._selected_primary, instant)
 end
 
-function PlayerInventory:equip_next(instant)
+function PlayerInventory:get_next_selection()
 	local i = self._selected_primary
 	for i = self._selected_primary, self._selected_primary + 9 do
 		local selection = 1 + math.mod(i, 10)
 		if self._available_selections[selection] then
-			return self:equip_selection(selection, instant)
+			return self._available_selections[selection], selection
 		end
+	end
+	return nil
+end
+
+function PlayerInventory:equip_next(instant)
+	local got, selection = self:get_next_selection()
+	if got then
+		return self:equip_selection(selection, instant)
 	end
 	return false
 end
 
-function PlayerInventory:equip_previous(instant)
+function PlayerInventory:get_previous_selection()
 	local i = self._selected_primary
 	for i = self._selected_primary, self._selected_primary - 9, -1 do
 		local selection = 1 + math.mod(8 + i, 10)
 		if self._available_selections[selection] then
-			return self:equip_selection(selection, instant)
+			return self._available_selections[selection], selection
 		end
 	end
+	return nil
+end
+
+function PlayerInventory:equip_previous(instant)
+	local got, selection = self:get_previous_selection()
+	if got then
+		return self:equip_selection(selection, instant)
+	end
 	return false
+end
+
+function PlayerInventory:get_selected(selection_index)
+	return selection_index and selection_index ~= self._equipped_selection and self._available_selections[selection_index]
 end
 
 function PlayerInventory:equip_selection(selection_index, instant)

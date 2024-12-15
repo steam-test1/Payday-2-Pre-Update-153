@@ -2495,6 +2495,7 @@ function NarrativeTweakData:init(tweak_data)
 		2408000,
 		2408000
 	}
+	self.jobs.pines.is_christmas_heist = true
 	self.jobs.mus = {}
 	self.jobs.mus.name_id = "heist_mus"
 	self.jobs.mus.briefing_id = "heist_mus_crimenet"
@@ -3468,6 +3469,7 @@ function NarrativeTweakData:init(tweak_data)
 		6218000,
 		6218000
 	}
+	self.jobs.cane.is_christmas_heist = true
 	self.jobs.nail = {}
 	self.jobs.nail.name_id = "heist_nail"
 	self.jobs.nail.briefing_id = "heist_nail_crimenet"
@@ -4054,6 +4056,67 @@ function NarrativeTweakData:init(tweak_data)
 		to = chill_combat_marker_dot_color_to,
 		speed = 10
 	}
+	self.jobs.moon = {}
+	self.jobs.moon.name_id = "heist_moon"
+	self.jobs.moon.briefing_id = "heist_moon_crimenet"
+	self.jobs.moon.contact = "vlad"
+	self.jobs.moon.region = "street"
+	self.jobs.moon.jc = 30
+	self.jobs.moon.chain = {
+		{
+			level_id = "moon",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.moon.briefing_event = "vld_moon_cbf_01"
+	self.jobs.moon.debrief_event = nil
+	self.jobs.moon.crimenet_callouts = {
+		"vld_moon_cnc_01"
+	}
+	self.jobs.moon.crimenet_videos = {
+		"cn_ukr1",
+		"cn_ukr2",
+		"cn_ukr3"
+	}
+	self.jobs.moon.payout = {
+		124000,
+		248000,
+		620000,
+		1150000,
+		1600000,
+		1600000,
+		1600000
+	}
+	self.jobs.moon.contract_cost = {
+		105000,
+		150000,
+		550000,
+		1050000,
+		1400000,
+		1400000,
+		1400000
+	}
+	self.jobs.moon.is_christmas_heist = true
+	self.jobs.moon.contract_visuals = {}
+	self.jobs.moon.contract_visuals.min_mission_xp = {
+		8300,
+		8300,
+		8300,
+		8300,
+		8300,
+		8300,
+		8300
+	}
+	self.jobs.moon.contract_visuals.max_mission_xp = {
+		17800,
+		17800,
+		17800,
+		17800,
+		17800,
+		17800,
+		17800
+	}
 	self.jobs.flat = {}
 	self.jobs.flat.name_id = "heist_flat"
 	self.jobs.flat.briefing_id = "heist_flat_crimenet"
@@ -4236,7 +4299,8 @@ function NarrativeTweakData:init(tweak_data)
 		"chill",
 		"chill_combat",
 		"flat",
-		"help"
+		"help",
+		"moon"
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self._jobs_index, "roberts")

@@ -51,7 +51,7 @@ function ElementRandomInstance:_get_random_elements()
 	return table.remove(self._unused_randoms, rand)
 end
 
-ElementRandomInstanceInputEvent = ElementRandomInstanceInputEvent or class(CoreMissionScriptElement.MissionScriptElement)
+ElementRandomInstanceInputEvent = ElementRandomInstanceInputEvent or class(ElementRandomInstance)
 ElementRandomInstanceInputEvent._type = "input"
-ElementRandomInstanceOutputEvent = ElementRandomInstanceOutputEvent or class(CoreMissionScriptElement.MissionScriptElement)
+ElementRandomInstanceOutputEvent = ElementRandomInstanceOutputEvent or class(ElementRandomInstance)
 ElementRandomInstanceOutputEvent._type = "output"

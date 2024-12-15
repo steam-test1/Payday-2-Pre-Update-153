@@ -4654,24 +4654,19 @@ function GuiTweakData:init()
 	}
 	self.new_heists = {}
 	table.insert(self.new_heists, {
+		name_id = "menu_nh_heist_2016_moon",
+		texture_path = "guis/textures/pd2/new_heists/christmas_heist_2016",
+		url = "http://www.overkillsoftware.com/games/christmas2016/"
+	})
+	table.insert(self.new_heists, {
 		name_id = "menu_nh_gage_spec_ops_2016",
 		texture_path = "guis/textures/pd2/new_heists/gage_spec_ops_2016",
 		url = "http://www.overkillsoftware.com/games/specops/"
 	})
 	table.insert(self.new_heists, {
-		name_id = "menu_nh_autumn_sale",
-		texture_path = "guis/textures/pd2/new_heists/autumn_sale",
-		url = "http://store.steampowered.com/dlc/218620/"
-	})
-	table.insert(self.new_heists, {
 		name_id = "menu_nh_beta_new_difficulty",
 		texture_path = "guis/textures/pd2/new_heists/beta_new_difficulty",
 		url = "http://steamcommunity.com/games/218620/announcements/detail/614007890988731544"
-	})
-	table.insert(self.new_heists, {
-		name_id = "menu_nh_halloween_2016",
-		texture_path = "guis/textures/pd2/new_heists/halloween_2016",
-		url = "http://www.overkillsoftware.com/games/halloween2016/"
 	})
 	table.insert(self.new_heists, {
 		name_id = "menu_nh_john_wick",

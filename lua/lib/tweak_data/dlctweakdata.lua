@@ -5380,4 +5380,21 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.ach_moon_4 = {}
+	self.ach_moon_4.dlc = "has_achievement"
+	self.ach_moon_4.achievement_id = "moon_4"
+	self.ach_moon_4.content = {}
+	self.ach_moon_4.content.loot_global_value = "normal"
+	self.ach_moon_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "moon_paycheck_dallas",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "moon_paycheck_chains",
+			amount = 1
+		}
+	}
 end

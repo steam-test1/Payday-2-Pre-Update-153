@@ -107,6 +107,8 @@ require("lib/managers/mission/ElementChangeVanSkin")
 require("lib/managers/mission/ElementCustomSafehouse")
 require("lib/managers/mission/ElementLootPile")
 require("lib/managers/mission/ElementTango")
+require("lib/managers/mission/ElementInvulnerable")
+require("lib/managers/mission/ElementCharacterDamage")
 require("lib/managers/mission/ElementPlayerSpawner")
 require("lib/managers/mission/ElementAreaTrigger")
 require("lib/managers/mission/ElementSpawnEnemyDummy")
@@ -190,7 +192,13 @@ function MissionManager:init(...)
 		"turret_destroyed",
 		"pku_toothbrush",
 		"tripmine_exploded",
-		"cloaker_loot"
+		"cloaker_loot",
+		"pku_diamond_necklace",
+		"pku_wine",
+		"pku_expensive_wine",
+		"pku_tin_boy_toy",
+		"pku_high_heels",
+		"pku_vr_headset"
 	})
 	self._mission_filter = {}
 	if not Global.mission_manager then

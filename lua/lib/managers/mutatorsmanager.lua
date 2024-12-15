@@ -328,7 +328,8 @@ function MutatorsManager:should_delay_game_start()
 	if BaseNetworkHandler._verify_gamestate(BaseNetworkHandler._gamestate_filter.any_ingame) then
 		return false
 	end
-	if table.size(managers.network:session():peers()) == 0 then
+	local peers_table = managers.network and managers.network:session() and managers.network:session():peers()
+	if table.size(peers_table or {}) == 0 then
 		return false
 	end
 	if not self:are_mutators_enabled() then

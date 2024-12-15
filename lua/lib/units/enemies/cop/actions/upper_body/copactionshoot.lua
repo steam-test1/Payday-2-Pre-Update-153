@@ -88,9 +88,7 @@ end
 function CopActionShoot:on_inventory_event(event)
 	if self._weapon_unit and self._autofiring then
 		self._weapon_base:stop_autofire()
-		if self._ext_anim.recoil then
-			self._ext_movement:play_redirect("up_idle")
-		end
+		self._ext_movement:play_redirect("up_idle")
 	end
 	local weapon_unit = self._ext_inventory:equipped_unit()
 	self._weapon_unit = weapon_unit
@@ -207,8 +205,6 @@ function CopActionShoot:on_exit()
 	end
 	if self._autofiring then
 		self._weapon_base:stop_autofire()
-	end
-	if self._ext_anim.recoil then
 		self._ext_movement:play_redirect("up_idle")
 	end
 	if Network:is_server() then
@@ -262,20 +258,16 @@ function CopActionShoot:update(t)
 	elseif self._weapon_base:clip_empty() then
 		if self._autofiring then
 			self._weapon_base:stop_autofire()
-			if ext_anim.recoil then
-				self._ext_movement:play_redirect("up_idle")
-			end
+			self._ext_movement:play_redirect("up_idle")
 			self._autofiring = nil
 			self._autoshots_fired = nil
 		end
-		if not ext_anim.recoil then
-			if self._ext_anim.base_no_reload then
-				self._weapon_unit:base():on_reload()
-			else
-				local res = CopActionReload._play_reload(self)
-				if res then
-					self._machine:set_speed(res, self._reload_speed)
-				end
+		if self._ext_anim.base_no_reload then
+			self._weapon_unit:base():on_reload()
+		else
+			local res = CopActionReload._play_reload(self)
+			if res then
+				self._machine:set_speed(res, self._reload_speed)
 			end
 		end
 	elseif self._autofiring then
@@ -284,9 +276,7 @@ function CopActionShoot:update(t)
 			self._shoot_t = t + 0.6
 			self._autofiring = nil
 			self._autoshots_fired = nil
-			if ext_anim.recoil then
-				self._ext_movement:play_redirect("up_idle")
-			end
+			self._ext_movement:play_redirect("up_idle")
 		else
 			local spread = self._spread
 			local falloff, i_range = self:_get_shoot_falloff(target_dis, self._falloff)
@@ -313,9 +303,7 @@ function CopActionShoot:update(t)
 					self._autofiring = nil
 					self._autoshots_fired = nil
 					self._weapon_base:stop_autofire()
-					if ext_anim.recoil then
-						self._ext_movement:play_redirect("up_idle")
-					end
+					self._ext_movement:play_redirect("up_idle")
 					if vis_state == 1 then
 						self._shoot_t = t + (self._common_data.is_suppressed and 1.5 or 1) * math.lerp(falloff.recoil[1], falloff.recoil[2], math.random())
 					else

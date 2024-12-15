@@ -5,7 +5,6 @@ PlayerDriving.IDS_STEER_RIGHT_REDIRECT = Idstring("steering_wheel_right")
 PlayerDriving.IDS_STEER_RIGHT_STATE = Idstring("fps/wheel_turn_right")
 PlayerDriving.IDS_STEER_IDLE_REDIRECT = Idstring("steering_wheel_idle")
 PlayerDriving.IDS_PASSENGER_REDIRECT = Idstring("passenger_vehicle")
-PlayerDriving.IDS_EQUIP = Idstring("equip")
 PlayerDriving.EXIT_VEHICLE_TIMER = 0.4
 PlayerDriving.STANCE_NORMAL = 0
 PlayerDriving.STANCE_SHOOTING = 1
@@ -105,7 +104,7 @@ function PlayerDriving:exit(state_data, new_state_name)
 	if self._seat.driving then
 		self._unit:inventory():show_equipped_unit()
 	end
-	self._unit:camera():play_redirect(self.IDS_EQUIP)
+	self._unit:camera():play_redirect(self:get_animation("equip"))
 	managers.player:exit_vehicle()
 	self._dye_risk = nil
 	self._state_data.in_air = false
@@ -258,7 +257,7 @@ function PlayerDriving:_enter_shooting_stance()
 	self._stance = PlayerDriving.STANCE_SHOOTING
 	self:_postion_player_on_seat()
 	self:_set_camera_limits("shooting")
-	self._unit:camera():play_redirect(self.IDS_EQUIP)
+	self._unit:camera():play_redirect(self:get_animation("equip"))
 	managers.controller:set_ingame_mode("main")
 end
 
@@ -281,7 +280,7 @@ function PlayerDriving:_exit_shooting_stance()
 		self:_interupt_action_use_item(t)
 		self._unit:camera():play_redirect(self.IDS_PASSENGER_REDIRECT)
 	else
-		self._unit:camera():play_redirect(self.IDS_EQUIP)
+		self._unit:camera():play_redirect(self:get_animation("equip"))
 	end
 	managers.controller:set_ingame_mode("driving")
 end
@@ -449,7 +448,7 @@ function PlayerDriving:cb_leave()
 	local vehicle_state = self._vehicle:get_state()
 	local speed = vehicle_state:get_speed() * 3.6
 	local player = managers.player:player_unit()
-	self._unit:camera():play_redirect(self.IDS_IDLE)
+	self._unit:camera():play_redirect(self:get_animation("idle"))
 	managers.player:set_player_state("standard")
 end
 

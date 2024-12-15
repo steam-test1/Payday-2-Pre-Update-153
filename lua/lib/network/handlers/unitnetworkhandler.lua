@@ -2405,20 +2405,40 @@ function UnitNetworkHandler:sync_upgrade(upgrade_category, upgrade_name, upgrade
 		print("[UnitNetworkHandler:sync_upgrade] missing peer", upgrade_category, upgrade_name, upgrade_level, sender:ip_at_index(0))
 		return
 	end
-	
-	local function _get_unit()
-		local unit = peer:unit()
-		if not unit then
-			print("[UnitNetworkHandler:sync_upgrade] missing unit", upgrade_category, upgrade_name, upgrade_level, sender:ip_at_index(0))
-		end
-		return unit
-	end
-	
-	local unit = _get_unit()
+	local unit = peer:unit()
 	if not unit then
+		print("[UnitNetworkHandler:sync_upgrade] missing unit", upgrade_category, upgrade_name, upgrade_level, sender:ip_at_index(0))
 		return
 	end
 	unit:base():set_upgrade_value(upgrade_category, upgrade_name, upgrade_level)
+end
+
+function UnitNetworkHandler:sync_temporary_upgrade_owned(upgrade_category, upgrade_name, upgrade_level, index, sender)
+	local peer = self._verify_sender(sender)
+	if not peer then
+		print("[UnitNetworkHandler:sync_temporary_upgrade_owned] missing peer", upgrade_category, upgrade_name, upgrade_level, index, sender:ip_at_index(0))
+		return
+	end
+	local unit = peer:unit()
+	if not unit then
+		print("[UnitNetworkHandler:sync_temporary_upgrade_owned] missing unit", upgrade_category, upgrade_name, upgrade_level, index, sender:ip_at_index(0))
+		return
+	end
+	unit:base():set_temporary_upgrade_owned(upgrade_category, upgrade_name, upgrade_level, index)
+end
+
+function UnitNetworkHandler:sync_temporary_upgrade_activated(upgrade_index, sender)
+	local peer = self._verify_sender(sender)
+	if not peer then
+		print("[UnitNetworkHandler:sync_temporary_upgrade_activated] missing peer", upgrade_index, time, sender:ip_at_index(0))
+		return
+	end
+	local unit = peer:unit()
+	if not unit then
+		print("[UnitNetworkHandler:sync_temporary_upgrade_activated] missing unit", upgrade_index, time, sender:ip_at_index(0))
+		return
+	end
+	unit:base():activate_temporary_upgrade(upgrade_index)
 end
 
 function UnitNetworkHandler:suppression(unit, ratio, sender)

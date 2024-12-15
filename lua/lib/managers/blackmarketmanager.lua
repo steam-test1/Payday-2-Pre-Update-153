@@ -1202,6 +1202,9 @@ function BlackMarketManager:preload_weapon_blueprint(category, factory_id, bluep
 end
 
 function BlackMarketManager:resource_loaded_callback(category, loaded_table, parts)
+	if not category then
+		return
+	end
 	local loaded_category = self._category_resource_loaded[category]
 	if loaded_category then
 		for part_id, unload in pairs(loaded_category) do
@@ -3569,6 +3572,10 @@ function BlackMarketManager:buy_and_modify_weapon(category, slot, global_value, 
 		Application:error("[BlackMarketManager:modify_weapon] Trying to buy and modify weapon that doesn't exist", category, slot)
 		return
 	end
+	if self:is_previewing_legendary_skin() then
+		managers.blackmarket:view_weapon(category, slot, nil, nil, BlackMarketGui.get_crafting_custom_data())
+		managers.blackmarket:clear_preview_blueprint()
+	end
 	self:modify_weapon(category, slot, global_value, part_id)
 	if not free_of_charge then
 		managers.money:on_buy_weapon_modification(self._global.crafted_items[category][slot].weapon_id, part_id, global_value)
@@ -3766,6 +3773,10 @@ end
 
 function BlackMarketManager:last_previewed_cosmetic()
 	return self._last_viewed_cosmetic_id
+end
+
+function BlackMarketManager:is_previewing_legendary_skin()
+	return tweak_data.blackmarket.weapon_skins[self._last_viewed_cosmetic_id] and tweak_data.blackmarket.weapon_skins[self._last_viewed_cosmetic_id].locked or false
 end
 
 function BlackMarketManager:preview_grenade(grenade_id)

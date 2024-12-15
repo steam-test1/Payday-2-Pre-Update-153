@@ -95,6 +95,7 @@ function CharacterTweakData:init(tweak_data)
 	self:_init_phalanx_vip(presets)
 	self:_init_taser(presets)
 	self:_init_civilian(presets)
+	self:_init_melee_box(presets)
 	self:_init_bank_manager(presets)
 	self:_init_drunk_pilot(presets)
 	self:_init_boris(presets)
@@ -1758,6 +1759,17 @@ function CharacterTweakData:_init_civilian(presets)
 	self.robbers_safehouse.intimidateable = false
 	self.robbers_safehouse.ignores_aggression = true
 	self.robbers_safehouse.ignores_contours = true
+end
+
+function CharacterTweakData:_init_melee_box(presets)
+	self.melee_box = deep_clone(self.civilian)
+	self.melee_box.move_speed = presets.move_speed.civ_fast
+	self.melee_box.flee_type = "hide"
+	self.melee_box.access = "civ_male"
+	self.melee_box.intimidateable = nil
+	self.melee_box.challenges = {type = "civilians"}
+	self.melee_box.calls_in = nil
+	self.melee_box.ignores_aggression = true
 end
 
 function CharacterTweakData:_init_bank_manager(presets)
@@ -9042,6 +9054,12 @@ function CharacterTweakData:character_map()
 			list = {
 				"npc_chavez",
 				"npc_jamaican"
+			}
+		},
+		moon = {
+			path = "units/pd2_dlc_moon/characters/",
+			list = {
+				"civ_male_pilot_2"
 			}
 		},
 		gitgud = {

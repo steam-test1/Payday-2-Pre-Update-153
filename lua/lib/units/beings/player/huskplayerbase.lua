@@ -9,6 +9,8 @@ function HuskPlayerBase:init(unit)
 	self._unit = unit
 	self._upgrades = {}
 	self._upgrade_levels = {}
+	self._temporary_upgrades = {}
+	self._temporary_upgrades_map = {}
 	self:_setup_suspicion_and_detection_data()
 end
 
@@ -36,6 +38,30 @@ function HuskPlayerBase:set_upgrade_value(category, upgrade, level)
 		self:set_detection_multiplier("equipment", 1 / con_mul)
 	elseif upgrade == "suspicion_multiplier" then
 		self:set_suspicion_multiplier(upgrade, value)
+	end
+end
+
+function HuskPlayerBase:set_temporary_upgrade_owned(category, upgrade, level, index)
+	local upgrade_values = managers.player:upgrade_value_by_level(category, upgrade, level)
+	if type(upgrade_values) ~= "table" then
+		Application:error("[HuskPlayerBase:set_temporary_upgrade_owned] invalid upgrade", category, upgrade, level, index)
+	end
+	self._temporary_upgrades_map[category] = self._temporary_upgrades_map[category] or {}
+	self._temporary_upgrades_map[category][upgrade] = index
+	self._temporary_upgrades[index] = {
+		value = upgrade_values[1],
+		time = upgrade_values[2]
+	}
+end
+
+function HuskPlayerBase:activate_temporary_upgrade(index)
+	self._temporary_upgrades[index].activation_time = TimerManager:game():time()
+end
+
+function HuskPlayerBase:has_activate_temporary_upgrade(category, upgrade)
+	local index = self._temporary_upgrades_map[category] and self._temporary_upgrades_map[category][upgrade]
+	if index then
+		return self._temporary_upgrades[index] and self._temporary_upgrades[index].activation_time and self._temporary_upgrades[index].activation_time + self._temporary_upgrades[index].time > TimerManager:game():time()
 	end
 end
 

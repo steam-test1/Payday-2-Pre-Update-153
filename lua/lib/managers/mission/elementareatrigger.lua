@@ -195,7 +195,13 @@ function ElementAreaTrigger:project_instigators()
 					"chl_puck",
 					"cloaker_gold",
 					"cloaker_money",
-					"cloaker_cocaine"
+					"cloaker_cocaine",
+					"robot_toy",
+					"ordinary_wine",
+					"expensive_vine",
+					"women_shoes",
+					"vr_headset",
+					"diamond_necklace"
 				}
 				if table.contains(carry_list, carry_id) then
 					return true

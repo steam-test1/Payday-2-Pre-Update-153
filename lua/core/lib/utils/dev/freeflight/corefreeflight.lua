@@ -10,6 +10,8 @@ local TURN_SPEED_BASE = 1
 local FAR_RANGE_MAX = 250000
 local PITCH_LIMIT_MIN = -80
 local PITCH_LIMIT_MAX = 80
+local ROLL_LIMIT_MIN = -80
+local ROLL_LIMIT_MAX = 80
 local TEXT_FADE_TIME = 0.3
 local TEXT_ON_SCREEN_TIME = 2
 local FREEFLIGHT_HEADER_TEXT = "FREEFLIGHT, PRESS 'F' OR 'C'"
@@ -149,6 +151,7 @@ function FreeFlight:_setup_actions()
 	local FFA = CoreFreeFlightAction.FreeFlightAction
 	local FFAT = CoreFreeFlightAction.FreeFlightActionToggle
 	local dp = FFA:new("DROP PLAYER", callback(self, self, "_drop_player"))
+	local hp = FFAT:new("HIDE PLAYER", "SHOW PLAYER", callback(self, self, "_hide_player"), callback(self, self, "_show_player"))
 	local au = FFA:new("ATTACH TO UNIT", callback(self, self, "_attach_unit"))
 	local pd = FFA:new("POSITION DEBUG", callback(self, self, "_position_debug"))
 	local yc = FFA:new("YIELD CONTROL (F9 EXIT)", callback(self, self, "_yield_control"))
@@ -158,6 +161,7 @@ function FreeFlight:_setup_actions()
 	self._actions = {
 		ps,
 		dp,
+		hp,
 		au,
 		pd,
 		yc,
@@ -329,6 +333,20 @@ function FreeFlight:_yield_control()
 	self._con:disable()
 end
 
+function FreeFlight:_hide_player()
+	local cam_unit = managers.player:local_player():camera():camera_unit()
+	if cam_unit:damage():has_sequence("int_seq_hide_all") then
+		cam_unit:damage():run_sequence_simple("int_seq_hide_all")
+	end
+	managers.player:local_player():inventory():hide_equipped_unit()
+end
+
+function FreeFlight:_show_player()
+	self._player_hidden = false
+	managers.player:local_player():movement():set_character_anim_variables()
+	managers.player:local_player():inventory():show_equipped_unit()
+end
+
 function FreeFlight:_drop_player()
 	local rot_new = Rotation(self._camera_rot:yaw(), 0, 0)
 	self._gsm:current_state():freeflight_drop_player(self._camera_pos, rot_new)
@@ -491,13 +509,19 @@ function FreeFlight:_update_camera(t, dt)
 	local axis_look = self._con:get_input_axis("freeflight_axis_look")
 	local btn_move_up = self._con:get_input_float("freeflight_move_up")
 	local btn_move_down = self._con:get_input_float("freeflight_move_down")
+	local btn_roll_left = self._con:get_input_float("freeflight_roll_left")
+	local btn_roll_right = self._con:get_input_float("freeflight_roll_right")
+	local btn_roll_reset = self._con:get_input_float("freeflight_roll_reset")
 	local move_dir = self._camera_rot:x() * axis_move.x + self._camera_rot:y() * axis_move.y
 	move_dir = move_dir + btn_move_up * Vector3(0, 0, 1) + btn_move_down * Vector3(0, 0, -1)
 	local move_delta = move_dir * self._move_speed:value() * MOVEMENT_SPEED_BASE * dt
 	local pos_new = self._camera_pos + move_delta
-	local yaw_new = self._camera_rot:yaw() + axis_look.x * -1 * self._turn_speed:value() * TURN_SPEED_BASE
-	local pitch_new = math.clamp(self._camera_rot:pitch() + axis_look.y * self._turn_speed:value() * TURN_SPEED_BASE, PITCH_LIMIT_MIN, PITCH_LIMIT_MAX)
-	local rot_new = Rotation(yaw_new, pitch_new, 0)
+	local turn_speed = self._turn_speed:value() * TURN_SPEED_BASE
+	local turn_speed_roll = turn_speed * 0.1
+	local yaw_new = self._camera_rot:yaw() + axis_look.x * -1 * turn_speed
+	local pitch_new = math.clamp(self._camera_rot:pitch() + axis_look.y * turn_speed, PITCH_LIMIT_MIN, PITCH_LIMIT_MAX)
+	local roll_new = math.clamp(0.5 < btn_roll_reset and 0 or self._camera_rot:roll() + btn_roll_left * turn_speed_roll + btn_roll_right * -1 * turn_speed_roll, ROLL_LIMIT_MIN, ROLL_LIMIT_MAX)
+	local rot_new = Rotation(yaw_new, pitch_new, roll_new)
 	if not CoreApp.arg_supplied("-vpslave") then
 		self:_set_camera(pos_new, rot_new)
 	end

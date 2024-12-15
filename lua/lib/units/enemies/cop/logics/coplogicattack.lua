@@ -827,18 +827,18 @@ function CopLogicAttack._upd_aim(data, my_data)
 			if aim == nil and focus_enemy.reaction >= AIAttentionObject.REACT_AIM then
 				if focus_enemy.reaction >= AIAttentionObject.REACT_SHOOT then
 					local running = my_data.advancing and not my_data.advancing:stopping() and my_data.advancing:haste() == "run"
-					if last_sup_t and data.t - last_sup_t < 7 * (running and 0.3 or 1) * (focus_enemy.verified and 1 or focus_enemy.vis_ray and focus_enemy.vis_ray.distance > 500 and 0.5 or 0.2) then
-						shoot = true
-					elseif focus_enemy.verified and data.internal_data.weapon_range and focus_enemy.verified_dis < data.internal_data.weapon_range.close then
-						shoot = true
-					elseif focus_enemy.verified and focus_enemy.criminal_record and focus_enemy.criminal_record.assault_t and data.t - focus_enemy.criminal_record.assault_t < 2 then
-						shoot = true
-					end
 					local firing_range = 500
 					if data.internal_data.weapon_range then
 						firing_range = running and data.internal_data.weapon_range.close or data.internal_data.weapon_range.far
 					else
 						debug_pause_unit(data.unit, "[CopLogicAttack]: Unit doesn't have data.internal_data.weapon_range")
+					end
+					if last_sup_t and data.t - last_sup_t < 7 * (running and 0.3 or 1) * (focus_enemy.verified and 1 or focus_enemy.vis_ray and firing_range < focus_enemy.vis_ray.distance and 0.5 or 0.2) then
+						shoot = true
+					elseif focus_enemy.verified and data.internal_data.weapon_range and firing_range > focus_enemy.verified_dis then
+						shoot = true
+					elseif focus_enemy.verified and focus_enemy.criminal_record and focus_enemy.criminal_record.assault_t and data.t - focus_enemy.criminal_record.assault_t < 2 then
+						shoot = true
 					end
 					if not shoot and my_data.attitude == "engage" then
 						if focus_enemy.verified then

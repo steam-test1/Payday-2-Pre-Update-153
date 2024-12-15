@@ -217,13 +217,16 @@ end
 
 function TeamAIMovement:save(save_data)
 	TeamAIMovement.super.save(self, save_data)
-	save_data.should_stay = self._should_stay
+	save_data.movement = save_data.movement or {}
+	save_data.movement.should_stay = self._should_stay
+	save_data.movement.carry_unit = self._carry_unit
 end
 
 function TeamAIMovement:load(load_data)
 	TeamAIMovement.super.load(self, load_data)
-	if load_data.should_stay then
-		self:set_should_stay(true)
+	if load_data.movement then
+		self:set_should_stay(load_data.movement.should_stay)
+		self._carry_unit = load_data.movement.carry_unit
 	end
 end
 

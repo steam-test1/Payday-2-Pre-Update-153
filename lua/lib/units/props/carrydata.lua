@@ -535,7 +535,7 @@ function CarryData:on_secure_SO_failed(thief)
 	self:unlink()
 end
 
-function CarryData:link_to(parent_unit)
+function CarryData:link_to(parent_unit, keep_collisions)
 	local body = self._unit:body("hinge_body_1") or self._unit:body(0)
 	body:set_keyframed()
 	local parent_obj_name = Idstring("Neck")

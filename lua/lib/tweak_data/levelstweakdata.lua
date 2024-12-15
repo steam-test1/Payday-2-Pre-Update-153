@@ -1341,6 +1341,7 @@ function LevelsTweakData:init()
 	self.chill_combat.max_bags = 28
 	self.chill_combat.team_ai_off = false
 	self.chill_combat.group_ai_state = "safehouse"
+	self.chill_combat.ai_group_type = america
 	self.chill_combat.is_safehouse = false
 	self.chill_combat.is_safehouse_combat = true
 	self.chill_combat.disable_mutators = true
@@ -1357,6 +1358,7 @@ function LevelsTweakData:init()
 	self.flat.music_overrides = {
 		track_47_gen = "track_47_flat"
 	}
+	self.flat.ai_group_type = america
 	self.help = {}
 	self.help.name_id = "heist_help_hl"
 	self.help.briefing_id = "heist_help_hl_briefing"
@@ -1369,6 +1371,19 @@ function LevelsTweakData:init()
 	self.help.cube = "cube_apply_heist_bank"
 	self.help.ghost_bonus = nil
 	self.help.max_bags = 9999
+	self.help.ai_group_type = america
+	self.moon = {}
+	self.moon.name_id = "heist_moon_hl"
+	self.moon.briefing_id = "heist_moon_hl_briefing"
+	self.moon.briefing_dialog = "Play_pln_moon_brf"
+	self.moon.world_name = "narratives/vlad/moon"
+	self.moon.intro_event = "Play_vld_moon_intro"
+	self.moon.outro_event = "Play_vld_moon_end"
+	self.moon.package = "packages/lvl_moon"
+	self.moon.cube = "cube_apply_heist_bank"
+	self.moon.ghost_bonus = nil
+	self.moon.max_bags = 12
+	self.moon.ai_group_type = america
 	self._level_index = {
 		"welcome_to_the_jungle_1",
 		"welcome_to_the_jungle_1_night",
@@ -1456,7 +1471,8 @@ function LevelsTweakData:init()
 		"chill",
 		"chill_combat",
 		"flat",
-		"help"
+		"help",
+		"moon"
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self._level_index, "roberts")

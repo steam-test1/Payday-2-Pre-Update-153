@@ -7,9 +7,6 @@ end
 
 function PlayerTased:enter(state_data, enter_data)
 	PlayerTased.super.enter(self, state_data, enter_data)
-	self._ids_tased_boost = Idstring("tased_boost")
-	self._ids_tased = Idstring("tased")
-	self._ids_counter_tase = Idstring("tazer_counter")
 	self:_start_action_tased(managers.player:player_timer():time(), state_data.non_lethal_electrocution)
 	if state_data.non_lethal_electrocution then
 		state_data.non_lethal_electrocution = nil
@@ -134,7 +131,7 @@ function PlayerTased:_update_check_actions(t, dt)
 				input.btn_primary_attack_press = true
 			end
 			self._camera_unit:base():recoil_kick(-5, 5, -5, 5)
-			self._unit:camera():play_redirect(self._ids_tased_boost)
+			self._unit:camera():play_redirect(self:get_animation("tased_boost"))
 		end
 	elseif self._recoil_t then
 		if not managers.player:has_category_upgrade("player", "resist_firing_tased") then
@@ -315,14 +312,14 @@ function PlayerTased:_start_action_tased(t, non_lethal)
 	self:_interupt_action_running(t)
 	self:_stance_entered()
 	self:_update_crosshair_offset()
-	self._unit:camera():play_redirect(self._ids_tased)
+	self._unit:camera():play_redirect(self:get_animation("tased"))
 	self._unit:sound():play("tasered_loop")
 	managers.hint:show_hint(non_lethal and "hint_been_electrocuted" or "hint_been_tasered")
 end
 
 function PlayerTased:_start_action_counter_tase(t, prime_target)
 	self._counter_taser_unit = prime_target.unit
-	self._unit:camera():play_redirect(self._ids_counter_tase)
+	self._unit:camera():play_redirect(self:get_animation("tased_counter"))
 end
 
 function PlayerTased:_register_revive_SO()

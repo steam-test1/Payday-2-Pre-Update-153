@@ -2126,11 +2126,23 @@ end
 function MenuCallbackHandler:toggle_throwable_contour(item)
 	local state = item:value() == "on"
 	managers.user:set_setting("throwable_contour", state, nil)
+	local throwables = World:find_units_quick("all", 20)
+	for _, unit in ipairs(throwables) do
+		if unit.base and unit:base().reload_contour then
+			unit:base():reload_contour()
+		end
+	end
 end
 
 function MenuCallbackHandler:toggle_ammo_contour(item)
 	local state = item:value() == "on"
 	managers.user:set_setting("ammo_contour", state, nil)
+	local pickups = World:find_units_quick("all", 23)
+	for _, unit in ipairs(pickups) do
+		if unit.pickup and unit:pickup().reload_contour then
+			unit:pickup():reload_contour()
+		end
+	end
 end
 
 function MenuCallbackHandler:choice_test(item)
@@ -6758,7 +6770,9 @@ function MenuCrimeNetSpecialInitiator:setup_node(node)
 			local contact = job_tweak.contact
 			local contact_tweak = tweak_data.narrative.contacts[contact]
 			if contact then
-				if not table.contains(contacts, contact) and (not contact_tweak or not contact_tweak.hidden) then
+				local allow_contact = true
+				allow_contact = not table.contains(contacts, contact) and (not contact_tweak or not contact_tweak.hidden)
+				if allow_contact then
 					table.insert(contacts, contact)
 				end
 				jobs[contact] = jobs[contact] or {}

@@ -3067,6 +3067,20 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.tng_cap.texture_bundle_folder = "tng"
 	self.masks.tng_cap.sort_number = 35
 	self.masks.tng_cap.dlc = "tango"
+	self.masks.moon_paycheck_dallas = {}
+	self.masks.moon_paycheck_dallas.unit = "units/pd2_dlc_moon/masks/paycheck_dallas/msk_moon_paycheck_dallas"
+	self.masks.moon_paycheck_dallas.name_id = "bm_paycheck_dallas"
+	self.masks.moon_paycheck_dallas.pcs = {}
+	self.masks.moon_paycheck_dallas.value = 0
+	self.masks.moon_paycheck_dallas.texture_bundle_folder = "moon"
+	self.masks.moon_paycheck_dallas.sort_number = 36
+	self.masks.moon_paycheck_chains = {}
+	self.masks.moon_paycheck_chains.unit = "units/pd2_dlc_moon/masks/paycheck_chains/msk_moon_paycheck_chains"
+	self.masks.moon_paycheck_chains.name_id = "bm_paycheck_chains"
+	self.masks.moon_paycheck_chains.pcs = {}
+	self.masks.moon_paycheck_chains.value = 0
+	self.masks.moon_paycheck_chains.texture_bundle_folder = "moon"
+	self.masks.moon_paycheck_chains.sort_number = 36
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.masks) do
 		if free_dlcs[data.dlc] then

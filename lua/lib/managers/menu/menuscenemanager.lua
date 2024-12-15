@@ -23,6 +23,7 @@ function MenuSceneManager:init()
 	self._one_frame_delayed_clbks = {}
 	self._current_scene_template = ""
 	self._global_poses = {}
+	self._forced_secondaries = {}
 	self._global_poses.generic = {
 		"husk_generic1",
 		"husk_generic2",
@@ -772,23 +773,24 @@ function MenuSceneManager:_select_character_pose(unit)
 		return
 	end
 	local pose
+	local secondary = managers.blackmarket:equipped_secondary()
+	if secondary and (math.rand(1) < 0.12 or table.contains(self._forced_secondaries, secondary.weapon_id)) then
+		local category = tweak_data.weapon[secondary.weapon_id].category
+		if category == "pistol" then
+			pose = self._global_poses.pistol[math.random(#self._global_poses.pistol)]
+		elseif self._global_poses[secondary.weapon_id] then
+			local wep_poses = self._global_poses[secondary.weapon_id]
+			pose = wep_poses[math.random(#wep_poses)]
+		end
+		if pose then
+			self:_set_character_unit_pose(pose, unit)
+			return
+		end
+	end
 	if math.rand(1) < 0.25 then
 		pose = self._global_poses.generic[math.random(#self._global_poses.generic)]
 		self:_set_character_unit_pose(pose, unit)
 		return
-	end
-	if math.rand(1) < 0.12 then
-		local secondary = managers.blackmarket:equipped_secondary()
-		if secondary then
-			local category = tweak_data.weapon[secondary.weapon_id].category
-			if category == "pistol" then
-				pose = self._global_poses.pistol[math.random(#self._global_poses.pistol)]
-			end
-			if pose then
-				self:_set_character_unit_pose(pose, unit)
-				return
-			end
-		end
 	end
 	local primary = managers.blackmarket:equipped_primary()
 	if primary then

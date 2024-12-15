@@ -4928,3 +4928,7 @@ end
 function GroupAIStateBase:is_unit_in_phalanx_minion_data(unit_key)
 	return self._phalanx_data and self._phalanx_data.minions and self._phalanx_data.minions[unit_key] and true
 end
+
+function GroupAIStateBase:is_unit_team_AI(unit)
+	return self._ai_criminals[unit:key()]
+end

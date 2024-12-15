@@ -384,15 +384,15 @@ function TripMineBase:_explode(col_ray)
 			managers.network:session():send_to_peers_synched("sync_trip_mine_explode_no_user", self._unit, self._ray_from_pos, self._ray_to_pos, damage_size, damage)
 		end
 	end
+	local alert_event = {
+		"aggression",
+		self._position,
+		tweak_data.weapon.trip_mines.alert_radius,
+		self._alert_filter,
+		self._unit
+	}
+	managers.groupai:state():propagate_alert(alert_event)
 	if Network:is_server() then
-		local alert_event = {
-			"aggression",
-			self._position,
-			tweak_data.weapon.trip_mines.alert_radius,
-			self._alert_filter,
-			self._unit
-		}
-		managers.groupai:state():propagate_alert(alert_event)
 		managers.mission:call_global_event("tripmine_exploded")
 		Application:error("TRIPMINE EXPLODED")
 	end

@@ -367,6 +367,8 @@ CopActionAct._act_redirects.SO = {
 	"e_nl_down_8m_swing_in",
 	"e_nl_down_9m_swing_in",
 	"e_nl_down_9_3m_rappel",
+	"e_nl_down_10m_rappel",
+	"e_nl_up_6_2_down_1m_var3",
 	"e_nl_down_4m_roll",
 	"e_nl_jump_over_0_5m",
 	"e_nl_jump_over_2_5m",
@@ -816,6 +818,14 @@ CopActionAct._act_redirects.SO = {
 	"cm_idle_3_disco",
 	"cmf_so_lean_1m",
 	"cm_so_impersonator",
+	"cm_so_sit_to_talk_loop",
+	"cm_so_sit_to_talk_enter",
+	"cm_so_sit_to_talk_exit",
+	"cm_so_sit_to_stand_enter",
+	"cm_so_sit_untied",
+	"cm_so_turn_dive",
+	"cm_so_sit_to_stand_loop",
+	"cm_so_sit_sleep",
 	"so_butler_pick_up",
 	"so_butler_silly_walk",
 	"so_butler_write",
@@ -1289,7 +1299,6 @@ function CopActionAct:_play_anim()
 		redir_res = self._ext_movement:play_redirect(redir_name, self._action_desc.start_anim_time)
 	end
 	if not redir_res then
-		debug_pause_unit(self._unit, "[CopActionAct:_play_anim] redirect", redir_name, "failed in", self._machine:segment_state(Idstring("base")), self._unit)
 		self._expired = true
 		return
 	end

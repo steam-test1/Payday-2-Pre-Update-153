@@ -314,6 +314,14 @@ function EquipmentsTweakData:init()
 		transfer_quantity = 8,
 		sync_possession = true
 	}
+	self.specials.c4_x3 = {
+		text_id = "hud_equipment_pickup_c4",
+		icon = "pd2_c4",
+		action_message = "c4_obtained",
+		quantity = 3,
+		transfer_quantity = 8,
+		sync_possession = true
+	}
 	self.specials.c4_x10 = {
 		text_id = "hud_equipment_pickup_c4",
 		icon = "pd2_c4",

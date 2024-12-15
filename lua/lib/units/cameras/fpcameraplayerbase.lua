@@ -1176,6 +1176,7 @@ function FPCameraPlayerBase:spawn_mask()
 		local glass_id_string = Idstring("glass")
 		local mtr_hair_solid_id_string = Idstring("mtr_hair_solid")
 		local mtr_hair_effect_id_string = Idstring("mtr_hair_effect")
+		local mtr_bloom_glow_id_string = Idstring("mtr_bloom_glow")
 		local glow_id_strings = {}
 		for i = 1, 5 do
 			glow_id_strings[Idstring("glow" .. tostring(i)):key()] = true
@@ -1189,6 +1190,8 @@ function FPCameraPlayerBase:spawn_mask()
 				material:set_render_template(Idstring("opacity:CUBE_ENVIRONMENT_MAPPING:CUBE_FRESNEL:DIFFUSE_TEXTURE:FPS"))
 			elseif material:name() == mtr_hair_solid_id_string then
 			elseif material:name() == mtr_hair_effect_id_string then
+			elseif material:name() == mtr_bloom_glow_id_string then
+				material:set_render_template(Idstring("generic:DEPTH_SCALING:DIFFUSE_TEXTURE:SELF_ILLUMINATION:SELF_ILLUMINATION_BLOOM"))
 			elseif glow_id_strings[material:name():key()] then
 				material:set_render_template(Idstring("effect:BLEND_ADD:DIFFUSE0_TEXTURE"))
 			elseif sweep_id_strings[material:name():key()] then

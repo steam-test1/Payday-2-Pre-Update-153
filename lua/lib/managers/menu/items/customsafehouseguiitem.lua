@@ -258,7 +258,11 @@ function CustomSafehouseGuiButtonItem:init(panel, data, x, priority)
 		blend_mode = "add",
 		layer = 1
 	})
-	self:set_text(managers.localization:text(data.name_id))
+	local text = data.name_id
+	if data.localize == nil or data.localize then
+		text = managers.localization:text(data.name_id)
+	end
+	self:set_text(text)
 	self._select_rect = self._panel:rect({
 		name = "select_rect",
 		blend_mode = "add",
@@ -289,6 +293,7 @@ function CustomSafehouseGuiButtonItem:set_text(text)
 	local prefix = not managers.menu:is_pc_controller() and self._btn_data.btn and managers.localization:get_default_macro(self._btn_data.btn) or ""
 	self._btn_text:set_text(prefix .. utf8.to_upper(text))
 	local _, _, w, h = self._btn_text:text_rect()
+	h = math.max(h, small_font_size)
 	self._panel:set_h(h)
 	self._btn_text:set_h(h)
 end

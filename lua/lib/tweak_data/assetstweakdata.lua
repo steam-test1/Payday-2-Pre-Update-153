@@ -269,7 +269,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"born",
 		"chew",
 		"flat",
-		"help"
+		"help",
+		"moon"
 	}
 	self.grenade_crate.visible_if_locked = true
 	self.grenade_crate.unlock_desc_id = "menu_asset_grenade_crate_desc"
@@ -307,7 +308,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"born",
 		"chew",
 		"flat",
-		"help"
+		"help",
+		"moon"
 	}
 	self.ammo_bag.visible_if_locked = true
 	self.ammo_bag.unlock_desc_id = "menu_asset_ammo_desc"
@@ -342,7 +344,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"born",
 		"chew",
 		"flat",
-		"help"
+		"help",
+		"moon"
 	}
 	self.health_bag.visible_if_locked = true
 	self.health_bag.unlock_desc_id = "menu_asset_health_desc"
@@ -1050,6 +1053,14 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.flat_recon_photos.name_id = "menu_asset_recon_photos"
 	self.flat_recon_photos.texture = "guis/dlcs/help/textures/pd2/mission_briefing/assets/recon_photos"
 	self.flat_recon_photos.stages = {"help"}
+	self.moon_security_camera = {}
+	self.moon_security_camera.name_id = "menu_asset_moon_security_camera"
+	self.moon_security_camera.texture = "guis/dlcs/moon/textures/pd2/mission_briefing/assets/moon_security_camera"
+	self.moon_security_camera.stages = {"moon"}
+	self.moon_mall_pamflet = {}
+	self.moon_mall_pamflet.name_id = "menu_asset_moon_mall_pamflet"
+	self.moon_mall_pamflet.texture = "guis/dlcs/moon/textures/pd2/mission_briefing/assets/moon_mall_pamflet"
+	self.moon_mall_pamflet.stages = {"moon"}
 end
 
 function AssetsTweakData:_init_debug_assets(tweak_data)

@@ -1567,6 +1567,16 @@ MenuNodeMainGui = MenuNodeMainGui or class(MenuNodeGui)
 
 function MenuNodeMainGui:_setup_item_rows(node)
 	MenuNodeMainGui.super._setup_item_rows(self, node)
+	self:_add_version_string()
+	managers.features:announce_feature("short_heists_available")
+end
+
+function MenuNodeMainGui:set_visible(visible)
+	MenuNodeMainGui.super.set_visible(self, visible)
+	self:_add_version_string()
+end
+
+function MenuNodeMainGui:_add_version_string()
 	if alive(self._version_string) then
 		self._version_string:parent():remove(self._version_string)
 		self._version_string = nil
@@ -1583,5 +1593,4 @@ function MenuNodeMainGui:_setup_item_rows(node)
 			alpha = 0.5
 		})
 	end
-	managers.features:announce_feature("short_heists_available")
 end

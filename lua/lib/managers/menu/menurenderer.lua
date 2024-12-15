@@ -110,13 +110,19 @@ end
 function MenuRenderer:close(...)
 	MenuRenderer.super.close(self, ...)
 	managers.menu_component:close_newsfeed_gui()
+	if alive(self._blackborder_workspace) then
+		Overlay:gui():destroy_workspace(self._blackborder_workspace)
+		self._blackborder_workspace = nil
+	end
 end
 
 function MenuRenderer:_layout_menu_bg()
 	local res = RenderSettings.resolution
 	local safe_rect_pixels = managers.gui_data:scaled_size()
 	self:set_stencil_align(self._menu_stencil_align, self._menu_stencil_align_percent)
-	self:_create_blackborders()
+	if not self._disable_blackborder then
+		self:_create_blackborders()
+	end
 end
 
 function MenuRenderer:_create_blackborders()

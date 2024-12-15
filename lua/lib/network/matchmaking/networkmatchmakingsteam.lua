@@ -1,6 +1,6 @@
 NetworkMatchMakingSTEAM = NetworkMatchMakingSTEAM or class()
 NetworkMatchMakingSTEAM.OPEN_SLOTS = 4
-NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.57.96"
+NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.58.0"
 
 function NetworkMatchMakingSTEAM:init()
 	cat_print("lobby", "matchmake = NetworkMatchMakingSTEAM")
@@ -285,7 +285,7 @@ function NetworkMatchMakingSTEAM:set_difficulty_filter(filter)
 	self._difficulty_filter = filter
 end
 
-function NetworkMatchMakingSTEAM:search_lobby(friends_only)
+function NetworkMatchMakingSTEAM:search_lobby(friends_only, no_filters)
 	self._search_friends_only = friends_only
 	if not self:_has_callback("search_lobby") then
 		return
@@ -351,9 +351,12 @@ function NetworkMatchMakingSTEAM:search_lobby(friends_only)
 			self.browser:set_lobby_filter("job_class_min", min_ply_jc, "equalto_or_greater_than")
 			self.browser:set_lobby_filter("job_class_max", max_ply_jc, "equalto_less_than")
 		end
-		for key, data in pairs(self._lobby_filters) do
-			if data.value and data.value ~= -1 then
-				self.browser:set_lobby_filter(data.key, data.value, data.comparision_type)
+		if not no_filters then
+			for key, data in pairs(self._lobby_filters) do
+				if data.value and data.value ~= -1 then
+					self.browser:set_lobby_filter(data.key, data.value, data.comparision_type)
+					print(data.key, data.value, data.comparision_type)
+				end
 			end
 		end
 		self.browser:set_max_lobby_return_count(self._lobby_return_count)

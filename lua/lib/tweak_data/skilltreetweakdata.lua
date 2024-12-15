@@ -1711,7 +1711,8 @@ function SkillTreeTweakData:init()
 			upgrades = {
 				"player_marked_inc_dmg_distance_1",
 				"weapon_steelsight_highlight_specials",
-				"player_mark_enemy_time_multiplier"
+				"player_mark_enemy_time_multiplier",
+				"player_marked_distance_mul"
 			},
 			cost = self.costs.hightierpro
 		}
@@ -2521,8 +2522,6 @@ function SkillTreeTweakData:init()
 		"player_silent_kill",
 		"player_primary_weapon_when_downed",
 		"player_intimidate_enemies",
-		"player_stamina_multiplier",
-		"team_stamina_multiplier",
 		"player_special_enemy_highlight",
 		"player_hostage_trade",
 		"player_sec_camera_highlight",

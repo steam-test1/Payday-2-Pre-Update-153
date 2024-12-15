@@ -9,8 +9,18 @@ function AmmoClip:init(unit)
 	AmmoClip.super.init(self, unit)
 	self._ammo_type = ""
 	self._ammo_box = self._unit:name() == Idstring("units/pickups/ammo/ammo_pickup")
-	if self._ammo_box and managers.user:get_setting("ammo_contour") and self._unit:contour() then
-		self._unit:contour():add("deployable_selected")
+	if self._ammo_box then
+		self:reload_contour()
+	end
+end
+
+function AmmoClip:reload_contour()
+	if self._ammo_box and self._unit:contour() then
+		if managers.user:get_setting("ammo_contour") then
+			self._unit:contour():add("deployable_selected")
+		else
+			self._unit:contour():remove("deployable_selected")
+		end
 	end
 end
 

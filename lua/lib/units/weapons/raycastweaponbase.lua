@@ -172,6 +172,11 @@ function RaycastWeaponBase:setup(setup_data, damage_multiplier)
 	end
 end
 
+function RaycastWeaponBase:ammo_base()
+	local base = self.parent_weapon and self.parent_weapon:base() or self
+	return base
+end
+
 function RaycastWeaponBase:fire_mode()
 	if not self._fire_mode then
 		self._fire_mode = tweak_data.weapon[self._name_id].FIRE_MODE or "single"
@@ -211,13 +216,17 @@ function RaycastWeaponBase:stop_shooting()
 	self._kills_without_releasing_trigger = nil
 end
 
+function RaycastWeaponBase:update_next_shooting_time()
+	local next_fire = (tweak_data.weapon[self._name_id].fire_mode_data and tweak_data.weapon[self._name_id].fire_mode_data.fire_rate or 0) / self:fire_rate_multiplier()
+	self._next_fire_allowed = self._next_fire_allowed + next_fire
+end
+
 function RaycastWeaponBase:trigger_pressed(...)
 	local fired
 	if self:start_shooting_allowed() then
 		fired = self:fire(...)
 		if fired then
-			local next_fire = (tweak_data.weapon[self._name_id].fire_mode_data and tweak_data.weapon[self._name_id].fire_mode_data.fire_rate or 0) / self:fire_rate_multiplier()
-			self._next_fire_allowed = self._next_fire_allowed + next_fire
+			self:update_next_shooting_time()
 		end
 	end
 	return fired
@@ -233,10 +242,10 @@ end
 
 function RaycastWeaponBase:trigger_held(...)
 	local fired
-	if self._next_fire_allowed <= self._unit:timer():time() then
+	if self:start_shooting_allowed() then
 		fired = self:fire(...)
 		if fired then
-			self._next_fire_allowed = self._next_fire_allowed + (tweak_data.weapon[self._name_id].fire_mode_data and tweak_data.weapon[self._name_id].fire_mode_data.fire_rate or 0) / self:fire_rate_multiplier()
+			self:update_next_shooting_time()
 		end
 	end
 	return fired
@@ -252,7 +261,7 @@ function RaycastWeaponBase:fire(from_pos, direction, dmg_mul, shoot_player, spre
 	local is_player = self._setup.user_unit == managers.player:player_unit()
 	local consume_ammo = not managers.player:has_active_temporary_property("bullet_storm") and (not managers.player:has_activate_temporary_upgrade("temporary", "berserker_damage_multiplier") or not managers.player:has_category_upgrade("player", "berserker_no_ammo_cost")) or not is_player
 	if consume_ammo then
-		local base = self.parent_weapon and self.parent_weapon:base() or self
+		local base = self:ammo_base()
 		if base:get_ammo_remaining_in_clip() == 0 then
 			return
 		end
@@ -281,9 +290,7 @@ function RaycastWeaponBase:fire(from_pos, direction, dmg_mul, shoot_player, spre
 	if alive(self._obj_fire) then
 		self:_spawn_muzzle_effect(from_pos, direction)
 	end
-	if self._use_shell_ejection_effect then
-		World:effect_manager():spawn(self._shell_ejection_effect_table)
-	end
+	self:_spawn_shell_eject_effect()
 	local ray_res = self:_fire_raycast(user_unit, from_pos, direction, dmg_mul, shoot_player, spread_mul, autohit_mul, suppr_mul, target_unit)
 	if self._alert_events and ray_res.rays then
 		self:_check_alert(ray_res.rays, from_pos, direction, user_unit)
@@ -300,6 +307,12 @@ end
 
 function RaycastWeaponBase:_spawn_muzzle_effect()
 	World:effect_manager():spawn(self._muzzle_effect_table)
+end
+
+function RaycastWeaponBase:_spawn_shell_eject_effect()
+	if self._use_shell_ejection_effect then
+		World:effect_manager():spawn(self._shell_ejection_effect_table)
+	end
 end
 
 function RaycastWeaponBase:_check_ammo_total(unit)
@@ -744,10 +757,15 @@ function RaycastWeaponBase:force_hit(from_pos, direction, user_unit, impact_pos,
 	self._bullet_class:on_collision(col_ray, self._unit, user_unit, self._damage)
 end
 
-function RaycastWeaponBase:tweak_data_anim_play(anim, ...)
+function RaycastWeaponBase:_get_tweak_data_weapon_animation(anim)
 	local animations = self:weapon_tweak_data().animations
-	if animations and animations[anim] then
-		self:anim_play(animations[anim], ...)
+	return animations and animations[anim]
+end
+
+function RaycastWeaponBase:tweak_data_anim_play(anim, ...)
+	local animation = self:_get_tweak_data_weapon_animation(anim)
+	if animation then
+		self:anim_play(animation, ...)
 		return true
 	end
 	return false
@@ -763,9 +781,9 @@ function RaycastWeaponBase:anim_play(anim, speed_multiplier)
 end
 
 function RaycastWeaponBase:tweak_data_anim_stop(anim, ...)
-	local animations = self:weapon_tweak_data().animations
-	if animations and animations[anim] then
-		self:anim_stop(self:weapon_tweak_data().animations[anim], ...)
+	local animation = self:_get_tweak_data_weapon_animation(anim)
+	if animation then
+		self:anim_stop(animation, ...)
 		return true
 	end
 	return false
@@ -1058,37 +1076,37 @@ function RaycastWeaponBase:melee_damage_info()
 end
 
 function RaycastWeaponBase:ammo_info()
-	return self:get_ammo_max_per_clip(), self:get_ammo_remaining_in_clip(), self:get_ammo_total(), self:get_ammo_max()
+	return self:ammo_base():get_ammo_max_per_clip(), self:ammo_base():get_ammo_remaining_in_clip(), self:ammo_base():get_ammo_total(), self:ammo_base():get_ammo_max()
 end
 
 function RaycastWeaponBase:set_ammo(ammo)
-	local ammo_num = math.floor(ammo * self:get_ammo_max())
-	self:set_ammo_total(ammo_num)
-	self:set_ammo_remaining_in_clip(math.min(self:get_ammo_max_per_clip(), ammo_num))
+	local ammo_num = math.floor(ammo * self:ammo_base():get_ammo_max())
+	self:ammo_base():set_ammo_total(ammo_num)
+	self:ammo_base():set_ammo_remaining_in_clip(math.min(self:ammo_base():get_ammo_max_per_clip(), ammo_num))
 end
 
 function RaycastWeaponBase:ammo_full()
-	return self:get_ammo_total() == self:get_ammo_max()
+	return self:ammo_base():get_ammo_total() == self:ammo_base():get_ammo_max()
 end
 
 function RaycastWeaponBase:clip_full()
-	return self:get_ammo_remaining_in_clip() == self:get_ammo_max_per_clip()
+	return self:ammo_base():get_ammo_remaining_in_clip() == self:ammo_base():get_ammo_max_per_clip()
 end
 
 function RaycastWeaponBase:clip_ratio()
-	return self:get_ammo_max_per_clip() / self:get_ammo_remaining_in_clip()
+	return self:ammo_base():get_ammo_max_per_clip() / self:ammo_base():get_ammo_remaining_in_clip()
 end
 
 function RaycastWeaponBase:clip_empty()
-	return self:get_ammo_remaining_in_clip() == 0
+	return self:ammo_base():get_ammo_remaining_in_clip() == 0
 end
 
 function RaycastWeaponBase:clip_not_empty()
-	return self:get_ammo_remaining_in_clip() > 0
+	return self:ammo_base():get_ammo_remaining_in_clip() > 0
 end
 
 function RaycastWeaponBase:remaining_full_clips()
-	return math.max(math.floor((self:get_ammo_total() - self:get_ammo_remaining_in_clip()) / self:get_ammo_max_per_clip()), 0)
+	return math.max(math.floor((self:ammo_base():get_ammo_total() - self:ammo_base():get_ammo_remaining_in_clip()) / self:ammo_base():get_ammo_max_per_clip()), 0)
 end
 
 function RaycastWeaponBase:zoom()
@@ -1111,6 +1129,7 @@ function RaycastWeaponBase:update_reloading(t, dt, time_left)
 end
 
 function RaycastWeaponBase:start_reload()
+	self._reload_ammo_base = self:ammo_base()
 end
 
 function RaycastWeaponBase:reload_interuptable()
@@ -1118,85 +1137,104 @@ function RaycastWeaponBase:reload_interuptable()
 end
 
 function RaycastWeaponBase:on_reload()
+	local ammo_base = self._reload_ammo_base or self:ammo_base()
 	if self._setup.expend_ammo then
-		self:set_ammo_remaining_in_clip(math.min(self:get_ammo_total(), self:get_ammo_max_per_clip()))
+		ammo_base:set_ammo_remaining_in_clip(math.min(ammo_base:get_ammo_total(), ammo_base:get_ammo_max_per_clip()))
 	else
-		self:set_ammo_remaining_in_clip(self:get_ammo_max_per_clip())
-		self:set_ammo_total(self:get_ammo_max_per_clip())
+		ammo_base:set_ammo_remaining_in_clip(ammo_base:get_ammo_max_per_clip())
+		ammo_base:set_ammo_total(ammo_base:get_ammo_max_per_clip())
 	end
 	managers.job:set_memory("kill_count_no_reload_" .. tostring(self._name_id), nil, true)
+	self._reload_ammo_base = nil
 end
 
 function RaycastWeaponBase:ammo_max()
-	return self:get_ammo_max() == self:get_ammo_total()
+	return self:ammo_base():get_ammo_max() == self:ammo_base():get_ammo_total()
 end
 
 function RaycastWeaponBase:out_of_ammo()
-	return self:get_ammo_total() == 0
+	return self:ammo_base():get_ammo_total() == 0
+end
+
+function RaycastWeaponBase:reload_prefix()
+	return ""
 end
 
 function RaycastWeaponBase:can_reload()
-	return self:get_ammo_total() > self:get_ammo_remaining_in_clip()
+	return self:ammo_base():get_ammo_total() > self:ammo_base():get_ammo_remaining_in_clip()
 end
 
 function RaycastWeaponBase:add_ammo_in_bullets(bullets)
-	local ammo_max = self:get_ammo_max()
-	local ammo_total = self:get_ammo_total()
+	local ammo_max = self:ammo_base():get_ammo_max()
+	local ammo_total = self:ammo_base():get_ammo_total()
 	local ammo = math.clamp(ammo_total + bullets, 0, ammo_max)
-	self:set_ammo_total(ammo)
+	self:ammo_base():set_ammo_total(ammo)
 end
 
 function RaycastWeaponBase:add_ammo(ratio, add_amount_override)
-	if self:ammo_max() then
-		return false, 0
+	local _add_ammo = function(ammo_base, ratio, add_amount_override)
+		if ammo_base:get_ammo_max() == ammo_base:get_ammo_total() then
+			return false, 0
+		end
+		local multiplier_min = 1
+		local multiplier_max = 1
+		if ammo_base._ammo_data and ammo_base._ammo_data.ammo_pickup_min_mul then
+			multiplier_min = ammo_base._ammo_data.ammo_pickup_min_mul
+		else
+			multiplier_min = managers.player:upgrade_value("player", "pick_up_ammo_multiplier", 1)
+			multiplier_min = multiplier_min + (managers.player:upgrade_value("player", "pick_up_ammo_multiplier_2", 1) - 1)
+		end
+		if ammo_base._ammo_data and ammo_base._ammo_data.ammo_pickup_max_mul then
+			multiplier_max = ammo_base._ammo_data.ammo_pickup_max_mul
+		else
+			multiplier_max = managers.player:upgrade_value("player", "pick_up_ammo_multiplier", 1)
+			multiplier_max = multiplier_max + (managers.player:upgrade_value("player", "pick_up_ammo_multiplier_2", 1) - 1)
+		end
+		local add_amount = add_amount_override
+		local picked_up = true
+		if not add_amount then
+			local rng_ammo = math.lerp(ammo_base._ammo_pickup[1] * multiplier_min, ammo_base._ammo_pickup[2] * multiplier_max, math.random())
+			picked_up = 0 < rng_ammo
+			add_amount = math.max(0, math.round(rng_ammo))
+		end
+		add_amount = math.floor(add_amount * (ratio or 1))
+		ammo_base:set_ammo_total(math.clamp(ammo_base:get_ammo_total() + add_amount, 0, ammo_base:get_ammo_max()))
+		return picked_up, add_amount
 	end
-	local multiplier_min = 1
-	local multiplier_max = 1
-	if self._ammo_data and self._ammo_data.ammo_pickup_min_mul then
-		multiplier_min = self._ammo_data.ammo_pickup_min_mul
-	else
-		multiplier_min = managers.player:upgrade_value("player", "pick_up_ammo_multiplier", 1)
-		multiplier_min = multiplier_min + (managers.player:upgrade_value("player", "pick_up_ammo_multiplier_2", 1) - 1)
-	end
-	if self._ammo_data and self._ammo_data.ammo_pickup_max_mul then
-		multiplier_max = self._ammo_data.ammo_pickup_max_mul
-	else
-		multiplier_max = managers.player:upgrade_value("player", "pick_up_ammo_multiplier", 1)
-		multiplier_max = multiplier_max + (managers.player:upgrade_value("player", "pick_up_ammo_multiplier_2", 1) - 1)
-	end
-	local add_amount = add_amount_override
-	local picked_up = true
-	if not add_amount then
-		local rng_ammo = math.lerp(self._ammo_pickup[1] * multiplier_min, self._ammo_pickup[2] * multiplier_max, math.random())
-		picked_up = 0 < rng_ammo
-		add_amount = math.max(0, math.round(rng_ammo))
-	end
-	add_amount = math.floor(add_amount * (ratio or 1))
-	self:set_ammo_total(math.clamp(self:get_ammo_total() + add_amount, 0, self:get_ammo_max()))
+	local picked_up, add_amount
+	picked_up, add_amount = _add_ammo(self, ratio, add_amount_override)
 	return picked_up, add_amount
 end
 
 function RaycastWeaponBase:add_ammo_ratio(ammo_ratio_increase)
-	if self:ammo_max() then
-		return
+	local _add_ammo = function(ammo_base, ammo_ratio_increase)
+		if ammo_base:get_ammo_max() == ammo_base:get_ammo_total() then
+			return
+		end
+		local ammo_max = ammo_base:get_ammo_max()
+		local ammo_total = ammo_base:get_ammo_total()
+		ammo_total = math.ceil(ammo_total * ammo_ratio_increase)
+		ammo_total = math.clamp(ammo_total, 0, ammo_max)
+		ammo_base:set_ammo_total(ammo_total)
 	end
-	local ammo_max = self:get_ammo_max()
-	local ammo_total = self:get_ammo_total()
-	ammo_total = math.ceil(ammo_total * ammo_ratio_increase)
-	ammo_total = math.clamp(ammo_total, 0, ammo_max)
-	self:set_ammo_total(ammo_total)
+	_add_ammo(self, ammo_ratio_increase)
 end
 
 function RaycastWeaponBase:add_ammo_from_bag(available)
-	if self:ammo_max() then
-		return 0
+	local process_ammo = function(ammo_base, amount_available)
+		if ammo_base:get_ammo_max() == ammo_base:get_ammo_total() then
+			return 0
+		end
+		local ammo_max = ammo_base:get_ammo_max()
+		local ammo_total = ammo_base:get_ammo_total()
+		local wanted = 1 - ammo_total / ammo_max
+		local can_have = math.min(wanted, amount_available)
+		ammo_base:set_ammo_total(math.min(ammo_max, ammo_total + math.ceil(can_have * ammo_max)))
+		print(wanted, can_have, math.ceil(can_have * ammo_max), ammo_base:get_ammo_total())
+		return can_have
 	end
-	local ammo_max = self:get_ammo_max()
-	local ammo_total = self:get_ammo_total()
-	local wanted = 1 - ammo_total / ammo_max
-	local can_have = math.min(wanted, available)
-	self:set_ammo_total(math.min(ammo_max, ammo_total + math.ceil(can_have * ammo_max)))
-	print(wanted, can_have, math.ceil(can_have * ammo_max), self:get_ammo_total())
+	local can_have = process_ammo(self, available)
+	available = available - can_have
 	return can_have
 end
 
@@ -1236,12 +1274,7 @@ function RaycastWeaponBase:enabled()
 end
 
 function RaycastWeaponBase:play_tweak_data_sound(event, alternative_event)
-	local str_name = self._name_id
-	if not self.third_person_important or not self:third_person_important() then
-		str_name = self._name_id:gsub("_npc", "")
-	end
-	local sounds = tweak_data.weapon[str_name].sounds
-	local event = sounds and (sounds[event] or sounds[alternative_event])
+	local event = self:_get_sound_event(event, alternative_event)
 	if event then
 		self:play_sound(event)
 	end
@@ -1249,6 +1282,16 @@ end
 
 function RaycastWeaponBase:play_sound(event)
 	self._sound_fire:post_event(event)
+end
+
+function RaycastWeaponBase:_get_sound_event(event, alternative_event)
+	local str_name = self._name_id
+	if not self.third_person_important or not self:third_person_important() then
+		str_name = self._name_id:gsub("_npc", "")
+	end
+	local sounds = tweak_data.weapon[str_name].sounds
+	local event = sounds and (sounds[event] or sounds[alternative_event])
+	return event
 end
 
 function RaycastWeaponBase:destroy(unit)

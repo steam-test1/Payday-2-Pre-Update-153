@@ -250,11 +250,6 @@ function NewShotgunBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, s
 			skip_bullet_count = true
 		})
 	end
-	print("total amount of kills:    ", kill_data.kills)
-	print("total amount of headshots:", kill_data.headshots)
-	print("amount of civ kills:      ", kill_data.civilian_kills)
-	print("amount of enemy kills:    ", kill_data.kills - kill_data.civilian_kills)
-	print("amount of enemy headshots:", kill_data.headshots - kill_data.civilian_kills)
 	for key, data in pairs(tweak_data.achievement.shotgun_single_shot_kills) do
 		if data.headshot and kill_data.headshots - kill_data.civilian_kills >= data.count or kill_data.kills - kill_data.civilian_kills >= data.count then
 			local should_award = true

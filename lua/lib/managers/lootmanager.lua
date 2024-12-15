@@ -136,17 +136,31 @@ function LootManager:_check_secured(achievement, secured_data)
 	local total_amount = 0
 	local value = 0
 	for _, data in ipairs(self._global.secured) do
-		if data.carry_id == secured_data.carry_id then
+		local found = false
+		local carry_id
+		if type(data.carry_id) == "table" then
+			for _, id in ipairs(data.carry_id) do
+				if id == secured_data.carry_id then
+					found = true
+					carry_id = id
+					break
+				end
+			end
+		elseif data.carry_id == secured_data.carry_id then
+			found = true
+			carry_id = data.carry_id
+		end
+		if found then
 			if not data[achievement] then
 				amount = amount + 1
 				data[achievement] = true
 			end
 			total_amount = total_amount + 1
-			local is_small_loot = not not tweak_data.carry.small_loot[data.carry_id]
+			local is_small_loot = not not tweak_data.carry.small_loot[carry_id]
 			if is_small_loot then
-				value = value + self:get_real_value(data.carry_id, data.multiplier)
+				value = value + self:get_real_value(carry_id, data.multiplier)
 			else
-				value = value + managers.money:get_secured_bonus_bag_value(data.carry_id, data.multiplier)
+				value = value + managers.money:get_secured_bonus_bag_value(carry_id, data.multiplier)
 			end
 		end
 	end

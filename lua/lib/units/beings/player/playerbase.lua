@@ -81,168 +81,18 @@ function PlayerBase:_chk_set_unit_upgrades()
 	managers.environment_controller:set_flashbang_multiplier(managers.player:upgrade_value("player", "flashbang_multiplier"))
 	local is_client = Network:is_client()
 	if is_client then
-		if managers.player:has_category_upgrade("player", "suspicion_multiplier") then
-			local level = managers.player:upgrade_level("player", "suspicion_multiplier")
-			managers.network:session():send_to_host("sync_upgrade", "player", "suspicion_multiplier", level)
-		end
-		if managers.player:has_category_upgrade("player", "passive_concealment_modifier") then
-			local level = managers.player:upgrade_level("player", "passive_concealment_modifier")
-			managers.network:session():send_to_host("sync_upgrade", "player", "passive_concealment_modifier", level)
-		end
-		if managers.player:has_category_upgrade("player", "silent_kill") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "silent_kill", 1)
-		end
-		if managers.player:has_category_upgrade("player", "crouch_speed_multiplier") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "crouch_speed_multiplier", 1)
-		end
-		if managers.player:has_category_upgrade("player", "run_speed_multiplier") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "run_speed_multiplier", 1)
-		end
-		if managers.player:has_category_upgrade("player", "silent_drill") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "silent_drill", 1)
-		end
-		if managers.player:has_category_upgrade("player", "drill_alert_rad") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "drill_alert_rad", 1)
-		end
-		if managers.player:has_category_upgrade("player", "drill_autorepair_1") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "drill_autorepair_1", 1)
-		end
-		if managers.player:has_category_upgrade("player", "drill_autorepair_2") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "drill_autorepair_2", 1)
-		end
-		if managers.player:has_category_upgrade("player", "intimidate_enemies") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "intimidate_enemies", 1)
-		end
-		if managers.player:has_category_upgrade("player", "intimidate_specials") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "intimidate_specials", 1)
-		end
-		if managers.player:has_category_upgrade("player", "empowered_intimidation_mul") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "empowered_intimidation_mul", 1)
-		end
-		if managers.player:has_category_upgrade("player", "intimidation_multiplier") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "intimidation_multiplier", 1)
-		end
-		if managers.player:has_category_upgrade("player", "intimidate_aura") then
-			local level = managers.player:upgrade_level("player", "intimidate_aura")
-			managers.network:session():send_to_host("sync_upgrade", "player", "intimidate_aura", level)
-		end
-		if managers.player:has_category_upgrade("player", "uncover_progress_mul") then
-			local level = managers.player:upgrade_level("player", "uncover_progress_mul")
-			managers.network:session():send_to_host("sync_upgrade", "player", "uncover_progress_mul", level)
-		end
-		if managers.player:has_category_upgrade("player", "uncover_progress_decay_mul") then
-			local level = managers.player:upgrade_level("player", "uncover_progress_decay_mul")
-			managers.network:session():send_to_host("sync_upgrade", "player", "uncover_progress_decay_mul", level)
-		end
-		if managers.player:has_category_upgrade("player", "civilian_gives_ammo") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "civilian_gives_ammo", 1)
-		end
-		if managers.player:has_category_upgrade("player", "drill_speed_multiplier") then
-			local level = managers.player:upgrade_level("player", "drill_speed_multiplier")
-			managers.network:session():send_to_host("sync_upgrade", "player", "drill_speed_multiplier", level)
-		end
-		if managers.player:has_category_upgrade("player", "saw_speed_multiplier") then
-			local level = managers.player:upgrade_level("player", "saw_speed_multiplier")
-			managers.network:session():send_to_host("sync_upgrade", "player", "saw_speed_multiplier", level)
-		end
-		if managers.player:has_category_upgrade("player", "camouflage_bonus") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "camouflage_bonus", 1)
-		end
-		if managers.player:has_category_upgrade("player", "camouflage_multiplier") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "camouflage_multiplier", 1)
-		end
-		if managers.player:has_category_upgrade("player", "uncover_multiplier") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "uncover_multiplier", 1)
-		end
-		if managers.player:has_category_upgrade("player", "stand_still_crouch_camouflage_bonus") then
-			local level = managers.player:upgrade_level("player", "stand_still_crouch_camouflage_bonus")
-			managers.network:session():send_to_host("sync_upgrade", "player", "stand_still_crouch_camouflage_bonus", level)
-		end
-		if managers.player:has_category_upgrade("sentry_gun", "spread_multiplier") then
-			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "spread_multiplier", 1)
-		end
-		if managers.player:has_category_upgrade("sentry_gun", "rot_speed_multiplier") then
-			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "rot_speed_multiplier", 1)
-		end
-		if managers.player:has_category_upgrade("sentry_gun", "shield") then
-			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "shield", 1)
-		end
-		if managers.player:has_category_upgrade("sentry_gun", "extra_ammo_multiplier") then
-			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "extra_ammo_multiplier", 1)
-		end
-		if managers.player:has_category_upgrade("sentry_gun", "armor_multiplier") then
-			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "armor_multiplier", 1)
-		end
-		if managers.player:has_category_upgrade("sentry_gun", "armor_multiplier2") then
-			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "armor_multiplier2", 1)
-		end
-		if managers.player:has_category_upgrade("sentry_gun", "damage_multiplier") then
-			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "damage_multiplier", 1)
-		end
-		if managers.player:has_category_upgrade("sentry_gun", "ap_bullets") then
-			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "ap_bullets", 1)
-		end
-		if managers.player:has_category_upgrade("sentry_gun", "fire_rate_reduction") then
-			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "fire_rate_reduction", 1)
-		end
-		if managers.player:has_category_upgrade("ecm_jammer", "affects_cameras") then
-			managers.network:session():send_to_host("sync_upgrade", "ecm_jammer", "affects_cameras", 1)
-		end
-		if managers.player:has_category_upgrade("ecm_jammer", "affects_pagers") then
-			managers.network:session():send_to_host("sync_upgrade", "ecm_jammer", "affects_pagers", 1)
-		end
-		if managers.player:has_category_upgrade("ecm_jammer", "feedback_duration_boost") then
-			managers.network:session():send_to_host("sync_upgrade", "ecm_jammer", "feedback_duration_boost", 1)
-		end
-		if managers.player:has_category_upgrade("ecm_jammer", "feedback_duration_boost_2") then
-			managers.network:session():send_to_host("sync_upgrade", "ecm_jammer", "feedback_duration_boost_2", 1)
-		end
-		if managers.player:has_category_upgrade("player", "convert_enemies_health_multiplier") then
-			local level = managers.player:upgrade_level("player", "convert_enemies_health_multiplier")
-			managers.network:session():send_to_host("sync_upgrade", "player", "convert_enemies_health_multiplier", level)
-		end
-		if managers.player:has_category_upgrade("player", "passive_convert_enemies_health_multiplier") then
-			local level = managers.player:upgrade_level("player", "passive_convert_enemies_health_multiplier")
-			managers.network:session():send_to_host("sync_upgrade", "player", "passive_convert_enemies_health_multiplier", level)
-		end
-		if managers.player:has_category_upgrade("player", "convert_enemies_damage_multiplier") then
-			local level = managers.player:upgrade_level("player", "convert_enemies_damage_multiplier")
-			managers.network:session():send_to_host("sync_upgrade", "player", "convert_enemies_damage_multiplier", level)
-		end
-		if managers.player:has_category_upgrade("player", "passive_convert_enemies_damage_multiplier") then
-			local level = managers.player:upgrade_level("player", "passive_convert_enemies_damage_multiplier")
-			managers.network:session():send_to_host("sync_upgrade", "player", "passive_convert_enemies_damage_multiplier", level)
-		end
-		if managers.player:has_category_upgrade("player", "corpse_alarm_pager_bluff") then
-			local level = managers.player:upgrade_level("player", "corpse_alarm_pager_bluff")
-			managers.network:session():send_to_host("sync_upgrade", "player", "corpse_alarm_pager_bluff", level)
-		end
-		if managers.player:has_category_upgrade("player", "civ_harmless_bullets") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "civ_harmless_bullets", 1)
-		end
-		if managers.player:has_category_upgrade("player", "civ_harmless_melee") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "civ_harmless_melee", 1)
-		end
-		if managers.player:has_category_upgrade("player", "civ_calming_alerts") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "civ_calming_alerts", 1)
-		end
-		if managers.player:has_category_upgrade("player", "convert_enemies_max_minions") then
-			local level = managers.player:upgrade_level("player", "convert_enemies_max_minions")
-			managers.network:session():send_to_host("sync_upgrade", "player", "convert_enemies_max_minions", level)
-		end
-		if managers.player:has_category_upgrade("player", "ene_hostage_lim_1") then
-			managers.network:session():send_to_host("sync_upgrade", "player", "ene_hostage_lim_1", 1)
-		end
-		if managers.player:has_category_upgrade("sentry_gun", "armor_piercing_chance") then
-			local level = managers.player:upgrade_level("sentry_gun", "armor_piercing_chance")
-			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "armor_piercing_chance", level)
-		end
-		if managers.player:has_category_upgrade("sentry_gun", "armor_piercing_chance_2") then
-			local level = managers.player:upgrade_level("sentry_gun", "armor_piercing_chance_2")
-			managers.network:session():send_to_host("sync_upgrade", "sentry_gun", "armor_piercing_chance_2", level)
-		end
-		if managers.player:has_category_upgrade("ecm_jammer", "can_retrigger") then
-			managers.network:session():send_to_host("sync_upgrade", "ecm_jammer", "can_retrigger", 1)
+		local pm = managers.player
+		local net_sesh = managers.network:session()
+		for category, upgrades in pairs(pm._global.upgrades) do
+			for upgrade, level in pairs(upgrades) do
+				if pm:is_upgrade_synced(category, upgrade) then
+					if category == "temporary" then
+						net_sesh:send_to_host("sync_temporary_upgrade_owned", category, upgrade, level, pm:temporary_upgrade_index(category, upgrade))
+					else
+						net_sesh:send_to_host("sync_upgrade", category, upgrade, level)
+					end
+				end
+			end
 		end
 	end
 end

@@ -377,6 +377,9 @@ function CopDamage:damage_bullet(attack_data)
 	local damage_percent = math.ceil(math.clamp(damage / self._HEALTH_INIT_PRECENT, 1, self._HEALTH_GRANULARITY))
 	damage = damage_percent * self._HEALTH_INIT_PRECENT
 	damage, damage_percent = self:_apply_min_health_limit(damage, damage_percent)
+	if self._immortal then
+		damage = math.min(damage, self._health - 1)
+	end
 	if damage >= self._health then
 		local medic = managers.enemy:get_nearby_medic(self._unit)
 		if medic and medic:character_damage():heal_unit(self._unit) then
@@ -707,6 +710,9 @@ function CopDamage:damage_fire(attack_data)
 	local damage_percent = math.ceil(damage / self._HEALTH_INIT_PRECENT)
 	damage = damage_percent * self._HEALTH_INIT_PRECENT
 	damage, damage_percent = self:_apply_min_health_limit(damage, damage_percent)
+	if self._immortal then
+		damage = math.min(damage, self._health - 1)
+	end
 	if damage >= self._health then
 		local medic = managers.enemy:get_nearby_medic(self._unit)
 		if medic and medic:character_damage():heal_unit(self._unit) then
@@ -852,6 +858,9 @@ function CopDamage:damage_dot(attack_data)
 	local damage_percent = math.ceil(damage / self._HEALTH_INIT_PRECENT)
 	damage = damage_percent * self._HEALTH_INIT_PRECENT
 	damage, damage_percent = self:_apply_min_health_limit(damage, damage_percent)
+	if self._immortal then
+		damage = math.min(damage, self._health - 1)
+	end
 	if damage >= self._health then
 		local medic = managers.enemy:get_nearby_medic(self._unit)
 		if medic and medic:character_damage():heal_unit(self._unit) then
@@ -945,6 +954,9 @@ function CopDamage:damage_explosion(attack_data)
 	local damage_percent = math.ceil(damage / self._HEALTH_INIT_PRECENT)
 	damage = damage_percent * self._HEALTH_INIT_PRECENT
 	damage, damage_percent = self:_apply_min_health_limit(damage, damage_percent)
+	if self._immortal then
+		damage = math.min(damage, self._health - 1)
+	end
 	if damage >= self._health then
 		local medic = managers.enemy:get_nearby_medic(self._unit)
 		if medic and medic:character_damage():heal_unit(self._unit) then
@@ -1241,6 +1253,9 @@ function CopDamage:damage_melee(attack_data)
 	local damage_percent = math.ceil(damage / self._HEALTH_INIT_PRECENT)
 	damage = damage_percent * self._HEALTH_INIT_PRECENT
 	damage, damage_percent = self:_apply_min_health_limit(damage, damage_percent)
+	if self._immortal then
+		damage = math.min(damage, self._health - 1)
+	end
 	if damage >= self._health then
 		local medic = managers.enemy:get_nearby_medic(self._unit)
 		if medic and medic:character_damage():heal_unit(self._unit) then
@@ -1390,7 +1405,7 @@ function CopDamage:damage_melee(attack_data)
 end
 
 function CopDamage:damage_mission(attack_data)
-	if self._dead or self._invulnerable and not attack_data.forced then
+	if self._dead or (self._invulnerable or self._immortal) and not attack_data.forced then
 		return
 	end
 	local result
@@ -1537,6 +1552,9 @@ function CopDamage:_remove_debug_gui()
 end
 
 function CopDamage:die(attack_data)
+	if self._immortal then
+		debug_pause("Immortal character died!")
+	end
 	local variant = attack_data.variant
 	CopDamage.MAD_3_ACHIEVEMENT(attack_data)
 	self:_remove_debug_gui()
@@ -2224,6 +2242,10 @@ function CopDamage:set_invulnerable(state)
 			self._invulnerable = self._invulnerable - 1
 		end
 	end
+end
+
+function CopDamage:set_immortal(immortal)
+	self._immortal = immortal
 end
 
 function CopDamage:build_suppression(amount, panic_chance)
