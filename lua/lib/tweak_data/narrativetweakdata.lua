@@ -3754,22 +3754,22 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.jobs.mad.contract_visuals = {}
 	self.jobs.mad.contract_visuals.min_mission_xp = {
-		36000,
-		36000,
-		36000,
-		36000,
-		36000,
-		36000,
-		36000
+		31000,
+		31000,
+		31000,
+		31000,
+		31000,
+		31000,
+		31000
 	}
 	self.jobs.mad.contract_visuals.max_mission_xp = {
-		66000,
-		66000,
-		66000,
-		66000,
-		66000,
-		66000,
-		66000
+		46000,
+		46000,
+		46000,
+		46000,
+		46000,
+		46000,
+		46000
 	}
 	self.jobs.born = {}
 	self.jobs.born.name_id = "heist_born"

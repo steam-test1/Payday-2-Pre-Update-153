@@ -67,6 +67,7 @@ function MoneyTweakData:init(tweak_data)
 	self.bag_values.warhead = 4600
 	self.bag_values.unknown = 5000
 	self.bag_values.safe = 4600
+	self.bag_values.prototype = 3000
 	self.bag_values.counterfeit_money = 1100
 	self.bag_values.masterpiece_painting = 10000
 	self.bag_values.master_server = 10000
@@ -333,7 +334,10 @@ function MoneyTweakData:init(tweak_data)
 		0.5,
 		1,
 		2,
-		4
+		4,
+		6,
+		8,
+		10
 	}
 	self.mission_asset_cost_small = self._create_value_table(2500, 15000, 10, true, 1)
 	self.mission_asset_cost_medium = self._create_value_table(10000, 45000, 10, true, 1)

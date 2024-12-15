@@ -7728,8 +7728,7 @@ function WeaponFactoryTweakData:_init_g17()
 		"wpn_fps_pis_g26_g_laser",
 		"wpn_fps_upg_fl_pis_m3x",
 		"wpn_fps_upg_ns_ass_filter",
-		"wpn_fps_upg_ns_pis_jungle",
-		"wpn_fps_pis_g18c_m_mag_33rnd"
+		"wpn_fps_upg_ns_pis_jungle"
 	}
 	self.wpn_fps_pis_g17_npc = deep_clone(self.wpn_fps_pis_g17)
 	self.wpn_fps_pis_g17_npc.unit = "units/payday2/weapons/wpn_fps_pis_g17/wpn_fps_pis_g17_npc"
@@ -15368,8 +15367,7 @@ function WeaponFactoryTweakData:_init_g26()
 		"wpn_fps_upg_ns_pis_ipsccomp",
 		"wpn_fps_upg_fl_pis_m3x",
 		"wpn_fps_upg_ns_ass_filter",
-		"wpn_fps_upg_ns_pis_jungle",
-		"wpn_fps_pis_g18c_m_mag_33rnd"
+		"wpn_fps_upg_ns_pis_jungle"
 	}
 	self.wpn_fps_pis_g26_npc = deep_clone(self.wpn_fps_pis_g26)
 	self.wpn_fps_pis_g26_npc.unit = "units/pd2_crimefest_2014/oct22/weapons/wpn_fps_pis_g26/wpn_fps_pis_g26_npc"
@@ -15431,20 +15429,6 @@ function WeaponFactoryTweakData:_init_jowi()
 				reload_left = "reload_left",
 				fire = "recoil"
 			}
-		},
-		wpn_fps_pis_g18c_m_mag_33rnd = {
-			animations = {
-				reload = "reload_right",
-				reload_not_empty = "reload_not_empty_right",
-				reload_left = "reload_left",
-				reload_not_empty_left = "reload_not_empty_left"
-			},
-			stats = {
-				value = 3,
-				spread_moving = -2,
-				concealment = -1,
-				extra_ammo = 12
-			}
 		}
 	}
 	self.wpn_fps_jowi.default_blueprint = {
@@ -15476,8 +15460,7 @@ function WeaponFactoryTweakData:_init_jowi()
 		"wpn_fps_upg_ns_pis_ipsccomp",
 		"wpn_fps_upg_fl_pis_m3x",
 		"wpn_fps_upg_ns_ass_filter",
-		"wpn_fps_upg_ns_pis_jungle",
-		"wpn_fps_pis_g18c_m_mag_33rnd"
+		"wpn_fps_upg_ns_pis_jungle"
 	}
 	self.wpn_fps_jowi_npc = deep_clone(self.wpn_fps_jowi)
 	self.wpn_fps_jowi_npc.unit = "units/pd2_crimefest_2014/oct22/weapons/wpn_fps_jowi/wpn_fps_jowi_npc"
@@ -20696,20 +20679,6 @@ function WeaponFactoryTweakData:_init_x_g17()
 				fire = "recoil",
 				fire_steelsight = "recoil"
 			}
-		},
-		wpn_fps_pis_g18c_m_mag_33rnd = {
-			animations = {
-				reload = "reload_right",
-				reload_not_empty = "reload_not_empty_right",
-				reload_left = "reload_left",
-				reload_not_empty_left = "reload_not_empty_left"
-			},
-			stats = {
-				value = 3,
-				spread_moving = -2,
-				concealment = -1,
-				extra_ammo = 12
-			}
 		}
 	}
 	self.wpn_fps_pis_x_g17.default_blueprint = {
@@ -20738,8 +20707,7 @@ function WeaponFactoryTweakData:_init_x_g17()
 		"wpn_fps_pis_g26_g_laser",
 		"wpn_fps_upg_fl_pis_m3x",
 		"wpn_fps_upg_ns_ass_filter",
-		"wpn_fps_upg_ns_pis_jungle",
-		"wpn_fps_pis_g18c_m_mag_33rnd"
+		"wpn_fps_upg_ns_pis_jungle"
 	}
 	self.wpn_fps_pis_x_g17_npc = deep_clone(self.wpn_fps_pis_x_g17)
 	self.wpn_fps_pis_x_g17_npc.unit = "units/pd2_dlc_butcher_mods/weapons/wpn_fps_pis_x_g17/wpn_fps_pis_x_g17_npc"
