@@ -3671,7 +3671,7 @@ function BlackMarketManager:view_weapon_with_mod(category, slot, part_id, open_n
 	end
 	table.insert(self._preloading_list, {
 		done_cb = function()
-			managers.menu_scene:spawn_item_weapon(weapon.factory_id, blueprint, weapon.cosmetics, texture_switches, custom_data)
+			managers.menu_scene:spawn_item_weapon(weapon.factory_id, blueprint, self:get_preview_cosmetics(category, slot), texture_switches, custom_data)
 		end
 	})
 	table.insert(self._preloading_list, {done_cb = open_node_cb})
@@ -3697,7 +3697,7 @@ function BlackMarketManager:view_weapon_without_mod(category, slot, part_id, ope
 	end
 	table.insert(self._preloading_list, {
 		done_cb = function()
-			managers.menu_scene:spawn_item_weapon(weapon.factory_id, blueprint, weapon.cosmetics, texture_switches, custom_data)
+			managers.menu_scene:spawn_item_weapon(weapon.factory_id, blueprint, self:get_preview_cosmetics(category, slot), texture_switches, custom_data)
 		end
 	})
 	table.insert(self._preloading_list, {done_cb = open_node_cb})
@@ -3718,6 +3718,9 @@ function BlackMarketManager:view_weapon_with_cosmetics(category, slot, cosmetics
 		end
 		self._last_viewed_cosmetic_id = cosmetics.id
 	end
+	self:get_preview_blueprint(category, slot)
+	self._preview_blueprint.blueprint = deep_clone(blueprint)
+	self:set_preview_cosmetics(category, slot, cosmetics)
 	local texture_switches = self:get_weapon_texture_switches(category, slot, weapon)
 	self:preload_weapon_blueprint("preview", weapon.factory_id, blueprint, spawn_workbench)
 	if spawn_workbench then
@@ -6689,7 +6692,7 @@ function BlackMarketManager:is_previewing_any_mod()
 			break
 		end
 	end
-	return not equal or #self._preview_blueprint.blueprint ~= #self._global.crafted_items[self._preview_blueprint.category][self._preview_blueprint.slot].blueprint
+	return not equal or #self._preview_blueprint.blueprint ~= #self._global.crafted_items[self._preview_blueprint.category][self._preview_blueprint.slot].blueprint or self._preview_blueprint.cosmetics
 end
 
 function BlackMarketManager:preview_mod_forbidden(category, slot, part_id)
@@ -6704,6 +6707,17 @@ end
 
 function BlackMarketManager:clear_preview_blueprint()
 	self._preview_blueprint = {}
+end
+
+function BlackMarketManager:set_preview_cosmetics(category, slot, cosmetics)
+	self:get_preview_blueprint(category, slot)
+	self._preview_blueprint.cosmetics = cosmetics
+end
+
+function BlackMarketManager:get_preview_cosmetics(category, slot)
+	self:get_preview_blueprint(category, slot)
+	self._preview_blueprint.cosmetics = self._preview_blueprint.cosmetics or self._global.crafted_items[category][slot].cosmetics
+	return self._preview_blueprint.cosmetics
 end
 
 function BlackMarketManager:has_unlocked_arbiter()

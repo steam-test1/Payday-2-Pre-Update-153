@@ -5355,7 +5355,9 @@ function BlackMarketGui:update_info_text()
 		end
 		local unlocked = slot_data.unlocked and slot_data.unlocked ~= true and slot_data.unlocked or 0
 		updated_texts[2].text = updated_texts[2].text .. (0 < price and "   " or "")
-		if slot_data.free_of_charge then
+		if slot_data.previewing then
+			updated_texts[2].text = updated_texts[2].text .. managers.localization:to_upper_text("bm_menu_mod_preview")
+		elseif slot_data.free_of_charge then
 			updated_texts[2].text = updated_texts[2].text .. (0 < unlocked and managers.localization:to_upper_text("bm_menu_item_unlocked") or managers.localization:to_upper_text("bm_menu_item_locked"))
 		else
 			updated_texts[2].text = updated_texts[2].text .. "##" .. managers.localization:to_upper_text("bm_menu_item_amount", {
@@ -9075,11 +9077,18 @@ function BlackMarketGui:populate_weapon_cosmetics(data)
 				new_data.comparision_data = managers.blackmarket:get_weapon_stats(new_data.category, new_data.slot, new_data.default_blueprint)
 			end
 			if new_data.unlocked then
-				table.insert(new_data, "wcc_preview")
+				if managers.blackmarket:last_previewed_cosmetic() == cosmetic_id then
+					table.insert(new_data, "wcc_cancel_preview")
+				else
+					table.insert(new_data, "wcc_preview")
+				end
 				if new_data.equipped then
 					table.insert(new_data, "wcc_remove")
-				else
+				elseif not crafted.previewing then
 					table.insert(new_data, "wcc_equip")
+				end
+				if managers.blackmarket:is_previewing_any_mod() then
+					table.insert(new_data, "wm_clear_mod_preview")
 				end
 			end
 			if new_data.cosmetic_bonus then
@@ -9148,6 +9157,9 @@ function BlackMarketGui:populate_weapon_cosmetics(data)
 				blend_mode = "normal",
 				color = tweak_data.screen_colors.important_1
 			})
+			print("last previewed:", managers.blackmarket:last_previewed_cosmetic(), [[
+
+current:]], cosmetic_id)
 			if managers.blackmarket:last_previewed_cosmetic() == cosmetic_id then
 				table.insert(new_data, "wcc_cancel_preview")
 			else
@@ -9155,6 +9167,9 @@ function BlackMarketGui:populate_weapon_cosmetics(data)
 			end
 			if not crafted.previewing and managers.menu:is_pc_controller() then
 				table.insert(new_data, "wcc_market")
+			end
+			if managers.blackmarket:is_previewing_any_mod() then
+				table.insert(new_data, "wm_clear_mod_preview")
 			end
 			data[index_i] = new_data
 			index_i = index_i + 1
@@ -9237,11 +9252,6 @@ function BlackMarketGui:populate_mods(data)
 			local weapon_id = managers.blackmarket:get_crafted_category(new_data.category)[new_data.slot].weapon_id
 			new_data.price = part_is_from_cosmetic and 0 or managers.money:get_weapon_modify_price(weapon_id, new_data.name, new_data.global_value)
 			new_data.can_afford = part_is_from_cosmetic or managers.money:can_afford_weapon_modification(weapon_id, new_data.name, new_data.global_value)
-			if crafted.previewing then
-				new_data.price = 0
-				new_data.can_afford = true
-				new_data.unlocked = 0
-			end
 			local font, font_size
 			local no_upper = false
 			if not new_data.lock_texture and (not new_data.unlocked or new_data.unlocked == 0) then
@@ -9280,6 +9290,12 @@ function BlackMarketGui:populate_mods(data)
 				new_data.corner_text = {}
 				new_data.corner_text.selected_text = selected_text
 				new_data.corner_text.noselected_text = selected_text
+			elseif crafted.previewing then
+				new_data.previewing = true
+				new_data.corner_text = {}
+				new_data.corner_text.selected_text = managers.localization:text("bm_menu_mod_preview")
+				new_data.corner_text.noselected_text = new_data.corner_text.selected_text
+				new_data.corner_text.noselected_color = Color.white
 			elseif new_data.unlocked and not new_data.can_afford then
 				new_data.corner_text = {}
 				new_data.corner_text.selected_text = managers.localization:text("bm_menu_not_enough_cash")
@@ -9346,8 +9362,8 @@ function BlackMarketGui:populate_mods(data)
 			local active = true
 			local can_apply = not crafted.previewing
 			local preview_forbidden = managers.blackmarket:preview_mod_forbidden(new_data.category, new_data.slot, new_data.name)
-			if mod_name and new_data.unlocked and not crafted.customize_locked and active then
-				if type(new_data.unlocked) ~= "number" or new_data.unlocked > 0 and can_apply then
+			if mod_name and not crafted.customize_locked and active then
+				if new_data.unlocked and (type(new_data.unlocked) ~= "number" or new_data.unlocked > 0) and can_apply then
 					if new_data.can_afford then
 						table.insert(new_data, "wm_buy")
 					end
@@ -9376,9 +9392,11 @@ function BlackMarketGui:populate_mods(data)
 				if managers.workshop and managers.workshop:enabled() and not table.contains(managers.blackmarket:skin_editor():get_excluded_weapons(), weapon_id) then
 					table.insert(new_data, "w_skin")
 				end
-				local weapon_mod_tweak = tweak_data.weapon.factory.parts[mod_name]
-				if weapon_mod_tweak and weapon_mod_tweak.type ~= "bonus" and weapon_mod_tweak.is_a_unlockable ~= true and can_apply then
-					table.insert(new_data, "wm_buy_mod")
+				if new_data.unlocked then
+					local weapon_mod_tweak = tweak_data.weapon.factory.parts[mod_name]
+					if weapon_mod_tweak and weapon_mod_tweak.type ~= "bonus" and weapon_mod_tweak.is_a_unlockable ~= true and can_apply then
+						table.insert(new_data, "wm_buy_mod")
+					end
 				end
 			end
 			data[index] = new_data

@@ -5365,4 +5365,19 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.win_bundle = {}
+	self.win_bundle.content = {}
+	self.win_bundle.content.loot_global_value = "normal"
+	self.win_bundle.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "win_donald",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "win_donald_mega",
+			amount = 1
+		}
+	}
 end

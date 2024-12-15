@@ -3006,6 +3006,30 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.pdc16_clover.sort_number = 33
 	self.masks.pdc16_clover.global_value = "pdcon_2016"
 	self.masks.pdc16_clover.dlc = "pdcon_2016"
+	self.masks.win_donald = {}
+	self.masks.win_donald.unit = "units/pd2_dlc_win/masks/msk_win_donald/msk_win_donald"
+	self.masks.win_donald.name_id = "bm_donald"
+	self.masks.win_donald.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.win_donald.value = 0
+	self.masks.win_donald.texture_bundle_folder = "win"
+	self.masks.win_donald.sort_number = 34
+	self.masks.win_donald_mega = {}
+	self.masks.win_donald_mega.unit = "units/pd2_dlc_win/masks/msk_win_donald_mega/msk_win_donald_mega"
+	self.masks.win_donald_mega.name_id = "bm_donald_mega"
+	self.masks.win_donald_mega.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.win_donald_mega.value = 0
+	self.masks.win_donald_mega.texture_bundle_folder = "win"
+	self.masks.win_donald_mega.sort_number = 34
 	self.masks.tng_bandana = {}
 	self.masks.tng_bandana.unit = "units/pd2_dlc_tng/masks/tng_bandana/msk_tng_bandana"
 	self.masks.tng_bandana.name_id = "bm_bandana"

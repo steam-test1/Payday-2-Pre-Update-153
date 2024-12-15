@@ -12042,7 +12042,8 @@ function WeaponFactoryTweakData:_init_striker()
 			"wpn_fps_upg_ns_shot_thick",
 			"wpn_fps_upg_ns_shot_shark",
 			"wpn_fps_upg_ns_sho_salvo_large",
-			"wpn_fps_upg_a_dragons_breath"
+			"wpn_fps_upg_a_dragons_breath",
+			"wpn_fps_upg_ns_duck"
 		},
 		dlc = "gage_pack_shotgun",
 		texture_bundle_folder = "gage_pack_shotgun",
@@ -21539,7 +21540,8 @@ function WeaponFactoryTweakData:_init_aa12()
 			"wpn_fps_upg_ns_shot_thick",
 			"wpn_fps_upg_ns_shot_shark",
 			"wpn_fps_upg_ns_sho_salvo_large",
-			"wpn_fps_upg_a_dragons_breath"
+			"wpn_fps_upg_a_dragons_breath",
+			"wpn_fps_upg_ns_duck"
 		},
 		texture_bundle_folder = "bbq",
 		dlc = "bbq"
@@ -27569,7 +27571,8 @@ function WeaponFactoryTweakData:_init_rota()
 			"wpn_fps_upg_ns_shot_thick",
 			"wpn_fps_upg_ns_shot_shark",
 			"wpn_fps_upg_ns_sho_salvo_large",
-			"wpn_fps_upg_a_dragons_breath"
+			"wpn_fps_upg_a_dragons_breath",
+			"wpn_fps_upg_ns_duck"
 		},
 		dlc = "rota",
 		texture_bundle_folder = "rota"

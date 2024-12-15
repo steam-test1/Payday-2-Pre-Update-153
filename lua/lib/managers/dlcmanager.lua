@@ -1197,7 +1197,8 @@ function WINDLCManager:init()
 			solus_clan = {
 				source_id = "103582791438562929"
 			},
-			pdcon_2016 = {app_id = "552490", no_install = true}
+			pdcon_2016 = {app_id = "552490", no_install = true},
+			win_bundle = {app_id = "218620", no_install = true}
 		}
 		self:_verify_dlcs()
 	end

@@ -508,7 +508,9 @@ function StatisticsTweakData:statistics_table()
 		"tng_cap",
 		"tng_zeal_swat_mask",
 		"tng_cloaker",
-		"tng_bandana"
+		"tng_bandana",
+		"win_donald",
+		"win_donald_mega"
 	}
 	local weapon_list = {
 		"ak5",
