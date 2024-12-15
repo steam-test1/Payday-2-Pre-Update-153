@@ -190,7 +190,7 @@ function MutatorEnemyReplacer:_get_unit_group_shield(difficulty_index)
 				special_type = "shield"
 			}
 		else
-			self.unit_categories.FBI_shield = {
+			self._groups.FBI_shield = {
 				unit_types = {
 					america = {
 						Idstring("units/pd2_dlc_gitgud/characters/ene_zeal_swat_shield/ene_zeal_swat_shield"),
@@ -243,7 +243,7 @@ function MutatorEnemyReplacer:_get_unit_group_spooc(difficulty_index)
 				special_type = "spooc"
 			}
 		else
-			self.unit_categories.spooc = {
+			self._groups.spooc = {
 				unit_types = {
 					america = {
 						Idstring("units/pd2_dlc_gitgud/characters/ene_zeal_cloaker/ene_zeal_cloaker")

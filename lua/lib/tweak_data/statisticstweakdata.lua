@@ -178,7 +178,9 @@ function StatisticsTweakData:statistics_table()
 		"flat",
 		"help",
 		"moon",
-		"friend"
+		"friend",
+		"spa",
+		"fish"
 	}
 	local mask_list = {
 		"character_locked",
