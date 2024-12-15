@@ -411,8 +411,16 @@ function GenericDLCManager:has_friend()
 	return self:is_dlc_unlocked("friend")
 end
 
+function GenericDLCManager:has_sparkle()
+	return self:is_dlc_unlocked("sparkle")
+end
+
 function GenericDLCManager:has_swm()
 	return self:is_dlc_unlocked("swm")
+end
+
+function GenericDLCManager:has_spa()
+	return self:is_dlc_unlocked("spa")
 end
 
 function GenericDLCManager:has_sha()
@@ -963,124 +971,35 @@ function XB1DLCManager:init()
 			preorder = {
 				index = 1,
 				is_default = false,
-				product_id = "f4bfed8e-a74c-4bd5-baad-5b985d0ef15d",
-				no_install = true
+				product_id = "f4bfed8e-a74c-4bd5-baad-5b985d0ef15d"
 			},
-			career_criminal_edition = {
-				index = 2,
-				is_default = true,
-				no_install = true
-			},
-			alienware_alpha = {
-				index = 3,
-				is_default = true,
-				no_install = true
-			},
-			alienware_alpha_promo = {
-				index = 4,
-				is_default = true,
-				no_install = true
-			},
-			soundtrack = {
-				index = 5,
-				is_default = true,
-				no_install = true
-			},
-			pdth_soundtrack = {
-				index = 6,
-				is_default = true,
-				no_install = true
-			},
-			armored_transport = {
-				index = 7,
-				is_default = true,
-				no_install = true
-			},
-			gage_pack = {
-				index = 8,
-				is_default = true,
-				no_install = true
-			},
-			gage_pack_lmg = {
-				index = 9,
-				is_default = true,
-				no_install = true
-			},
-			gage_pack_jobs = {
-				index = 10,
-				is_default = true,
-				no_install = true
-			},
-			gage_pack_snp = {
-				index = 11,
-				is_default = true,
-				no_install = true
-			},
-			gage_pack_shotgun = {
-				index = 12,
-				is_default = true,
-				no_install = true
-			},
-			gage_pack_assault = {
-				index = 13,
-				is_default = true,
-				no_install = true
-			},
-			big_bank = {
-				index = 14,
-				is_default = true,
-				no_install = true
-			},
-			hl_miami = {
-				index = 15,
-				is_default = true,
-				no_install = true
-			},
+			career_criminal_edition = {index = 2, is_default = true},
+			alienware_alpha = {index = 3, is_default = true},
+			alienware_alpha_promo = {index = 4, is_default = true},
+			soundtrack = {index = 5, is_default = true},
+			pdth_soundtrack = {index = 6, is_default = true},
+			armored_transport = {index = 7, is_default = true},
+			gage_pack = {index = 8, is_default = true},
+			gage_pack_lmg = {index = 9, is_default = true},
+			gage_pack_jobs = {index = 10, is_default = true},
+			gage_pack_snp = {index = 11, is_default = true},
+			gage_pack_shotgun = {index = 12, is_default = true},
+			gage_pack_assault = {index = 13, is_default = true},
+			big_bank = {index = 14, is_default = true},
+			hl_miami = {index = 15, is_default = true},
 			hlm_game = {
 				index = 16,
 				is_default = true,
 				external = true
 			},
-			character_pack_clover = {
-				index = 17,
-				is_default = true,
-				no_install = true
-			},
-			character_pack_dragan = {
-				index = 18,
-				is_default = true,
-				no_install = true
-			},
-			hope_diamond = {
-				index = 19,
-				is_default = true,
-				no_install = true
-			},
-			the_bomb = {
-				index = 20,
-				is_default = true,
-				no_install = true
-			},
-			xmas_soundtrack = {
-				index = 21,
-				is_default = true,
-				no_install = true
-			},
-			twitch_pack = {
-				index = 22,
-				is_default = true,
-				no_install = true
-			},
-			humble_pack2 = {
-				index = 23,
-				is_default = true,
-				no_install = true
-			},
-			gage_pack_historical = {
-				index = 24,
-				is_default = true,
-				no_install = true
-			}
+			character_pack_clover = {index = 17, is_default = true},
+			character_pack_dragan = {index = 18, is_default = true},
+			hope_diamond = {index = 19, is_default = true},
+			the_bomb = {index = 20, is_default = true},
+			xmas_soundtrack = {index = 21, is_default = true},
+			twitch_pack = {index = 22, is_default = true},
+			humble_pack2 = {index = 23, is_default = true},
+			gage_pack_historical = {index = 24, is_default = true}
 		}
 		self:_verify_dlcs()
 	end
@@ -1217,10 +1136,10 @@ function WINDLCManager:init()
 			},
 			fez1 = {app_id = "218620", no_install = true},
 			pim = {app_id = "545100", no_install = true},
-			sparkle = {app_id = "532810", no_install = true},
 			rota = {app_id = "218620", no_install = true},
 			gotti_bundle = {app_id = "218620", no_install = true},
 			nyck_bundle = {app_id = "218620", no_install = true},
+			sparkle = {app_id = "532810", no_install = true},
 			urf_bundle = {app_id = "218620", no_install = true},
 			tango = {app_id = "548420", no_install = true},
 			friend = {app_id = "548421", no_install = true},
@@ -1238,7 +1157,8 @@ function WINDLCManager:init()
 			win_bundle = {app_id = "218620", no_install = true},
 			swm = {app_id = "588130", no_install = true},
 			yor_bundle = {app_id = "218620", no_install = true},
-			sha = {app_id = "218620", no_install = true}
+			sha = {app_id = "218620", no_install = true},
+			spa = {app_id = "591710", no_install = true}
 		}
 		self:_verify_dlcs()
 	end

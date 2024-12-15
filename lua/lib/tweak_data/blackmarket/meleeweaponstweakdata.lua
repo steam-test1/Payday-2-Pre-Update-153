@@ -2251,6 +2251,43 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.ostry.melee_damage_delay = 0.11
 	self.melee_weapons.ostry.menu_scene_anim = "menu"
 	self.melee_weapons.ostry.menu_scene_params = {loop = false, start_time = -1}
+	self.melee_weapons.catch = {}
+	self.melee_weapons.catch.name_id = "bm_melee_catch"
+	self.melee_weapons.catch.animation = nil
+	self.melee_weapons.catch.anim_attack_vars = {
+		"var1",
+		"var2",
+		"var3",
+		"var2"
+	}
+	self.melee_weapons.catch.anim_global_param = "melee_catch"
+	self.melee_weapons.catch.dlc = "spa"
+	self.melee_weapons.catch.texture_bundle_folder = "spa"
+	self.melee_weapons.catch.type = "knife"
+	self.melee_weapons.catch.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.catch.unit = "units/pd2_dlc_spa/weapons/wpn_fps_mel_catch/wpn_fps_mel_catch"
+	self.melee_weapons.catch.third_unit = "units/pd2_dlc_spa/weapons/wpn_fps_mel_catch/wpn_third_mel_catch"
+	self.melee_weapons.catch.sounds = {}
+	self.melee_weapons.catch.sounds.equip = "catch_equip"
+	self.melee_weapons.catch.sounds.hit_air = "catch_hit_air"
+	self.melee_weapons.catch.sounds.hit_gen = "catch_hit_gen"
+	self.melee_weapons.catch.sounds.hit_body = "catch_hit_body"
+	self.melee_weapons.catch.sounds.charge = "catch_charge"
+	self.melee_weapons.catch.stats = {}
+	self.melee_weapons.catch.stats.weapon_type = "sharp"
+	self.melee_weapons.catch.stats.min_damage = 3
+	self.melee_weapons.catch.stats.max_damage = 8
+	self.melee_weapons.catch.stats.min_damage_effect = 1
+	self.melee_weapons.catch.stats.max_damage_effect = 1
+	self.melee_weapons.catch.stats.charge_time = 2
+	self.melee_weapons.catch.stats.range = 200
+	self.melee_weapons.catch.stats.concealment = 28
+	self.melee_weapons.catch.stats.remove_weapon_movement_penalty = true
+	self.melee_weapons.catch.repeat_expire_t = 0.4
+	self.melee_weapons.catch.expire_t = 0.6
+	self.melee_weapons.catch.melee_damage_delay = 0.11
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.melee_weapons) do
 		if free_dlcs[data.dlc] then

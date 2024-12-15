@@ -126,7 +126,12 @@ function MissionEndState:at_enter(old_state, params)
 	if managers.statistics:started_session_from_beginning() then
 		managers.achievment:check_complete_heist_stats_achivements()
 	end
-	managers.music:post_event(self._success and managers.music:jukebox_menu_track("heistresult") or managers.music:jukebox_menu_track("heistlost"))
+	local level_data = Global.level_data.level_id and tweak_data.levels[Global.level_data.level_id]
+	if not self._success and level_data and level_data.failure_music then
+		managers.menu:post_event(level_data.failure_music)
+	else
+		managers.music:post_event(self._success and managers.music:jukebox_menu_track("heistresult") or managers.music:jukebox_menu_track("heistlost"))
+	end
 	managers.enemy:add_delayed_clbk("play_finishing_sound", callback(self, self, "play_finishing_sound", self._success), Application:time() + 2)
 	local ghost_bonus = 0
 	if self._type == "victory" or self._type == "gameover" then

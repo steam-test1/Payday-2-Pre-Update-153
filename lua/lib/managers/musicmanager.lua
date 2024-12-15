@@ -326,7 +326,8 @@ function MusicManager:jukebox_default_tracks()
 		heist_flat = "track_47_gen",
 		heist_help = "track_48",
 		heist_moon = "track_49",
-		heist_friend = "all"
+		heist_friend = "all",
+		heist_spa = "all"
 	}
 	if managers.dlc:has_dlc_or_soundtrack_or_cce("armored_transport") then
 		default_options.heist_arm_cro = "track_09"
@@ -374,6 +375,9 @@ function MusicManager:jukebox_default_tracks()
 	if managers.dlc:has_dlc_or_soundtrack_or_cce("friend") then
 		default_options.heist_friend = "track_50"
 	end
+	if managers.dlc:has_dlc_or_soundtrack_or_cce("spa") then
+		default_options.heist_spa = "track_51"
+	end
 	return default_options
 end
 
@@ -395,7 +399,8 @@ function MusicManager:jukebox_music_tracks()
 		peta = managers.dlc and managers.dlc:has_dlc_or_soundtrack_or_cce("peta"),
 		pal = managers.dlc and managers.dlc:has_dlc_or_soundtrack_or_cce("pal"),
 		born = managers.dlc and managers.dlc:has_dlc_or_soundtrack_or_cce("born"),
-		friend = managers.dlc and managers.dlc:has_dlc_or_soundtrack_or_cce("friend")
+		friend = managers.dlc and managers.dlc:has_dlc_or_soundtrack_or_cce("friend"),
+		spa = managers.dlc and managers.dlc:has_dlc_or_soundtrack_or_cce("spa")
 	}
 	for _, data in ipairs(tweak_data.music.track_list) do
 		table.insert(tracks, data.track)
@@ -421,7 +426,9 @@ function MusicManager:jukebox_menu_tracks()
 		xmas = managers.dlc and managers.dlc:is_dlc_unlocked("xmas_soundtrack"),
 		alesso = managers.dlc and managers.dlc:is_dlc_unlocked("arena"),
 		berry = managers.dlc and managers.dlc:has_dlc_or_soundtrack_or_cce("berry"),
-		born_wild = not managers.dlc or managers.dlc:has_dlc_or_soundtrack_or_cce("born") or managers.dlc:is_dlc_unlocked("wild")
+		born_wild = not managers.dlc or managers.dlc:has_dlc_or_soundtrack_or_cce("born") or managers.dlc:is_dlc_unlocked("wild"),
+		peta = managers.dlc and managers.dlc:has_dlc_or_soundtrack_or_cce("peta"),
+		pal = managers.dlc and managers.dlc:has_dlc_or_soundtrack_or_cce("pal")
 	}
 	for _, data in ipairs(tweak_data.music.track_menu_list) do
 		table.insert(tracks, data.track)

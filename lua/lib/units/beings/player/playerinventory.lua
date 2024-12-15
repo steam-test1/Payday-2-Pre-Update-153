@@ -537,9 +537,18 @@ function PlayerInventory:set_mask_visibility(state)
 	local mask_align = self._unit:get_object(Idstring("Head"))
 	local mask_unit = World:spawn_unit(Idstring(mask_unit_name), mask_align:position(), mask_align:rotation())
 	mask_unit:base():apply_blueprint(managers.criminals:character_data_by_name(character_name).mask_blueprint)
-	self._unit:link(mask_align:name(), mask_unit, mask_unit:orientation_object():name())
+	self._unit:link(mask_align:name(), mask_unit)
 	self._mask_unit = mask_unit
 	local mask_id = managers.criminals:character_data_by_name(character_name).mask_id
+	local peer = managers.network:session():peer_by_unit(self._unit)
+	local mask_data = {
+		mask_id = mask_id,
+		mask_unit = mask_unit,
+		mask_align = mask_align,
+		peer_id = peer and peer:id(),
+		character_name = character_name
+	}
+	self:update_mask_offset(mask_data)
 	if not mask_id or not tweak_data.blackmarket.masks[mask_id].type then
 		local backside = World:spawn_unit(Idstring("units/payday2/masks/msk_backside/msk_backside"), mask_align:position(), mask_align:rotation())
 		self._mask_unit:link(self._mask_unit:orientation_object():name(), backside, backside:orientation_object():name())
@@ -549,6 +558,35 @@ function PlayerInventory:set_mask_visibility(state)
 		if mask_on_sequence then
 			self._unit:damage():run_sequence_simple(mask_on_sequence)
 		end
+	end
+end
+
+function PlayerInventory:update_mask_offset(mask_data)
+	local char
+	if mask_data.peer_id then
+		char = managers.blackmarket:get_real_character(nil, mask_data.peer_id)
+	else
+		char = mask_data.character_name
+	end
+	local mask_tweak = tweak_data.blackmarket.masks[mask_data.mask_id]
+	if mask_tweak and mask_tweak.offsets and mask_tweak.offsets[char] then
+		local char_tweak = mask_tweak.offsets[char]
+		self:set_mask_offset(mask_data.mask_unit, mask_data.mask_align, char_tweak[1] or Vector3(0, 0, 0), char_tweak[2] or Rotation(0, 0, 0))
+		self:set_mask_offset(mask_data.mask_unit, mask_data.mask_align, char_tweak[1] or Vector3(0, 0, 0), char_tweak[2] or Rotation(0, 0, 0))
+	else
+		self:set_mask_offset(mask_data.mask_unit, mask_data.mask_align, Vector3(0, 0, 0), Rotation(0, 0, 0))
+	end
+end
+
+function PlayerInventory:set_mask_offset(mask_unit, mask_align, position, rotation)
+	if not alive(mask_unit) then
+		return
+	end
+	if rotation then
+		mask_unit:set_rotation(mask_align:rotation() * rotation)
+	end
+	if position then
+		mask_unit:set_position(mask_align:position() + mask_unit:rotation():x() * position.x + mask_unit:rotation():z() * position.z + mask_unit:rotation():y() * position.y)
 	end
 end
 

@@ -53,9 +53,13 @@ function DLCTweakData:init(tweak_data)
 			tng = true,
 			howl = 1,
 			paydaycon2016 = 1,
+			sparkle = 1,
 			swm = 1,
 			yor = 1,
+			spa = true,
 			sha = true,
+			fish = true,
+			lxy = true,
 			rip = true,
 			pd2_goty = 1,
 			pd2_hw_boxing = true,
@@ -5197,15 +5201,6 @@ function DLCTweakData:init(tweak_data)
 	self.fez1.dlc = "has_fez1"
 	self.fez1.content = {}
 	self.fez1.content.loot_drops = {}
-	self.sparkle = {}
-	self.sparkle.content = {}
-	self.sparkle.content.loot_drops = {
-		{
-			type_items = "masks",
-			item_entry = "spk_party",
-			amount = 1
-		}
-	}
 	self.howl = {}
 	self.howl.free = true
 	self.howl.content = {}
@@ -5514,6 +5509,17 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.sparkle_bundle = {}
+	self.sparkle_bundle.dlc = "has_sparkle"
+	self.sparkle_bundle.content = {}
+	self.sparkle_bundle.content.loot_global_value = "sparkle"
+	self.sparkle_bundle.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "spk_party",
+			amount = 1
+		}
+	}
 	self.sha_bundle = {}
 	self.sha_bundle.free = true
 	self.sha_bundle.content = {}
@@ -5548,6 +5554,99 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "masks",
 			item_entry = "yor",
+			amount = 1
+		}
+	}
+	self.spa_bundle = {}
+	self.spa_bundle.content = {}
+	self.spa_bundle.content.loot_global_value = "spa"
+	self.spa_bundle.dlc = "has_spa"
+	self.spa_bundle.content.loot_drops = {}
+	self.ach_spa_5 = {}
+	self.ach_spa_5.dlc = "has_achievement"
+	self.ach_spa_5.achievement_id = "spa_5"
+	self.ach_spa_5.content = {}
+	self.ach_spa_5.content.loot_global_value = "spa"
+	self.ach_spa_5.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "spa_04",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "underground_neon",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "baba_yaga",
+			amount = 1
+		}
+	}
+	self.ach_spa_6 = {}
+	self.ach_spa_6.dlc = "has_achievement"
+	self.ach_spa_6.achievement_id = "spa_6"
+	self.ach_spa_6.content = {}
+	self.ach_spa_6.content.loot_global_value = "spa"
+	self.ach_spa_6.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "spa_03",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "carbon_fiber_weave",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "hood_stripes",
+			amount = 1
+		}
+	}
+	self.ach_fish_5 = {}
+	self.ach_fish_5.dlc = "has_achievement"
+	self.ach_fish_5.achievement_id = "fish_5"
+	self.ach_fish_5.content = {}
+	self.ach_fish_5.content.loot_global_value = "spa"
+	self.ach_fish_5.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "spa_02",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "neon_blue",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "hotel_pattern",
+			amount = 1
+		}
+	}
+	self.ach_fish_6 = {}
+	self.ach_fish_6.dlc = "has_achievement"
+	self.ach_fish_6.achievement_id = "fish_6"
+	self.ach_fish_6.content = {}
+	self.ach_fish_6.content.loot_global_value = "spa"
+	self.ach_fish_6.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "spa_01",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "black_suede",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "continental",
 			amount = 1
 		}
 	}

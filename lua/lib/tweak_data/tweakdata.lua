@@ -2373,6 +2373,16 @@ Play the full version soon to get your full PAYDAY!]],
 			difficulty = easywish_and_above,
 			job = "friend"
 		},
+		easywish_spa = {
+			award = "spa_1",
+			difficulty = easywish_and_above,
+			job = "spa"
+		},
+		easywish_fish = {
+			award = "fish_1",
+			difficulty = easywish_and_above,
+			job = "fish"
+		},
 		complete_pines_easywish = {
 			award = "pick_59",
 			difficulty = easywish_and_above,
@@ -2665,6 +2675,16 @@ Play the full version soon to get your full PAYDAY!]],
 			difficulty = deathwish_and_above,
 			job = "friend"
 		},
+		death_spa = {
+			award = "spa_2",
+			difficulty = deathwish_and_above,
+			job = "spa"
+		},
+		death_fish = {
+			award = "fish_2",
+			difficulty = deathwish_and_above,
+			job = "fish"
+		},
 		complete_pines_deathwish = {
 			award = "deer_5",
 			difficulty = deathwish_and_above,
@@ -2951,6 +2971,16 @@ Play the full version soon to get your full PAYDAY!]],
 			award = "friend_3",
 			difficulty = sm_wish_and_above,
 			job = "friend"
+		},
+		sm_wish_spa = {
+			award = "spa_3",
+			difficulty = sm_wish_and_above,
+			job = "spa"
+		},
+		sm_wish_fish = {
+			award = "fish_3",
+			difficulty = sm_wish_and_above,
+			job = "fish"
 		},
 		complete_pines_sm_wish = {
 			award = "axe_59",
@@ -3301,6 +3331,31 @@ Play the full version soon to get your full PAYDAY!]],
 				amount = 200
 			}
 		},
+		spa_4 = {
+			award = "spa_4",
+			job = "spa",
+			difficulty = overkill_and_above,
+			need_full_job = true,
+			equipped_team = {
+				primary_category = "snp",
+				secondaries = {
+					"wpn_fps_saw_secondary"
+				}
+			}
+		},
+		fish_4 = {
+			award = "fish_4",
+			job = "fish",
+			timer = 360,
+			difficulty = overkill_and_above
+		},
+		fish_5 = {
+			award = "fish_5",
+			job = "fish",
+			everyone_killed_by_weapons = 0,
+			everyone_killed_by_melee = 0,
+			everyone_killed_by_grenade = 0
+		},
 		bain_jobs = {
 			challenge_stat = "bain_jobs",
 			complete_job = true,
@@ -3626,6 +3681,14 @@ Play the full version soon to get your full PAYDAY!]],
 			stealth = false,
 			equipped_team = {num_skills = 0, perk_deck = 14},
 			num_players = 4
+		},
+		trophy_fish_trophy = {
+			trophy_stat = "trophy_fish_trophy",
+			job = "fish",
+			need_full_job = true,
+			equipped_team = {
+				detection = {min = 75, max = 100}
+			}
 		},
 		daily_classics = {
 			trophy_stat = "daily_classics",
@@ -4675,6 +4738,7 @@ Play the full version soon to get your full PAYDAY!]],
 		{track = "track_48"},
 		{track = "track_49"},
 		{track = "track_50", lock = "friend"},
+		{track = "track_51", lock = "spa"},
 		{
 			track = "track_32_lcv"
 		},
@@ -5348,6 +5412,27 @@ Play the full version soon to get your full PAYDAY!]],
 	self.medic.cooldown = 3
 	self.medic.debug_drawing = false
 	self.medic.disabled_units = {"spooc"}
+	self.spotlights = {}
+	self.spotlights.helicopter_1 = {
+		objects = {
+			"g_light_cone",
+			"g_spotlight",
+			"align_spotlight_effect",
+			"ls_spotlight"
+		},
+		wiggle = {
+			ang = {2, 6},
+			speed = {50, 80}
+		},
+		neutral_direction = Vector3(0, 1, -0.7),
+		tracking_speed = 1.2,
+		targetting = {
+			slot = 12,
+			body = "a_body",
+			max_distance = math.pow(4000, 2),
+			search_t = 3
+		}
+	}
 	self:_init_wip_tweak_data()
 	self:set_difficulty()
 	self:set_mode()

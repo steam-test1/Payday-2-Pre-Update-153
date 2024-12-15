@@ -368,6 +368,13 @@ function Drill:clbk_sabotage_SO_verification(candidate_unit)
 end
 
 function Drill:_set_attention_state(state)
+	if self.ignore_detection then
+		if self._attention_handler then
+			self._attention_handler:set_attention(nil)
+			self._attention_handler = nil
+		end
+		return
+	end
 	if state then
 		if not self._attention_setting then
 			self._attention_handler = AIAttentionObject:new(self._unit, true)
@@ -527,6 +534,9 @@ function Drill:clbk_autorepair()
 end
 
 function Drill:_set_alert_state(state)
+	if self.ignore_detection then
+		state = false
+	end
 	self._alert_state = state
 	if state and self._alert_radius then
 		self:_register_investigate_SO()

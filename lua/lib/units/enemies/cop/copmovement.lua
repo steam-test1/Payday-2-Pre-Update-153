@@ -138,6 +138,12 @@ CopMovement._gadgets = {
 	},
 	cigar = {
 		Idstring("units/pd2_dlc_friend/props/sfm_prop_cigar/sfm_prop_cigar")
+	},
+	camera = {
+		Idstring("units/pd2_dlc_fish/characters/ene_acc_prop_camera/civ_acc_prop_camera")
+	},
+	microphone = {
+		Idstring("units/pd2_dlc_arena/weapons/wpn_third_mel_microphone/wpn_third_mel_microphone")
 	}
 }
 local action_variants = {
@@ -197,6 +203,7 @@ action_variants.bolivian = security_variant
 action_variants.bolivian_indoors = security_variant
 action_variants.drug_lord_boss = security_variant
 action_variants.drug_lord_boss_stealth = security_variant
+action_variants.spa_vip = security_variant
 action_variants.cop_scared = security_variant
 action_variants.security_undominatable = security_variant
 action_variants.civilian = {

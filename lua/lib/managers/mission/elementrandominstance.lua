@@ -4,6 +4,7 @@ ElementRandomInstance._type = "input"
 function ElementRandomInstance:init(...)
 	ElementRandomInstance.super.init(self, ...)
 	self._instances = {}
+	self._unused_randoms = {}
 end
 
 function ElementRandomInstance:client_on_executed(...)
@@ -13,13 +14,22 @@ function ElementRandomInstance:on_executed(instigator)
 	if not self._values.enabled then
 		return
 	end
-	self._unused_randoms = {}
-	for i, element_data in ipairs(self._values.instances) do
-		table.insert(self._unused_randoms, i)
+	self._instances = {}
+	if not self._values.unique_instance then
+		self._unused_randoms = {}
 	end
 	local amount = self:_calc_amount()
-	for i = 1, math.min(amount, #self._values.instances) do
-		table.insert(self._instances, self._values.instances[self:_get_random_elements()])
+	while 0 < amount do
+		if #self._unused_randoms < 1 then
+			for i, element_data in ipairs(self._values.instances) do
+				table.insert(self._unused_randoms, i)
+			end
+		end
+		local inst = self._values.instances[self:_get_random_elements()]
+		if not table.contains(self._instances, inst) then
+			table.insert(self._instances, inst)
+		end
+		amount = amount - 1
 	end
 	for i, instance_data in ipairs(self._instances) do
 		local elements

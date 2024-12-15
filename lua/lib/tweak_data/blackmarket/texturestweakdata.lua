@@ -2044,6 +2044,30 @@ function BlackMarketTweakData:_init_textures(tweak_data)
 	self.textures.my_little.texture = "units/pd2_dlc_friend/masks/patterns/pattern_my_little_df"
 	self.textures.my_little.value = 0
 	self.textures.my_little.dlc = "friend"
+	self.textures.continental = {}
+	self.textures.continental.name_id = "bm_txt_continental"
+	self.textures.continental.pcs = {}
+	self.textures.continental.texture = "units/pd2_dlc_spa/masks/patterns/pattern_continental_df"
+	self.textures.continental.value = 0
+	self.textures.continental.dlc = "spa"
+	self.textures.hotel_pattern = {}
+	self.textures.hotel_pattern.name_id = "bm_txt_hotel_pattern"
+	self.textures.hotel_pattern.pcs = {}
+	self.textures.hotel_pattern.texture = "units/pd2_dlc_spa/masks/patterns/pattern_hotel_pattern_df"
+	self.textures.hotel_pattern.value = 0
+	self.textures.hotel_pattern.dlc = "spa"
+	self.textures.baba_yaga = {}
+	self.textures.baba_yaga.name_id = "bm_txt_baba_yaga"
+	self.textures.baba_yaga.pcs = {}
+	self.textures.baba_yaga.texture = "units/pd2_dlc_spa/masks/patterns/pattern_baba_yaga_df"
+	self.textures.baba_yaga.value = 0
+	self.textures.baba_yaga.dlc = "spa"
+	self.textures.hood_stripes = {}
+	self.textures.hood_stripes.name_id = "bm_txt_hood_stripes"
+	self.textures.hood_stripes.pcs = {}
+	self.textures.hood_stripes.texture = "units/pd2_dlc_spa/masks/patterns/pattern_hood_stripes_df"
+	self.textures.hood_stripes.value = 0
+	self.textures.hood_stripes.dlc = "spa"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.textures) do
 		if free_dlcs[data.dlc] then

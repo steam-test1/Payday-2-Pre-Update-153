@@ -1178,7 +1178,7 @@ function LevelsTweakData:init()
 	self.mad.package = "packages/lvl_mad"
 	self.mad.cube = "cube_apply_heist_bank"
 	self.mad.ai_group_type = russia
-	self.spawn_dis_limit = 150
+	self.mad.spawn_dis_limit = 150
 	self.biker_train = {}
 	self.biker_train.name_id = "heist_biker_train_hl"
 	self.biker_train.briefing_id = "heist_biker_train_briefing"
@@ -1401,6 +1401,34 @@ function LevelsTweakData:init()
 	self.moon.ghost_bonus = nil
 	self.moon.max_bags = 12
 	self.moon.ai_group_type = america
+	self.spa = {}
+	self.spa.name_id = "heist_spa_hl"
+	self.spa.briefing_id = "heist_spa_hl_briefing"
+	self.spa.briefing_dialog = "Play_rb6_spa_brf_01"
+	self.spa.world_name = "narratives/continental/spa"
+	self.spa.intro_event = "Play_pln_spa_intro"
+	self.spa.outro_event = "Play_cha_spa_end"
+	self.spa.package = "packages/job_spa"
+	self.spa.cube = "cube_apply_heist_bank"
+	self.spa.ghost_bonus = nil
+	self.spa.max_bags = 9999
+	self.spa.ai_group_type = america
+	self.fish = {}
+	self.fish.name_id = "heist_fish_hl"
+	self.fish.briefing_id = "heist_fish_hl_briefing"
+	self.fish.briefing_dialog = "Play_pln_fish_brf"
+	self.fish.world_name = "narratives/continental/fish"
+	self.fish.intro_event = "Play_pln_fish_intro"
+	self.fish.outro_event = "Play_pln_fish_end"
+	self.fish.failure_music = "Play_fish_jazz_game_over"
+	self.fish.music = "no_music"
+	self.fish.music_ext = "music_fish"
+	self.fish.music_ext_start = "suspense_1"
+	self.fish.package = "packages/lvl_fish"
+	self.fish.cube = "cube_apply_heist_bank"
+	self.fish.ghost_bonus = 0.1
+	self.fish.max_bags = 9999
+	self.fish.ai_group_type = america
 	self._level_index = {
 		"welcome_to_the_jungle_1",
 		"welcome_to_the_jungle_1_night",
@@ -1490,7 +1518,9 @@ function LevelsTweakData:init()
 		"friend",
 		"flat",
 		"help",
-		"moon"
+		"moon",
+		"spa",
+		"fish"
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self._level_index, "roberts")

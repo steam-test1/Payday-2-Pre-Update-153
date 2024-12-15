@@ -1318,6 +1318,32 @@ function BlackMarketTweakData:_init_materials(tweak_data)
 	self.materials.black_marble.value = 0
 	self.materials.black_marble.material_amount = 0
 	self.materials.black_marble.dlc = "friend"
+	self.materials.carbon_fiber_weave = {}
+	self.materials.carbon_fiber_weave.name_id = "bm_mtl_carbon_fiber_weave"
+	self.materials.carbon_fiber_weave.pcs = {}
+	self.materials.carbon_fiber_weave.texture = "units/pd2_dlc_spa/masks/materials/matcap_carbon_fiber_weave_df"
+	self.materials.carbon_fiber_weave.value = 0
+	self.materials.carbon_fiber_weave.material_amount = 0
+	self.materials.carbon_fiber_weave.dlc = "spa"
+	self.materials.black_suede = {}
+	self.materials.black_suede.name_id = "bm_mtl_black_suede"
+	self.materials.black_suede.pcs = {}
+	self.materials.black_suede.texture = "units/pd2_dlc_spa/masks/materials/matcap_black_suede_df"
+	self.materials.black_suede.value = 0
+	self.materials.black_suede.material_amount = 0
+	self.materials.black_suede.dlc = "spa"
+	self.materials.neon_blue = {}
+	self.materials.neon_blue.name_id = "bm_mtl_neon_blue"
+	self.materials.neon_blue.pcs = {}
+	self.materials.neon_blue.texture = "units/pd2_dlc_spa/masks/materials/matcap_neon_blue_df"
+	self.materials.neon_blue.value = 0
+	self.materials.neon_blue.dlc = "spa"
+	self.materials.underground_neon = {}
+	self.materials.underground_neon.name_id = "bm_mtl_underground_neon"
+	self.materials.underground_neon.pcs = {}
+	self.materials.underground_neon.texture = "units/pd2_dlc_spa/masks/materials/matcap_underground_neon_df"
+	self.materials.underground_neon.value = 0
+	self.materials.underground_neon.dlc = "spa"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.materials) do
 		if free_dlcs[data.dlc] then

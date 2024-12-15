@@ -101,6 +101,18 @@ function ArrowBase:sync_throw_projectile(dir, projectile_type)
 	self._unit:damage():add_body_collision_callback(callback(self._unit:base(), self._unit:base(), "clbk_impact"))
 end
 
+function ArrowBase:add_damage_result(unit, is_dead, damage_percent)
+	if not alive(self._thrower_unit) or self._thrower_unit ~= managers.player:player_unit() then
+		return
+	end
+	local unit_type = unit:base()._tweak_table
+	local is_civlian = unit:character_damage().is_civilian(unit_type)
+	if is_civlian or not is_dead then
+		return
+	end
+	GrenadeBase._check_achievements(self, unit, true, 1, 1, 1)
+end
+
 function ArrowBase:update(unit, t, dt)
 	if self._drop_in_sync_data then
 		self._drop_in_sync_data.f = self._drop_in_sync_data.f - 1

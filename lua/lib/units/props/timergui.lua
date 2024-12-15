@@ -56,6 +56,23 @@ TimerGui.themes.bry_control_display.jammed.bg_rect = Color(0.1, 0, 0)
 TimerGui.themes.bry_control_display.upgrade_color_0 = Color(0, 0, 0)
 TimerGui.themes.bry_control_display.upgrade_color_1 = Color(0.2, 0.3, 0.4)
 TimerGui.themes.bry_control_display.upgrade_color_2 = TimerGui.themes.bry_control_display.timer_color
+TimerGui.themes.lxy_control_display = {}
+TimerGui.themes.lxy_control_display.hide_background = true
+TimerGui.themes.lxy_control_display.jammed = {}
+TimerGui.themes.lxy_control_display.jammed.bg_rect = Color(0.1, 0, 0, 0)
+TimerGui.themes.lxy_control_display.upgrade_color_0 = Color(0, 0, 0)
+TimerGui.themes.lxy_control_display.upgrade_color_1 = Color(0.2, 0.3, 0.4)
+TimerGui.themes.lxy_control_display.upgrade_color_2 = TimerGui.themes.lxy_control_display.timer_color
+TimerGui.themes.lxy_control_display.timer_color = Color(0.5, 1, 0.3, 0.3)
+TimerGui.themes.lxy_control_display.working_text_font = Idstring("fonts/font_eurostile_ext")
+TimerGui.themes.lxy_control_display.working_text_font_size = 120
+TimerGui.themes.lxy_control_display.working_text_color = Color(0.75, 1, 0.3, 0.3)
+TimerGui.themes.lxy_control_display.time_header_text_font = Idstring("fonts/font_eurostile_ext")
+TimerGui.themes.lxy_control_display.time_header_text_font_size = 50
+TimerGui.themes.lxy_control_display.time_header_text_color = Color(0.75, 1, 0.3, 0.3)
+TimerGui.themes.lxy_control_display.time_text_font = Idstring("fonts/font_eurostile_ext")
+TimerGui.themes.lxy_control_display.time_text_font_size = 90
+TimerGui.themes.lxy_control_display.time_text_color = Color(0.75, 1, 0.3, 0.3)
 TimerGui.upgrade_colors = {}
 TimerGui.upgrade_colors.upgrade_color_0 = tweak_data.screen_colors.item_stage_3
 TimerGui.upgrade_colors.upgrade_color_1 = tweak_data.screen_colors.text
@@ -134,11 +151,32 @@ function TimerGui:_set_theme(theme_name)
 	if theme.working_text_color then
 		self._gui_script.working_text:set_color(theme.working_text_color)
 	end
+	if theme.working_text_font then
+		self._gui_script.working_text:set_font(theme.working_text_font)
+	end
+	if theme.working_text_font_size then
+		print("[TimerGui] theme.working_text_font_size", theme.working_text_font_size)
+		self._gui_script.working_text:set_font_size(theme.working_text_font_size)
+	end
 	if theme.time_header_text_color then
 		self._gui_script.time_header_text:set_color(theme.time_header_text_color)
 	end
+	if theme.time_header_text_font then
+		self._gui_script.time_header_text:set_font(theme.time_header_text_font)
+	end
+	if theme.time_header_text_font_size then
+		print("[TimerGui] theme.time_header_text_font_size", theme.time_header_text_font_size)
+		self._gui_script.time_header_text:set_font_size(theme.time_header_text_font_size)
+	end
 	if theme.time_text_color then
 		self._gui_script.time_text:set_color(theme.time_text_color)
+	end
+	if theme.time_text_font then
+		self._gui_script.time_text:set_font(theme.time_text_font)
+	end
+	if theme.time_text_font_size then
+		print("[TimerGui] theme.time_header_text_font_size", theme.time_text_font_size)
+		self._gui_script.time_text:set_font_size(theme.time_text_font_size)
 	end
 	self._gui_script.bg_rect:set_visible(theme.bg_rect_color and true or false)
 	if theme.bg_rect_color then

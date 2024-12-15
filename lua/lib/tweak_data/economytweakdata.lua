@@ -1069,3 +1069,33 @@ end
 function EconomyTweakData:create_sell_tradable_url(steam_id, instance_id)
 	return "https://steamcommunity.com/profiles/" .. tostring(steam_id) .. "/inventory/?sellOnLoad=1#218620_2_" .. tostring(instance_id)
 end
+
+function EconomyTweakData:get_bonuses_by_safe(safe)
+	local safe_tweak = self.contents[safe]
+	local ids = deep_clone(safe_tweak.contains.weapon_skins)
+	if safe_tweak.contains.contents then
+		for _, content in ipairs(safe_tweak.contains.contents) do
+			local legendary_tweak = self.contents[content]
+			for _, new_id in ipairs(legendary_tweak.contains.weapon_skins) do
+				table.insert(ids, new_id)
+			end
+		end
+	end
+	local bonuses = {}
+	for _, wid in ipairs(ids) do
+		local bonus = "none"
+		local item = tweak_data.blackmarket.weapon_skins[wid]
+		if item.bonus then
+			local bonus_data = self.bonuses[item.bonus]
+			if bonus_data.stats and (bonus_data.exp_multiplier or bonus_data.money_multiplier) then
+				bonus = "both"
+			elseif bonus_data.stats then
+				bonus = "single"
+			else
+				bonus = "team"
+			end
+		end
+		bonuses[wid] = bonus
+	end
+	return bonuses
+end

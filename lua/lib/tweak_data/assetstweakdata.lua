@@ -204,7 +204,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"arena",
 		"red2",
 		"dark",
-		"friend"
+		"friend",
+		"fish"
 	}
 	self.bodybags_bag.visible_if_locked = true
 	self.bodybags_bag.unlock_desc_id = "menu_asset_bodybags_bag_desc"
@@ -272,7 +273,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"flat",
 		"help",
 		"moon",
-		"friend"
+		"friend",
+		"spa"
 	}
 	self.grenade_crate.visible_if_locked = true
 	self.grenade_crate.unlock_desc_id = "menu_asset_grenade_crate_desc"
@@ -312,7 +314,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"flat",
 		"help",
 		"moon",
-		"friend"
+		"friend",
+		"spa"
 	}
 	self.ammo_bag.visible_if_locked = true
 	self.ammo_bag.unlock_desc_id = "menu_asset_ammo_desc"
@@ -349,7 +352,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"flat",
 		"help",
 		"moon",
-		"friend"
+		"friend",
+		"spa"
 	}
 	self.health_bag.visible_if_locked = true
 	self.health_bag.unlock_desc_id = "menu_asset_health_desc"
@@ -1079,6 +1083,26 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.rope_ladder.stages = {"friend"}
 	self.rope_ladder.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 2)
 	self.rope_ladder.no_mystery = true
+	self.potential_location = {}
+	self.potential_location.name_id = "menu_asset_potential_location"
+	self.potential_location.texture = "guis/dlcs/fish/textures/pd2/mission_briefing/assets/potential_location"
+	self.potential_location.stages = {"fish"}
+	self.potential_location.no_mystery = true
+	self.colored_tags = {}
+	self.colored_tags.name_id = "menu_asset_colored_tags"
+	self.colored_tags.texture = "guis/dlcs/fish/textures/pd2/mission_briefing/assets/colored_tags"
+	self.colored_tags.stages = {"fish"}
+	self.colored_tags.no_mystery = true
+	self.laptop = {}
+	self.laptop.name_id = "menu_asset_laptop"
+	self.laptop.texture = "guis/dlcs/fish/textures/pd2/mission_briefing/assets/laptop"
+	self.laptop.stages = {"fish"}
+	self.laptop.no_mystery = true
+	self.charon = {}
+	self.charon.name_id = "menu_asset_charon"
+	self.charon.texture = "guis/dlcs/spa/textures/pd2/mission_briefing/assets/charon"
+	self.charon.stages = {"spa"}
+	self.charon.no_mystery = true
 end
 
 function AssetsTweakData:_init_debug_assets(tweak_data)

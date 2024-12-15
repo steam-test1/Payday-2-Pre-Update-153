@@ -232,6 +232,11 @@ function NarrativeTweakData:init(tweak_data)
 	self.contacts.hoxton.package = "packages/contact_hoxton"
 	self.contacts.hoxton.assets_gui = Idstring("guis/mission_briefing/preload_contact_hoxton")
 	self.contacts.hoxton.hidden = true
+	self.contacts.the_continental = {}
+	self.contacts.the_continental.name_id = "heist_contact_continental"
+	self.contacts.the_continental.description_id = "heist_contact_continental_description"
+	self.contacts.the_continental.package = "packages/contact_continental"
+	self.contacts.the_continental.assets_gui = Idstring("guis/mission_briefing/preload_contact_continental")
 	self.jobs = {}
 	self.jobs.firestarter = {}
 	self.jobs.firestarter.name_id = "heist_firestarter"
@@ -4181,6 +4186,129 @@ function NarrativeTweakData:init(tweak_data)
 		17800,
 		17800
 	}
+	self.jobs.spa = {}
+	self.jobs.spa.name_id = "heist_spa"
+	self.jobs.spa.briefing_id = "heist_spa_crimenet"
+	self.jobs.spa.briefing_dialog = "Play_pln_bb1_brf_01"
+	self.jobs.spa.contact = "the_continental"
+	self.jobs.spa.dlc = "spa"
+	self.jobs.spa.region = "street"
+	self.jobs.spa.jc = 30
+	self.jobs.spa.chain = {
+		{
+			level_id = "spa",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.spa.briefing_event = "pln_spa_cbf_01"
+	self.jobs.spa.debrief_event = nil
+	self.jobs.spa.crimenet_callouts = {
+		"pln_spa_cnc_01"
+	}
+	self.jobs.spa.crimenet_videos = {
+		"contact_continental1"
+	}
+	self.jobs.spa.package = "packages/job_spa"
+	self.jobs.spa.cube = "cube_apply_heist_bank"
+	self.jobs.spa.ghost_bonus = 0.15
+	self.jobs.spa.max_bags = 28
+	self.jobs.spa.payout = {
+		124000,
+		248000,
+		620000,
+		1150000,
+		1600000,
+		1600000,
+		1600000
+	}
+	self.jobs.spa.contract_cost = {
+		105000,
+		150000,
+		550000,
+		1050000,
+		1400000,
+		1400000,
+		1400000
+	}
+	self.jobs.spa.contract_visuals = {}
+	self.jobs.spa.contract_visuals.min_mission_xp = {
+		26000,
+		26000,
+		26000,
+		26000,
+		26000,
+		26000,
+		26000
+	}
+	self.jobs.spa.contract_visuals.max_mission_xp = {
+		30000,
+		30000,
+		30000,
+		30000,
+		30000,
+		30000,
+		30000
+	}
+	self.jobs.fish = {}
+	self.jobs.fish.name_id = "heist_fish"
+	self.jobs.fish.briefing_id = "heist_fish_crimenet"
+	self.jobs.fish.contact = "the_continental"
+	self.jobs.fish.dlc = "spa"
+	self.jobs.fish.region = "street"
+	self.jobs.fish.jc = 30
+	self.jobs.fish.chain = {
+		{
+			level_id = "fish",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.fish.briefing_event = "cha_fish_cbf_01"
+	self.jobs.fish.debrief_event = nil
+	self.jobs.fish.crimenet_callouts = {
+		"cha_fish_cnc_01"
+	}
+	self.jobs.fish.crimenet_videos = {
+		"contact_continental1"
+	}
+	self.jobs.fish.payout = {
+		70000,
+		95000,
+		125000,
+		200000,
+		250000,
+		250000,
+		250000
+	}
+	self.jobs.fish.contract_cost = {
+		39000,
+		78000,
+		195000,
+		390000,
+		500000,
+		500000,
+		500000
+	}
+	self.jobs.fish.contract_visuals = {}
+	self.jobs.fish.contract_visuals.min_mission_xp = {
+		12000,
+		12000,
+		12000,
+		12000,
+		12000,
+		12000,
+		12000
+	}
+	self.jobs.fish.contract_visuals.max_mission_xp = {
+		15000,
+		15000,
+		15000,
+		15000,
+		15000,
+		15000,
+		15000
+	}
 	self.jobs.flat = {}
 	self.jobs.flat.name_id = "heist_flat"
 	self.jobs.flat.briefing_id = "heist_flat_crimenet"
@@ -4224,7 +4352,7 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.jobs.flat.contract_visuals = {}
 	self.jobs.flat.contract_visuals.min_mission_xp = {
-		25000,
+		12000,
 		25000,
 		25000,
 		25000,
@@ -4365,6 +4493,8 @@ function NarrativeTweakData:init(tweak_data)
 		"friend",
 		"flat",
 		"help",
+		"spa",
+		"fish",
 		"moon"
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then

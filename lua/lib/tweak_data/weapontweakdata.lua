@@ -124,6 +124,7 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_arbiter_npc()
 	self:_init_data_contraband_npc()
 	self:_init_data_ray_npc()
+	self:_init_data_tti_npc()
 	self:_precalculate_values()
 end
 
@@ -385,6 +386,8 @@ function WeaponTweakData:_init_data_m14_sniper_npc()
 	self.m14_sniper_npc.suppression = 1
 	self.m14_sniper_npc.armor_piercing = true
 	self.svd_snp_npc = deep_clone(self.m14_sniper_npc)
+	self.svdsil_snp_npc = deep_clone(self.m14_sniper_npc)
+	self.svdsil_snp_npc.has_suppressor = "suppressed_a"
 end
 
 function WeaponTweakData:_init_data_r870_npc()
@@ -2220,6 +2223,21 @@ function WeaponTweakData:_init_data_ray_npc()
 	self.ray_npc.animations.thq_align_anim = "thq"
 	self.ray_npc.alert_size = 2800
 	self.ray_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_tti_npc()
+	self.tti_npc.sounds.prefix = "tti_npc"
+	self.tti_npc.use_data.selection_index = 1
+	self.tti_npc.DAMAGE = 2
+	self.tti_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.tti_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.tti_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.tti_npc.CLIP_AMMO_MAX = 30
+	self.tti_npc.NR_CLIPS_MAX = 5
+	self.tti_npc.auto.fire_rate = 0.5
+	self.tti_npc.hold = "rifle"
+	self.tti_npc.alert_size = 5000
+	self.tti_npc.suppression = 1
 end
 
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
@@ -13063,6 +13081,104 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		reload = 11
 	}
 	self.ray.stats_modifiers = {damage = 100}
+	self.tti = {}
+	self.tti.category = "snp"
+	self.tti.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.tti.damage_melee = damage_melee_default
+	self.tti.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.tti.sounds = {}
+	self.tti.sounds.fire = "tti_fire"
+	self.tti.sounds.dryfire = "primary_dryfire"
+	self.tti.sounds.enter_steelsight = "primary_steel_sight_enter"
+	self.tti.sounds.leave_steelsight = "primary_steel_sight_exit"
+	self.tti.timers = {}
+	self.tti.timers.reload_not_empty = 2.3
+	self.tti.timers.reload_empty = 3.3
+	self.tti.timers.unequip = 0.9
+	self.tti.timers.equip = 0.9
+	self.tti.name_id = "bm_w_tti"
+	self.tti.desc_id = "bm_w_tti_desc"
+	self.tti.description_id = "des_tti"
+	self.tti.muzzleflash = "effects/payday2/particles/weapons/big_762_auto_fps"
+	self.tti.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.tti.use_data = {}
+	self.tti.use_data.selection_index = 2
+	self.tti.DAMAGE = 1
+	self.tti.CLIP_AMMO_MAX = 20
+	self.tti.NR_CLIPS_MAX = 2
+	self.tti.AMMO_MAX = self.tti.CLIP_AMMO_MAX * self.tti.NR_CLIPS_MAX
+	self.tti.AMMO_PICKUP = self:_pickup_chance(self.tti.AMMO_MAX, 5)
+	self.tti.FIRE_MODE = "single"
+	self.tti.fire_mode_data = {}
+	self.tti.fire_mode_data.fire_rate = 0.4
+	self.tti.CAN_TOGGLE_FIREMODE = false
+	self.tti.single = {}
+	self.tti.single.fire_rate = 0.4
+	self.tti.spread = {}
+	self.tti.spread.standing = self.new_m4.spread.standing
+	self.tti.spread.crouching = self.new_m4.spread.crouching
+	self.tti.spread.steelsight = self.new_m4.spread.steelsight
+	self.tti.spread.moving_standing = self.new_m4.spread.moving_standing
+	self.tti.spread.moving_crouching = self.new_m4.spread.moving_crouching
+	self.tti.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.tti.kick = {}
+	self.tti.kick.standing = {
+		2,
+		3.8,
+		-0.3,
+		0.3
+	}
+	self.tti.kick.crouching = self.tti.kick.standing
+	self.tti.kick.steelsight = self.tti.kick.standing
+	self.tti.crosshair = {}
+	self.tti.crosshair.standing = {}
+	self.tti.crosshair.crouching = {}
+	self.tti.crosshair.steelsight = {}
+	self.tti.crosshair.standing.offset = 1.14
+	self.tti.crosshair.standing.moving_offset = 1.8
+	self.tti.crosshair.standing.kick_offset = 1.6
+	self.tti.crosshair.crouching.offset = 1.1
+	self.tti.crosshair.crouching.moving_offset = 1.6
+	self.tti.crosshair.crouching.kick_offset = 1.4
+	self.tti.crosshair.steelsight.hidden = true
+	self.tti.crosshair.steelsight.offset = 1
+	self.tti.crosshair.steelsight.moving_offset = 1
+	self.tti.crosshair.steelsight.kick_offset = 1.14
+	self.tti.shake = {}
+	self.tti.shake.fire_multiplier = 1.1
+	self.tti.shake.fire_steelsight_multiplier = -1.1
+	self.tti.autohit = autohit_snp_default
+	self.tti.aim_assist = aim_assist_snp_default
+	self.tti.weapon_hold = "tti"
+	self.tti.animations = {}
+	self.tti.animations.equip_id = "equip_tti"
+	self.tti.animations.recoil_steelsight = true
+	self.tti.panic_suppression_chance = 0.2
+	self.tti.global_value = "spa"
+	self.tti.texture_bundle_folder = "spa"
+	self.tti.can_shoot_through_enemy = true
+	self.tti.can_shoot_through_shield = true
+	self.tti.can_shoot_through_wall = true
+	self.tti.stats = {
+		damage = 160,
+		spread = 20,
+		recoil = 2,
+		spread_moving = 24,
+		zoom = 1,
+		concealment = 16,
+		suppression = 12,
+		alert_size = 8,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 9,
+		reload = 11
+	}
+	self.tti.armor_piercing_chance = 1
+	self.tti.stats_modifiers = {damage = 1}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -13885,6 +14001,12 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.tti_npc = {
+		usage = "rifle",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -14018,4 +14140,6 @@ function WeaponTweakData:_precalculate_values()
 	self.contraband_m203_npc.AMMO_MAX = self.contraband_m203_npc.CLIP_AMMO_MAX * self.contraband_m203_npc.NR_CLIPS_MAX
 	self.ray_npc.AMMO_MAX = self.ray_npc.CLIP_AMMO_MAX * self.ray_npc.NR_CLIPS_MAX
 	self.sg417_npc.AMMO_MAX = self.sg417_npc.CLIP_AMMO_MAX * self.sg417_npc.NR_CLIPS_MAX
+	self.tti_npc.AMMO_MAX = self.tti_npc.CLIP_AMMO_MAX * self.tti_npc.NR_CLIPS_MAX
+	self.svdsil_snp_npc.AMMO_MAX = self.svdsil_snp_npc.CLIP_AMMO_MAX * self.svdsil_snp_npc.NR_CLIPS_MAX
 end

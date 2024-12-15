@@ -3000,3 +3000,23 @@ function UnitNetworkHandler:sync_carried_bag_unit(ai_unit, carry_unit, sender)
 		carry_unit:carry_data():link_to(ai_unit)
 	end
 end
+
+function UnitNetworkHandler:sync_unit_spawn(parent_unit, spawn_unit, align_obj_name, unit_id, parent_extension_name)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	if not alive(parent_unit) or not alive(spawn_unit) then
+		return
+	end
+	parent_unit[parent_extension_name](parent_unit):spawn_unit(unit_id, align_obj_name, spawn_unit)
+end
+
+function UnitNetworkHandler:run_spawn_unit_sequence(parent_unit, parent_extension_name, unit_id, sequence_name)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	if not alive(parent_unit) then
+		return
+	end
+	parent_unit[parent_extension_name](parent_unit):_spawn_run_sequence(unit_id, sequence_name)
+end

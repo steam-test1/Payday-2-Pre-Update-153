@@ -3199,6 +3199,106 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.sha_04.texture_bundle_folder = "sha"
 	self.masks.sha_04.sort_number = 40
 	self.masks.sha_04.global_value = "sha"
+	self.masks.spa_01 = {}
+	self.masks.spa_01.unit = "units/pd2_dlc_spa/masks/spa_01/msk_spa_01"
+	self.masks.spa_01.name_id = "bm_msk_spa_01"
+	self.masks.spa_01.pcs = {}
+	self.masks.spa_01.value = 0
+	self.masks.spa_01.texture_bundle_folder = "spa"
+	self.masks.spa_01.type = "helmet"
+	self.masks.spa_01.sort_number = 41
+	self.masks.spa_01.dlc = "spa"
+	self.masks.spa_01.global_value = "spa"
+	self.masks.spa_02 = {}
+	self.masks.spa_02.unit = "units/pd2_dlc_spa/masks/spa_02/msk_spa_02"
+	self.masks.spa_02.name_id = "bm_msk_spa_02"
+	self.masks.spa_02.pcs = {}
+	self.masks.spa_02.value = 0
+	self.masks.spa_02.texture_bundle_folder = "spa"
+	self.masks.spa_02.type = "helmet"
+	self.masks.spa_02.sort_number = 41
+	self.masks.spa_02.dlc = "spa"
+	self.masks.spa_02.global_value = "spa"
+	self.masks.spa_02.offsets = {
+		jacket = {
+			Vector3(0, -0.160978, -0.160978),
+			Rotation(0, 0, 0)
+		},
+		dallas = {
+			Vector3(0, -0.75721, -0.518717),
+			Rotation(0, 0, 0)
+		},
+		sydney = {
+			Vector3(-2.06892, -0.637963, 2.82018),
+			Rotation(-10.6034, -14.0376, -1.06722E-7)
+		},
+		dragon = {
+			Vector3(-0.160978, -0.399471, -0.280224),
+			Rotation(0, 0, 0)
+		},
+		wild = {
+			Vector3(0, -1.47269, -0.75721),
+			Rotation(0, 0, 0)
+		},
+		female_1 = {
+			Vector3(-0.399471, 1.38922, -0.995702),
+			Rotation(-0.300467, 5.70955, 1.41668)
+		},
+		hoxton = {
+			Vector3(0, -0.995702, -0.0417315),
+			Rotation(0, 0, 0)
+		},
+		sokol = {
+			Vector3(0.0775149, -0.518717, -0.399471),
+			Rotation(0, 0, 0)
+		},
+		chico = {
+			Vector3(0.673747, -0.637963, -0.518717),
+			Rotation(3.9924, 1.41668, 4.85098)
+		},
+		wolf = {
+			Vector3(0, -0.637963, 0.196761),
+			Rotation(0, 0, 0)
+		},
+		jimmy = {
+			Vector3(0.0775149, 0.435254, -0.518717),
+			Rotation(0, 0, 0)
+		},
+		bodhi = {
+			Vector3(0, -0.518717, -0.399471),
+			Rotation(0, 0, 0)
+		},
+		jowi = {
+			Vector3(0, -1.2342, 0.0775149),
+			Rotation(0, 0, 0)
+		},
+		chains = {
+			Vector3(0, -0.876456, -0.518717),
+			Rotation(0, 0, 0)
+		},
+		old_hoxton = {
+			Vector3(0, -1.11495, -0.637963),
+			Rotation(0, 0, 0)
+		}
+	}
+	self.masks.spa_03 = {}
+	self.masks.spa_03.unit = "units/pd2_dlc_spa/masks/spa_03/msk_spa_03"
+	self.masks.spa_03.name_id = "bm_msk_spa_03"
+	self.masks.spa_03.pcs = {}
+	self.masks.spa_03.value = 0
+	self.masks.spa_03.texture_bundle_folder = "spa"
+	self.masks.spa_03.sort_number = 41
+	self.masks.spa_03.dlc = "spa"
+	self.masks.spa_03.global_value = "spa"
+	self.masks.spa_04 = {}
+	self.masks.spa_04.unit = "units/pd2_dlc_spa/masks/spa_04/msk_spa_04"
+	self.masks.spa_04.name_id = "bm_msk_spa_04"
+	self.masks.spa_04.pcs = {}
+	self.masks.spa_04.value = 0
+	self.masks.spa_04.texture_bundle_folder = "spa"
+	self.masks.spa_04.sort_number = 41
+	self.masks.spa_04.dlc = "spa"
+	self.masks.spa_04.global_value = "spa"
 	self.masks.yor = {}
 	self.masks.yor.unit = "units/pd2_dlc_yor/masks/yor/msk_yor"
 	self.masks.yor.name_id = "bm_msk_yor"

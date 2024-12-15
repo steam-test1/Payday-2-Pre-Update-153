@@ -3804,23 +3804,33 @@ function BlackMarketTweakData:_init_weapon_skins()
 		wpn_fps_snp_mosin_b_sniper = {
 			[Idstring("mtr_sniper"):key()] = {
 				base_gradient = Idstring("units/payday2_cash/safes/surf/base_gradient/base_surf_013_b_df"),
-				pattern = Idstring("units/payday2_cash/safes/surf/pattern/pattern_surf_001_df"),
+				pattern_tweak = Vector3(12.3682, 5.474, 1),
 				pattern_gradient = Idstring("units/payday2_cash/safes/sputnik/pattern_gradient/gradient_sput_002_df"),
-				pattern_tweak = Vector3(12.3682, 5.474, 1)
-			}
-		},
-		wpn_fps_snp_mosin_body_black = {
-			[Idstring("mtr_body"):key()] = {
-				sticker = Idstring("units/payday2_cash/safes/surf/sticker/sticker_waves_df"),
-				uv_scale = Vector3(1.20017, 4.45805, 1),
-				uv_offset_rot = Vector3(-0.00141802, 0.986171, 3.05149)
+				pattern = Idstring("units/payday2_cash/safes/surf/pattern/pattern_surf_001_df")
 			}
 		},
 		wpn_fps_snp_mosin_body_standard = {
 			[Idstring("mtr_body"):key()] = {
+				uv_offset_rot = Vector3(-0.00141802, 0.986171, 3.05149),
 				sticker = Idstring("units/payday2_cash/safes/surf/sticker/sticker_waves_df"),
-				uv_scale = Vector3(1.20017, 4.45805, 1),
-				uv_offset_rot = Vector3(-0.00141802, 0.986171, 3.05149)
+				uv_scale = Vector3(1.20017, 4.45805, 1)
+			}
+		},
+		wpn_fps_upg_o_spot = {
+			[Idstring("mtr_spot"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/burn/base_gradient/base_burn_001_df")
+			}
+		},
+		wpn_fps_upg_o_box = {
+			[Idstring("mtr_box"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/dinner/base_gradient/base_assault_003_df")
+			}
+		},
+		wpn_fps_snp_mosin_body_black = {
+			[Idstring("mtr_body"):key()] = {
+				uv_offset_rot = Vector3(-0.00141802, 0.986171, 3.05149),
+				sticker = Idstring("units/payday2_cash/safes/surf/sticker/sticker_waves_df"),
+				uv_scale = Vector3(1.20017, 4.45805, 1)
 			}
 		}
 	}
@@ -4070,6 +4080,13 @@ function BlackMarketTweakData:_init_weapon_skins()
 	self.weapon_skins.saiga_ginger.pattern_tweak = Vector3(0.491297, 1.17332, 1)
 	self.weapon_skins.saiga_ginger.pattern_pos = Vector3(-0.642499, 0, 0)
 	self.weapon_skins.saiga_ginger.cubemap_pattern_control = Vector3(1, 0, 0)
+	self.weapon_skins.saiga_ginger.parts = {
+		wpn_fps_upg_o_spot = {
+			[Idstring("mtr_spot"):key()] = {
+				pattern_tweak = Vector3(2.39924, 0, 1)
+			}
+		}
+	}
 	self.weapon_skins.p226_ginger = {}
 	self.weapon_skins.p226_ginger.name_id = "bm_wskn_p226_ginger"
 	self.weapon_skins.p226_ginger.desc_id = "bm_wskn_p226_ginger_desc"
@@ -4407,19 +4424,32 @@ function BlackMarketTweakData:_init_weapon_skins()
 		"wpn_fps_upg_o_leupold",
 		"wpn_fps_upg_o_45iron"
 	}
+	self.weapon_skins.wa2000_ginger.parts = {
+		wpn_fps_upg_o_spot = {
+			[Idstring("mtr_spot"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/cola/base_gradient/base_cola_015_df"),
+				pattern_tweak = Vector3(0, 0, 1)
+			}
+		},
+		wpn_fps_upg_o_box = {
+			[Idstring("mtr_box"):key()] = {
+				pattern_tweak = Vector3(0, 0, 1)
+			}
+		}
+	}
 	self.weapon_skins.wa2000_ginger.types = {
 		stock = {
 			base_gradient = Idstring("units/payday2_cash/safes/flake/base_gradient/base_flake_009b_df"),
 			pattern_tweak = Vector3(1, 0, 0)
 		},
 		grip = {
-			sticker = Idstring("units/payday2_cash/safes/flake/sticker/flake_sticker_helper_df"),
-			uv_offset_rot = Vector3(-0.259451, 0.664901, 0),
 			pattern_tweak = Vector3(4.73647, 0, 0),
-			pattern_pos = Vector3(-0.337228, -0.575721, 0),
+			sticker = Idstring("units/payday2_cash/safes/flake/sticker/flake_sticker_helper_df"),
 			uv_scale = Vector3(14.5651, 13.3732, 1),
-			pattern = Idstring("units/payday2_cash/safes/dallas/pattern/pattern_wood_df"),
-			pattern_gradient = Idstring("units/payday2_cash/safes/flake/pattern_gradient/gradient_flake_009_df")
+			pattern_pos = Vector3(-0.337228, -0.575721, 0),
+			pattern_gradient = Idstring("units/payday2_cash/safes/flake/pattern_gradient/gradient_flake_009_df"),
+			uv_offset_rot = Vector3(-0.259451, 0.664901, 0),
+			pattern = Idstring("units/payday2_cash/safes/dallas/pattern/pattern_wood_df")
 		}
 	}
 	self.weapon_skins.akmsu_ginger = {}
@@ -7397,57 +7427,62 @@ function BlackMarketTweakData:_init_weapon_skins()
 		wpn_fps_sho_s_spas12_solid = {
 			[Idstring("mtr_solid"):key()] = {
 				base_gradient = Idstring("units/payday2_cash/safes/burn/base_gradient/base_burn_002_df"),
-				uv_scale = Vector3(2.64641, 3.21851, 0),
-				uv_offset_rot = Vector3(0.254233, 0.979251, 1.57791)
+				uv_offset_rot = Vector3(0.254233, 0.979251, 1.57791),
+				uv_scale = Vector3(2.64641, 3.21851, 0)
 			}
 		},
 		wpn_fps_sho_s_spas12_folded = {
 			[Idstring("mtr_stock"):key()] = {
-				uv_scale = Vector3(20, 20, 1),
-				uv_offset_rot = Vector3(2, 2, 0)
+				uv_offset_rot = Vector3(2, 2, 0),
+				uv_scale = Vector3(20, 20, 1)
+			}
+		},
+		wpn_fps_upg_o_spot = {
+			[Idstring("mtr_spot"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/buck/base_gradient/base_buck_005_df")
 			}
 		},
 		wpn_fps_sho_b_spas12_short = {
 			[Idstring("mtr_barrel"):key()] = {
-				uv_scale = Vector3(1.54989, 1.40687, 1),
-				uv_offset_rot = Vector3(0.208455, 0.873775, 4.70977)
+				uv_offset_rot = Vector3(0.208455, 0.873775, 4.70977),
+				uv_scale = Vector3(1.54989, 1.40687, 1)
 			}
 		}
 	}
 	self.weapon_skins.spas12_burn.types = {
 		foregrip = {
 			base_gradient = Idstring("units/payday2_cash/safes/burn/base_gradient/base_burn_010_b_df"),
-			pattern = Idstring("units/payday2_cash/safes/burn/pattern/burn_pattern_017_df"),
-			pattern_tweak = Vector3(1.25447, 3.24124, 1),
-			pattern_pos = Vector3(-0.997468, -0.764595, 0),
-			uv_scale = Vector3(1, 1, 0.720964),
 			cubemap_pattern_control = Vector3(0, 0.436157, 0),
-			pattern_gradient = Idstring("units/payday2_cash/safes/burn/pattern_gradient/gradient_burn_003_df")
+			uv_scale = Vector3(1, 1, 0.720964),
+			pattern_pos = Vector3(-0.997468, -0.764595, 0),
+			pattern_gradient = Idstring("units/payday2_cash/safes/burn/pattern_gradient/gradient_burn_003_df"),
+			pattern_tweak = Vector3(1.25447, 3.24124, 1),
+			pattern = Idstring("units/payday2_cash/safes/burn/pattern/burn_pattern_017_df")
 		},
 		barrel = {
-			sticker = Idstring("units/payday2_cash/safes/burn/sticker/burn_sticker_006_df"),
+			pattern_tweak = Vector3(1.54067, 1.56293, 1),
 			uv_offset_rot = Vector3(-0.227292, 0.759838, 0),
-			pattern_pos = Vector3(0, -1.48199, 0),
 			uv_scale = Vector3(1.26385, 1.18817, 0.260673),
-			pattern_tweak = Vector3(1.54067, 1.56293, 1)
+			pattern_pos = Vector3(0, -1.48199, 0),
+			sticker = Idstring("units/payday2_cash/safes/burn/sticker/burn_sticker_006_df")
 		},
 		stock = {
+			uv_offset_rot = Vector3(0.038979, 0.889774, 1.57991),
 			sticker = Idstring("units/payday2_cash/safes/burn/sticker/burn_sticker_003_df"),
-			uv_scale = Vector3(1.64524, 1.69292, 0.246363),
-			uv_offset_rot = Vector3(0.038979, 0.889774, 1.57991)
-		},
-		barrel_ext = {
-			base_gradient = Idstring("units/payday2_cash/safes/burn/base_gradient/base_burn_005_df")
+			uv_scale = Vector3(1.64524, 1.69292, 0.246363)
 		},
 		lower_reciever = {
 			base_gradient = Idstring("units/payday2_cash/safes/burn/base_gradient/base_burn_010_b_df"),
-			pattern_gradient = Idstring("units/payday2_cash/safes/cola/pattern_gradient/gradient_cola_001_df"),
-			uv_offset_rot = Vector3(-0.0777356, 0.922473, 1.57793),
+			pattern_tweak = Vector3(2.44594, 0.119376, 1),
 			sticker = Idstring("units/payday2_cash/safes/burn/sticker/burn_sticker_007_df"),
-			pattern_pos = Vector3(-0.531562, 0.732139, 0),
 			uv_scale = Vector3(2.45771, 2.45571, 0),
-			pattern = Idstring("units/payday2_cash/safes/burn/pattern/burn_pattern_012_df"),
-			pattern_tweak = Vector3(2.44594, 0.119376, 1)
+			pattern_pos = Vector3(-0.531562, 0.732139, 0),
+			uv_offset_rot = Vector3(-0.0777356, 0.922473, 1.57793),
+			pattern_gradient = Idstring("units/payday2_cash/safes/cola/pattern_gradient/gradient_cola_001_df"),
+			pattern = Idstring("units/payday2_cash/safes/burn/pattern/burn_pattern_012_df")
+		},
+		barrel_ext = {
+			base_gradient = Idstring("units/payday2_cash/safes/burn/base_gradient/base_burn_005_df")
 		}
 	}
 	self.weapon_skins.fal_burn = {}
@@ -8838,9 +8873,16 @@ function BlackMarketTweakData:_init_weapon_skins()
 				uv_scale = Vector3(6.50806, 7.12783, 1)
 			}
 		},
-		wpn_fps_upg_ak_g_pgrip = {
-			[Idstring("mtr_akgrip"):key()] = {
-				uv_scale = Vector3(0.358028, 0.372703, 0.0579538)
+		wpn_fps_upg_ak_g_hgrip = {
+			[Idstring("mtr_ergoak"):key()] = {
+				uv_scale = Vector3(0.834774, 0.358028, 1)
+			}
+		},
+		wpn_fps_upg_o_spot = {
+			[Idstring("mtr_spot"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/dinner/base_gradient/base_dinner_003_df"),
+				uv_offset_rot = Vector3(0.192456, 0.857235, 0),
+				uv_scale = Vector3(16.1383, 18.1407, 0)
 			}
 		},
 		wpn_upg_ak_s_folding_vanilla = {
@@ -8855,10 +8897,17 @@ function BlackMarketTweakData:_init_weapon_skins()
 				uv_scale = Vector3(0.548726, 0.363703, 0.0889579)
 			}
 		},
-		wpn_fps_upg_o_aimpoint = {
-			[Idstring("aimpoint"):key()] = {
-				uv_offset_rot = Vector3(-0.378467, 1.18766, 1.62287),
-				uv_scale = Vector3(10.9418, 10.7034, 0)
+		wpn_upg_saiga_fg_lowerrail_short = {
+			[Idstring("lower_rail_short"):key()] = {
+				uv_offset_rot = Vector3(0.454567, 1.14143, 4.70977),
+				sticker = Idstring("units/payday2_cash/safes/buck/sticker/buck_sticker_004_df"),
+				uv_scale = Vector3(1.40687, 0.644076, 0)
+			}
+		},
+		wpn_fps_upg_o_cmore = {
+			[Idstring("cmore"):key()] = {
+				uv_offset_rot = Vector3(0.082979, 0.543504, 0),
+				uv_scale = Vector3(8.74877, 12.8011, 0.100883)
 			}
 		},
 		wpn_upg_ak_s_skfoldable = {
@@ -8867,12 +8916,11 @@ function BlackMarketTweakData:_init_weapon_skins()
 				uv_offset_rot = Vector3(-2, -2, 0)
 			}
 		},
-		wpn_fps_sho_saiga_fg_holy = {
-			[Idstring("mtr_holy"):key()] = {
-				base_gradient = Idstring("units/payday2_cash/safes/buck/base_gradient/base_buck_002_df"),
-				uv_offset_rot = Vector3(-2, -2, 1.62287),
-				uv_scale = Vector3(0.739425, 0.548726, 1),
-				pattern_pos = Vector3(0, 0.003, 0)
+		wpn_fps_upg_o_cs = {
+			[Idstring("mtr_cs"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/buck/base_gradient/base_buck_009_df"),
+				uv_offset_rot = Vector3(0, 0.902934, 0),
+				uv_scale = Vector3(9.74994, 11.2279, 0.0269498)
 			}
 		},
 		wpn_fps_upg_m4_s_pts = {
@@ -8894,16 +8942,9 @@ function BlackMarketTweakData:_init_weapon_skins()
 		},
 		wpn_upg_saiga_fg_lowerrail = {
 			[Idstring("lower_rail"):key()] = {
-				sticker = Idstring("units/payday2_cash/safes/buck/sticker/buck_sticker_004_df"),
 				uv_offset_rot = Vector3(0.187455, 1.06511, 4.70977),
-				uv_scale = Vector3(0.834774, 0.834774, 0)
-			}
-		},
-		wpn_upg_saiga_fg_lowerrail_short = {
-			[Idstring("lower_rail_short"):key()] = {
 				sticker = Idstring("units/payday2_cash/safes/buck/sticker/buck_sticker_004_df"),
-				uv_offset_rot = Vector3(0.454567, 1.14143, 4.70977),
-				uv_scale = Vector3(1.40687, 0.644076, 0)
+				uv_scale = Vector3(0.834774, 0.834774, 0)
 			}
 		},
 		wpn_fps_upg_o_specter = {
@@ -8912,17 +8953,18 @@ function BlackMarketTweakData:_init_weapon_skins()
 				uv_scale = Vector3(9.51157, 10.7988, 0.086573)
 			}
 		},
-		wpn_fps_upg_o_t1micro = {
-			[Idstring("mtr_t1micro"):key()] = {
-				uv_offset_rot = Vector3(0.120217, 0.865155, 6.27619),
-				uv_scale = Vector3(4.79177, 5.17317, 0.053184)
+		wpn_fps_sho_saiga_fg_holy = {
+			[Idstring("mtr_holy"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/buck/base_gradient/base_buck_002_df"),
+				uv_offset_rot = Vector3(-2, -2, 1.62287),
+				uv_scale = Vector3(0.739425, 0.548726, 1),
+				pattern_pos = Vector3(0, 0.003, 0)
 			}
 		},
-		wpn_fps_upg_o_cs = {
-			[Idstring("mtr_cs"):key()] = {
-				base_gradient = Idstring("units/payday2_cash/safes/buck/base_gradient/base_buck_009_df"),
-				uv_offset_rot = Vector3(0, 0.902934, 0),
-				uv_scale = Vector3(9.74994, 11.2279, 0.0269498)
+		wpn_fps_upg_o_aimpoint = {
+			[Idstring("aimpoint"):key()] = {
+				uv_offset_rot = Vector3(-0.378467, 1.18766, 1.62287),
+				uv_scale = Vector3(10.9418, 10.7034, 0)
 			}
 		},
 		wpn_fps_upg_o_aimpoint_2 = {
@@ -8937,15 +8979,15 @@ function BlackMarketTweakData:_init_weapon_skins()
 				uv_scale = Vector3(1.69292, 0.930124, 0.0412594)
 			}
 		},
-		wpn_fps_upg_o_acog = {
-			[Idstring("mtr_acog"):key()] = {
-				uv_offset_rot = Vector3(0.0825188, 0.893394, 0)
-			}
-		},
 		wpn_fps_upg_m4_s_standard = {
 			[Idstring("stock_standard"):key()] = {
 				uv_offset_rot = Vector3(0.36871, 1.00787, 4.70977),
 				uv_scale = Vector3(0.977799, 1, 0.0889579)
+			}
+		},
+		wpn_fps_upg_o_acog = {
+			[Idstring("mtr_acog"):key()] = {
+				uv_offset_rot = Vector3(0.0825188, 0.893394, 0)
 			}
 		},
 		wpn_fps_upg_o_ak_scopemount = {
@@ -8971,9 +9013,10 @@ function BlackMarketTweakData:_init_weapon_skins()
 				uv_scale = Vector3(0.7871, 0.501052, 1)
 			}
 		},
-		wpn_fps_upg_ak_g_hgrip = {
-			[Idstring("mtr_ergoak"):key()] = {
-				uv_scale = Vector3(0.834774, 0.358028, 1)
+		wpn_fps_upg_o_t1micro = {
+			[Idstring("mtr_t1micro"):key()] = {
+				uv_offset_rot = Vector3(0.120217, 0.865155, 6.27619),
+				uv_scale = Vector3(4.79177, 5.17317, 0.053184)
 			}
 		},
 		wpn_fps_upg_o_eotech_xps = {
@@ -8982,10 +9025,9 @@ function BlackMarketTweakData:_init_weapon_skins()
 				uv_offset_rot = Vector3(-0.0605769, 0.756758, 0)
 			}
 		},
-		wpn_fps_upg_o_cmore = {
-			[Idstring("cmore"):key()] = {
-				uv_offset_rot = Vector3(0.082979, 0.543504, 0),
-				uv_scale = Vector3(8.74877, 12.8011, 0.100883)
+		wpn_fps_upg_ak_g_pgrip = {
+			[Idstring("mtr_akgrip"):key()] = {
+				uv_scale = Vector3(0.358028, 0.372703, 0.0579538)
 			}
 		},
 		wpn_upg_saiga_fg_standard = {
@@ -9002,20 +9044,20 @@ function BlackMarketTweakData:_init_weapon_skins()
 		},
 		sight = {
 			base_gradient = Idstring("units/payday2_cash/safes/buck/base_gradient/base_buck_012_c_df"),
-			uv_offset_rot = Vector3(0.114757, 0.807537, 0),
 			sticker = Idstring("units/payday2_cash/safes/buck/sticker/buck_sticker_006_df"),
+			uv_offset_rot = Vector3(0.114757, 0.807537, 0),
 			uv_scale = Vector3(7.03248, 7.08016, 0.0698785)
 		},
 		stock = {
 			base_gradient = Idstring("units/payday2_cash/safes/pack/base_gradient/base_pack_003_b_df"),
-			uv_offset_rot = Vector3(0.340091, 1.01287, 4.7108),
 			sticker = Idstring("units/payday2_cash/safes/buck/sticker/buck_sticker_005_df"),
+			uv_offset_rot = Vector3(0.340091, 1.01287, 4.7108),
 			uv_scale = Vector3(1.63624, 1.2135, 0.18674)
 		},
 		grip = {
 			base_gradient = Idstring("units/payday2_cash/safes/dinner/base_gradient/base_assault_002_df"),
-			uv_offset_rot = Vector3(-0.210133, 0.884934, 1.53501),
 			sticker = Idstring("units/payday2_cash/safes/buck/sticker/buck_sticker_004_df"),
+			uv_offset_rot = Vector3(-0.210133, 0.884934, 1.53501),
 			uv_scale = Vector3(0.644076, 0.358028, 0.146196)
 		},
 		upper_reciever = {
@@ -9026,14 +9068,22 @@ function BlackMarketTweakData:_init_weapon_skins()
 			uv_offset_rot = Vector3(0.158836, 1.04449, 4.73974),
 			uv_scale = Vector3(0.834774, 0.930124, 0.148581),
 			pattern_pos = Vector3(-0.108275, 0.111138, 0),
-			pattern_gradient = Idstring("units/payday2_cash/safes/buck/pattern_gradient/gradient_buck_008_df"),
+			pattern_tweak = Vector3(1.15908, 3.13635, 1),
 			sticker = Idstring("units/payday2_cash/safes/buck/sticker/buck_sticker_004_df"),
-			pattern_tweak = Vector3(1.15908, 3.13635, 1)
+			pattern_gradient = Idstring("units/payday2_cash/safes/buck/pattern_gradient/gradient_buck_008_df")
+		},
+		barrel = {
+			base_gradient = Idstring("units/payday2_cash/safes/burn/base_gradient/base_burn_014_df"),
+			uv_offset_rot = Vector3(-0.127895, 0.979251, 1.56293),
+			uv_scale = Vector3(1.54989, 1.88362, 0.0412594),
+			pattern_pos = Vector3(-0.423086, 0, 0),
+			pattern_tweak = Vector3(1.87455, 0, 1),
+			pattern_gradient = Idstring("units/payday2_cash/safes/buck/pattern_gradient/gradient_buck_008_df")
 		},
 		lower_reciever = {
 			base_gradient = Idstring("units/payday2_cash/safes/buck/base_gradient/base_buck_012_b_df"),
-			sticker = Idstring("units/payday2_cash/safes/buck/sticker/buck_sticker_004_df"),
 			uv_offset_rot = Vector3(-0.470324, 0.949172, 1.5929),
+			sticker = Idstring("units/payday2_cash/safes/buck/sticker/buck_sticker_004_df"),
 			uv_scale = Vector3(0.407702, 0.8788, 0.0507991)
 		},
 		magazine = {
@@ -9041,16 +9091,8 @@ function BlackMarketTweakData:_init_weapon_skins()
 			uv_offset_rot = Vector3(0.292853, 1.11281, 6.22325),
 			uv_scale = Vector3(0.453377, 0.7871, 0.0984976),
 			pattern_pos = Vector3(0.321011, 0.0157406, 0),
-			pattern_tweak = Vector3(0.872886, 4.6798, 1),
-			sticker = Idstring("units/payday2_cash/safes/buck/sticker/buck_sticker_004_df")
-		},
-		barrel = {
-			base_gradient = Idstring("units/payday2_cash/safes/burn/base_gradient/base_burn_014_df"),
-			uv_offset_rot = Vector3(-0.127895, 0.979251, 1.56293),
-			uv_scale = Vector3(1.54989, 1.88362, 0.0412594),
-			pattern_pos = Vector3(-0.423086, 0, 0),
-			pattern_gradient = Idstring("units/payday2_cash/safes/buck/pattern_gradient/gradient_buck_008_df"),
-			pattern_tweak = Vector3(1.87455, 0, 1)
+			sticker = Idstring("units/payday2_cash/safes/buck/sticker/buck_sticker_004_df"),
+			pattern_tweak = Vector3(0.872886, 4.6798, 1)
 		}
 	}
 	self.weapon_skins.p226_buck = {}
@@ -13896,6 +13938,11 @@ function BlackMarketTweakData:_init_weapon_skins()
 				pattern = "units/payday2_cash/safes/smosh/pattern/smosh_pattern_011_df"
 			}
 		},
+		wpn_fps_upg_o_spot = {
+			[Idstring("mtr_spot"):key()] = {
+				base_gradient = Idstring("units/payday2_cash/safes/buck/base_gradient/base_buck_015_df")
+			}
+		},
 		wpn_fps_gre_m32_upper_reciever = {
 			[Idstring("body"):key()] = {
 				base_gradient = "units/payday2_cash/safes/smosh/base_gradient/base_smosh_011_b_df"
@@ -13904,15 +13951,15 @@ function BlackMarketTweakData:_init_weapon_skins()
 	}
 	self.weapon_skins.m32_smosh.types = {
 		lower_reciever = {
-			uv_scale = Vector3(16.3624, 16.3624, 0.389459),
+			uv_offset_rot = Vector3(-0.203673, 1.04603, 1.87761),
 			sticker = "units/payday2_cash/safes/smosh/sticker/smosh_sticker_011_b_df",
-			uv_offset_rot = Vector3(-0.203673, 1.04603, 1.87761)
+			uv_scale = Vector3(16.3624, 16.3624, 0.389459)
 		},
 		magazine = {
 			pattern_tweak = Vector3(2.87622, 0, 1),
+			sticker = "units/payday2_cash/safes/smosh/sticker/smosh_sticker_011_df",
 			uv_scale = Vector3(10.4984, 10.4984, 1),
 			pattern_pos = Vector3(-0.260911, 0.111138, 0),
-			sticker = "units/payday2_cash/safes/smosh/sticker/smosh_sticker_011_df",
 			uv_offset_rot = Vector3(-0.0414975, 1.02695, 5.80367),
 			pattern = "units/payday2_cash/safes/smosh/pattern/smosh_pattern_011_df"
 		}

@@ -1,11 +1,8 @@
 core:import("CoreMissionScriptElement")
 ElementDialogue = ElementDialogue or class(CoreMissionScriptElement.MissionScriptElement)
 ElementDialogue.MutedDialogs = {
-	"play_pln_",
 	"pln_",
-	"play_vld_",
-	"play_crn_",
-	"play_hnc_",
+	"play_pln_",
 	"btc_",
 	"play_btc_",
 	"vld_",
@@ -49,7 +46,9 @@ ElementDialogue.MutedDialogs = {
 	"bot_",
 	"play_bot_",
 	"snp_",
-	"play_snp_"
+	"play_snp_",
+	"com_",
+	"play_com_"
 }
 
 function ElementDialogue:init(...)

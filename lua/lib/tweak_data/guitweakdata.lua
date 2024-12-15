@@ -1864,6 +1864,17 @@ function GuiTweakData:init()
 					videos = {"jimmy1"},
 					post_event = "pln_contact_jimmy"
 				}
+			},
+			{
+				id = "continental_contact",
+				name_id = "menu_continental",
+				{
+					desc_id = "menu_continental_desc_codex",
+					videos = {
+						"continental1"
+					},
+					post_event = "continental_quote_set_a"
+				}
 			}
 		},
 		{
@@ -4662,6 +4673,11 @@ function GuiTweakData:init()
 		"bonus"
 	}
 	self.new_heists = {}
+	table.insert(self.new_heists, {
+		name_id = "menu_nh_wick_heist",
+		texture_path = "guis/textures/pd2/new_heists/wick_heists",
+		url = "http://store.steampowered.com/app/591710"
+	})
 	table.insert(self.new_heists, {
 		name_id = "menu_nh_sw_collab",
 		texture_path = "guis/textures/pd2/new_heists/sw_collab",

@@ -9,9 +9,11 @@ function RandomInstanceElement:init(unit)
 	self._hed.amount = 1
 	self._hed.amount_random = 0
 	self._hed.instances = {}
+	self._hed.unique_instance = false
 	table.insert(self._save_values, "amount")
 	table.insert(self._save_values, "amount_random")
 	table.insert(self._save_values, "instances")
+	table.insert(self._save_values, "unique_instance")
 end
 
 function RandomInstanceElement:update_editing(t, dt)
@@ -162,6 +164,7 @@ function RandomInstanceElement:_build_panel(panel, panel_sizer)
 	panel_sizer:add(btn_toolbar, 0, 1, "EXPAND,LEFT")
 	self:_build_value_number(panel, panel_sizer, "amount", {floats = 0, min = 1}, "Specifies the amount of instances to be executed")
 	self:_build_value_number(panel, panel_sizer, "amount_random", {floats = 0, min = 0}, "Add a random amount to amount")
+	self:_build_value_checkbox(panel, panel_sizer, "unique_instance", "Always pick an instance that hasn't been selected yet until all instances have been selected", "Pick Unique Instances")
 	self:_add_help_text("Use 'Amount' only to specify an exact amount of instances to execute. Use 'Amount Random' to add a random amount to 'Amount' ('Amount' + random('Amount Random').")
 	self._panel:layout()
 	self._gui_items = self._gui_items or {}

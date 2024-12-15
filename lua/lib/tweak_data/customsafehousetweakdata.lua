@@ -1125,6 +1125,16 @@ function CustomSafehouseTweakData:_init_trophies(tweak_data)
 		},
 		image_id = "safehouse_trophies_preview_tonys_car"
 	})
+	table.insert(self.trophies, {
+		id = "trophy_fish_trophy",
+		name_id = "trophy_fish_trophy",
+		desc_id = "trophy_fish_trophy_desc",
+		objective_id = "trophy_fish_trophy_objective",
+		objectives = {
+			self:_progress("trophy_fish_trophy", 1)
+		},
+		image_id = "safehouse_trophies_preview_yacht"
+	})
 end
 
 function CustomSafehouseTweakData:get_trophy_data(id)

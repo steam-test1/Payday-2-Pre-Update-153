@@ -1148,6 +1148,9 @@ function CoreEditor:on_hide_all_layers()
 end
 
 function CoreEditor:set_unit_visible(unit, visible)
+	if not alive(unit) then
+		return
+	end
 	if unit:mission_element() then
 		unit:mission_element():on_set_visible(visible)
 	end

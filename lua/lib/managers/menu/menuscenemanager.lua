@@ -932,6 +932,10 @@ function MenuSceneManager:change_lobby_character(i, character_id)
 	end
 	local sequence = managers.blackmarket:character_sequence_by_character_id(character_id, i)
 	unit:damage():run_sequence_simple(sequence)
+	local mask_data = self._mask_units[unit:key()]
+	if mask_data then
+		self:update_mask_offset(mask_data)
+	end
 end
 
 function MenuSceneManager:test_show_all_lobby_characters(enable_card)
@@ -1149,18 +1153,47 @@ function MenuSceneManager:clbk_mask_unit_loaded(mask_data_param, status, asset_t
 	if mask_data ~= mask_data_param then
 		return
 	end
-	if mask_data.ready or asset_name ~= mask_data.mask_name then
+	if asset_name ~= mask_data.mask_name then
+		return
+	end
+	if mask_data.ready then
 		return
 	end
 	local mask_align = mask_data.unit:get_object(Idstring("Head"))
 	local mask_unit = self:_spawn_mask(mask_data.mask_name, false, mask_align:position(), mask_align:rotation(), mask_data.mask_id)
+	mask_data.mask_align = mask_align
 	mask_data.mask_unit = mask_unit
 	mask_data.ready = true
-	mask_data.unit:link(mask_align:name(), mask_unit, mask_unit:orientation_object():name())
+	mask_data.unit:link(mask_align:name(), mask_unit)
+	self:update_mask_offset(mask_data)
 	self:_chk_character_visibility(mask_data.unit)
 	if mask_data.ready_clbk then
 		mask_data.ready_clbk(mask_unit)
 		mask_data.ready_clbk = nil
+	end
+end
+
+function MenuSceneManager:update_mask_offset(mask_data)
+	local char = managers.blackmarket:get_real_character(nil, mask_data.peer_id)
+	local mask_tweak = tweak_data.blackmarket.masks[mask_data.mask_id]
+	if mask_tweak and mask_tweak.offsets and mask_tweak.offsets[char] then
+		local char_tweak = mask_tweak.offsets[char]
+		self:set_mask_offset(mask_data.mask_unit, mask_data.mask_align, char_tweak[1] or Vector3(0, 0, 0), char_tweak[2] or Rotation(0, 0, 0))
+		self:set_mask_offset(mask_data.mask_unit, mask_data.mask_align, char_tweak[1] or Vector3(0, 0, 0), char_tweak[2] or Rotation(0, 0, 0))
+	else
+		self:set_mask_offset(mask_data.mask_unit, mask_data.mask_align, Vector3(0, 0, 0), Rotation(0, 0, 0))
+	end
+end
+
+function MenuSceneManager:set_mask_offset(mask_unit, mask_align, position, rotation)
+	if not alive(mask_unit) then
+		return
+	end
+	if rotation then
+		mask_unit:set_rotation(mask_align:rotation() * rotation)
+	end
+	if position then
+		mask_unit:set_position(mask_align:position() + mask_unit:rotation():x() * position.x + mask_unit:rotation():z() * position.z + mask_unit:rotation():y() * position.y)
 	end
 end
 
@@ -1418,6 +1451,10 @@ function MenuSceneManager:on_set_preferred_character()
 	if equipped_mask.mask_id then
 		self:set_character_mask_by_id(equipped_mask.mask_id, equipped_mask.blueprint)
 		self:_check_character_mask_sequence(self._character_unit, equipped_mask.mask_id, nil)
+	end
+	local mask_data = self._mask_units[self._character_unit:key()]
+	if mask_data then
+		self:update_mask_offset(mask_data)
 	end
 end
 
