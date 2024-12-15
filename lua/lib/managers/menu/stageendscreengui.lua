@@ -623,7 +623,11 @@ function StageEndScreenGui:play_bain_debrief()
 		local snd_event
 		local tactic = managers.groupai:state():enemy_weapons_hot() and "loud" or "stealth"
 		if type(outro_event) == "table" then
-			snd_event = outro_event[tactic]
+			if outro_event.loud or outro_event.stealth then
+				snd_event = outro_event[tactic]
+			else
+				snd_event = outro_event[math.random(#outro_event)]
+			end
 		else
 			snd_event = outro_event
 		end

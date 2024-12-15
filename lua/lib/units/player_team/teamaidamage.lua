@@ -370,6 +370,9 @@ function TeamAIDamage:_check_bleed_out()
 		self._regenerate_t = nil
 		self._bleed_out_paused_count = 0
 		if Network:is_server() then
+			if self._unit:movement():carrying_bag() then
+				self._unit:movement():throw_bag()
+			end
 			if not self._to_dead_clbk_id then
 				self._to_dead_clbk_id = "TeamAIDamage_to_dead" .. tostring(self._unit:key())
 				self._to_dead_t = TimerManager:game():time() + self:down_time()

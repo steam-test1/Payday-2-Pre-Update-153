@@ -3138,6 +3138,67 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.chc_terry_begins.dlc = "chico"
 	self.masks.chc_terry_begins.texture_bundle_folder = "chico"
 	self.masks.chc_terry_begins.sort_number = 38
+	self.masks.swm_sydney = {}
+	self.masks.swm_sydney.unit = "units/pd2_dlc_swm/masks/msk_swm_sydney"
+	self.masks.swm_sydney.name_id = "bm_msk_mega_sydney"
+	self.masks.swm_sydney.pcs = {}
+	self.masks.swm_sydney.value = 0
+	self.masks.swm_sydney.texture_bundle_folder = "swm"
+	self.masks.swm_sydney.sort_number = 39
+	self.masks.swm_sydney.dlc = "swm_bundle"
+	self.masks.swm_sydney.global_value = "swm_bundle"
+	self.masks.sha_01 = {}
+	self.masks.sha_01.unit = "units/pd2_dlc_sha/masks/sha_01/msk_sha_01"
+	self.masks.sha_01.name_id = "bm_sha_01"
+	self.masks.sha_01.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.sha_01.value = 0
+	self.masks.sha_01.texture_bundle_folder = "sha"
+	self.masks.sha_01.sort_number = 40
+	self.masks.sha_01.global_value = "sha"
+	self.masks.sha_02 = {}
+	self.masks.sha_02.unit = "units/pd2_dlc_sha/masks/sha_02/msk_sha_02"
+	self.masks.sha_02.name_id = "bm_sha_02"
+	self.masks.sha_02.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.sha_02.value = 0
+	self.masks.sha_02.texture_bundle_folder = "sha"
+	self.masks.sha_02.sort_number = 40
+	self.masks.sha_02.global_value = "sha"
+	self.masks.sha_03 = {}
+	self.masks.sha_03.unit = "units/pd2_dlc_sha/masks/sha_03/msk_sha_03"
+	self.masks.sha_03.name_id = "bm_sha_03"
+	self.masks.sha_03.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.sha_03.value = 0
+	self.masks.sha_03.texture_bundle_folder = "sha"
+	self.masks.sha_03.sort_number = 40
+	self.masks.sha_03.global_value = "sha"
+	self.masks.sha_04 = {}
+	self.masks.sha_04.unit = "units/pd2_dlc_sha/masks/sha_04/msk_sha_04"
+	self.masks.sha_04.name_id = "bm_sha_04"
+	self.masks.sha_04.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.sha_04.value = 0
+	self.masks.sha_04.texture_bundle_folder = "sha"
+	self.masks.sha_04.sort_number = 40
+	self.masks.sha_04.global_value = "sha"
 	self.masks.yor = {}
 	self.masks.yor.unit = "units/pd2_dlc_yor/masks/yor/msk_yor"
 	self.masks.yor.name_id = "bm_msk_yor"

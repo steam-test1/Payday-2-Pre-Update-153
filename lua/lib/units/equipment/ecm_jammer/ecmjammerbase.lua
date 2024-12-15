@@ -463,6 +463,9 @@ function ECMJammerBase._detect_and_give_dmg(hit_pos, device_unit, user_unit, ran
 		if u_data.unit.brain and u_data.unit:brain().is_hostage and u_data.unit:brain():is_hostage() then
 			return
 		end
+		if u_data.unit:anim_data() and u_data.unit:anim_data().act then
+			return
+		end
 		if math.random() >= u_data.char_tweak.ecm_vulnerability then
 			return
 		end

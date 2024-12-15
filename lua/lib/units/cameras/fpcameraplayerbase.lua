@@ -35,19 +35,16 @@ function FPCameraPlayerBase:init(unit)
 	self._aim_assist.direction = Vector3()
 	self._aim_assist.distance = 0
 	self._aim_assist.mrotation = Rotation()
+	self._aim_assist.distance_to_aim_line = 0
+	self._aim_assist_sticky = {}
+	self._aim_assist_sticky.direction = Vector3()
+	self._aim_assist_sticky.distance = 0
+	self._aim_assist_sticky.mrotation = Rotation()
+	self._aim_assist_sticky.distance_to_aim_line = 0
+	self._aim_assist_sticky.is_sticky = true
 	self._fov = {fov = 75}
 	self._input = {}
-	self._tweak_data = {}
-	self._tweak_data.look_speed_dead_zone = 0.1
-	self._tweak_data.look_speed_standard = 120
-	self._tweak_data.look_speed_fast = 360
-	self._tweak_data.look_speed_steel_sight = 60
-	self._tweak_data.look_speed_transition_to_fast = 0.5
-	self._tweak_data.look_speed_transition_zone = 0.8
-	self._tweak_data.look_speed_transition_occluder = 0.95
-	self._tweak_data.uses_keyboard = true
-	self._tweak_data.aim_assist_speed = 200
-	self._tweak_data.aim_assist_use_sticky_aim = false
+	self._tweak_data = tweak_data.input.gamepad.deprecated
 	self._camera_properties.look_speed_current = self._tweak_data.look_speed_standard
 	self._camera_properties.look_speed_transition_timer = 0
 	self._camera_properties.target_tilt = 0
@@ -66,6 +63,7 @@ function FPCameraPlayerBase:set_parent_unit(parent_unit)
 	local controller_type = self._parent_unit:base():controller():get_default_controller_id()
 	if controller_type == "keyboard" then
 		self._look_function = callback(self, self, "_pc_look_function")
+		self._tweak_data.uses_keyboard = true
 	elseif controller_type == "steampad" then
 		self._look_function = callback(self, self, "_steampad_look_function")
 		self._tweak_data.uses_keyboard = true
@@ -87,7 +85,7 @@ end
 
 function FPCameraPlayerBase:update(unit, t, dt)
 	if self._tweak_data.aim_assist_use_sticky_aim then
-		self:_update_aim_assist(t, dt)
+		self:_update_aim_assist_sticky(t, dt)
 	end
 	self._parent_unit:base():controller():get_input_axis_clbk("look", callback(self, self, "_update_rot"))
 	self:_update_stance(t, dt)
@@ -256,10 +254,7 @@ function FPCameraPlayerBase:_update_movement(t, dt)
 	self._parent_unit:m_position(new_head_pos)
 	mvector3.add(new_head_pos, self._head_stance.translation)
 	local stick_input_x, stick_input_y = 0, 0
-	local aim_assist_x, aim_assist_y = 0, 0
-	if not self._tweak_data.aim_assist_use_sticky_aim then
-		aim_assist_x, aim_assist_y = self:_get_aim_assist(t, dt, self._tweak_data.aim_assist_speed)
-	end
+	local aim_assist_x, aim_assist_y = self:_get_aim_assist(t, dt, self._tweak_data.aim_assist_snap_speed, self._aim_assist)
 	stick_input_x = stick_input_x + self:_horizonatal_recoil_kick(t, dt) + aim_assist_x
 	stick_input_y = stick_input_y + self:_vertical_recoil_kick(t, dt) + aim_assist_y
 	local look_polar_spin = data.spin - stick_input_x
@@ -298,7 +293,7 @@ end
 
 local mvec1 = Vector3()
 
-function FPCameraPlayerBase:_update_rot(axis)
+function FPCameraPlayerBase:_update_rot(axis, unscaled_axis)
 	if self._animate_pitch then
 		self:animate_pitch_upd()
 	end
@@ -314,7 +309,7 @@ function FPCameraPlayerBase:_update_rot(axis)
 	mvector3.add(new_head_pos, self._head_stance.translation)
 	self._input.look = axis
 	self._input.look_multiplier = self._parent_unit:base():controller():get_setup():get_connection("look"):get_multiplier()
-	local stick_input_x, stick_input_y = self._look_function(axis, self._input.look_multiplier, dt)
+	local stick_input_x, stick_input_y = self._look_function(axis, self._input.look_multiplier, dt, unscaled_axis)
 	local look_polar_spin = data.spin - stick_input_x
 	local look_polar_pitch = math.clamp(data.pitch + stick_input_y, -85, 85)
 	local player_state = managers.player:current_state()
@@ -472,25 +467,25 @@ function FPCameraPlayerBase:_set_camera_position_in_vehicle()
 	end
 end
 
-function FPCameraPlayerBase:_get_aim_assist(t, dt, speed)
-	if self._aim_assist.distance == 0 then
+function FPCameraPlayerBase:_get_aim_assist(t, dt, speed, aim_data)
+	if aim_data.distance == 0 then
 		return 0, 0
 	end
-	local s_value = math.step(0, self._aim_assist.distance, speed * dt)
-	local r_value_x = mvector3.x(self._aim_assist.direction) * s_value
-	local r_value_y = mvector3.y(self._aim_assist.direction) * s_value
-	if self._tweak_data.aim_assist_use_sticky_aim then
-		local strength = 1 - math.min(1, (self._aim_assist.distance_to_aim_line or 0) / 100)
+	local s_value = math.step(0, aim_data.distance, speed * dt)
+	local r_value_x = mvector3.x(aim_data.direction) * s_value
+	local r_value_y = mvector3.y(aim_data.direction) * s_value
+	if aim_data.is_sticky and self._tweak_data.aim_assist_use_sticky_aim then
+		local strength = 1 - math.min(1, (aim_data.distance_to_aim_line or 0) / 100)
 		local mx = 1 - self._tweak_data.aim_assist_gradient_max
 		local mn = 1 - self._tweak_data.aim_assist_gradient_min
-		local min_strength = math.lerp(mn, mx, math.min(1, (self._aim_assist.target_distance or 0) / self._tweak_data.aim_assist_gradient_max_distance))
+		local min_strength = math.lerp(mn, mx, math.min(1, (aim_data.target_distance or 0) / self._tweak_data.aim_assist_gradient_max_distance))
 		strength = math.max(0, strength - min_strength) / (1 - min_strength)
 		r_value_x = r_value_x * strength
 		r_value_y = r_value_y * strength
 	end
-	self._aim_assist.distance = self._aim_assist.distance - s_value
-	if self._aim_assist.distance <= 0 then
-		self:clbk_stop_aim_assist()
+	aim_data.distance = aim_data.distance - s_value
+	if aim_data.distance <= 0 then
+		self:_stop_aim_assist(aim_data)
 	end
 	return r_value_x, r_value_y
 end
@@ -850,24 +845,11 @@ function FPCameraPlayerBase:clbk_stance_entered(new_shoulder_stance, new_head_st
 	end
 end
 
-function FPCameraPlayerBase:_update_aim_assist(t, dt)
-	if managers.controller:get_default_wrapper_type() ~= "pc" and managers.user:get_setting("aim_assist") then
-		local weapon = self._parent_unit:inventory():equipped_unit()
-		local player_state = self._parent_unit:movement():current_state()
-		if weapon then
-			local closest_ray = weapon:base():get_aim_assist(player_state:get_fire_weapon_position(), player_state:get_fire_weapon_direction(), nil, true)
-			self:clbk_aim_assist(closest_ray)
-		else
-			self:clbk_stop_aim_assist()
-		end
-	end
-end
-
-function FPCameraPlayerBase:clbk_aim_assist(col_ray)
+function FPCameraPlayerBase:_start_aim_assist(col_ray, aim_data)
 	if col_ray then
 		local ray = col_ray.ray
 		local r1 = self._parent_unit:camera():rotation()
-		local r2 = self._aim_assist.mrotation or Rotation()
+		local r2 = aim_data.mrotation or Rotation()
 		mrotation.set_look_at(r2, ray, r1:z())
 		local yaw = mrotation.yaw(r1) - mrotation.yaw(r2)
 		local pitch = mrotation.pitch(r1) - mrotation.pitch(r2)
@@ -881,18 +863,39 @@ function FPCameraPlayerBase:clbk_aim_assist(col_ray)
 		elseif pitch < -180 then
 			pitch = 360 + pitch
 		end
-		mvector3.set_static(self._aim_assist.direction, yaw, -pitch, 0)
-		self._aim_assist.distance = mvector3.normalize(self._aim_assist.direction)
-		self._aim_assist.target_distance = col_ray.distance
-		self._aim_assist.distance_to_aim_line = col_ray.distance_to_aim_line
+		mvector3.set_static(aim_data.direction, yaw, -pitch, 0)
+		aim_data.distance = mvector3.normalize(aim_data.direction)
+		aim_data.target_distance = col_ray.distance
+		aim_data.distance_to_aim_line = col_ray.distance_to_aim_line
 	end
 end
 
+function FPCameraPlayerBase:_stop_aim_assist(aim_data)
+	mvector3.set_static(aim_data.direction, 0, 0, 0)
+	aim_data.distance = 0
+	aim_data.target_distance = 0
+	aim_data.distance_to_aim_line = 0
+end
+
+function FPCameraPlayerBase:_update_aim_assist_sticky(t, dt)
+	if managers.controller:get_default_wrapper_type() ~= "pc" and managers.user:get_setting("sticky_aim") then
+		local weapon = self._parent_unit:inventory():equipped_unit()
+		local player_state = self._parent_unit:movement():current_state()
+		if weapon then
+			local closest_ray = weapon:base():get_aim_assist(player_state:get_fire_weapon_position(), player_state:get_fire_weapon_direction(), nil, true)
+			self:_start_aim_assist(closest_ray, self._aim_assist_sticky)
+		else
+			self:_stop_aim_assist(self._aim_assist_sticky)
+		end
+	end
+end
+
+function FPCameraPlayerBase:clbk_aim_assist(col_ray)
+	self:_start_aim_assist(col_ray, self._aim_assist)
+end
+
 function FPCameraPlayerBase:clbk_stop_aim_assist()
-	mvector3.set_static(self._aim_assist.direction, 0, 0, 0)
-	self._aim_assist.distance = 0
-	self._aim_assist.target_distance = 0
-	self._aim_assist.distance_to_aim_line = 0
+	self:_stop_aim_assist(self._aim_assist)
 end
 
 function FPCameraPlayerBase:animate_fov(new_fov, duration_multiplier)
@@ -1180,6 +1183,7 @@ function FPCameraPlayerBase:spawn_mask()
 		local mtr_hair_solid_id_string = Idstring("mtr_hair_solid")
 		local mtr_hair_effect_id_string = Idstring("mtr_hair_effect")
 		local mtr_bloom_glow_id_string = Idstring("mtr_bloom_glow")
+		local mtr_opacity = Idstring("mtr_opacity")
 		local glow_id_strings = {}
 		for i = 1, 5 do
 			glow_id_strings[Idstring("glow" .. tostring(i)):key()] = true
@@ -1192,6 +1196,7 @@ function FPCameraPlayerBase:spawn_mask()
 			if material:name() == glass_id_string then
 				material:set_render_template(Idstring("opacity:CUBE_ENVIRONMENT_MAPPING:CUBE_FRESNEL:DIFFUSE_TEXTURE:FPS"))
 			elseif material:name() == mtr_hair_solid_id_string then
+			elseif material:name() == mtr_opacity then
 			elseif material:name() == mtr_hair_effect_id_string then
 			elseif material:name() == mtr_bloom_glow_id_string then
 				material:set_render_template(Idstring("generic:DEPTH_SCALING:DIFFUSE_TEXTURE:SELF_ILLUMINATION:SELF_ILLUMINATION_BLOOM"))

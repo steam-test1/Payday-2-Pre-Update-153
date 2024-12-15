@@ -598,7 +598,7 @@ function CopLogicBase._upd_attention_obj_detection(data, min_reaction, max_react
 	return delay
 end
 
-function CopLogicBase._create_detected_attention_object_data(time, my_unit, u_key, attention_info, settings)
+function CopLogicBase._create_detected_attention_object_data(time, my_unit, u_key, attention_info, settings, forced)
 	local ext_brain = my_unit:brain()
 	attention_info.handler:add_listener("detect_" .. tostring(my_unit:key()), callback(ext_brain, ext_brain, "on_detected_attention_obj_modified"))
 	local att_unit = attention_info.unit
@@ -654,7 +654,8 @@ function CopLogicBase._create_detected_attention_object_data(time, my_unit, u_ke
 		verified_t = false,
 		has_team = att_unit:movement() and att_unit:movement().team,
 		health_ratio = att_unit:character_damage() and att_unit:character_damage().health_ratio,
-		objective = att_unit:brain() and att_unit:brain().objective
+		objective = att_unit:brain() and att_unit:brain().objective,
+		forced = forced
 	}
 	return new_entry
 end
@@ -885,7 +886,7 @@ function CopLogicBase._upd_suspicion(data, my_data, attention_obj)
 		attention_obj.unit:movement():on_uncovered(data.unit)
 		
 		local reaction, state_name
-		if attention_obj.dis < 2000 and attention_obj.verified and not data.char_tweak.no_arrest then
+		if attention_obj.dis < 2000 and attention_obj.verified and not data.char_tweak.no_arrest and not attention_obj.forced then
 			reaction = AIAttentionObject.REACT_ARREST
 			state_name = "arrest"
 		else
@@ -981,7 +982,7 @@ function CopLogicBase._get_logic_state_from_reaction(data, reaction)
 		end
 	elseif reaction == AIAttentionObject.REACT_ARREST and not data.is_converted then
 		return "arrest"
-	elseif (data.char_tweak.calls_in or not data.char_tweak.no_arrest) and not police_is_being_called and not managers.groupai:state():is_police_called() and not data.unit:movement():cool() and not data.is_converted and (not (data.attention_obj and data.attention_obj.verified) or not (data.attention_obj.dis < 1500)) then
+	elseif (data.char_tweak.calls_in or not data.char_tweak.no_arrest) and not police_is_being_called and not managers.groupai:state():is_police_called() and not data.unit:movement():cool() and not data.is_converted and (not (data.attention_obj and data.attention_obj.verified) or not (data.attention_obj.dis < 1500)) and not data.attention_obj.forced then
 		return "arrest"
 	else
 		return "attack"

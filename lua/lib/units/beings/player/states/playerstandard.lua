@@ -174,7 +174,10 @@ function PlayerStandard:enter(state_data, enter_data)
 		managers.navigation:add_pos_reservation(self._pos_reservation)
 		managers.navigation:add_pos_reservation(self._pos_reservation_slow)
 	end
-	managers.hud:set_ammo_amount(self._equipped_unit:base():selection_index(), self._equipped_unit:base():ammo_info())
+	for _, data in ipairs(self._ext_inventory._available_selections) do
+		local unit = data.unit
+		managers.hud:set_ammo_amount(unit:base():selection_index(), unit:base():ammo_info())
+	end
 	if enter_data and enter_data.equip_weapon then
 		self:_start_action_unequip_weapon(managers.player:player_timer():time(), {
 			selection_wanted = enter_data.equip_weapon
@@ -529,7 +532,7 @@ function PlayerStandard:_get_input(t, dt, paused)
 		end
 		if self._input then
 			for i = 1, #self._input do
-				self._input[i]:update(t, dt, self._controller, input)
+				self._input[i]:update(t, dt, self._controller, input, self._ext_movement:current_state_name())
 			end
 		end
 	end
@@ -637,7 +640,8 @@ local mvec_move_dir_normalized = Vector3()
 
 function PlayerStandard:_update_movement(t, dt)
 	local anim_data = self._unit:anim_data()
-	local weapon_tweak_data = tweak_data.weapon[self._equipped_unit and self._equipped_unit:base() and self._equipped_unit:base():get_name_id()]
+	local weapon_id = alive(self._equipped_unit) and self._equipped_unit:base() and self._equipped_unit:base():get_name_id()
+	local weapon_tweak_data = weapon_id and tweak_data.weapon[weapon_id]
 	local pos_new
 	self._target_headbob = self._target_headbob or 0
 	self._headbob = self._headbob or 0
@@ -1016,6 +1020,7 @@ function PlayerStandard:_start_action_running(t)
 	self:set_running(true)
 	self._end_running_expire_t = nil
 	self._start_running_t = t
+	self._play_stop_running_anim = nil
 	if not self:_is_reloading() or not self.RUN_AND_RELOAD then
 		if not managers.player.RUN_AND_SHOOT then
 			self._ext_camera:play_redirect(self:get_animation("start_running"))
@@ -1034,7 +1039,8 @@ function PlayerStandard:_end_action_running(t)
 	if not self._end_running_expire_t then
 		local speed_multiplier = self._equipped_unit:base():exit_run_speed_multiplier()
 		self._end_running_expire_t = t + 0.4 / speed_multiplier
-		if not managers.player.RUN_AND_SHOOT and (not self.RUN_AND_RELOAD or not self:_is_reloading()) then
+		local stop_running = not managers.player.RUN_AND_SHOOT and (not self.RUN_AND_RELOAD or not self:_is_reloading())
+		if stop_running then
 			self._ext_camera:play_redirect(self:get_animation("stop_running"), speed_multiplier)
 		end
 	end
@@ -1585,6 +1591,7 @@ function PlayerStandard:_start_action_melee(t, input, instant)
 		local segment_relative_time = self._camera_unit:anim_state_machine():segment_relative_time(self:get_animation("base"))
 		offset = (1 - segment_relative_time) * 0.9
 	end
+	offset = math.max(offset or 0, attack_allowed_expire_t)
 	self._ext_camera:play_redirect(self:get_animation("melee_enter"), nil, offset)
 end
 
@@ -1742,10 +1749,6 @@ function PlayerStandard:_do_melee_damage(t, bayonet_melee, melee_hit_ray)
 				no_sound = true
 			})
 		end
-		if hit_unit:damage() and col_ray.body:extension() and col_ray.body:extension().damage then
-			col_ray.body:extension().damage:damage_melee(self._unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
-			managers.network:session():send_to_peers_synched("sync_body_damage_melee", col_ray.body, self._unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
-		end
 		managers.rumble:play("melee_hit")
 		managers.game_play_central:physics_push(col_ray)
 		local character_unit, shield_knock
@@ -1794,7 +1797,9 @@ function PlayerStandard:_do_melee_damage(t, bayonet_melee, melee_hit_ray)
 			action_data.damage_effect = damage_effect
 			action_data.attacker_unit = self._unit
 			action_data.col_ray = col_ray
-			action_data.shield_knock = can_shield_knock
+			if shield_knock then
+				action_data.shield_knock = can_shield_knock
+			end
 			action_data.name_id = melee_entry
 			action_data.charge_lerp_value = charge_lerp_value
 			if managers.player:has_category_upgrade("melee", "stacking_hit_damage_multiplier") then
@@ -1811,7 +1816,10 @@ function PlayerStandard:_do_melee_damage(t, bayonet_melee, melee_hit_ray)
 			end
 			local defense_data = character_unit:character_damage():damage_melee(action_data)
 			self:_check_melee_dot_damage(col_ray, defense_data, melee_entry)
+			self:_perform_sync_melee_damage(hit_unit, col_ray, action_data.damage)
 			return defense_data
+		else
+			self:_perform_sync_melee_damage(hit_unit, col_ray, damage)
 		end
 	else
 	end
@@ -1823,6 +1831,16 @@ function PlayerStandard:_do_melee_damage(t, bayonet_melee, melee_hit_ray)
 		stack[2] = 0
 	end
 	return col_ray
+end
+
+PlayerStandard.MINMAX_MELEE_SYNC = {0, 63}
+
+function PlayerStandard:_perform_sync_melee_damage(hit_unit, col_ray, damage)
+	if hit_unit:damage() and col_ray.body:extension() and col_ray.body:extension().damage then
+		damage = math.clamp(damage, PlayerStandard.MINMAX_MELEE_SYNC[1], PlayerStandard.MINMAX_MELEE_SYNC[2])
+		col_ray.body:extension().damage:damage_melee(self._unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
+		managers.network:session():send_to_peers_synched("sync_body_damage_melee", col_ray.body, self._unit, col_ray.normal, col_ray.position, col_ray.ray, damage)
+	end
 end
 
 function PlayerStandard:_check_melee_dot_damage(col_ray, defense_data, melee_entry)
@@ -2408,6 +2426,19 @@ function PlayerStandard:_get_unit_intimidation_action(intimidate_enemies, intimi
 			end
 		end
 	end
+	if intimidate_enemies and intimidate_teammates then
+		local enemies = managers.enemy:all_enemies()
+		for u_key, u_data in pairs(enemies) do
+			if u_data.unit:movement():team() and u_data.unit:movement():team().id == "criminal1" and not u_data.unit:movement():cool() and not u_data.unit:anim_data().long_dis_interact_disabled then
+				local is_escort = u_data.char_tweak.is_escort
+				if not is_escort or intimidate_escorts then
+					local dist = is_escort and 300 or intimidate_range_civ
+					local prio = is_escort and 100000 or 0.001
+					self:_add_unit_to_char_table(char_table, u_data.unit, unit_type_civilian, dist, false, false, prio, my_head_pos, cam_fwd)
+				end
+			end
+		end
+	end
 	if intimidate_enemies then
 		if managers.groupai:state():whisper_mode() then
 			for _, unit in ipairs(SecurityCamera.cameras) do
@@ -2454,7 +2485,7 @@ function PlayerStandard:_start_action_intimidate(t, secondary)
 				sound_name = tweak_data.character[prime_target.unit:base()._tweak_table].priority_shout .. "x_any"
 			end
 			if managers.player:has_category_upgrade("player", "special_enemy_highlight") then
-				prime_target.unit:contour():add(managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or "mark_enemy", true, managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1))
+				prime_target.unit:contour():add(managers.player:get_contour_for_marked_enemy(), true, managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1))
 				managers.network:session():send_to_peers_synched("spot_enemy", prime_target.unit)
 			end
 		elseif voice_type == "down" then
@@ -2529,9 +2560,10 @@ function PlayerStandard:_start_action_intimidate(t, secondary)
 		elseif voice_type == "mark_turret" then
 			sound_name = "f44x_any"
 			interact_type = "cmd_point"
-			prime_target.unit:contour():add(managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_unit_dangerous_damage_bonus" or "mark_unit_dangerous", true, managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1))
+			local type = prime_target.unit:base().get_type and prime_target.unit:base():get_type()
+			prime_target.unit:contour():add(managers.player:get_contour_for_marked_enemy(type), true, managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1))
 		elseif voice_type == "ai_stay" then
-			sound_name = "f03a_" .. sound_suffix
+			sound_name = "f48x_any"
 			interact_type = "cmd_stop"
 		end
 		self:_do_action_intimidate(t, interact_type, sound_name, skip_alert)
@@ -2882,11 +2914,17 @@ end
 function PlayerStandard:_check_action_deploy_underbarrel(t, input)
 	local new_action
 	local action_forbidden = false
-	if not input.btn_deploy_bipod then
+	if not input.btn_deploy_bipod and not self._toggle_underbarrel_wanted then
 		return new_action
 	end
 	action_forbidden = self:in_steelsight() or self:_is_throwing_projectile() or self:_is_meleeing() or self:is_equipping() or self:_changing_weapon() or self:shooting() or self:_is_reloading() or self:is_switching_stances() or self:_interacting() or self:running() and not managers.player.RUN_AND_SHOOT
+	if self._running and not managers.player.RUN_AND_SHOOT and not self._end_running_expire_t then
+		self:_interupt_action_running(t)
+		self._toggle_underbarrel_wanted = true
+		return
+	end
 	if not action_forbidden then
+		self._toggle_underbarrel_wanted = false
 		local weapon = self._equipped_unit:base()
 		local underbarrel_names = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("underbarrel", weapon._factory_id, weapon._blueprint)
 		if underbarrel_names and underbarrel_names[1] then
@@ -3645,11 +3683,13 @@ function PlayerStandard:inventory_clbk_listener(unit, event)
 	if event == "equip" then
 		local weapon = self._ext_inventory:equipped_unit()
 		self:set_animation_weapon_hold(nil)
-		self._equipped_unit = weapon
-		weapon:base():on_equip(unit)
-		managers.hud:set_weapon_selected_by_inventory_index(self._ext_inventory:equipped_selection())
-		for id, weapon in pairs(self._ext_inventory:available_selections()) do
-			managers.hud:set_ammo_amount(id, weapon.unit:base():ammo_info())
+		if self._equipped_unit ~= weapon then
+			self._equipped_unit = weapon
+			weapon:base():on_equip(unit)
+			managers.hud:set_weapon_selected_by_inventory_index(self._ext_inventory:equipped_selection())
+			for id, weapon in pairs(self._ext_inventory:available_selections()) do
+				managers.hud:set_ammo_amount(id, weapon.unit:base():ammo_info())
+			end
 		end
 		self:_update_crosshair_offset()
 		self:_stance_entered()

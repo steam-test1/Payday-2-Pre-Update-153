@@ -1,4 +1,4 @@
-WeaponSimpleAnim = WeaponSimpleAnim or class(WeaponGadgetBase)
+WeaponSimpleAnim = WeaponSimpleAnim or class(WeaponSecondSight)
 WeaponSimpleAnim.GADGET_TYPE = "simple_anim"
 
 function WeaponSimpleAnim:init(unit)
@@ -12,11 +12,11 @@ function WeaponSimpleAnim:init(unit)
 end
 
 function WeaponSimpleAnim:_check_state(current_state)
-	WeaponSimpleAnim.super._check_state(self, current_state)
 	if self._anim_state ~= self._on then
 		self._anim_state = self._on
 		self:play_anim()
 	end
+	WeaponSimpleAnim.super._check_state(self, current_state)
 end
 
 function WeaponSimpleAnim:play_anim()

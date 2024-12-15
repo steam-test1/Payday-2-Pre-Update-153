@@ -64,9 +64,24 @@ function HUDManager:init()
 	end
 	self._visible_huds_states = {}
 	self._disabled = Global.hud_disabled
+	self._controller = managers.controller:create_controller("HUDManager", nil, false)
+	self._controller:add_trigger("toggle_hud", callback(self, self, "_toggle_hud_callback"))
+	self._controller:enable()
 end
 
 function HUDManager:destroy()
+	self._controller:destroy()
+end
+
+function HUDManager:_toggle_hud_callback()
+	if managers.menu:is_active() or not Global.hud_disabled and self._chat_focus then
+		return
+	end
+	if Global.hud_disabled then
+		managers.hud:set_enabled()
+	else
+		managers.hud:set_disabled()
+	end
 end
 
 function HUDManager:crosshair_enabled_changed(name, old_value, new_value)

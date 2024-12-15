@@ -39,7 +39,8 @@ function NewSkillTreeGui:init(ws, fullscreen_ws, node)
 	self._init_layer = self._ws:panel():layer()
 	local menu_components_data = node:parameters().menu_component_data or {}
 	self._active_page = nil
-	self._active_tree = nil
+	self._active_tree_item = nil
+	self._active_tier_item = nil
 	self._selected_item = nil
 	managers.menu_component:close_contract_gui()
 	self:_setup()
@@ -225,6 +226,8 @@ function NewSkillTreeGui:_setup()
 	self._tab_items = {}
 	self._tree_items = {}
 	self._active_page = 0
+	self._active_tree_item = nil
+	self._active_tier_item = nil
 	self._selected_item = nil
 	local pages = managers.skilltree:get_pages()
 	local page_data
@@ -442,9 +445,39 @@ function NewSkillTreeGui:set_selected_item(item, play_sound)
 	if self._selected_item then
 		self._selected_item:set_selected(false)
 	end
+	if item._tier_item then
+		self:set_active_tier(item._tier_item)
+	end
 	self._selected_item = item
 	self._selected_item:set_selected(true)
 	self:update_item()
+end
+
+function NewSkillTreeGui:set_active_tier(item)
+	if item == self._active_tier_item then
+		return
+	end
+	if self._active_tier_item then
+		self._active_tier_item:set_active(false)
+	end
+	self._active_tier_item = item
+	if self._active_tier_item then
+		self._active_tier_item:set_active(true)
+		self:set_active_tree(self._active_tier_item._tree_item)
+	end
+end
+
+function NewSkillTreeGui:set_active_tree(item)
+	if item == self._active_tree_item then
+		return
+	end
+	if self._active_tree_item then
+		self._active_tree_item:set_active(false)
+	end
+	self._active_tree_item = item
+	if self._active_tree_item then
+		self._active_tree_item:set_active(true)
+	end
 end
 
 function NewSkillTreeGui:update_item()
@@ -1482,7 +1515,7 @@ function NewSkillTreeTreeItem:init(tree, tree_data, tree_panel, fullscreen_panel
 			h = tier_height,
 			y = (num_tiers - tier) * tier_height
 		})
-		tier_item = NewSkillTreeTierItem:new(tier, tier_data, tier_panel, tree_panel, tree, fullscreen_panel, gui)
+		tier_item = NewSkillTreeTierItem:new(tier, tier_data, tier_panel, tree_panel, tree, self, fullscreen_panel, gui)
 		self._tiers[tier] = tier_item
 	end
 	for tier, tier_item in ipairs(self._tiers) do
@@ -1523,13 +1556,6 @@ end
 
 function NewSkillTreeTreeItem:inside(x, y)
 	if self._tree_panel:inside(x, y) then
-		if not self._selected then
-			for tier, tier_item in pairs(self._tiers) do
-				tier_item:refresh_points(true)
-			end
-		end
-		self._selected = true
-		self._progress:set_alpha(1)
 		local item
 		for tier, tier_item in pairs(self._tiers) do
 			item = tier_item:inside(x, y)
@@ -1538,14 +1564,6 @@ function NewSkillTreeTreeItem:inside(x, y)
 			end
 		end
 		return nil, true
-	else
-		if self._selected then
-			for tier, tier_item in pairs(self._tiers) do
-				tier_item:refresh_points(false)
-			end
-		end
-		self._selected = nil
-		self._progress:set_alpha(0.5)
 	end
 end
 
@@ -1576,6 +1594,14 @@ function NewSkillTreeTreeItem:reload_connections()
 	end
 	local tier, points_spent, points_max = self:_tree_points()
 	self._progress_pos_wanted = math.max(0, self._progress_start - self._progress_tier_height * tier - self._progress_tier_height * (points_spent / points_max))
+end
+
+function NewSkillTreeTreeItem:set_active(active)
+	for tier, tier_item in pairs(self._tiers) do
+		tier_item:refresh_points(active)
+	end
+	self._selected = active
+	self._progress:set_alpha(active and 1 or 0.5)
 end
 
 function NewSkillTreeTreeItem:_tree_points()
@@ -1619,11 +1645,12 @@ end
 
 NewSkillTreeTierItem = NewSkillTreeTierItem or class(NewSkillTreeItem)
 
-function NewSkillTreeTierItem:init(tier, tier_data, tier_panel, tree_panel, tree, fullscreen_panel, gui)
+function NewSkillTreeTierItem:init(tier, tier_data, tier_panel, tree_panel, tree, tree_item, fullscreen_panel, gui)
 	NewSkillTreeTierItem.super.init(self)
 	local skilltrees_tweak = tweak_data.skilltree.skills
 	self._gui = gui
 	self._tree = tree
+	self._tree_item = tree_item
 	self._tier = tier
 	self._tier_panel = tier_panel
 	self._skills = {}
@@ -1641,7 +1668,7 @@ function NewSkillTreeTierItem:init(tier, tier_data, tier_panel, tree_panel, tree
 				w = skill_width
 			})
 			skill_x = skill_panel:right()
-			skill_item = NewSkillTreeSkillItem:new(skill_id, skill_data, skill_panel, tree_panel, tree, tier, fullscreen_panel, gui)
+			skill_item = NewSkillTreeSkillItem:new(skill_id, skill_data, skill_panel, tree_panel, tree, tier, self, fullscreen_panel, gui)
 			self._skills[skill_id] = skill_item
 			table.insert(self._skills_ordered, skill_id)
 		end
@@ -1953,16 +1980,18 @@ function NewSkillTreeTierItem:reload_connections()
 	end
 end
 
+function NewSkillTreeTierItem:set_active(active)
+	self:_refresh_tier_text(active)
+end
+
 function NewSkillTreeTierItem:inside(x, y)
 	if self._tier_panel:inside(x, y) then
-		self:_refresh_tier_text(true)
+		self._gui:set_active_tier(self)
 		for skill_id, skill_item in pairs(self._skills) do
 			if skill_item:inside(x, y) then
 				return skill_item
 			end
 		end
-	else
-		self:_refresh_tier_text(false)
 	end
 end
 
@@ -1980,13 +2009,14 @@ end
 
 NewSkillTreeSkillItem = NewSkillTreeSkillItem or class(NewSkillTreeItem)
 
-function NewSkillTreeSkillItem:init(skill_id, skill_data, skill_panel, tree_panel, tree, tier, fullscreen_panel, gui)
+function NewSkillTreeSkillItem:init(skill_id, skill_data, skill_panel, tree_panel, tree, tier, tier_item, fullscreen_panel, gui)
 	NewSkillTreeSkillItem.super.init(self)
 	self._gui = gui
 	self._skilltree = managers.skilltree
 	self._fullscreen_panel = fullscreen_panel
 	self._tree = tree
 	self._tier = tier
+	self._tier_item = tier_item
 	self._skill_panel = skill_panel
 	self._tree_panel = tree_panel
 	self._skill_id = skill_id

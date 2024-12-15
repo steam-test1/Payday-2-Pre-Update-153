@@ -83,6 +83,10 @@ function TeamAILogicIdle.enter(data, new_logic_name, enter_params)
 				data.unit:brain():set_objective()
 				return
 			end
+		elseif objective.type == "throw_bag" then
+			data.unit:movement():throw_bag(objective.unit)
+			data._ignore_first_travel_order = true
+			data.unit:brain():set_objective()
 		else
 			if objective.action_duration then
 				my_data.action_timeout_clbk_id = "TeamAILogicIdle_action_timeout" .. key_str
@@ -288,14 +292,23 @@ function TeamAILogicIdle.on_long_dis_interacted(data, other_unit, secondary)
 	local objective
 	local should_stay = false
 	if objective_type == "follow" then
-		objective = {
-			type = objective_type,
-			follow_unit = other_unit,
-			called = true,
-			destroy_clbk_key = false,
-			scan = true
-		}
-		data.unit:sound():say("r01x_sin", true)
+		if data.unit:movement():carrying_bag() and not data.unit:movement()._should_stay then
+			local throw_distance = tweak_data.ai_carry.throw_distance * data.unit:movement():carry_tweak().throw_distance_multiplier
+			local dist = data.unit:position() - other_unit:position()
+			if mvector3.dot(dist, dist) < throw_distance * throw_distance then
+				objective = {type = "throw_bag", unit = other_unit}
+			end
+		end
+		if not objective then
+			objective = {
+				type = objective_type,
+				follow_unit = other_unit,
+				called = true,
+				destroy_clbk_key = false,
+				scan = true
+			}
+			data.unit:sound():say("r01x_sin", true)
+		end
 	elseif objective_type == "stop" then
 		objective = {
 			type = "follow",
@@ -348,6 +361,9 @@ function TeamAILogicIdle.on_long_dis_interacted(data, other_unit, secondary)
 		}
 		data.unit:sound():say("r02a_sin", true)
 	end
+	if data.unit:movement():carrying_bag() and objective.type == "revive" then
+		data.unit:movement():throw_bag()
+	end
 	data.unit:movement():set_should_stay(should_stay)
 	if objective then
 		data.unit:brain():set_objective(objective)
@@ -361,7 +377,11 @@ function TeamAILogicIdle.on_new_objective(data, old_objective)
 	if not my_data.exiting then
 		if new_objective then
 			if (new_objective.nav_seg or new_objective.follow_unit) and not new_objective.in_place then
-				CopLogicBase._exit(data.unit, "travel")
+				if data._ignore_first_travel_order then
+					data._ignore_first_travel_order = nil
+				else
+					CopLogicBase._exit(data.unit, "travel")
+				end
 			else
 				CopLogicBase._exit(data.unit, "idle")
 			end
@@ -722,6 +742,20 @@ function TeamAILogicIdle._check_should_relocate(data, my_data, objective)
 	end
 end
 
+function TeamAILogicIdle._ignore_shield(unit, attention)
+	if not TeamAILogicIdle._shield_check then
+		TeamAILogicIdle._shield_check = managers.slot:get_mask("enemy_shield_check")
+	end
+	local head_pos = unit:movement():m_head_pos()
+	local att_movement = attention and attention.unit and attention.unit.movement and attention.unit:movement() or nil
+	local u_head_pos = att_movement and att_movement.m_head_pos and att_movement:m_head_pos() or nil
+	if not u_head_pos then
+		return false
+	end
+	local hit_shield = World:raycast("ray", head_pos, u_head_pos, "ignore_unit", {unit}, "slot_mask", TeamAILogicIdle._shield_check)
+	return not not hit_shield
+end
+
 function TeamAILogicIdle._get_priority_attention(data, attention_objects, reaction_func)
 	reaction_func = reaction_func or TeamAILogicBase._chk_reaction_to_attention_object
 	local best_target, best_target_priority_slot, best_target_priority, best_target_reaction
@@ -766,12 +800,14 @@ function TeamAILogicIdle._get_priority_attention(data, attention_objects, reacti
 				local has_damaged = dmg_dt < 2
 				local been_marked = mark_dt < 8
 				local dangerous_special = attention_data.is_very_dangerous
+				local is_shield = attention_data.is_shield
 				local target_priority = distance
 				local target_priority_slot = 0
+				local is_shielded = TeamAILogicIdle._ignore_shield and TeamAILogicIdle._ignore_shield(data.unit, attention_data) or nil
 				if visible then
 					if (dangerous_special or been_marked) and distance < 1600 then
 						target_priority_slot = 1
-					elseif near and (has_alerted and has_damaged or been_marked) then
+					elseif near and (has_alerted and has_damaged or been_marked or is_shield and not is_shielded) then
 						target_priority_slot = 2
 					elseif near and has_alerted then
 						target_priority_slot = 3
@@ -780,10 +816,16 @@ function TeamAILogicIdle._get_priority_attention(data, attention_objects, reacti
 					else
 						target_priority_slot = 5
 					end
+					if is_shielded then
+						target_priority_slot = math.min(5, target_priority_slot + 1)
+					end
 				elseif has_alerted then
 					target_priority_slot = 6
 				else
 					target_priority_slot = 7
+				end
+				if is_shielded then
+					target_priority = target_priority * 10
 				end
 				if reaction < AIAttentionObject.REACT_COMBAT then
 					target_priority_slot = 10 + target_priority_slot + math.max(0, AIAttentionObject.REACT_COMBAT - reaction)

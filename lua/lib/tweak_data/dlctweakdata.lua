@@ -53,7 +53,9 @@ function DLCTweakData:init(tweak_data)
 			tng = true,
 			howl = 1,
 			paydaycon2016 = 1,
+			swm = 1,
 			yor = 1,
+			sha = true,
 			rip = true,
 			pd2_goty = 1,
 			pd2_hw_boxing = true,
@@ -5498,6 +5500,43 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "textures",
 			item_entry = "my_little",
+			amount = 1
+		}
+	}
+	self.swm_bundle = {}
+	self.swm_bundle.dlc = "has_swm"
+	self.swm_bundle.content = {}
+	self.swm_bundle.content.loot_global_value = "swm"
+	self.swm_bundle.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "swm_sydney",
+			amount = 1
+		}
+	}
+	self.sha_bundle = {}
+	self.sha_bundle.free = true
+	self.sha_bundle.content = {}
+	self.sha_bundle.content.loot_global_value = "sha"
+	self.sha_bundle.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "sha_01",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "sha_02",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "sha_03",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "sha_04",
 			amount = 1
 		}
 	}

@@ -688,6 +688,7 @@ function EconomyTweakData:init()
 	self.safes.event_red.name_id = "bm_menu_safe_event_red"
 	self.safes.event_red.texture_bundle_folder = "cash/safes/red"
 	self.safes.event_red.achievement = "green_7"
+	self.safes.event_red.market_link = "http://steamcommunity.com/market/listings/218620/First%20World%20Safe"
 	self.safes.event_dinner = {}
 	self.safes.event_dinner.def_id = 50004
 	self.safes.event_dinner.free = true
@@ -697,6 +698,7 @@ function EconomyTweakData:init()
 	self.safes.event_dinner.name_id = "bm_menu_safe_event_dinner"
 	self.safes.event_dinner.texture_bundle_folder = "cash/safes/dinner"
 	self.safes.event_dinner.achievement = "farm_6"
+	self.safes.event_dinner.market_link = "http://steamcommunity.com/market/listings/218620/Slaughter%20Safe"
 	self.safes.dallas_01 = {}
 	self.safes.dallas_01.drill = "dallas_01"
 	self.safes.dallas_01.content = "dallas_01"
@@ -720,6 +722,7 @@ function EconomyTweakData:init()
 	self.safes.event_flake.unit_name = "units/payday2_cash/safes/flake/safe/eco_safe_event_flake"
 	self.safes.event_flake.texture_bundle_folder = "cash/safes/flake"
 	self.safes.event_flake.achievement = "flake_1"
+	self.safes.event_flake.market_link = "http://steamcommunity.com/market/listings/218620/Christmas%20Safe"
 	self.safes.event_bah = {}
 	self.safes.event_bah.def_id = 50008
 	self.safes.event_bah.free = true
@@ -729,6 +732,7 @@ function EconomyTweakData:init()
 	self.safes.event_bah.name_id = "bm_menu_safe_event_bah"
 	self.safes.event_bah.texture_bundle_folder = "cash/safes/bah"
 	self.safes.event_bah.achievement = "bah_1"
+	self.safes.event_bah.market_link = "http://steamcommunity.com/market/listings/218620/Goat%20Safe"
 	self.safes.pack_01 = {}
 	self.safes.pack_01.drill = "pack_01"
 	self.safes.pack_01.content = "pack_01"

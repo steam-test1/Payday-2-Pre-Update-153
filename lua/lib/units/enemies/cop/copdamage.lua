@@ -337,9 +337,9 @@ function CopDamage:damage_bullet(attack_data)
 		damage = math.min(damage, self._unit:base():char_tweak().DAMAGE_CLAMP_BULLET)
 	end
 	damage = damage * (self._marked_dmg_mul or 1)
-	if self._marked_dmg_mul and managers.player:has_category_upgrade("player", "marked_inc_dmg_distance") then
+	if self._marked_dmg_mul and self._marked_dmg_dist_mul then
 		local dst = mvector3.distance(attack_data.origin, self._unit:position())
-		local spott_dst = managers.player:upgrade_value("player", "marked_inc_dmg_distance")
+		local spott_dst = tweak_data.upgrades.values.player.marked_inc_dmg_distance[self._marked_dmg_dist_mul]
 		if dst > spott_dst[1] then
 			damage = damage * spott_dst[2]
 		end
@@ -376,8 +376,9 @@ function CopDamage:damage_bullet(attack_data)
 	if attack_data.weapon_unit and attack_data.weapon_unit:base().is_category and attack_data.weapon_unit:base():is_category("bow", "crossbow", "saw") and managers.player:has_category_upgrade("weapon", "automatic_head_shot_add") then
 		attack_data.add_head_shot_mul = managers.player:upgrade_value("weapon", "automatic_head_shot_add", nil)
 	end
-	if not head and attack_data.add_head_shot_mul and self._char_tweak and self._char_tweak.access ~= "tank" then
-		local mul = self._char_tweak.headshot_dmg_mul * attack_data.add_head_shot_mul + 1
+	if not head and attack_data.add_head_shot_mul and self._char_tweak then
+		local tweak_headshot_mul = math.max(0, self._char_tweak.headshot_dmg_mul - 1)
+		local mul = tweak_headshot_mul * attack_data.add_head_shot_mul + 1
 		damage = damage * mul
 	end
 	damage = self:_apply_damage_reduction(damage)
@@ -396,7 +397,7 @@ function CopDamage:damage_bullet(attack_data)
 			}
 		else
 			if head then
-				managers.player:on_lethal_headshot_dealt(attack_data.attacker_unit)
+				managers.player:on_lethal_headshot_dealt(attack_data.attacker_unit, attack_data)
 				if damage > math.random(10) then
 					self:_spawn_head_gadget({
 						position = attack_data.col_ray.body:position(),
@@ -2359,11 +2360,13 @@ function CopDamage:shoot_pos_mid(m_pos)
 	self._spine2_obj:m_position(m_pos)
 end
 
-function CopDamage:on_marked_state(state)
+function CopDamage:on_marked_state(state, bonus_distance_damage)
 	if state then
 		self._marked_dmg_mul = self._marked_dmg_mul or tweak_data.upgrades.values.player.marked_enemy_damage_mul
+		self._marked_dmg_dist_mul = bonus_distance_damage
 	else
 		self._marked_dmg_mul = nil
+		self._marked_dmg_dist_mul = nil
 	end
 end
 

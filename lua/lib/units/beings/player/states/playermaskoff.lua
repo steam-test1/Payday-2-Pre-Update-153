@@ -251,7 +251,7 @@ function PlayerMaskOff:mark_units(line, t, no_gesture, skip_alert)
 			sound_name = tweak_data.character[prime_target.unit:base()._tweak_table].priority_shout .. "x_any"
 		end
 		if managers.player:has_category_upgrade("player", "special_enemy_highlight") then
-			prime_target.unit:contour():add(managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or "mark_enemy", true, managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1))
+			prime_target.unit:contour():add(managers.player:get_contour_for_marked_enemy(), true, managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1))
 		end
 	elseif voice_type == "mark_camera" and mark_sec_camera then
 		sound_name = "f39_any"

@@ -1,5 +1,6 @@
 HuskCopBrain = HuskCopBrain or class()
 HuskCopBrain._NET_EVENTS = {weapon_laser_on = 1, weapon_laser_off = 2}
+HuskCopBrain._ENABLE_LASER_TIME = 3
 HuskCopBrain._get_radio_id = CopBrain._get_radio_id
 
 function HuskCopBrain:init(unit)
@@ -19,6 +20,7 @@ function HuskCopBrain:post_init()
 	}, self._unit:movement():m_head_pos())
 	self._last_alert_t = 0
 	self._unit:character_damage():add_listener("HuskCopBrain_death" .. tostring(self._unit:key()), {"death"}, callback(self, self, "clbk_death"))
+	self._post_init_complete = true
 end
 
 function HuskCopBrain:interaction_voice()
@@ -104,19 +106,37 @@ end
 function HuskCopBrain:on_team_set(team_data)
 end
 
+function HuskCopBrain:update(unit, t, dt)
+	if self._add_laser_t ~= nil and self._post_init_complete then
+		self._add_laser_t = self._add_laser_t - dt
+		if self._add_laser_t < 0 then
+			self:enable_weapon_laser()
+			self._add_laser_t = nil
+		end
+	end
+end
+
 function HuskCopBrain:sync_net_event(event_id)
 	if event_id == self._NET_EVENTS.weapon_laser_on then
-		self._weapon_laser_on = true
-		self._unit:inventory():equipped_unit():base():set_laser_enabled(true)
-		managers.enemy:_destroy_unit_gfx_lod_data(self._unit:key())
+		self._add_laser_t = HuskCopBrain._ENABLE_LASER_TIME
 	elseif event_id == self._NET_EVENTS.weapon_laser_off then
-		self._weapon_laser_on = nil
-		if self._unit:inventory():equipped_unit() then
-			self._unit:inventory():equipped_unit():base():set_laser_enabled(false)
-		end
-		if not self._unit:character_damage():dead() then
-			managers.enemy:_create_unit_gfx_lod_data(self._unit)
-		end
+		self:disable_weapon_laser()
+	end
+end
+
+function HuskCopBrain:enable_weapon_laser()
+	self._weapon_laser_on = true
+	self._unit:inventory():equipped_unit():base():set_laser_enabled(true)
+	managers.enemy:_destroy_unit_gfx_lod_data(self._unit:key())
+end
+
+function HuskCopBrain:disable_weapon_laser()
+	self._weapon_laser_on = nil
+	if self._unit:inventory():equipped_unit() then
+		self._unit:inventory():equipped_unit():base():set_laser_enabled(false)
+	end
+	if not self._unit:character_damage():dead() then
+		managers.enemy:_create_unit_gfx_lod_data(self._unit)
 	end
 end
 

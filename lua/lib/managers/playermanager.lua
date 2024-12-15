@@ -123,17 +123,7 @@ function PlayerManager:check_skills()
 	self._saw_panic_when_kill = self:has_category_upgrade("saw", "panic_when_kill")
 	self._unseen_strike = self:has_category_upgrade("player", "unseen_increased_crit_chance")
 	if self:has_category_upgrade("pistol", "stacked_accuracy_bonus") then
-		local function start_expert_handling()
-			if self:is_current_weapon_of_category("pistol") and not self._coroutine_mgr:is_running(PlayerAction.ExpertHandling) then
-				local data = self:upgrade_value("pistol", "stacked_accuracy_bonus", nil)
-				
-				if data and type(data) ~= "number" then
-					self._coroutine_mgr:add_coroutine(PlayerAction.ExpertHandling, PlayerAction.ExpertHandling, self, data.accuracy_bonus, data.max_stacks, Application:time() + data.max_time)
-				end
-			end
-		end
-		
-		self._message_system:register(Message.OnEnemyShot, self, start_expert_handling)
+		self._message_system:register(Message.OnEnemyShot, self, callback(self, self, "_on_expert_handling_event"))
 	else
 		self._message_system:unregister(Message.OnEnemyShot, self)
 	end
@@ -215,6 +205,15 @@ function PlayerManager:set_damage_absorption(value)
 	self._damage_absorption = Application:digest_value(value, true)
 end
 
+function PlayerManager:_on_expert_handling_event(attacker_unit, unit, variant)
+	if attacker_unit == self:player_unit() and self:is_current_weapon_of_category("pistol") and variant == "bullet" and not self._coroutine_mgr:is_running(PlayerAction.ExpertHandling) then
+		local data = self:upgrade_value("pistol", "stacked_accuracy_bonus", nil)
+		if data and type(data) ~= "number" then
+			self._coroutine_mgr:add_coroutine(PlayerAction.ExpertHandling, PlayerAction.ExpertHandling, self, data.accuracy_bonus, data.max_stacks, Application:time() + data.max_time)
+		end
+	end
+end
+
 function PlayerManager:_on_enter_trigger_happy_event(attacker_unit, unit, variant)
 	if attacker_unit == self:player_unit() and variant == "bullet" and not self._coroutine_mgr:is_running("trigger_happy") and self:is_current_weapon_of_category("pistol") then
 		local data = self:upgrade_value("pistol", "stacking_hit_damage_multiplier", 0)
@@ -242,12 +241,14 @@ function PlayerManager:_on_enter_ammo_efficiency_event()
 	end
 end
 
-function PlayerManager:_on_activate_aggressive_reload_event()
-	local weapon_unit = self:equipped_weapon_unit()
-	if weapon_unit then
-		local weapon = weapon_unit:base()
-		if weapon and weapon:fire_mode() == "single" and weapon:is_category("smg", "assault_rifle", "snp") then
-			self:activate_temporary_upgrade("temporary", "single_shot_fast_reload")
+function PlayerManager:_on_activate_aggressive_reload_event(attack_data)
+	if attack_data and attack_data.variant ~= "projectile" then
+		local weapon_unit = self:equipped_weapon_unit()
+		if weapon_unit then
+			local weapon = weapon_unit:base()
+			if weapon and weapon:fire_mode() == "single" and weapon:is_category("smg", "assault_rifle", "snp") then
+				self:activate_temporary_upgrade("temporary", "single_shot_fast_reload")
+			end
 		end
 	end
 end
@@ -777,6 +778,10 @@ function PlayerManager:spawned_player(id, unit)
 	self:setup_viewports()
 	self:_internal_load()
 	self:_change_player_state()
+	if id == 1 then
+		managers.hud:set_teammate_weapon_firemode(HUDManager.PLAYER_PANEL, 1, unit:inventory():unit_by_selection(1):base():fire_mode())
+		managers.hud:set_teammate_weapon_firemode(HUDManager.PLAYER_PANEL, 2, unit:inventory():unit_by_selection(2):base():fire_mode())
+	end
 end
 
 function PlayerManager:_change_player_state()
@@ -1140,11 +1145,11 @@ function PlayerManager:on_headshot_dealt()
 	end
 end
 
-function PlayerManager:on_lethal_headshot_dealt(attacker_unit)
+function PlayerManager:on_lethal_headshot_dealt(attacker_unit, attack_data)
 	if not self:player_unit() or attacker_unit ~= self:player_unit() then
 		return
 	end
-	self._message_system:notify(Message.OnLethalHeadShot, nil, nil)
+	self._message_system:notify(Message.OnLethalHeadShot, nil, attack_data)
 end
 
 function PlayerManager:_check_damage_to_hot(t, unit, damage_info)
@@ -2344,6 +2349,21 @@ function PlayerManager:has_team_category_upgrade(category, upgrade)
 	return true
 end
 
+function PlayerManager:get_contour_for_marked_enemy(enemy_type)
+	local contour_type = "mark_enemy"
+	if enemy_type == "swat_turret" or enemy_type == "sentry_gun" then
+		contour_type = "mark_unit_dangerous"
+		contour_type = managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_unit_dangerous_damage_bonus" or contour_type
+		if managers.player:has_category_upgrade("player", "marked_inc_dmg_distance") then
+			contour_type = "mark_unit_dangerous_damage_bonus_distance" or contour_type
+		end
+	else
+		contour_type = managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or contour_type
+		contour_type = managers.player:has_category_upgrade("player", "marked_inc_dmg_distance") and "mark_enemy_damage_bonus_distance" or contour_type
+	end
+	return contour_type
+end
+
 function PlayerManager:update_team_upgrades_to_peers()
 	for category, upgrades in pairs(self._global.team_upgrades) do
 		for upgrade, level in pairs(upgrades) do
@@ -2624,7 +2644,7 @@ function PlayerManager:transfer_from_custody_special_equipment_to(target_id)
 end
 
 function PlayerManager:on_sole_criminal_respawned(peer_id)
-	if managers.groupai:state():num_alive_criminals() > 1 or managers.trade:is_peer_in_custody(peer_id) then
+	if managers.groupai:state():num_alive_players() > 1 or managers.trade:is_peer_in_custody(peer_id) then
 		return
 	end
 	self:transfer_from_custody_special_equipment_to(peer_id)

@@ -1731,6 +1731,8 @@ function BlackMarketGui:init(ws, fullscreen_ws, node)
 	self._ws = ws
 	self._fullscreen_ws = fullscreen_ws
 	self._init_layer = self._ws:panel():layer()
+	self._preloading_list = {}
+	self._preloading_index = 0
 	self._node = node
 	local component_data = self._node:parameters().menu_component_data
 	local do_animation = not component_data and not self._data
@@ -6556,6 +6558,24 @@ function BlackMarketGui:update(t, dt)
 			self:reload()
 		end
 	end
+	if self._preloading_list and 0 < #self._preloading_list then
+		if not self._preload_ws then
+			self:create_preload_ws()
+			self._streaming_preload = nil
+		elseif not self._streaming_preload then
+			self._preloading_index = self._preloading_index + 1
+			if self._preloading_index > #self._preloading_list then
+				self._preloading_list = {}
+				self._preloading_index = 0
+				if self._preload_ws then
+					Overlay:gui():destroy_workspace(self._preload_ws)
+					self._preload_ws = nil
+				end
+			elseif self._preload_ws then
+				self._preload_ws:panel():script().set_progress(self._preloading_index)
+			end
+		end
+	end
 end
 
 function BlackMarketGui:press_first_btn(button)
@@ -9071,7 +9091,7 @@ function BlackMarketGui:populate_weapon_cosmetics(data)
 			new_data.unlocked = true
 			new_data.equipped = crafted and crafted.cosmetics and crafted.cosmetics.instance_id == instance_id
 			new_data.stream = true
-			owned_cosmetics[cosmetic_id] = new_data.cosmetic_quality == "mint"
+			owned_cosmetics[cosmetic_id] = owned_cosmetics[cosmetic_id] or new_data.cosmetic_quality == "mint"
 			new_data.lock_texture = not new_data.unlocked
 			if new_data.default_blueprint then
 				new_data.comparision_data = managers.blackmarket:get_weapon_stats(new_data.category, new_data.slot, new_data.default_blueprint)
@@ -9177,7 +9197,7 @@ current:]], cosmetic_id)
 	end
 	local new_data
 	local count = table.size(cosmetics_instances)
-	count = count + table.size(all_cosmetics)
+	count = table.size(all_cosmetics)
 	for i = 1, math.ceil(count / 6) * 6 do
 		if not data[i] then
 			new_data = {}

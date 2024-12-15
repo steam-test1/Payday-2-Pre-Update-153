@@ -5,7 +5,10 @@ function SecondDeployableControllerInput:init()
 	self._secondary_deployable_waiting = true
 end
 
-function SecondDeployableControllerInput:update(t, dt, controller, input)
+function SecondDeployableControllerInput:update(t, dt, controller, input, current_state_name)
+	if current_state_name == "carry" then
+		return
+	end
 	input.btn_use_item_press = false
 	if input.any_input_pressed and controller:get_input_pressed("use_item") then
 		self._secondary_deployable_t = t

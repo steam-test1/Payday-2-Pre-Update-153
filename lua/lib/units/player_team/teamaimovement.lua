@@ -16,6 +16,7 @@ function TeamAIMovement:_post_init()
 	end
 	self._standing_nav_seg_id = self._nav_tracker:nav_segment()
 	self:play_redirect("idle")
+	self._last_position = Vector3()
 end
 
 function TeamAIMovement:set_character_anim_variables()
@@ -219,14 +220,16 @@ function TeamAIMovement:save(save_data)
 	TeamAIMovement.super.save(self, save_data)
 	save_data.movement = save_data.movement or {}
 	save_data.movement.should_stay = self._should_stay
-	save_data.movement.carry_unit = self._carry_unit
+	save_data.movement.has_bag = self:carrying_bag()
 end
 
 function TeamAIMovement:load(load_data)
 	TeamAIMovement.super.load(self, load_data)
 	if load_data.movement then
 		self:set_should_stay(load_data.movement.should_stay)
-		self._carry_unit = load_data.movement.carry_unit
+		if load_data.movement.has_bag and Network:is_client() then
+			managers.network:session():send_to_host("request_carried_bag_unit", self._unit)
+		end
 	end
 end
 
@@ -249,4 +252,62 @@ function TeamAIMovement:chk_action_forbidden(action_type)
 		return true
 	end
 	return TeamAIMovement.super.chk_action_forbidden(self, action_type)
+end
+
+function TeamAIMovement:carrying_bag()
+	return self._carry_unit and true or false
+end
+
+function TeamAIMovement:set_carrying_bag(unit)
+	self._carry_unit = unit
+end
+
+function TeamAIMovement:carry_id()
+	return self._carry_unit and self._carry_unit:carry_data():carry_id()
+end
+
+function TeamAIMovement:carry_data()
+	return self._carry_unit and self._carry_unit:carry_data()
+end
+
+function TeamAIMovement:carry_tweak()
+	return self:carry_id() and tweak_data.carry.types[tweak_data.carry[self:carry_id()].type]
+end
+
+function TeamAIMovement:throw_bag(target_unit)
+	if not self:carrying_bag() then
+		return
+	end
+	local carry_unit = self._carry_unit
+	carry_unit:carry_data():unlink()
+	if Network:is_server() then
+		self:sync_throw_bag(carry_unit, target_unit)
+		managers.network:session():send_to_peers("sync_ai_throw_bag", self._unit, carry_unit, target_unit)
+	end
+end
+
+function TeamAIMovement:sync_throw_bag(carry_unit, target_unit)
+	if alive(target_unit) then
+		local dir = target_unit:position() - self._unit:position()
+		mvector3.set_z(dir, math.abs(dir.x + dir.y) * 0.5)
+		local throw_distance_multiplier = tweak_data.carry.types[tweak_data.carry[carry_unit:carry_data():carry_id()].type].throw_distance_multiplier
+		carry_unit:push(tweak_data.ai_carry.throw_force, (dir - carry_unit:velocity()) * throw_distance_multiplier)
+	end
+end
+
+function TeamAIMovement:update(...)
+	TeamAIMovement.super.update(self, ...)
+	if self._pre_destroyed then
+		return
+	end
+	if self._last_position then
+		local ray = World:raycast("ray", self._last_position, self:m_detect_pos(), "ignore_unit", self._unit, "ray_type", "throw bag body")
+		if ray and not ray.unit:visible() and self:carry_data() then
+			print("[CarryData:link_to] this is not a valid place for a bag, dropping it", self:carry_data()._unit, ray.unit)
+			self:carry_data():unlink()
+		end
+	else
+		self._last_position = Vector3()
+	end
+	mvector3.set(self._last_position, self:m_detect_pos())
 end

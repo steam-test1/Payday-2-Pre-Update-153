@@ -521,6 +521,7 @@ function StatisticsTweakData:statistics_table()
 		"sfm_02",
 		"chc_terry",
 		"chc_terry_begins",
+		"swm_sydney",
 		"yor"
 	}
 	local weapon_list = {
@@ -635,7 +636,8 @@ function StatisticsTweakData:statistics_table()
 		"rota",
 		"arbiter",
 		"contraband",
-		"ray"
+		"ray",
+		"tti"
 	}
 	local melee_list = {
 		"weapon",
@@ -715,7 +717,8 @@ function StatisticsTweakData:statistics_table()
 		"wing",
 		"road",
 		"brick",
-		"cs"
+		"cs",
+		"ostry"
 	}
 	local grenade_list = {
 		"frag",

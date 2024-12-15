@@ -28,12 +28,17 @@ function CopSound:set_voice_prefix(index)
 	self._prefix = (char_tweak.speech_prefix_p1 or "") .. (nr_variations and tostring(index or math.random(nr_variations)) or "") .. (char_tweak.speech_prefix_p2 or "") .. "_"
 end
 
-function CopSound:_play(sound_name, source_name)
+function CopSound:_play(sound_name, source_name, clbk)
 	local source
 	if source_name then
 		source = Idstring(source_name)
 	end
-	local event = self._unit:sound_source(source):post_event(sound_name)
+	local event
+	if clbk then
+		event = self._unit:sound_source(source):post_event(sound_name, clbk, nil, "end_of_event")
+	else
+		event = self._unit:sound_source(source):post_event(sound_name)
+	end
 	return event
 end
 
@@ -52,7 +57,7 @@ function CopSound:play(sound_name, source_name, sync)
 	return event
 end
 
-function CopSound:corpse_play(sound_name, source_name, sync)
+function CopSound:corpse_play(sound_name, source_name, sync, important, clbk)
 	local event_id
 	if type(sound_name) == "number" then
 		event_id = sound_name
@@ -64,7 +69,7 @@ function CopSound:corpse_play(sound_name, source_name, sync)
 		local u_id = managers.enemy:get_corpse_unit_data_from_key(self._unit:key()).u_id
 		managers.network:session():send_to_peers_synched("corpse_sound_play", u_id, event_id, sync_source_name)
 	end
-	local event = self:_play(sound_name or event_id, source_name)
+	local event = self:_play(sound_name or event_id, source_name, clbk)
 	if not event then
 		Application:error("[CopSound:corpse_play] event not found in Wwise", sound_name, event_id, self._unit)
 		Application:stack_dump("error")
@@ -81,7 +86,7 @@ function CopSound:stop(source_name)
 	self._unit:sound_source(source):stop()
 end
 
-function CopSound:say(sound_name, sync, skip_prefix)
+function CopSound:say(sound_name, sync, skip_prefix, important, callback)
 	if self._last_speech then
 		self._last_speech:stop()
 	end

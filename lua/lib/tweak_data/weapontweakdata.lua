@@ -2353,7 +2353,7 @@ function WeaponTweakData:_init_data_player_weapons(tweak_data)
 	aim_assist_snp_default.near_angle = 20
 	aim_assist_smg_default.near_angle = 30
 	self.crosshair = {}
-	self.crosshair.MIN_OFFSET = 18
+	self.crosshair.MIN_OFFSET = 10
 	self.crosshair.MAX_OFFSET = 150
 	self.crosshair.MIN_KICK_OFFSET = 0
 	self.crosshair.MAX_KICK_OFFSET = 100

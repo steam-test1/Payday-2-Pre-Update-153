@@ -114,6 +114,7 @@ function HUDAssaultCorner:init(hud, full_hud, tweak_hud)
 		self._hud_panel:remove(self._hud_panel:child("wave_panel"))
 	end
 	self._max_waves = tweak_data.safehouse.combat.waves[Global.game_settings.difficulty or "normal"]
+	self._wave_number = 0
 	if self:is_safehouse_raid() then
 		self._wave_panel_size = {250, 38}
 		local wave_w, wave_h = 38, 38
@@ -451,12 +452,18 @@ function HUDAssaultCorner:sync_start_assault(assault_number)
 	self:_update_assault_hud_color(color)
 	self._start_assault_after_hostage_offset = true
 	self:_set_hostage_offseted(true)
+	self:set_assault_wave_number(assault_number)
 end
 
 function HUDAssaultCorner:set_assault_wave_number(assault_number)
-	if alive(self._wave_bg_box) then
+	self._wave_number = assault_number
+	local panel = self._hud_panel:child("wave_panel")
+	print("found panel")
+	if alive(self._wave_bg_box) and panel then
 		local wave_text = panel:child("num_waves")
-		wave_text:set_text(self:get_completed_waves_string())
+		if wave_text then
+			wave_text:set_text(self:get_completed_waves_string())
+		end
 	end
 end
 
@@ -984,7 +991,7 @@ end
 
 function HUDAssaultCorner:get_completed_waves_string()
 	local macro = {
-		current = managers.groupai:state():get_assault_number() or 0,
+		current = managers.network:session():is_host() and managers.groupai:state():get_assault_number() or self._wave_number,
 		max = self._max_waves or 0
 	}
 	return managers.localization:to_upper_text("hud_assault_waves", macro)

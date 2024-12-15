@@ -1,5 +1,6 @@
 require("lib/states/GameState")
 IngameMaskOffState = IngameMaskOffState or class(IngamePlayerBaseState)
+IngameMaskOffState.immortal = true
 
 function IngameMaskOffState:init(game_state_machine)
 	IngameMaskOffState.super.init(self, "ingame_mask_off", game_state_machine)

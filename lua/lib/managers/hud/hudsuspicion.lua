@@ -100,6 +100,7 @@ function HUDSuspicion:init(hud, sound_source)
 	hud_stealth_exclam:set_center(suspicion_left:center_x(), suspicion_left:top() - 4)
 	self._eye_animation = nil
 	self._suspicion_value = 0
+	self._hud_timeout = 0
 end
 
 function HUDSuspicion:animate_eye()
@@ -146,6 +147,10 @@ function HUDSuspicion:animate_eye()
 				return
 			end
 			dt = coroutine.yield()
+			self._hud_timeout = self._hud_timeout - dt
+			if 0 > self._hud_timeout then
+				self._back_to_stealth = true
+			end
 			if self._discovered then
 				self._discovered = nil
 				if not detect_me then
@@ -247,6 +252,7 @@ end
 function HUDSuspicion:feed_value(value)
 	self:show()
 	self._suspicion_value = math.min(value, 1)
+	self._hud_timeout = 5
 end
 
 function HUDSuspicion:back_to_stealth()

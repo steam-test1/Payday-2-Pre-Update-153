@@ -309,7 +309,7 @@ function GenericDLCManager:has_dlc(dlc)
 	end
 	local dlc_data = Global.dlc_manager.all_dlc_data[dlc]
 	if not dlc_data then
-		Application:error("Didn't have dlc data for", dlc)
+		Application:error("Didn't have dlc data for ", dlc)
 		Application:stack_dump()
 		return false
 	end
@@ -409,6 +409,14 @@ end
 
 function GenericDLCManager:has_friend()
 	return self:is_dlc_unlocked("friend")
+end
+
+function GenericDLCManager:has_swm()
+	return self:is_dlc_unlocked("swm")
+end
+
+function GenericDLCManager:has_sha()
+	return self:is_dlc_unlocked("sha")
 end
 
 function GenericDLCManager:has_goty_all_dlc_bundle_2014()
@@ -1228,7 +1236,9 @@ function WINDLCManager:init()
 			},
 			pdcon_2016 = {app_id = "552490", no_install = true},
 			win_bundle = {app_id = "218620", no_install = true},
-			yor_bundle = {app_id = "218620", no_install = true}
+			swm = {app_id = "588130", no_install = true},
+			yor_bundle = {app_id = "218620", no_install = true},
+			sha = {app_id = "218620", no_install = true}
 		}
 		self:_verify_dlcs()
 	end

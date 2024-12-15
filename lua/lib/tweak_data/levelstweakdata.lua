@@ -918,6 +918,7 @@ function LevelsTweakData:init()
 	self.cage.package = "packages/narr_cage"
 	self.cage.cube = "cube_apply_heist_bank"
 	self.cage.max_bags = 6
+	self.cage.ghost_bonus = 0
 	self.cage.ai_group_type = america
 	self.hox_3 = {}
 	self.hox_3.name_id = "heist_hox_3_hl"

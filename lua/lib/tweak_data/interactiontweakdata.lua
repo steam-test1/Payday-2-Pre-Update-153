@@ -1011,6 +1011,11 @@ function InteractionTweakData:init(tweak_data)
 	self.access_camera.icon = "develop"
 	self.access_camera.text_id = "hud_int_access_camera"
 	self.access_camera.interact_distance = 125
+	self.access_camera_x_axis = {}
+	self.access_camera_x_axis.icon = "develop"
+	self.access_camera_x_axis.text_id = "hud_int_access_camera"
+	self.access_camera_x_axis.interact_distance = 125
+	self.access_camera_x_axis.axis = "x"
 	self.driving_console = {}
 	self.driving_console.icon = "develop"
 	self.driving_console.text_id = "hud_int_driving_console"

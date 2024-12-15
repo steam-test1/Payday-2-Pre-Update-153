@@ -1162,6 +1162,9 @@ function GroupAIStateBase:on_enemy_registered(unit)
 end
 
 function GroupAIStateBase:is_enemy_special(unit)
+	if not unit:base() then
+		return false
+	end
 	local category_name = unit:base()._tweak_table
 	local category = self._special_units[category_name]
 	if not category then
@@ -2371,6 +2374,9 @@ function GroupAIStateBase:remove_one_teamAI(name_to_remove, replace_with_player)
 	local trade_entry = self:sync_remove_one_teamAI(name, replace_with_player)
 	managers.network:session():send_to_peers_synched("sync_remove_one_teamAI", name, replace_with_player)
 	if alive(unit) then
+		if unit:movement():carrying_bag() then
+			unit:movement():throw_bag()
+		end
 		unit:brain():set_active(false)
 		unit:base():set_slot(unit, 0)
 		unit:base():unregister()
@@ -2829,6 +2835,10 @@ end
 
 function GroupAIStateBase:num_alive_criminals()
 	return table.size(self._criminals)
+end
+
+function GroupAIStateBase:num_alive_players()
+	return #self._player_criminals
 end
 
 function GroupAIStateBase:amount_of_winning_ai_criminals()
@@ -4934,4 +4944,51 @@ end
 
 function GroupAIStateBase:is_unit_team_AI(unit)
 	return self._ai_criminals[unit:key()]
+end
+
+function GroupAIStateBase:set_force_attention(data)
+	if data then
+		self._force_attention_data = deep_clone(data)
+		self._force_attention_data.included_units = {}
+		self._force_attention_data.excluded_units = {}
+	else
+		self._force_attention_data = nil
+	end
+end
+
+function GroupAIStateBase:add_affected_force_attention_unit(unit)
+	if not self._force_attention_data or not alive(unit) then
+		return
+	end
+	self._force_attention_data.included_units[unit:key()] = true
+end
+
+function GroupAIStateBase:add_excluded_force_attention_unit(unit)
+	if not self._force_attention_data or not alive(unit) then
+		return
+	end
+	self._force_attention_data.excluded_units[unit:key()] = true
+end
+
+function GroupAIStateBase:force_attention_data(unit)
+	if not self._force_attention_data or not alive(unit) then
+		return nil
+	end
+	if not alive(self._force_attention_data.unit) then
+		self._force_attention_data = nil
+		return nil
+	end
+	if not (not self._force_attention_data.include_all_force_spawns or unit:brain()._logic_data.group or self._force_attention_data.excluded_units[unit:key()]) or self._force_attention_data.included_units[unit:key()] then
+		return self._force_attention_data
+	end
+end
+
+function GroupAIStateBase:get_AI_attention_object_by_unit(unit)
+	local new_data = {}
+	for key, data in pairs(self._attention_objects.all) do
+		if data.unit == unit then
+			new_data[key] = deep_clone(data)
+			return new_data
+		end
+	end
 end

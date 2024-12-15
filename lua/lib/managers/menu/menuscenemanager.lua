@@ -837,18 +837,19 @@ function MenuSceneManager:_set_character_equipment()
 	end
 	local rank = managers.experience:current_rank()
 	local ignore_infamy_card = self._scene_templates and self._scene_templates[self._current_scene_template] and self._scene_templates[self._current_scene_template].remove_infamy_card and true or false
+	local ignore_weapons = self._scene_templates and self._scene_templates[self._current_scene_template] and self._scene_templates[self._current_scene_template].remove_weapons and true or false
 	if 0 < rank and not ignore_infamy_card then
 		self:set_character_equipped_card(nil, rank - 1)
 	else
 		local secondary = managers.blackmarket:equipped_secondary()
-		if secondary then
+		if secondary and not ignore_weapons then
 			self:set_character_equipped_weapon(nil, secondary.factory_id, secondary.blueprint, "secondary", secondary.cosmetics)
 		else
 			self:_delete_character_weapon(self._character_unit, "secondary")
 		end
 	end
 	local primary = managers.blackmarket:equipped_primary()
-	if primary then
+	if primary and not ignore_weapons then
 		self:set_character_equipped_weapon(nil, primary.factory_id, primary.blueprint, "primary", primary.cosmetics)
 	else
 		self:_delete_character_weapon(self._character_unit, "primary")

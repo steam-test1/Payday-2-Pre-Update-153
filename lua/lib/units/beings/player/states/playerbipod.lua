@@ -55,6 +55,10 @@ function PlayerBipod:get_movement_modifier(weapon_spread)
 	return weapon_spread.bipod
 end
 
+function PlayerBipod:get_movement_state()
+	return "crouching"
+end
+
 function PlayerBipod:exit(state_data, new_state_name)
 	PlayerBipod.super.exit(self, state_data or self._state_data, new_state_name)
 	self._bipod = nil

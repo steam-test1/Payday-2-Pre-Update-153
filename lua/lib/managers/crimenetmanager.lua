@@ -1761,7 +1761,6 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 		end
 	end
 	managers.challenge:fetch_challenges()
-	return
 end
 
 function CrimeNetGui:make_fine_text(text)
@@ -3666,6 +3665,7 @@ function CrimeNetGui:mouse_moved(o, x, y)
 	if self._getting_hacked then
 		return
 	end
+	local used, pointer
 	if managers.menu:is_pc_controller() then
 		if self._panel:child("back_button"):inside(x, y) then
 			if not self._back_highlighted then
@@ -3673,7 +3673,7 @@ function CrimeNetGui:mouse_moved(o, x, y)
 				self._panel:child("back_button"):set_color(tweak_data.screen_colors.button_stage_2)
 				managers.menu_component:post_event("highlight")
 			end
-			return true, "link"
+			used, pointer = true, "link"
 		elseif self._back_highlighted then
 			self._back_highlighted = false
 			self._panel:child("back_button"):set_color(tweak_data.screen_colors.button_stage_3)
@@ -3684,7 +3684,7 @@ function CrimeNetGui:mouse_moved(o, x, y)
 				self._panel:child("legends_button"):set_color(tweak_data.screen_colors.button_stage_2)
 				managers.menu_component:post_event("highlight")
 			end
-			return true, "link"
+			used, pointer = true, "link"
 		elseif self._legend_highlighted then
 			self._legend_highlighted = false
 			self._panel:child("legends_button"):set_color(tweak_data.screen_colors.button_stage_3)
@@ -3696,7 +3696,7 @@ function CrimeNetGui:mouse_moved(o, x, y)
 					self._panel:child("filter_button"):set_color(tweak_data.screen_colors.button_stage_2)
 					managers.menu_component:post_event("highlight")
 				end
-				return true, "link"
+				used, pointer = true, "link"
 			elseif self._filter_highlighted then
 				self._filter_highlighted = false
 				self._panel:child("filter_button"):set_color(tweak_data.screen_colors.button_stage_3)
@@ -3736,19 +3736,21 @@ function CrimeNetGui:mouse_moved(o, x, y)
 	local dist = 0
 	local inside_any_job = false
 	local math_x, math_y
-	for id, job in pairs(self._jobs) do
-		local inside = job.marker_panel:child("select_panel"):inside(x, y) and self._panel:inside(x, y)
-		inside_any_job = inside_any_job or inside
-		if inside then
-			job_x, job_y = job.marker_panel:child("select_panel"):world_center()
-			math_x = job_x - x
-			math_y = job_y - y
-			dist = math_x * math_x + math_y * math_y
-			if closest_dist > dist then
-				closest_job = job
-				closest_dist = dist
-				closest_job_x = job_x
-				closest_job_y = job_y
+	if not used then
+		for id, job in pairs(self._jobs) do
+			local inside = job.marker_panel:child("select_panel"):inside(x, y) and self._panel:inside(x, y)
+			inside_any_job = inside_any_job or inside
+			if inside then
+				job_x, job_y = job.marker_panel:child("select_panel"):world_center()
+				math_x = job_x - x
+				math_y = job_y - y
+				dist = math_x * math_x + math_y * math_y
+				if closest_dist > dist then
+					closest_job = job
+					closest_dist = dist
+					closest_job_x = job_x
+					closest_job_y = job_y
+				end
 			end
 		end
 	end
@@ -3778,12 +3780,13 @@ function CrimeNetGui:mouse_moved(o, x, y)
 			self:_set_map_position(push_x, push_y)
 		end
 	end
-	if inside_any_job then
-		return true, "link"
+	if not used and inside_any_job then
+		used, pointer = true, "link"
 	end
-	if self._panel:inside(x, y) then
-		return true, "hand"
+	if not used and self._panel:inside(x, y) then
+		used, pointer = true, "hand"
 	end
+	return used, pointer
 end
 
 function CrimeNetGui:ps3_invites_callback()

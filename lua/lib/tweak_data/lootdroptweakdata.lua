@@ -1145,6 +1145,33 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.friend.track = true
 	self.global_values.friend.sort_number = 301
 	self.global_values.friend.category = "dlc"
+	self.global_values.swm = {}
+	self.global_values.swm.name_id = "bm_global_value_swm"
+	self.global_values.swm.desc_id = "menu_l_global_value_swm"
+	self.global_values.swm.unlock_id = "bm_global_value_swm_unlock"
+	self.global_values.swm.color = Color(255, 255, 145, 0) / 255
+	self.global_values.swm.dlc = true
+	self.global_values.swm.chance = 1
+	self.global_values.swm.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "swm_bundle")
+	self.global_values.swm.durability_multiplier = 1
+	self.global_values.swm.drops = true
+	self.global_values.swm.track = true
+	self.global_values.swm.sort_number = 301
+	self.global_values.swm.hide_unavailable = true
+	self.global_values.swm.category = "global_event"
+	self.global_values.sha = {}
+	self.global_values.sha.name_id = "bm_global_value_sha"
+	self.global_values.sha.desc_id = "menu_l_global_value_sha"
+	self.global_values.sha.unlock_id = "bm_global_value_sha_unlock"
+	self.global_values.sha.color = Color(255, 255, 212, 0) / 255
+	self.global_values.sha.dlc = true
+	self.global_values.sha.chance = 1
+	self.global_values.sha.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "sha")
+	self.global_values.sha.durability_multiplier = 1
+	self.global_values.sha.drops = true
+	self.global_values.sha.track = true
+	self.global_values.sha.sort_number = 302
+	self.global_values.sha.category = "collaboration"
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.global_values.sweettooth = {}
 		self.global_values.sweettooth.name_id = "bm_global_value_sweettooth"
@@ -1205,7 +1232,9 @@ function LootDropTweakData:init(tweak_data)
 		"rota",
 		"tango",
 		"chico",
-		"friend"
+		"friend",
+		"swm",
+		"sha"
 	}
 	self:_create_global_value_list_map()
 end

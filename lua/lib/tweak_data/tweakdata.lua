@@ -34,6 +34,7 @@ require("lib/tweak_data/EnvEffectTweakData")
 require("lib/tweak_data/CustomSafehouseTweakData")
 require("lib/tweak_data/TangoTweakData")
 require("lib/tweak_data/SubtitleTweakData")
+require("lib/tweak_data/InputTweakData")
 TweakData = TweakData or class()
 
 function TweakData:_init_wip_tweak_data()
@@ -619,6 +620,10 @@ function TweakData:init()
 	self.env_effect = EnvEffectTweakData:new()
 	self.tango = TangoTweakData:new(self)
 	self.subtitles = SubtitleTweakData:new(self)
+	self.input = InputTweakData:new(self)
+	self.ai_carry = {}
+	self.ai_carry.throw_distance = 500
+	self.ai_carry.throw_force = 100
 	self.EFFECT_QUALITY = 0.5
 	if SystemInfo:platform() == Idstring("X360") then
 		self.EFFECT_QUALITY = 0.5
@@ -2033,7 +2038,7 @@ Play the full version soon to get your full PAYDAY!]],
 		},
 		trophy_knockouts = {
 			trophy_stat = "trophy_knockouts",
-			enemy = "tank",
+			enemies = {"tank", "tank_hw"},
 			melee_id = "boxing_gloves",
 			is_not_civilian = true
 		},
@@ -2942,7 +2947,7 @@ Play the full version soon to get your full PAYDAY!]],
 			difficulty = sm_wish_and_above,
 			job = "moon"
 		},
-		sm_wish_moon = {
+		sm_wish_friend = {
 			award = "friend_3",
 			difficulty = sm_wish_and_above,
 			job = "friend"
@@ -3638,6 +3643,7 @@ Play the full version soon to get your full PAYDAY!]],
 		},
 		daily_fwtd = {
 			trophy_stat = "daily_fwtd",
+			difficulty = overkill_and_above,
 			everyone_weapons_used = {
 				"sentry_gun",
 				"swat_van_turret_module"
@@ -3698,7 +3704,8 @@ Play the full version soon to get your full PAYDAY!]],
 					"wpn_prj_four",
 					"wpn_prj_jav",
 					"wpn_prj_hur",
-					"wpn_prj_target"
+					"wpn_prj_target",
+					"chico_injector"
 				}
 			}
 		},
@@ -3789,12 +3796,6 @@ Play the full version soon to get your full PAYDAY!]],
 				carry_id = "counterfeit_money",
 				value = 1000000
 			}
-		},
-		trophy_goats_extracted = {
-			trophy_stat = "trophy_goats_extracted",
-			jobs = {"peta"},
-			levels = {"peta2"},
-			secured = {carry_id = "goat", amount = 1}
 		},
 		trophy_tfturret = {
 			trophy_stat = "trophy_tfturret",
@@ -4123,7 +4124,7 @@ Play the full version soon to get your full PAYDAY!]],
 		wind_of_change = {
 			award = "eagle_3",
 			jobs = {"hox"},
-			difficulties = veryhard_and_above,
+			difficulties = overkill_and_above,
 			masks = {
 				"churchill",
 				"red_hurricane",

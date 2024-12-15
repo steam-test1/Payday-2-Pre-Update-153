@@ -52,6 +52,13 @@ ContourExt._types = {
 		fadeout = 9,
 		damage_bonus = true
 	},
+	mark_unit_dangerous_damage_bonus_distance = {
+		priority = 4,
+		color = tweak_data.contour.character.dangerous_color,
+		fadeout = 9,
+		damage_bonus = true,
+		damage_bonus_distance = 1
+	},
 	mark_unit_friendly = {
 		priority = 3,
 		color = tweak_data.contour.character.friendly_color
@@ -70,6 +77,15 @@ ContourExt._types = {
 		fadeout_silent = 13.5,
 		fadeout = 4.5,
 		damage_bonus = true
+	},
+	mark_enemy_damage_bonus_distance = {
+		priority = 4,
+		material_swap_required = true,
+		color = tweak_data.contour.character.more_dangerous_color,
+		fadeout_silent = 13.5,
+		fadeout = 4.5,
+		damage_bonus = true,
+		damage_bonus_distance = 1
 	},
 	highlight = {
 		priority = 4,
@@ -263,6 +279,15 @@ function ContourExt:remove_by_id(id, sync)
 	end
 end
 
+function ContourExt:has_id(id)
+	for i, setup in ipairs(self._contour_list) do
+		if setup.type == id then
+			return true
+		end
+	end
+	return false
+end
+
 function ContourExt:_clear()
 	self._contour_list = nil
 	self._materials = nil
@@ -409,7 +434,7 @@ function ContourExt:material_applied(material_was_swapped)
 	local setup = self._contour_list[1]
 	local data = self._types[setup.type]
 	if data.damage_bonus then
-		self._unit:character_damage():on_marked_state(true)
+		self._unit:character_damage():on_marked_state(true, data.damage_bonus_distance)
 	end
 	if material_was_swapped then
 		managers.occlusion:remove_occlusion(self._unit)

@@ -93,6 +93,10 @@ function PlayerBleedOut:interaction_blocked()
 	return true
 end
 
+function PlayerBleedOut:_check_use_item()
+	return false
+end
+
 function PlayerBleedOut:update(t, dt)
 	PlayerBleedOut.super.update(self, t, dt)
 	if self._tilt_wait_t then
@@ -131,7 +135,27 @@ function PlayerBleedOut:_update_check_actions(t, dt)
 	new_action = new_action or self:_check_action_interact(t, input)
 	new_action = new_action or self:_check_action_steelsight(t, input)
 	new_action = new_action or self:_check_action_deploy_underbarrel(t, input)
-	PlayerCarry._check_use_item(self, t, input)
+	self:_check_use_item(t, input)
+end
+
+function PlayerBleedOut:_check_use_item(t, input)
+	local new_action
+	local action_wanted = input.btn_use_item_release and self._throw_time and t and t < self._throw_time
+	if input.btn_use_item_press then
+		self._throw_down = true
+		self._throw_time = t + PlayerCarry.throw_limit_t
+	end
+	if action_wanted then
+		local action_forbidden = self._use_item_expire_t or self:_changing_weapon() or self:_interacting() or self._ext_movement:has_carry_restriction() or self:_is_throwing_projectile() or self:_on_zipline()
+		if not action_forbidden then
+			managers.player:drop_carry()
+			new_action = true
+		end
+	end
+	if self._throw_down and input.btn_use_item_release then
+		self._throw_down = false
+	end
+	return new_action
 end
 
 function PlayerBleedOut:_check_action_interact(t, input)
@@ -374,6 +398,9 @@ function PlayerBleedOut:on_rescue_SO_administered(revive_SO_data, receiver_unit)
 	end
 	revive_SO_data.rescuer = receiver_unit
 	revive_SO_data.SO_id = nil
+	if receiver_unit:movement():carrying_bag() then
+		receiver_unit:movement():throw_bag()
+	end
 end
 
 function PlayerBleedOut:on_rescue_SO_failed(revive_SO_data, rescuer)

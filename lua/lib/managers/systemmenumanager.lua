@@ -16,6 +16,7 @@ require("lib/managers/dialogs/Xbox360PlayerDialog")
 require("lib/managers/dialogs/Xbox360MarketplaceDialog")
 require("lib/managers/dialogs/NewUnlockDialog")
 require("lib/managers/dialogs/SpecializationDialog")
+require("lib/managers/dialogs/ButtonsDialog")
 SystemMenuManager = SystemMenuManager or class()
 SystemMenuManager.PLATFORM_CLASS_MAP = {}
 
@@ -32,6 +33,8 @@ GenericSystemMenuManager.NEW_UNLOCK_CLASS = NewUnlockDialog
 GenericSystemMenuManager.GENERIC_NEW_UNLOCK_CLASS = NewUnlockDialog
 GenericSystemMenuManager.SPECIALIZATION_CLASS = SpecializationDialog
 GenericSystemMenuManager.GENERIC_SPECIALIZATION_CLASS = SpecializationDialog
+GenericSystemMenuManager.BUTTON_DIALOG_CLASS = ButtonsDialog
+GenericSystemMenuManager.GENERIC_BUTTON_DIALOG_CLASS = ButtonsDialog
 
 function GenericSystemMenuManager:init()
 	if not Global.dialog_manager then
@@ -327,6 +330,11 @@ end
 
 function GenericSystemMenuManager:show_specialization_convert(data)
 	local success = self:_show_class(data, self.GENERIC_SPECIALIZATION_CLASS, self.SPECIALIZATION_CLASS, data.force)
+	self:_show_result(success, data)
+end
+
+function GenericSystemMenuManager:show_buttons(data)
+	local success = self:_show_class(data, self.GENERIC_BUTTON_DIALOG_CLASS, self.BUTTON_DIALOG_CLASS, data.force)
 	self:_show_result(success, data)
 end
 

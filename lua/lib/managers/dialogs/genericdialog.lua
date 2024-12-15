@@ -1,6 +1,7 @@
 core:module("SystemMenuManager")
 require("lib/managers/dialogs/Dialog")
 GenericDialog = GenericDialog or class(Dialog)
+GenericDialog.PANEL_SCRIPT_CLASS = "TextBoxGui"
 GenericDialog.FADE_IN_DURATION = 0.2
 GenericDialog.FADE_OUT_DURATION = 0.2
 GenericDialog.MOVE_AXIS_LIMIT = 0.4
@@ -16,7 +17,7 @@ function GenericDialog:init(manager, data, is_title_outside)
 		end
 	end
 	self._ws = self._data.ws or manager:_get_ws()
-	self._panel_script = _G.TextBoxGui:new(self._ws, self._data.title or "", self._data.text or "", self._data, {
+	self._panel_script = _G[self.PANEL_SCRIPT_CLASS]:new(self._ws, self._data.title or "", self._data.text or "", self._data, {
 		type = self._data.type or "system_menu",
 		no_close_legend = true,
 		use_indicator = data.indicator or data.no_buttons,

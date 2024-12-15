@@ -113,8 +113,8 @@ function MenuManager:init(is_start_menu)
 	end
 	self._active_changed_callback_handler = CoreEvent.CallbackEventHandler:new()
 	managers.user:add_setting_changed_callback("brightness", callback(self, self, "brightness_changed"), true)
-	managers.user:add_setting_changed_callback("camera_sensitivity", callback(self, self, "camera_sensitivity_changed"), true)
 	managers.user:add_setting_changed_callback("camera_zoom_sensitivity", callback(self, self, "camera_sensitivity_changed"), true)
+	managers.user:add_setting_changed_callback("camera_sensitivity", callback(self, self, "camera_sensitivity_changed"), true)
 	managers.user:add_setting_changed_callback("rumble", callback(self, self, "rumble_changed"), true)
 	managers.user:add_setting_changed_callback("invert_camera_x", callback(self, self, "invert_camera_x_changed"), true)
 	managers.user:add_setting_changed_callback("invert_camera_y", callback(self, self, "invert_camera_y_changed"), true)
@@ -487,36 +487,65 @@ function MenuManager:set_mouse_sensitivity(zoomed)
 	if self:is_console() then
 		return
 	end
-	local sens = zoomed and managers.user:get_setting("enable_camera_zoom_sensitivity") and managers.user:get_setting("camera_zoom_sensitivity") or managers.user:get_setting("camera_sensitivity")
+	local zoom_sense = zoomed and managers.user:get_setting("enable_camera_zoom_sensitivity")
+	local sense_x, sense_y
+	if zoom_sense then
+		sense_x = managers.user:get_setting("camera_zoom_sensitivity")
+		sense_y = sense_x
+	else
+		sense_x = managers.user:get_setting("camera_sensitivity")
+		sense_y = sense_x
+	end
 	if zoomed and managers.user:get_setting("enable_fov_based_sensitivity") and alive(managers.player:player_unit()) then
 		local state = managers.player:player_unit():movement():current_state()
 		if alive(state._equipped_unit) then
 			local fov = managers.user:get_setting("fov_multiplier")
-			sens = sens * (state._equipped_unit:base():zoom() or 65) * (fov + 1) / 2 / (65 * fov)
+			local scale = (state._equipped_unit:base():zoom() or 65) * (fov + 1) / 2 / (65 * fov)
+			sense_x = sense_x * scale
+			sense_y = sense_y * scale
 		end
 	end
-	self._controller:get_setup():get_connection("look"):set_multiplier(sens * self._look_multiplier)
+	local multiplier = Vector3()
+	mvector3.set_x(multiplier, sense_x * self._look_multiplier.x)
+	mvector3.set_y(multiplier, sense_y * self._look_multiplier.y)
+	self._controller:get_setup():get_connection("look"):set_multiplier(multiplier)
 	managers.controller:rebind_connections()
 end
 
 function MenuManager:camera_sensitivity_x_changed(name, old_value, new_value)
 	local setup = self._controller:get_setup()
 	local look_connection = setup:get_connection("look")
-	local look_multiplier = look_connection:get_multiplier()
+	local look_multiplier = Vector3()
+	mvector3.set(look_multiplier, look_connection:get_multiplier())
 	mvector3.set_x(look_multiplier, self._look_multiplier.x * new_value)
 	look_connection:set_multiplier(look_multiplier)
 	managers.controller:rebind_connections()
-	print("[MenuManager]:camera_sensitivity_x_changed")
+	if alive(managers.player:player_unit()) then
+		local plr_state = managers.player:player_unit():movement():current_state()
+		local weapon_id = alive(plr_state._equipped_unit) and plr_state._equipped_unit:base():get_name_id()
+		local stances = tweak_data.player.stances[weapon_id] or tweak_data.player.stances.default
+		self:set_mouse_sensitivity(plr_state:in_steelsight() and stances.steelsight.zoom_fov)
+	else
+		self:set_mouse_sensitivity(false)
+	end
 end
 
 function MenuManager:camera_sensitivity_y_changed(name, old_value, new_value)
 	local setup = self._controller:get_setup()
 	local look_connection = setup:get_connection("look")
-	local look_multiplier = look_connection:get_multiplier()
+	local look_multiplier = Vector3()
+	mvector3.set(look_multiplier, look_connection:get_multiplier())
 	mvector3.set_y(look_multiplier, self._look_multiplier.y * new_value)
 	look_connection:set_multiplier(look_multiplier)
 	managers.controller:rebind_connections()
-	print("[MenuManager]:camera_sensitivity_y_changed")
+	if alive(managers.player:player_unit()) then
+		local plr_state = managers.player:player_unit():movement():current_state()
+		local weapon_id = alive(plr_state._equipped_unit) and plr_state._equipped_unit:base():get_name_id()
+		local stances = tweak_data.player.stances[weapon_id] or tweak_data.player.stances.default
+		self:set_mouse_sensitivity(plr_state:in_steelsight() and stances.steelsight.zoom_fov)
+	else
+		self:set_mouse_sensitivity(false)
+	end
 end
 
 function MenuManager:camera_sensitivity_changed(name, old_value, new_value)
@@ -1691,10 +1720,6 @@ function MenuCallbackHandler:is_level_50()
 	return managers.experience:current_level() >= 50
 end
 
-function MenuCallbackHandler:is_new_gamepad_input()
-	return false
-end
-
 function MenuCallbackHandler:is_win32()
 	return SystemInfo:platform() == Idstring("WIN32")
 end
@@ -2148,7 +2173,7 @@ function MenuCallbackHandler:toggle_throwable_contour(item)
 	managers.user:set_setting("throwable_contour", state, nil)
 	local throwables = World:find_units_quick("all", 20)
 	for _, unit in ipairs(throwables) do
-		if unit.base and unit:base().reload_contour then
+		if alive(unit) and unit.base and unit:base().reload_contour then
 			unit:base():reload_contour()
 		end
 	end
@@ -2159,10 +2184,14 @@ function MenuCallbackHandler:toggle_ammo_contour(item)
 	managers.user:set_setting("ammo_contour", state, nil)
 	local pickups = World:find_units_quick("all", 23)
 	for _, unit in ipairs(pickups) do
-		if unit.pickup and unit:pickup().reload_contour then
+		if alive(unit) and unit.pickup and unit:pickup().reload_contour then
 			unit:pickup():reload_contour()
 		end
 	end
+end
+
+function MenuCallbackHandler:toggle_mute_heist_vo(item)
+	managers.user:set_setting("mute_heist_vo", item:value() == "on", nil)
 end
 
 function MenuCallbackHandler:choice_test(item)
@@ -3326,6 +3355,20 @@ function MenuCallbackHandler:set_effect_quality(item)
 	managers.user:set_setting("effect_quality", effect_quality)
 end
 
+function MenuCallbackHandler:_update_linked_sliders(linked_sliders, value)
+	local triggers = {}
+	for _, item in ipairs(linked_sliders) do
+		local slider = managers.menu:active_menu().logic:selected_node():item(item)
+		if slider and slider:visible() and math.abs(value - slider:value()) > 0.001 then
+			slider:set_value(value)
+			table.insert(triggers, slider)
+		end
+	end
+	for _, slider in ipairs(triggers) do
+		slider:trigger()
+	end
+end
+
 function MenuCallbackHandler:set_camera_sensitivity(item)
 	local value = item:value()
 	managers.user:set_setting("camera_sensitivity", value)
@@ -3342,11 +3385,11 @@ function MenuCallbackHandler:set_camera_sensitivity_x(item)
 	local value = item:value()
 	managers.user:set_setting("camera_sensitivity_x", value)
 	if not managers.user:get_setting("enable_camera_sensitivity_separate") then
-		local item_other_sens = managers.menu:active_menu().logic:selected_node():item("camera_sensitivity_vertical")
-		if item_other_sens and item_other_sens:visible() and math.abs(value - item_other_sens:value()) > 0.001 then
-			item_other_sens:set_value(value)
-			item_other_sens:trigger()
-		end
+		self:_update_linked_sliders({
+			"camera_sensitivity_vertical",
+			"camera_zoom_sensitivity_horizontal",
+			"camera_zoom_sensitivity_vertical"
+		}, value)
 	end
 end
 
@@ -3354,11 +3397,11 @@ function MenuCallbackHandler:set_camera_sensitivity_y(item)
 	local value = item:value()
 	managers.user:set_setting("camera_sensitivity_y", value)
 	if not managers.user:get_setting("enable_camera_sensitivity_separate") then
-		local item_other_sens = managers.menu:active_menu().logic:selected_node():item("camera_sensitivity_horizontal")
-		if item_other_sens and item_other_sens:visible() and math.abs(value - item_other_sens:value()) > 0.001 then
-			item_other_sens:set_value(value)
-			item_other_sens:trigger()
-		end
+		self:_update_linked_sliders({
+			"camera_sensitivity_horizontal",
+			"camera_zoom_sensitivity_horizontal",
+			"camera_zoom_sensitivity_vertical"
+		}, value)
 	end
 end
 
@@ -3376,6 +3419,30 @@ function MenuCallbackHandler:set_camera_zoom_sensitivity(item)
 			item_other_sens:set_value(value)
 			item_other_sens:trigger()
 		end
+	end
+end
+
+function MenuCallbackHandler:set_camera_zoom_sensitivity_x(item)
+	local value = item:value()
+	managers.user:set_setting("camera_zoom_sensitivity_x", value)
+	if not managers.user:get_setting("enable_camera_sensitivity_separate") then
+		self:_update_linked_sliders({
+			"camera_sensitivity_horizontal",
+			"camera_sensitivity_vertical",
+			"camera_zoom_sensitivity_vertical"
+		}, value)
+	end
+end
+
+function MenuCallbackHandler:set_camera_zoom_sensitivity_y(item)
+	local value = item:value()
+	managers.user:set_setting("camera_zoom_sensitivity_y", value)
+	if not managers.user:get_setting("enable_camera_sensitivity_separate") then
+		self:_update_linked_sliders({
+			"camera_sensitivity_horizontal",
+			"camera_sensitivity_vertical",
+			"camera_zoom_sensitivity_horizontal"
+		}, value)
 	end
 end
 
@@ -4807,7 +4874,8 @@ MenuCustomizeControllerCreator.CONTROLS = {
 	"vehicle_change_camera",
 	"vehicle_rear_camera",
 	"vehicle_shooting_stance",
-	"vehicle_exit"
+	"vehicle_exit",
+	"toggle_hud"
 }
 MenuCustomizeControllerCreator.AXIS_ORDERED = {
 	move = {
@@ -4927,6 +4995,10 @@ MenuCustomizeControllerCreator.CONTROLS_INFO.deploy_bipod = {
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.change_equipment = {
 	text_id = "menu_button_change_equipment",
+	category = "normal"
+}
+MenuCustomizeControllerCreator.CONTROLS_INFO.toggle_hud = {
+	text_id = "menu_button_toggle_hud",
 	category = "normal"
 }
 MenuCustomizeControllerCreator.CONTROLS_INFO.drive = {hidden = true, category = "vehicle"}
@@ -8081,24 +8153,41 @@ function MenuOptionInitiator:modify_controls(node)
 	if cs_item then
 		cs_item:set_min(tweak_data.player.camera.MIN_SENSITIVITY)
 		cs_item:set_max(tweak_data.player.camera.MAX_SENSITIVITY)
-		cs_item:set_step((tweak_data.player.camera.MAX_SENSITIVITY - tweak_data.player.camera.MIN_SENSITIVITY) * 0.1)
+		cs_item:set_step((tweak_data.player.camera.MAX_SENSITIVITY - tweak_data.player.camera.MIN_SENSITIVITY) * 0.05)
 		cs_item:set_value(managers.user:get_setting("camera_sensitivity_x"))
 	end
 	local cs_item = node:item("camera_sensitivity_vertical")
 	if cs_item then
 		cs_item:set_min(tweak_data.player.camera.MIN_SENSITIVITY)
 		cs_item:set_max(tweak_data.player.camera.MAX_SENSITIVITY)
-		cs_item:set_step((tweak_data.player.camera.MAX_SENSITIVITY - tweak_data.player.camera.MIN_SENSITIVITY) * 0.1)
+		cs_item:set_step((tweak_data.player.camera.MAX_SENSITIVITY - tweak_data.player.camera.MIN_SENSITIVITY) * 0.05)
 		cs_item:set_value(managers.user:get_setting("camera_sensitivity_y"))
 	end
 	local czs_item = node:item("camera_zoom_sensitivity")
 	if czs_item then
 		czs_item:set_min(tweak_data.player.camera.MIN_SENSITIVITY)
 		czs_item:set_max(tweak_data.player.camera.MAX_SENSITIVITY)
-		czs_item:set_step((tweak_data.player.camera.MAX_SENSITIVITY - tweak_data.player.camera.MIN_SENSITIVITY) * 0.1)
+		czs_item:set_step((tweak_data.player.camera.MAX_SENSITIVITY - tweak_data.player.camera.MIN_SENSITIVITY) * 0.05)
 		czs_item:set_value(managers.user:get_setting("camera_zoom_sensitivity"))
 	end
-	node:item("toggle_zoom_sensitivity"):set_value(managers.user:get_setting("enable_camera_zoom_sensitivity") and "on" or "off")
+	local czs_item = node:item("camera_zoom_sensitivity_horizontal")
+	if czs_item then
+		czs_item:set_min(tweak_data.player.camera.MIN_SENSITIVITY)
+		czs_item:set_max(tweak_data.player.camera.MAX_SENSITIVITY)
+		czs_item:set_step((tweak_data.player.camera.MAX_SENSITIVITY - tweak_data.player.camera.MIN_SENSITIVITY) * 0.05)
+		czs_item:set_value(managers.user:get_setting("camera_zoom_sensitivity_x"))
+	end
+	local czs_item = node:item("camera_zoom_sensitivity_vertical")
+	if czs_item then
+		czs_item:set_min(tweak_data.player.camera.MIN_SENSITIVITY)
+		czs_item:set_max(tweak_data.player.camera.MAX_SENSITIVITY)
+		czs_item:set_step((tweak_data.player.camera.MAX_SENSITIVITY - tweak_data.player.camera.MIN_SENSITIVITY) * 0.05)
+		czs_item:set_value(managers.user:get_setting("camera_zoom_sensitivity_y"))
+	end
+	local cs_item = node:item("toggle_zoom_sensitivity")
+	if cs_item then
+		cs_item:set_value(managers.user:get_setting("enable_camera_zoom_sensitivity") and "on" or "off")
+	end
 	local cs_item = node:item("toggle_camera_sensitivity_separate")
 	if cs_item then
 		cs_item:set_value(managers.user:get_setting("enable_camera_sensitivity_separate") and "on" or "off")
@@ -8123,6 +8212,10 @@ function MenuOptionInitiator:modify_gameplay_options(node)
 			option_value = "on"
 		end
 		ammo_contour:set_value(option_value)
+	end
+	local mute_heist_vo = node:item("toggle_mute_heist_vo")
+	if mute_heist_vo then
+		mute_heist_vo:set_value(managers.user:get_setting("mute_heist_vo") and "on" or "off")
 	end
 	return node
 end

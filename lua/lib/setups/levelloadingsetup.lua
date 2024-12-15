@@ -4,11 +4,26 @@ require("lib/managers/menu/MenuBackdropGUI")
 require("core/lib/managers/CoreGuiDataManager")
 require("core/lib/utils/CoreMath")
 require("core/lib/utils/CoreEvent")
+
+function fake_inspect(val)
+	if val == nil or type(val) ~= "table" then
+		return tostring(val)
+	end
+	local rtn = "---\n"
+	for k, v in pairs(val) do
+		rtn = rtn .. "| " .. tostring(k) .. " = " .. tostring(v) .. "\n"
+	end
+	rtn = rtn .. "---\n"
+	return rtn
+end
+
 LevelLoadingSetup = LevelLoadingSetup or class(CoreLoadingSetup)
 
 function LevelLoadingSetup:init()
 	self._camera = Scene:create_camera()
 	LoadingViewport:set_camera(self._camera)
+	print("LevelLoadingSetup:init")
+	print(fake_inspect(arg.load_level_data))
 	self._gui_wrapper = LevelLoadingScreenGuiScript:new(Scene:gui(), arg.res, -1, arg.layer)
 end
 

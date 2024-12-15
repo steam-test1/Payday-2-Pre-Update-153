@@ -323,7 +323,7 @@ function UpgradesTweakData:_init_pd2_values()
 	}
 	self.values.weapon.passive_damage_multiplier = {1.05}
 	self.values.weapon.knock_down = {0.05, 0.2}
-	self.values.weapon.automatic_head_shot_add = {0.25, 0.75}
+	self.values.weapon.automatic_head_shot_add = {0.33, 1}
 	self.values.assault_rifle.enter_steelsight_speed_multiplier = {2}
 	self.values.assault_rifle.zoom_increase = {2}
 	self.values.player.crafting_weapon_multiplier = {0.9}
@@ -573,6 +573,7 @@ function UpgradesTweakData:_init_pd2_values()
 	}
 	self.values.player.secured_bags_money_multiplier = {1.02}
 	self.values.pistol.stacking_hit_expire_t = {6, 20}
+	self.values.pistol.zoom_increase = {2}
 	self.values.carry.movement_penalty_nullifier = {true}
 	self.values.temporary.berserker_damage_multiplier = {
 		{1, 3},
@@ -692,7 +693,12 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.trip_mine.marked_enemy_extra_damage = {true}
 	self.values.ecm_jammer.can_retrigger = {true}
 	self.values.player.panic_suppression = {true}
-	self.values.akimbo.extra_ammo_multiplier = {1.25, 1.5}
+	self.values.akimbo.extra_ammo_multiplier = {
+		1.25,
+		1.5,
+		2,
+		2.5
+	}
 	self.values.akimbo.damage_multiplier = {1.5, 3}
 	self.values.akimbo.recoil_multiplier = {
 		2.5,
@@ -895,7 +901,9 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.akimbo.recoil_index_addend = {
 		-6,
 		-4,
-		-2
+		-2,
+		0,
+		2
 	}
 	self.values.weapon.steelsight_highlight_specials = {true}
 	self.armor_health_store_kill_amount = 1
@@ -1150,7 +1158,7 @@ function UpgradesTweakData:_init_pd2_values()
 			{},
 			{
 				"55%",
-				"200%",
+				"100%",
 				"65%"
 			}
 		},
@@ -1220,7 +1228,7 @@ function UpgradesTweakData:_init_pd2_values()
 		},
 		rifleman = {
 			{"100%"},
-			{"25%", "50%"}
+			{"25%", "16"}
 		},
 		scavenger = {
 			{"30%", "5"},
@@ -1870,7 +1878,7 @@ function UpgradesTweakData:_init_pd2_values()
 				"10%",
 				"5%",
 				"-24",
-				"25%",
+				"50%",
 				"-16"
 			},
 			{
@@ -2143,7 +2151,7 @@ function UpgradesTweakData:_init_pd2_values()
 			},
 			{
 				"10%",
-				"25",
+				"15",
 				"1"
 			},
 			{"135%"},
@@ -2151,7 +2159,7 @@ function UpgradesTweakData:_init_pd2_values()
 			{"5%", "20%"},
 			{
 				"10%",
-				"25",
+				"15",
 				"1",
 				"10%"
 			}
@@ -2374,7 +2382,8 @@ function UpgradesTweakData:init(tweak_data)
 			"m37",
 			"rota",
 			"cs",
-			"brick"
+			"brick",
+			"ostry"
 		}
 	}
 	self.level_tree[24] = {
@@ -8600,6 +8609,10 @@ function UpgradesTweakData:_melee_weapon_definitions()
 		category = "melee_weapon",
 		dlc = "friend"
 	}
+	self.definitions.ostry = {
+		category = "melee_weapon",
+		dlc = "sha"
+	}
 end
 
 function UpgradesTweakData:_grenades_definitions()
@@ -8781,6 +8794,7 @@ function UpgradesTweakData:_weapon_definitions()
 	}
 	self.definitions.akimbo_recoil_index_addend_1 = {
 		category = "feature",
+		incremental = true,
 		name_id = "menu_akimbo_recoil_index_addend",
 		upgrade = {
 			category = "akimbo",
@@ -8790,6 +8804,7 @@ function UpgradesTweakData:_weapon_definitions()
 	}
 	self.definitions.akimbo_recoil_index_addend_2 = {
 		category = "feature",
+		incremental = true,
 		name_id = "menu_akimbo_recoil_index_addend",
 		upgrade = {
 			category = "akimbo",
@@ -8799,6 +8814,7 @@ function UpgradesTweakData:_weapon_definitions()
 	}
 	self.definitions.akimbo_recoil_index_addend_3 = {
 		category = "feature",
+		incremental = true,
 		name_id = "menu_akimbo_recoil_index_addend",
 		upgrade = {
 			category = "akimbo",
@@ -9166,6 +9182,15 @@ function UpgradesTweakData:_pistol_definitions()
 		upgrade = {
 			category = "pistol",
 			upgrade = "magazine_capacity_inc",
+			value = 1
+		}
+	}
+	self.definitions.pistol_zoom_increase = {
+		category = "feature",
+		name_id = "menu_pistol_zoom_increase",
+		upgrade = {
+			category = "pistol",
+			upgrade = "zoom_increase",
 			value = 1
 		}
 	}
@@ -11027,6 +11052,7 @@ function UpgradesTweakData:_akimbo_definitions()
 	}
 	self.definitions.akimbo_extra_ammo_multiplier_1 = {
 		category = "feature",
+		incremental = true,
 		name_id = "menu_akimbo_extra_ammo_multiplier",
 		upgrade = {
 			category = "akimbo",
@@ -11036,6 +11062,7 @@ function UpgradesTweakData:_akimbo_definitions()
 	}
 	self.definitions.akimbo_extra_ammo_multiplier_2 = {
 		category = "feature",
+		incremental = true,
 		name_id = "menu_akimbo_extra_ammo_multiplier",
 		upgrade = {
 			category = "akimbo",

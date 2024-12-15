@@ -886,6 +886,31 @@ end
 function CopLogicIdle._get_priority_attention(data, attention_objects, reaction_func)
 	reaction_func = reaction_func or CopLogicIdle._chk_reaction_to_attention_object
 	local best_target, best_target_priority_slot, best_target_priority, best_target_reaction
+	local forced_attention_data = managers.groupai:state():force_attention_data(data.unit)
+	if forced_attention_data then
+		if data.attention_obj and data.attention_obj.unit == forced_attention_data.unit then
+			return data.attention_obj, 1, AIAttentionObject.REACT_SHOOT
+		end
+		local forced_attention_object = managers.groupai:state():get_AI_attention_object_by_unit(forced_attention_data.unit)
+		if forced_attention_object then
+			for u_key, attention_info in pairs(forced_attention_object) do
+				if forced_attention_data.ignore_vis_blockers then
+					local vis_ray = World:raycast("ray", data.unit:movement():m_head_pos(), attention_info.handler:get_detection_m_pos(), "slot_mask", data.visibility_slotmask, "ray_type", "ai_vision")
+					if not vis_ray or vis_ray.unit:key() == u_key or not vis_ray.unit:visible() then
+						best_target = CopLogicBase._create_detected_attention_object_data(data.t, data.unit, u_key, attention_info, attention_info.handler:get_attention(data.SO_access), true)
+						best_target.verified = true
+					end
+				else
+					best_target = CopLogicBase._create_detected_attention_object_data(data.t, data.unit, u_key, attention_info, attention_info.handler:get_attention(data.SO_access), true)
+				end
+			end
+		else
+			Application:error("[CopLogicIdle._get_priority_attention] No attention object available for unit", inspect(forced_attention_data))
+		end
+		if best_target then
+			return best_target, 1, AIAttentionObject.REACT_SHOOT
+		end
+	end
 	local near_threshold = data.internal_data.weapon_range.optimal
 	local too_close_threshold = data.internal_data.weapon_range.close
 	for u_key, attention_data in pairs(attention_objects) do

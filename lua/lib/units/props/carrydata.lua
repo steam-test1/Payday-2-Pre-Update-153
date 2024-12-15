@@ -13,6 +13,7 @@ function CarryData:init(unit)
 	else
 		self._value = tweak_data:get_value("money_manager", "bag_values", "default")
 	end
+	self._linked_ai = {}
 end
 
 function CarryData:set_mission_element(mission_element)
@@ -36,6 +37,50 @@ function CarryData:update(unit, t, dt)
 	end
 	if alive(self._linked_to) and self._linked_to.character_damage and self._linked_to:character_damage():dead() then
 		self:unlink()
+	end
+	if not self._linked_to then
+		local bag_object = self._unit:get_object(Idstring("g_bag")) or self._unit:get_object(Idstring("g_canvasbag")) or self._unit:get_object(Idstring("g_g")) or self._unit:get_object(Idstring("g_goat")) or self._unit:get_object(Idstring("g_bodybag"))
+		if bag_object then
+			local unit
+			for key, data in pairs(managers.groupai:state():all_AI_criminals()) do
+				if alive(data.unit) then
+					local body = data.unit:get_object(Idstring("g_body")) or data.unit:get_object(Idstring("g_body_terry"))
+					if body then
+						local bag_center = bag_object:oobb():center()
+						if body:inside_oobb(bag_center) then
+							unit = data.unit
+							break
+						end
+					end
+				end
+			end
+			if unit then
+				local skip = false
+				if self._linked_ai[unit:key()] then
+					skip = t < self._linked_ai[unit:key()] + 1
+				end
+				if unit:movement()._cool or unit:movement():downed() or unit:movement().vehicle_unit then
+					skip = true
+				end
+				if not skip and unit:children() then
+					for _, linked_unit in ipairs(unit:children()) do
+						if linked_unit:carry_data() then
+							skip = true
+							break
+						end
+					end
+				end
+				if not skip and self._unit:interaction() and not self._unit:interaction()._has_modified_timer then
+					skip = true
+				end
+				if not skip then
+					self:link_to(unit, false)
+					if unit:movement().set_carrying_bag then
+						unit:movement():set_carrying_bag(self._unit)
+					end
+				end
+			end
+		end
 	end
 end
 
@@ -536,6 +581,9 @@ function CarryData:on_secure_SO_failed(thief)
 end
 
 function CarryData:link_to(parent_unit, keep_collisions)
+	if self._linked_to and managers.groupai:state():is_unit_team_AI(self._linked_to) then
+		self._linked_to:movement():set_carrying_bag(nil)
+	end
 	local body = self._unit:body("hinge_body_1") or self._unit:body(0)
 	body:set_keyframed()
 	local parent_obj_name = Idstring("Neck")
@@ -548,12 +596,30 @@ function CarryData:link_to(parent_unit, keep_collisions)
 	self._unit:set_rotation(world_rot)
 	self._disabled_collisions = {}
 	local nr_bodies = self._unit:num_bodies()
-	for i_body = 0, nr_bodies - 1 do
-		local body = self._unit:body(i_body)
-		if body:collisions_enabled() then
-			table.insert(self._disabled_collisions, body)
-			body:set_collisions_enabled(false)
+	if keep_collisions then
+		self._kept_collisions = true
+		self._unit:set_body_collision_callback(function(tag, unit, colliding_body, other_unit, other_body, position, normal, velocity)
+			if tag ~= Idstring("throw") then
+				return
+			end
+			if other_unit:visible() then
+				unit:set_disable_collision_with_unit(other_unit)
+			else
+				unit:carry_data():unlink()
+				print("[CarryData:link_to] this is not a valid place for a bag, dropping it", unit, other_unit, position)
+			end
+		end)
+	else
+		for i_body = 0, nr_bodies - 1 do
+			local body = self._unit:body(i_body)
+			if body:collisions_enabled() then
+				table.insert(self._disabled_collisions, body)
+				body:set_collisions_enabled(false)
+			end
 		end
+	end
+	if parent_unit:movement().set_carrying_bag then
+		parent_unit:movement():set_carrying_bag(self._unit)
 	end
 	self._linked_to = parent_unit
 	if Network:is_server() then
@@ -562,6 +628,10 @@ function CarryData:link_to(parent_unit, keep_collisions)
 end
 
 function CarryData:unlink()
+	if self._linked_to and managers.groupai:state():is_unit_team_AI(self._linked_to) then
+		self._linked_to:movement():set_carrying_bag(nil)
+		self._linked_ai[self._linked_to:key()] = TimerManager:game():time()
+	end
 	self._linked_to = nil
 	self._unit:unlink()
 	local body = self._unit:body("hinge_body_1") or self._unit:body(0)
@@ -571,6 +641,10 @@ function CarryData:unlink()
 			body:set_collisions_enabled(true)
 		end
 		self._disabled_collisions = nil
+	end
+	if self._kept_collisions then
+		self._kept_collisions = nil
+		self._unit:interaction():register_collision_callbacks()
 	end
 	if Network:is_server() then
 		managers.network:session():send_to_peers_synched("loot_link", self._unit, self._unit)
@@ -674,6 +748,9 @@ function CarryData:destroy()
 		self._register_out_of_world_dynamic_clbk_id = nil
 	end
 	self:_unregister_steal_SO()
+	if self._linked_to and managers.groupai:state():is_unit_team_AI(self._linked_to) then
+		self._linked_to:movement():set_carrying_bag(nil)
+	end
 	self._linked_to = nil
 end
 
@@ -683,4 +760,8 @@ end
 
 function CarryData:latest_peer_id()
 	return self._latest_peer_id
+end
+
+function CarryData:is_linked_to_unit()
+	return self._linked_to or false
 end

@@ -1,3 +1,4 @@
+require("lib/utils/Version")
 local selected_setup
 if Global.load_level then
 	selected_setup = require("lib/setups/NetworkGameSetup")

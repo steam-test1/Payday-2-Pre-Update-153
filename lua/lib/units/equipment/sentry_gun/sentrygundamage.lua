@@ -81,6 +81,7 @@ function SentryGunDamage:damage_bullet(attack_data)
 	if self._invulnerable_bodies and self._invulnerable_bodies[hit_body_name:key()] then
 		return
 	end
+	managers.player:send_message(Message.OnEnemyShot, nil, attack_data.attacker_unit, self._unit, attack_data and attack_data.variant or "bullet")
 	local hit_shield = attack_data.col_ray.body and hit_body_name == self._shield_body_name_ids
 	local hit_bag = attack_data.col_ray.body and hit_body_name == self._bag_body_name_ids
 	local dmg_adjusted = attack_data.damage

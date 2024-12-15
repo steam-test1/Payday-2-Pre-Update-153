@@ -82,7 +82,7 @@ function PlayerSound:play_whizby(params)
 	self:_play("bullet_whizby_medium")
 end
 
-function PlayerSound:say(sound_name, sync, important_say)
+function PlayerSound:say(sound_name, sync, important_say, ignore_prefix, callback)
 	if self._last_speech and self._speaking then
 		self._last_speech:stop()
 		self._speaking = nil
@@ -96,7 +96,7 @@ function PlayerSound:say(sound_name, sync, important_say)
 		event_id = event_id or SoundDevice:string_to_id(sound_name)
 		self._unit:network():send("say", event_id)
 	end
-	self._last_speech = self:_play(sound_name or event_id, nil, true)
+	self._last_speech = self:_play(sound_name or event_id, nil, true, callback)
 	if important_say and self._last_speech then
 		managers.hud:set_mugshot_talk(self._unit:unit_data().mugshot_id, true)
 		self._speaking = true

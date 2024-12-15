@@ -725,6 +725,9 @@ end
 function VehicleDrivingExt:on_team_ai_enter(ai_unit)
 	ai_unit:movement().vehicle_unit:link(Idstring(VehicleDrivingExt.THIRD_PREFIX .. ai_unit:movement().vehicle_seat.name), ai_unit, ai_unit:orientation_object():name())
 	ai_unit:movement().vehicle_seat.occupant = ai_unit
+	if ai_unit:movement():carrying_bag() then
+		ai_unit:movement():throw_bag()
+	end
 	Application:debug("VehicleDrivingExt:sync_ai_vehicle_action")
 	self._door_soundsource:set_position(ai_unit:movement().vehicle_seat.object:position())
 	self._door_soundsource:post_event(self._tweak_data.sound.door_close)

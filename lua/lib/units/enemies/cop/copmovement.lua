@@ -211,6 +211,7 @@ action_variants.civilian_female = action_variants.civilian
 action_variants.robbers_safehouse = action_variants.civilian
 action_variants.bank_manager = action_variants.civilian
 action_variants.drunk_pilot = action_variants.civilian
+action_variants.spa_vip_hurt = action_variants.civilian
 action_variants.boris = action_variants.civilian
 action_variants.escort = action_variants.civilian
 action_variants.escort_suitcase = clone(action_variants.civilian)
@@ -2182,6 +2183,11 @@ end
 
 function CopMovement:team()
 	return self._team
+end
+
+function CopMovement:get_location_id()
+	local metadata = managers.navigation:get_nav_seg_metadata(self._standing_nav_seg_id)
+	return metadata and metadata.location_id
 end
 
 IgnoreAlertsMovement = IgnoreAlertsMovement or class(CopMovement)

@@ -296,7 +296,10 @@ function CustomSafehouseTweakData:_init_safehouse_contractors(tweak_data)
 		character = "wild",
 		image_name = "rust",
 		weighting = heister_weighting,
-		dailies = {}
+		dailies = {
+			"daily_coke_run",
+			"daily_whats_stealth"
+		}
 	})
 	table.insert(self.contractors, {
 		name_id = "menu_terry",

@@ -24862,6 +24862,7 @@ function WeaponFactoryTweakData:_init_legendary()
 		unatainable = true,
 		animations = {reload = "reload"}
 	}
+	self.parts.wpn_fps_rpg7_m_grinclown.third_unit = "units/payday2_cash/safes/cop/weapons/wpn_fps_rpg7_m_grinclown/wpn_third_rpg7_m_grinclown"
 	self.parts.wpn_fps_lmg_m134_body_upper_spikey = {
 		type = "extra",
 		name_id = "bm_wp_m134_body_upper_spikey",
@@ -27716,12 +27717,7 @@ end
 
 function WeaponFactoryTweakData:_init_tng()
 	self.parts.wpn_fps_sho_saiga_b_short = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
+		pcs = {},
 		type = "barrel",
 		name_id = "bm_wp_saiga_b_short",
 		a_obj = "a_b",
@@ -27745,12 +27741,7 @@ function WeaponFactoryTweakData:_init_tng()
 		}
 	}
 	self.parts.wpn_fps_sho_saiga_fg_holy = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
+		pcs = {},
 		type = "foregrip",
 		name_id = "bm_wp_saiga_fg_holy",
 		a_obj = "a_fg",
@@ -27761,12 +27752,7 @@ function WeaponFactoryTweakData:_init_tng()
 		is_a_unlockable = true
 	}
 	self.parts.wpn_fps_upg_o_45rds = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
+		pcs = {},
 		type = "gadget",
 		name_id = "bm_wpn_fps_upg_o_45rds",
 		depends_on = "sight",
@@ -27906,12 +27892,7 @@ function WeaponFactoryTweakData:_init_tng()
 		}
 	}
 	self.parts.wpn_fps_upg_o_spot = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
+		pcs = {},
 		type = "sight",
 		name_id = "bm_wp_upg_o_spot",
 		a_obj = "a_o",
@@ -27939,12 +27920,7 @@ function WeaponFactoryTweakData:_init_tng()
 		is_a_unlockable = true
 	}
 	self.parts.wpn_fps_upg_o_box = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
+		pcs = {},
 		type = "sight",
 		name_id = "bm_wp_upg_o_box",
 		a_obj = "a_o",
@@ -27990,12 +27966,7 @@ function WeaponFactoryTweakData:_init_tng()
 		reticle_obj = "g_reticle"
 	}
 	self.parts.wpn_fps_ass_g36_o_vintage = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
+		pcs = {},
 		type = "sight",
 		name_id = "bm_wp_g36_o_vintage",
 		a_obj = "a_body",
@@ -28030,12 +28001,7 @@ function WeaponFactoryTweakData:_init_tng()
 		}
 	}
 	self.parts.wpn_fps_upg_g36_fg_long = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
+		pcs = {},
 		type = "foregrip",
 		name_id = "bm_wp_g36_fg_long",
 		a_obj = "a_fg",
@@ -28066,12 +28032,7 @@ function WeaponFactoryTweakData:_init_tng()
 		dlc = "tango"
 	}
 	self.parts.wpn_fps_smg_mp5_fg_flash = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
+		pcs = {},
 		type = "foregrip",
 		name_id = "bm_wp_mp5_fg_flash",
 		a_obj = "a_fg",
@@ -28100,12 +28061,7 @@ function WeaponFactoryTweakData:_init_tng()
 		}
 	}
 	self.parts.wpn_fps_smg_mp5_s_folding = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
+		pcs = {},
 		type = "stock",
 		name_id = "bm_wp_mp5_s_folding",
 		a_obj = "a_s",
@@ -28116,12 +28072,7 @@ function WeaponFactoryTweakData:_init_tng()
 		is_a_unlockable = true
 	}
 	self.parts.wpn_fps_upg_ns_duck = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
+		pcs = {},
 		type = "barrel_ext",
 		name_id = "bm_wp_ns_duck",
 		a_obj = "a_ns",
@@ -28139,12 +28090,7 @@ function WeaponFactoryTweakData:_init_tng()
 		is_a_unlockable = true
 	}
 	self.parts.wpn_fps_pis_usp_m_big = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
+		pcs = {},
 		type = "magazine",
 		name_id = "bm_wp_usp_m_big",
 		a_obj = "a_m",
@@ -28165,12 +28111,7 @@ function WeaponFactoryTweakData:_init_tng()
 		is_a_unlockable = true
 	}
 	self.parts.wpn_fps_pis_1911_m_big = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
+		pcs = {},
 		type = "magazine",
 		name_id = "bm_wp_1911_m_big",
 		a_obj = "a_m",
@@ -28191,12 +28132,7 @@ function WeaponFactoryTweakData:_init_tng()
 		is_a_unlockable = true
 	}
 	self.parts.wpn_fps_smg_p90_m_strap = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
+		pcs = {},
 		type = "magazine",
 		name_id = "bm_wp_p90_m_strap",
 		a_obj = "a_m",
@@ -28211,12 +28147,7 @@ function WeaponFactoryTweakData:_init_tng()
 		is_a_unlockable = true
 	}
 	self.parts.wpn_fps_ass_aug_m_quick = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
+		pcs = {},
 		type = "magazine",
 		name_id = "bm_wp_aug_m_quick",
 		a_obj = "a_m",
@@ -28231,12 +28162,7 @@ function WeaponFactoryTweakData:_init_tng()
 		is_a_unlockable = true
 	}
 	self.parts.wpn_fps_m4_upg_m_quick = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
+		pcs = {},
 		type = "magazine",
 		name_id = "bm_wp_m4_m_quick",
 		a_obj = "a_m",
@@ -28247,12 +28173,7 @@ function WeaponFactoryTweakData:_init_tng()
 		is_a_unlockable = true
 	}
 	self.parts.wpn_fps_upg_ak_m_quick = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
+		pcs = {},
 		type = "magazine",
 		name_id = "bm_wp_ak_m_quick",
 		a_obj = "a_m",
@@ -28263,12 +28184,7 @@ function WeaponFactoryTweakData:_init_tng()
 		is_a_unlockable = true
 	}
 	self.parts.wpn_fps_ass_g36_m_quick = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
+		pcs = {},
 		type = "magazine",
 		name_id = "bm_wp_g36_m_quick",
 		a_obj = "a_m",
@@ -28283,12 +28199,7 @@ function WeaponFactoryTweakData:_init_tng()
 		is_a_unlockable = true
 	}
 	self.parts.wpn_fps_smg_mac10_m_quick = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
+		pcs = {},
 		type = "magazine",
 		name_id = "bm_wp_mac10_m_quick",
 		a_obj = "a_m",
@@ -28307,12 +28218,7 @@ function WeaponFactoryTweakData:_init_tng()
 		is_a_unlockable = true
 	}
 	self.parts.wpn_fps_smg_sr2_m_quick = {
-		pcs = {
-			10,
-			20,
-			30,
-			40
-		},
+		pcs = {},
 		type = "magazine",
 		name_id = "bm_wp_sr2_m_quick",
 		a_obj = "a_m",

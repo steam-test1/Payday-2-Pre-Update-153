@@ -769,6 +769,8 @@ function SkillTreeTweakData:init()
 				"assault_rifle_zoom_increase",
 				"snp_zoom_increase",
 				"smg_zoom_increase",
+				"lmg_zoom_increase",
+				"pistol_zoom_increase",
 				"assault_rifle_move_spread_index_addend",
 				"snp_move_spread_index_addend",
 				"smg_move_spread_index_addend"
@@ -2786,9 +2788,9 @@ function SkillTreeTweakData:init()
 			deck8,
 			{
 				upgrades = {
+					"player_passive_loot_drop_multiplier",
 					"player_passive_health_multiplier_4",
-					"player_passive_health_regen",
-					"player_passive_loot_drop_multiplier"
+					"player_passive_health_regen"
 				},
 				cost = 4000,
 				icon_xy = {4, 1},
@@ -2843,10 +2845,10 @@ function SkillTreeTweakData:init()
 			deck8,
 			{
 				upgrades = {
+					"player_passive_loot_drop_multiplier",
 					"player_tier_armor_multiplier_5",
 					"player_tier_armor_multiplier_6",
-					"team_passive_armor_regen_time_multiplier",
-					"player_passive_loot_drop_multiplier"
+					"team_passive_armor_regen_time_multiplier"
 				},
 				cost = 4000,
 				icon_xy = {0, 2},
@@ -2956,8 +2958,8 @@ function SkillTreeTweakData:init()
 			deck8,
 			{
 				upgrades = {
-					"player_perk_armor_regen_timer_multiplier_5",
 					"player_passive_loot_drop_multiplier",
+					"player_perk_armor_regen_timer_multiplier_5",
 					"player_passive_always_regen_armor_1"
 				},
 				cost = 4000,
@@ -3086,8 +3088,8 @@ function SkillTreeTweakData:init()
 			deck8,
 			{
 				upgrades = {
-					"player_armor_regen_timer_stand_still_multiplier",
 					"player_passive_loot_drop_multiplier",
+					"player_armor_regen_timer_stand_still_multiplier",
 					"player_crouch_speed_multiplier_2"
 				},
 				cost = 4000,
@@ -3145,8 +3147,8 @@ function SkillTreeTweakData:init()
 			deck8,
 			{
 				upgrades = {
-					"player_melee_life_leech",
-					"player_passive_loot_drop_multiplier"
+					"player_passive_loot_drop_multiplier",
+					"player_melee_life_leech"
 				},
 				cost = 4000,
 				icon_xy = {7, 4},
@@ -3200,8 +3202,8 @@ function SkillTreeTweakData:init()
 			deck8,
 			{
 				upgrades = {
-					"player_killshot_close_panic_chance",
-					"player_passive_loot_drop_multiplier"
+					"player_passive_loot_drop_multiplier",
+					"player_killshot_close_panic_chance"
 				},
 				cost = 4000,
 				icon_xy = {3, 5},
@@ -3255,8 +3257,8 @@ function SkillTreeTweakData:init()
 			deck8,
 			{
 				upgrades = {
-					"temporary_loose_ammo_restore_health_3",
-					"player_passive_loot_drop_multiplier"
+					"player_passive_loot_drop_multiplier",
+					"temporary_loose_ammo_restore_health_3"
 				},
 				cost = 4000,
 				icon_xy = {0, 6},
@@ -3314,9 +3316,9 @@ function SkillTreeTweakData:init()
 			deck8,
 			{
 				upgrades = {
+					"player_passive_loot_drop_multiplier",
 					"player_damage_to_hot_extra_ticks",
-					"player_armor_piercing_chance_2",
-					"player_passive_loot_drop_multiplier"
+					"player_armor_piercing_chance_2"
 				},
 				cost = 4000,
 				icon_xy = {5, 6},
@@ -3370,9 +3372,9 @@ function SkillTreeTweakData:init()
 			deck8,
 			{
 				upgrades = {
+					"player_passive_loot_drop_multiplier",
 					"player_armor_regen_damage_health_ratio_threshold_multiplier",
-					"player_movement_speed_damage_health_ratio_threshold_multiplier",
-					"player_passive_loot_drop_multiplier"
+					"player_movement_speed_damage_health_ratio_threshold_multiplier"
 				},
 				cost = 4000,
 				icon_xy = {2, 7},
@@ -3429,8 +3431,8 @@ function SkillTreeTweakData:init()
 			deck8,
 			{
 				upgrades = {
-					"player_kill_change_regenerate_speed",
-					"player_passive_loot_drop_multiplier"
+					"player_passive_loot_drop_multiplier",
+					"player_kill_change_regenerate_speed"
 				},
 				cost = 4000,
 				icon_xy = {7, 7},
@@ -3487,8 +3489,8 @@ function SkillTreeTweakData:init()
 			deck8,
 			{
 				upgrades = {
-					"player_cocaine_stack_absorption_multiplier_1",
-					"player_passive_loot_drop_multiplier"
+					"player_passive_loot_drop_multiplier",
+					"player_cocaine_stack_absorption_multiplier_1"
 				},
 				cost = 4000,
 				icon_xy = {0, 1},
@@ -3549,6 +3551,7 @@ function SkillTreeTweakData:init()
 			deck8,
 			{
 				upgrades = {
+					"player_passive_loot_drop_multiplier",
 					"player_damage_to_armor_1"
 				},
 				cost = 4000,
@@ -3609,6 +3612,7 @@ function SkillTreeTweakData:init()
 			deck8,
 			{
 				upgrades = {
+					"player_passive_loot_drop_multiplier",
 					"player_less_armor_wild_cooldown_1"
 				},
 				cost = 4000,
@@ -3671,6 +3675,7 @@ function SkillTreeTweakData:init()
 			deck8,
 			{
 				upgrades = {
+					"player_passive_loot_drop_multiplier",
 					"player_passive_health_multiplier_4",
 					"player_chico_injector_health_to_speed"
 				},

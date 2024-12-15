@@ -2008,6 +2008,7 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.ballistic.stats.concealment = 29
 	self.melee_weapons.zeus = deep_clone(self.melee_weapons.fists)
 	self.melee_weapons.zeus.name_id = "bm_melee_zeus"
+	self.melee_weapons.zeus.info_id = "bm_melee_zeus_info"
 	self.melee_weapons.zeus.type = "fists"
 	self.melee_weapons.zeus.special_weapon = "taser"
 	self.melee_weapons.zeus.texture_bundle_folder = "mad"
@@ -2209,6 +2210,47 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.brick.repeat_expire_t = 2
 	self.melee_weapons.brick.expire_t = 1.2
 	self.melee_weapons.brick.melee_damage_delay = 0.06
+	self.melee_weapons.ostry = {}
+	self.melee_weapons.ostry.name_id = "bm_melee_ostry"
+	self.melee_weapons.ostry.animation = nil
+	self.melee_weapons.ostry.anim_attack_vars = {
+		"var1",
+		"var2",
+		"var3",
+		"var2"
+	}
+	self.melee_weapons.ostry.anim_global_param = "melee_ostry"
+	self.melee_weapons.ostry.free = true
+	self.melee_weapons.ostry.dlc = "sha"
+	self.melee_weapons.ostry.texture_bundle_folder = "pd2_clan"
+	self.melee_weapons.ostry.type = "knife"
+	self.melee_weapons.ostry.align_objects = {
+		"a_weapon_left",
+		"a_weapon_right"
+	}
+	self.melee_weapons.ostry.unit = "units/pd2_dlc_sha/weapons/wpn_fps_mel_ostry/wpn_fps_mel_ostry"
+	self.melee_weapons.ostry.third_unit = "units/pd2_dlc_sha/weapons/wpn_fps_mel_ostry/wpn_third_mel_ostry"
+	self.melee_weapons.ostry.sounds = {}
+	self.melee_weapons.ostry.sounds.equip = "ostry_equip"
+	self.melee_weapons.ostry.sounds.hit_air = "ostry_hit_air"
+	self.melee_weapons.ostry.sounds.hit_gen = "ostry_hit_gen"
+	self.melee_weapons.ostry.sounds.hit_body = "ostry_hit_body"
+	self.melee_weapons.ostry.sounds.charge = "ostry_charge"
+	self.melee_weapons.ostry.stats = {}
+	self.melee_weapons.ostry.stats.weapon_type = "sharp"
+	self.melee_weapons.ostry.stats.min_damage = 3
+	self.melee_weapons.ostry.stats.max_damage = 8
+	self.melee_weapons.ostry.stats.min_damage_effect = 1
+	self.melee_weapons.ostry.stats.max_damage_effect = 1
+	self.melee_weapons.ostry.stats.charge_time = 2
+	self.melee_weapons.ostry.stats.range = 200
+	self.melee_weapons.ostry.stats.concealment = 28
+	self.melee_weapons.ostry.stats.remove_weapon_movement_penalty = true
+	self.melee_weapons.ostry.repeat_expire_t = 0.4
+	self.melee_weapons.ostry.expire_t = 0.6
+	self.melee_weapons.ostry.melee_damage_delay = 0.11
+	self.melee_weapons.ostry.menu_scene_anim = "menu"
+	self.melee_weapons.ostry.menu_scene_params = {loop = false, start_time = -1}
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.melee_weapons) do
 		if free_dlcs[data.dlc] then

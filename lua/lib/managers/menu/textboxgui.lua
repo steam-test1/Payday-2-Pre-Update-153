@@ -316,6 +316,10 @@ function TextBoxGui:_create_text_box(ws, title, text, content_data, config)
 	buttons_panel:set_bottom(info_area:h() - 10)
 	if not preset_or_config_y then
 		main:set_h(info_area:h())
+		if content_data.clamp_to_screen then
+			main:set_h(main:parent():h() * 0.9)
+			main:set_center_y(main:parent():h() / 2)
+		end
 		if bottom then
 			main:set_bottom(bottom)
 		elseif y == 0 then

@@ -68,7 +68,11 @@ function PlayerDamage:init(unit)
 			self._damage_to_armor.elapsed = 0
 			
 			local function on_damage(damage_info)
-				if self._unit == damage_info.attacker_unit then
+				local attacker_unit = damage_info and damage_info.attacker_unit
+				if alive(attacker_unit) and attacker_unit:base() and attacker_unit:base().thrower_unit then
+					attacker_unit = attacker_unit:base():thrower_unit()
+				end
+				if self._unit == attacker_unit then
 					local time = Application:time()
 					if time - self._damage_to_armor.elapsed > self._damage_to_armor.target_tick then
 						self._damage_to_armor.elapsed = time
@@ -845,6 +849,8 @@ function PlayerDamage:damage_bullet(attack_data)
 		return
 	elseif self:_chk_dmg_too_soon(attack_data.damage) then
 		return
+	elseif self._unit:movement():current_state().immortal then
+		return
 	elseif self._revive_miss and math.random() < self._revive_miss then
 		self:play_whizby(attack_data.col_ray.position)
 		return
@@ -1008,6 +1014,8 @@ function PlayerDamage:damage_killzone(attack_data)
 		return
 	elseif self:incapacitated() then
 		return
+	elseif self._unit:movement():current_state().immortal then
+		return
 	end
 	self._unit:sound():play("player_hit")
 	self:_hit_direction(attack_data.col_ray.origin)
@@ -1033,6 +1041,8 @@ function PlayerDamage:damage_fall(data)
 		self:_call_listeners(damage_info)
 		return
 	elseif self:incapacitated() then
+		return
+	elseif self._unit:movement():current_state().immortal then
 		return
 	elseif self._mission_damage_blockers.damage_fall_disabled then
 		return
@@ -1103,6 +1113,8 @@ function PlayerDamage:damage_explosion(attack_data)
 	if self._god_mode or self._invulnerable or self._mission_damage_blockers.invulnerable then
 		self:_call_listeners(damage_info)
 		return
+	elseif self._unit:movement():current_state().immortal then
+		return
 	elseif self:incapacitated() then
 		return
 	end
@@ -1133,6 +1145,8 @@ function PlayerDamage:damage_fire(attack_data)
 	}
 	if self._god_mode or self._invulnerable or self._mission_damage_blockers.invulnerable then
 		self:_call_listeners(damage_info)
+		return
+	elseif self._unit:movement():current_state().immortal then
 		return
 	elseif self:incapacitated() then
 		return

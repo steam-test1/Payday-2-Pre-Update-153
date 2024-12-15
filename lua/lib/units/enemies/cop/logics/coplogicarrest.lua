@@ -188,7 +188,11 @@ function CopLogicArrest._upd_advance(data, my_data, attention_obj, arrest_data)
 		if my_data.should_arrest then
 			my_data.path_search_id = "cuff" .. tostring(data.key)
 			my_data.processing_path = true
-			data.unit:brain():search_for_path_to_unit(my_data.path_search_id, attention_obj.unit)
+			if attention_obj.nav_tracker:lost() then
+				data.unit:brain():search_for_path(my_data.path_search_id, attention_obj.nav_tracker:field_position(), 1)
+			else
+				data.unit:brain():search_for_path_to_unit(my_data.path_search_id, attention_obj.unit)
+			end
 		elseif my_data.should_stand_close then
 			CopLogicArrest._say_scary_stuff_discovered(data)
 			local close_pos = CopLogicArrest._get_att_obj_close_pos(data, my_data)

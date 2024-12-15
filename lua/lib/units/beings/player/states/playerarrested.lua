@@ -148,7 +148,7 @@ function PlayerArrested:call_teammate(line, t, no_gesture, skip_alert, skip_mark
 			interact_type = "cmd_point"
 			queue_name = shout_sound .. "y_any"
 			if managers.player:has_category_upgrade("player", "special_enemy_highlight") then
-				prime_target.unit:contour():add(managers.player:has_category_upgrade("player", "marked_enemy_extra_damage") and "mark_enemy_damage_bonus" or "mark_enemy", true, managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1))
+				prime_target.unit:contour():add(managers.player:get_contour_for_marked_enemy(), true, managers.player:upgrade_value("player", "mark_enemy_time_multiplier", 1))
 			end
 		end
 	end

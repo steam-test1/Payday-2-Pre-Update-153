@@ -773,11 +773,6 @@ function TradeManager:clbk_respawn_criminal(pos, rotation)
 	end
 	print("Found criminal to respawn ", respawn_criminal and inspect(respawn_criminal))
 	self:criminal_respawn(pos, rotation, respawn_criminal)
-	local player_unit = managers.player:player_unit()
-	if player_unit then
-		managers.hud:set_teammate_weapon_firemode(HUDManager.PLAYER_PANEL, 1, player_unit:inventory():unit_by_selection(1):base():fire_mode())
-		managers.hud:set_teammate_weapon_firemode(HUDManager.PLAYER_PANEL, 2, player_unit:inventory():unit_by_selection(2):base():fire_mode())
-	end
 end
 
 function TradeManager:criminal_respawn(pos, rotation, respawn_criminal)
@@ -792,7 +787,7 @@ function TradeManager:criminal_respawn(pos, rotation, respawn_criminal)
 		spawned_unit = managers.groupai:state():spawn_one_teamAI(false, respawn_criminal.id, pos, rotation)
 	else
 		print("RC: respawn human", respawn_criminal.id)
-		local lone_survivor = managers.groupai:state():num_alive_criminals() == 0
+		local lone_survivor = managers.groupai:state():num_alive_players() == 0
 		local sp_id = "clbk_respawn_criminal"
 		local spawn_point = {position = pos, rotation = rotation}
 		managers.network:register_spawn_point(sp_id, spawn_point)

@@ -695,6 +695,7 @@ function SkillTreeGui:init(ws, fullscreen_ws, node)
 	self._node = node
 	self._init_layer = self._ws:panel():layer()
 	self._selected_item = nil
+	self._hover_spec_item = nil
 	self._active_page = nil
 	self._active_tree = nil
 	self._prerequisites_links = {}
@@ -1160,6 +1161,13 @@ function SkillTreeGui:_setup(add_skilltree, add_specialization)
 				pc_btn = "menu_remove_item",
 				name = "menu_st_remove_spec_points",
 				callback = nil
+			},
+			max_points = {
+				prio = 3,
+				btn = "BTN_STICK_R",
+				pc_btn = "menu_preview_item",
+				name = "menu_st_max_perk_deck",
+				callback = callback(self, self, "max_specialization")
 			}
 		}
 		self._btn_panel = self._specialization_panel:panel({
@@ -1616,14 +1624,7 @@ function SkillTreeGui:_set_active_spec_tree(tree_panel_name, play_sound)
 			elseif tab_wr > panel_wr then
 				self._spec_tabs_scroll_panel:move(panel_wr - tab_wr, 0)
 			end
-			local btns = {}
-			local dlc = tweak_data:get_raw_value("skilltree", "specializations", tab_item:tree(), "dlc")
-			if not dlc or managers.dlc:is_dlc_unlocked(dlc) then
-				btns = {
-					tab_item:tree() ~= managers.skilltree:get_specialization_value("current_specialization") and "activate_spec" or false
-				}
-			end
-			self:show_btns(unpack(btns))
+			self:refresh_btns()
 		else
 			self._spec_tree_items[tree]:deselect()
 		end
@@ -1699,8 +1700,8 @@ function SkillTreeGui:set_selected_item(item, no_sound)
 	end
 end
 
-function SkillTreeGui:update_spec_descriptions()
-	local item = self._selected_spec_item
+function SkillTreeGui:update_spec_descriptions(item)
+	item = item or self._selected_spec_item
 	if not item then
 		self._spec_description_title:set_text("")
 		self._spec_description_locked:set_text("")
@@ -1772,11 +1773,10 @@ function SkillTreeGui:update_spec_descriptions()
 	self._spec_description_progress:set_y(self._spec_description_text:y() + h + 10)
 end
 
-function SkillTreeGui:_set_selected_spec_item(item, no_sound)
-	if self._selected_spec_item ~= item then
-		if self._selected_spec_item then
-			self._selected_spec_item:deselect()
-			self._selected_spec_tier = nil
+function SkillTreeGui:set_hover_spec_item(item, no_sound)
+	if self._hover_spec_item ~= item then
+		if self._hover_spec_item then
+			self._hover_spec_item:deselect()
 		end
 		if item then
 			if item.tree then
@@ -1786,26 +1786,17 @@ function SkillTreeGui:_set_selected_spec_item(item, no_sound)
 				self._selected_spec_tier = item:tier()
 			end
 			item:select(no_sound)
-			self._selected_spec_item = item
-			self:update_spec_descriptions()
-			if not managers.menu:is_pc_controller() or managers.menu:is_steam_controller() then
-				local btns = {}
-				if item.tree then
-					local dlc = tweak_data:get_raw_value("skilltree", "specializations", item:tree(), "dlc")
-					if not dlc or managers.dlc:is_dlc_unlocked(dlc) then
-						if item:tree() ~= managers.skilltree:get_specialization_value("current_specialization") then
-							table.insert(btns, "activate_spec")
-						end
-						local current_tier = managers.skilltree:get_specialization_value(item:tree(), "tiers", "current_tier")
-						if item.tier and item:tier() == current_tier + 1 then
-							table.insert(btns, "add_points")
-							table.insert(btns, "remove_points")
-						end
-					end
-				end
-				self:show_btns(unpack(btns))
-			end
+			self._hover_spec_item = item
+			self:update_spec_descriptions(item)
 		end
+	end
+end
+
+function SkillTreeGui:_set_selected_spec_item(item, no_sound)
+	self:set_hover_spec_item(item)
+	if self._selected_spec_item ~= item then
+		self._selected_spec_item = item
+		self:refresh_btns()
 	end
 end
 
@@ -2118,7 +2109,7 @@ function SkillTreeGui:mouse_moved(o, x, y)
 		for _, tab_item in ipairs(self._spec_tree_items) do
 			local selected_item = tab_item:selected_item(x, y)
 			if selected_item then
-				self:set_selected_item(selected_item)
+				self:set_hover_spec_item(selected_item)
 				inside = true
 				pointer = "link"
 				break
@@ -2764,6 +2755,7 @@ function SkillTreeGui:mouse_clicked(o, button, x, y)
 	self._mouse_click[self._mouse_click_index].x = x
 	self._mouse_click[self._mouse_click_index].y = y
 	self._mouse_click[self._mouse_click_index].selected_tree = self._active_spec_tree
+	self:set_selected_item(self._hover_spec_item, true)
 end
 
 function SkillTreeGui:mouse_double_click(o, button, x, y)
@@ -2866,15 +2858,7 @@ function SkillTreeGui:update(t, dt)
 		if points_placed == self._spec_placing_points then
 			self:stop_spec_place_points()
 		else
-			local points_text = self._specialization_panel:child("points_text")
-			local spec_box_panel = self._specialization_panel:child("spec_box_panel")
-			points_text:set_text(managers.localization:to_upper_text("menu_st_available_spec_points", {
-				points = managers.money:add_decimal_marks_to_string(tostring(points_to_spend - math.round(self._spec_placing_points)))
-			}))
-			make_fine_text(points_text)
-			points_text:set_right(spec_box_panel:right())
-			points_text:set_top(spec_box_panel:bottom() + 20)
-			points_text:set_position(math.round(points_text:x()), math.round(points_text:y()))
+			self:refresh_spec_points()
 		end
 	end
 end
@@ -2919,6 +2903,10 @@ function SkillTreeGui:stop_spec_place_points()
 		end
 	end
 	WalletGuiObject.refresh()
+	self:refresh_spec_points()
+end
+
+function SkillTreeGui:refresh_spec_points()
 	local points_text = self._specialization_panel:child("points_text")
 	local spec_box_panel = self._specialization_panel:child("spec_box_panel")
 	points_text:set_text(managers.localization:to_upper_text("menu_st_available_spec_points", {
@@ -2928,6 +2916,36 @@ function SkillTreeGui:stop_spec_place_points()
 	points_text:set_right(spec_box_panel:right())
 	points_text:set_top(spec_box_panel:bottom() + 20)
 	points_text:set_position(math.round(points_text:x()), math.round(points_text:y()))
+end
+
+function SkillTreeGui:refresh_btns()
+	local btns = {}
+	local item = self._selected_spec_item
+	if not item or not item.tree then
+		return
+	end
+	local tree = item:tree()
+	local dlc = tweak_data:get_raw_value("skilltree", "specializations", tree, "dlc")
+	if not dlc or managers.dlc:is_dlc_unlocked(dlc) then
+		if tree ~= managers.skilltree:get_specialization_value("current_specialization") then
+			table.insert(btns, "activate_spec")
+		end
+		local current_tier = managers.skilltree:get_specialization_value(tree, "tiers", "current_tier")
+		local max_tier = managers.skilltree:get_specialization_value(tree, "tiers", "max_tier")
+		if current_tier < max_tier then
+			local next_points = managers.skilltree:get_specialization_value(tree, "tiers", "next_tier_data", "current_points")
+			local next_tier_cost = managers.skilltree:get_specialization_value(tree, "tiers", "next_tier_data", "points")
+			local points_to_spend = managers.skilltree:get_specialization_value("points")
+			if points_to_spend >= next_tier_cost - next_points then
+				table.insert(btns, "max_points")
+			end
+		end
+		if (not managers.menu:is_pc_controller() or managers.menu:is_steam_controller()) and item.tier and item:tier() == current_tier + 1 then
+			table.insert(btns, "add_points")
+			table.insert(btns, "remove_points")
+		end
+	end
+	self:show_btns(unpack(btns))
 end
 
 function SkillTreeGui:show_btns(...)
@@ -3035,27 +3053,67 @@ end
 function SkillTreeGui:activate_specialization(tree, tier)
 	if tree then
 		managers.skilltree:set_current_specialization(tree)
-		if not managers.menu:is_pc_controller() or managers.menu:is_steam_controller() then
-			local btns = {}
-			local item = self._selected_spec_item
-			if item and item.tree then
-				local dlc = tweak_data:get_raw_value("skilltree", "specializations", item:tree(), "dlc")
-				if not dlc or managers.dlc:is_dlc_unlocked(dlc) then
-					local current_tier = managers.skilltree:get_specialization_value(item:tree(), "tiers", "current_tier")
-					if item.tier and item:tier() == current_tier + 1 then
-						table.insert(btns, "add_points")
-						table.insert(btns, "remove_points")
-					end
-				end
-			end
-			self:show_btns(unpack(btns))
-		else
-			self:show_btns()
-		end
+		self:refresh_btns()
 		for tree, item in ipairs(self._spec_tab_items) do
 			item:refresh()
 		end
 		for tree, item in ipairs(self._spec_tree_items) do
+			item:refresh()
+		end
+	end
+end
+
+function SkillTreeGui:max_specialization(tree, tier)
+	if tree then
+		local current_tier = managers.skilltree:get_specialization_value(tree, "tiers", "current_tier")
+		local max_tier = managers.skilltree:get_specialization_value(tree, "tiers", "max_tier")
+		if current_tier == max_tier then
+			return
+		end
+		local next_points = managers.skilltree:get_specialization_value(tree, "tiers", "next_tier_data", "current_points")
+		local next_tier_cost = managers.skilltree:get_specialization_value(tree, "tiers", "next_tier_data", "points")
+		local total_cost = 0
+		local next_cost = next_tier_cost - next_points
+		local points_to_spend = managers.skilltree:get_specialization_value("points")
+		local afford_tier = current_tier
+		while points_to_spend >= total_cost + next_cost and max_tier > afford_tier do
+			total_cost = total_cost + next_cost
+			afford_tier = afford_tier + 1
+			next_cost = max_tier > afford_tier and tweak_data.skilltree.specializations[tree][afford_tier + 1].cost or 0
+		end
+		local deck_name = managers.localization:text(tweak_data.skilltree.specializations[tree].name_id)
+		local dialog_data = {}
+		dialog_data.title = managers.localization:text("st_menu_max_perk_dialog_title")
+		dialog_data.text = managers.localization:text("st_menu_max_perk_dialog_text", {
+			perk_deck_name = deck_name,
+			point_cost = total_cost,
+			perk_tier = afford_tier,
+			num_tiers = afford_tier - current_tier,
+			max_tier = max_tier,
+			current_tier = current_tier
+		})
+		dialog_data.focus_button = 2
+		dialog_data.button_list = {
+			{
+				text = managers.localization:text("dialog_yes"),
+				callback_func = callback(self, self, "_actually_max_specialization", {total_cost, tree})
+			},
+			{
+				text = managers.localization:text("dialog_no"),
+				cancel_button = true
+			}
+		}
+		managers.system_menu:show(dialog_data)
+	end
+end
+
+function SkillTreeGui:_actually_max_specialization(params)
+	local total_cost, tree = unpack(params)
+	managers.skilltree:spend_specialization_points(total_cost, tree)
+	self:refresh_spec_points()
+	for _, tree_item in ipairs(self._spec_tree_items) do
+		tree_item:refresh()
+		for _, item in ipairs(tree_item:items()) do
 			item:refresh()
 		end
 	end

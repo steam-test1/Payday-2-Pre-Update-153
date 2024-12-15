@@ -513,6 +513,8 @@ function PlayerMovement:on_suspicion(observer_unit, status)
 				self._suspicion = nil
 			end
 			if visible_status and observer_unit:movement() and not observer_unit:movement():cool() and TimerManager:game():time() - observer_unit:movement():not_cool_t() > 1 then
+				self._suspicion_ratio = false
+				self:_feed_suspicion_to_hud()
 				return
 			end
 		elseif type(visible_status) == "number" and (not observer_unit:movement() or observer_unit:movement():cool()) then

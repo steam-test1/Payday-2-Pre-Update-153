@@ -1491,11 +1491,16 @@ function IntimitateInteractionExt:_at_interact_start(player, timer)
 		player:sound():say(event, true, true)
 		if Network:is_server() then
 			self._unit:brain():on_alarm_pager_interaction("started")
-		elseif managers.enemy:get_corpse_unit_data_from_key(self._unit:key()) then
-			local u_id = managers.enemy:get_corpse_unit_data_from_key(self._unit:key()).u_id
-			managers.network:session():send_to_host("alarm_pager_interaction", u_id, self.tweak_data, 1)
 		else
-			managers.network:session():send_to_host("sync_interacted", self._unit, self._unit:id(), self.tweak_data, 1)
+			self._unit:sound():stop()
+		end
+		local sendToX = Network:is_server() and managers.network:session().send_to_peers_synched or managers.network:session().send_to_host
+		local corpse_data = managers.enemy:get_corpse_unit_data_from_key(self._unit:key())
+		if corpse_data then
+			local u_id = corpse_data.u_id
+			sendToX(managers.network:session(), "alarm_pager_interaction", u_id, self.tweak_data, 1)
+		else
+			sendToX(managers.network:session(), "sync_interacted", self._unit, self._unit:id(), self.tweak_data, 1)
 		end
 	end
 end
@@ -1564,6 +1569,12 @@ function IntimitateInteractionExt:sync_interacted(peer, player, status, skip_ali
 					return
 				end
 				self._in_progress = true
+				if managers.enemy:get_corpse_unit_data_from_key(self._unit:key()) then
+					local u_id = managers.enemy:get_corpse_unit_data_from_key(self._unit:key()).u_id
+					managers.network:session():send_to_peers_synched_except(peer:id(), "alarm_pager_interaction", u_id, self.tweak_data, 1)
+				else
+					managers.network:session():send_to_peers_synched_except(peer:id(), "sync_interacted", self._unit, self._unit:id(), self.tweak_data, 1)
+				end
 				self._unit:brain():on_alarm_pager_interaction(status, _get_unit())
 			else
 				if not self._in_progress then
@@ -1594,6 +1605,8 @@ function IntimitateInteractionExt:sync_interacted(peer, player, status, skip_ali
 					self._unit:brain():on_alarm_pager_interaction(status, _get_unit())
 				end
 			end
+		elseif status == "started" then
+			self._unit:sound():stop()
 		end
 	elseif self.tweak_data == "corpse_dispose" then
 		if peer then
@@ -1679,7 +1692,7 @@ end
 function CarryInteractionExt:interact(player)
 	CarryInteractionExt.super.super.interact(self, player)
 	local peer_id = managers.network:session():local_peer():id()
-	if self._has_modified_timer then
+	if self._has_modified_timer and not self._unit:carry_data():is_linked_to_unit() then
 		managers.achievment:award("murphys_laws")
 		if self._unit:carry_data():latest_peer_id() == peer_id then
 			local kill_count_no_carry = managers.job:get_memory("kill_count_no_carry", true) or 0
