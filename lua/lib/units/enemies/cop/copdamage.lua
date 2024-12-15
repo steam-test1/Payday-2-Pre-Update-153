@@ -482,8 +482,9 @@ function CopDamage:damage_bullet(attack_data)
 	if attacker:id() == -1 then
 		attacker = self._unit
 	end
-	if alive(attack_data.weapon_unit) and attack_data.weapon_unit:base() and attack_data.weapon_unit:base().add_damage_result then
-		attack_data.weapon_unit:base():add_damage_result(self._unit, attacker, result.type == "death", damage_percent)
+	local weapon_unit = attack_data.weapon_unit
+	if alive(weapon_unit) and weapon_unit:base() and weapon_unit:base().add_damage_result then
+		weapon_unit:base():add_damage_result(self._unit, attacker, result.type == "death", damage_percent)
 	end
 	local variant
 	if result.type == "knock_down" then
@@ -811,8 +812,9 @@ function CopDamage:damage_fire(attack_data)
 			self:_check_damage_achievements(attack_data, false)
 		end
 	end
-	if alive(attacker) and attacker:base() and attacker:base().add_damage_result then
-		attacker:base():add_damage_result(self._unit, result.type == "death", damage_percent)
+	local weapon_unit = attack_data.weapon_unit or attacker
+	if alive(weapon_unit) and weapon_unit:base() and weapon_unit:base().add_damage_result then
+		weapon_unit:base():add_damage_result(self._unit, result.type == "death", damage_percent)
 	end
 	if not attack_data.is_fire_dot_damage then
 		local fire_dot_data = attack_data.fire_dot_data
@@ -878,7 +880,7 @@ function CopDamage:damage_dot(attack_data)
 				variant = attack_data.variant
 			}
 			self:die(attack_data)
-			self:chk_killshot(attack_data.attacker_unit, attack_data.variant or "dot")
+			self:chk_killshot(attack_data.attacker_unit, attack_data.variant or "dot", nil, attack_data.weapon_id)
 		end
 	else
 		attack_data.damage = damage
@@ -1034,8 +1036,9 @@ function CopDamage:damage_explosion(attack_data)
 			self:_check_damage_achievements(attack_data, false)
 		end
 	end
-	if alive(attacker) and attacker:base() and attacker:base().add_damage_result then
-		attacker:base():add_damage_result(self._unit, result.type == "death", damage_percent)
+	local weapon_unit = attack_data.weapon_unit
+	if alive(weapon_unit) and weapon_unit:base() and weapon_unit:base().add_damage_result then
+		weapon_unit:base():add_damage_result(self._unit, result.type == "death", damage_percent)
 	end
 	if not self._no_blood then
 		managers.game_play_central:sync_play_impact_flesh(attack_data.pos, attack_data.col_ray.ray)
@@ -1194,8 +1197,9 @@ function CopDamage:damage_tase(attack_data)
 			self:_check_damage_achievements(attack_data, false)
 		end
 	end
-	if alive(attacker) and attacker:base() and attacker:base().add_damage_result then
-		attacker:base():add_damage_result(self._unit, result.type == "death", damage_percent)
+	local weapon_unit = attack_data.weapon_unit
+	if alive(weapon_unit) and weapon_unit:base() and weapon_unit:base().add_damage_result then
+		weapon_unit:base():add_damage_result(self._unit, result.type == "death", damage_percent)
 	end
 	local variant = result.variant == "heavy" and 1 or 0
 	self:_send_tase_attack_result(attack_data, damage_percent, variant)
@@ -1721,9 +1725,9 @@ function CopDamage:sync_damage_bullet(attacker_unit, damage_percent, i_body, hit
 	end
 end
 
-function CopDamage:chk_killshot(attacker_unit, variant, headshot)
+function CopDamage:chk_killshot(attacker_unit, variant, headshot, weapon_id)
 	if attacker_unit and attacker_unit == managers.player:player_unit() then
-		managers.player:on_killshot(self._unit, variant, headshot)
+		managers.player:on_killshot(self._unit, variant, headshot, weapon_id)
 	end
 end
 
@@ -1800,8 +1804,9 @@ function CopDamage:sync_damage_explosion(attacker_unit, damage_percent, i_attack
 			end
 		end
 	end
-	if alive(attacker_unit) and attacker_unit:base() and attacker_unit:base().add_damage_result then
-		attacker_unit:base():add_damage_result(self._unit, result.type == "death", damage_percent)
+	local weapon_unit = attack_data.weapon_unit
+	if alive(weapon_unit) and weapon_unit:base() and weapon_unit:base().add_damage_result then
+		weapon_unit:base():add_damage_result(self._unit, result.type == "death", damage_percent)
 	end
 	if not self._no_blood then
 		local hit_pos = mvector3.copy(self._unit:movement():m_pos())
@@ -1940,8 +1945,9 @@ function CopDamage:sync_damage_fire(attacker_unit, damage_percent, start_dot_dan
 			end
 		end
 	end
-	if alive(attacker_unit) and attacker_unit:base() and attacker_unit:base().add_damage_result then
-		attacker_unit:base():add_damage_result(self._unit, result.type == "death", damage_percent)
+	local weapon_unit = attack_data.weapon_unit
+	if alive(weapon_unit) and weapon_unit:base() and weapon_unit:base().add_damage_result then
+		weapon_unit:base():add_damage_result(self._unit, result.type == "death", damage_percent)
 	end
 	attack_data.pos = self._unit:position()
 	mvector3.set_z(attack_data.pos, attack_data.pos.z + math.random() * 180)
@@ -1959,7 +1965,7 @@ function CopDamage:sync_damage_dot(attacker_unit, damage_percent, death, variant
 	if death then
 		result = {type = "death", variant = variant}
 		self:die(attack_data)
-		self:chk_killshot(attacker_unit, variant or "dot")
+		self:chk_killshot(attacker_unit, variant or "dot", nil, weapon_id)
 		local real_variant = weapon_id and tweak_data.blackmarket and tweak_data.blackmarket.melee_weapons and tweak_data.blackmarket.melee_weapons[weapon_id] and "melee" or attack_data.variant
 		local data = {
 			name = self._unit:base()._tweak_table,
@@ -1987,6 +1993,7 @@ function CopDamage:sync_damage_dot(attacker_unit, damage_percent, death, variant
 	attack_data.variant = variant
 	attack_data.result = result
 	attack_data.damage = damage
+	attack_data.weapon_id = weapon_id
 	self:_on_damage_received(attack_data)
 end
 
@@ -2500,6 +2507,10 @@ function CopDamage:save(data)
 		data.char_dmg = data.char_dmg or {}
 		data.char_dmg.invulnerable = self._invulnerable
 	end
+	if self._immortal then
+		data.char_dmg = data.char_dmg or {}
+		data.char_dmg.immortal = self._immortal
+	end
 	if self._unit:in_slot(16) then
 		data.char_dmg = data.char_dmg or {}
 		data.char_dmg.is_converted = true
@@ -2521,6 +2532,7 @@ function CopDamage:load(data)
 	if data.char_dmg.invulnerable then
 		self._invulnerable = data.char_dmg.invulnerable
 	end
+	self._immortal = data.char_dmg.immortal or self._immortal
 	if data.char_dmg.is_converted then
 		self._unit:set_slot(16)
 		managers.groupai:state():sync_converted_enemy(self._unit)

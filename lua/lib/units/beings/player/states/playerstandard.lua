@@ -306,7 +306,7 @@ function PlayerStandard:update(t, dt)
 		if self._last_equipped ~= self._equipped_unit then
 			self._equipped_visibility_timer = t + 0.1
 		end
-		if self._equipped_visibility_timer and t > self._equipped_visibility_timer then
+		if self._equipped_visibility_timer and t > self._equipped_visibility_timer and alive(self._equipped_unit) then
 			self._equipped_unit:base():set_visibility_state(true)
 		end
 	end

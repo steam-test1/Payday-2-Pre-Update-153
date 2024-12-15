@@ -790,13 +790,13 @@ function PS4DLCManager:init()
 			},
 			mad = {
 				product_id = "PD2DLCHARDCORE11",
-				verified = false,
-				verified_for_TheBigScore = false
+				verified = true,
+				verified_for_TheBigScore = true
 			},
 			coco = {
 				product_id = "PD2DLCJIMMYCHA12",
-				verified = false,
-				verified_for_TheBigScore = false
+				verified = true,
+				verified_for_TheBigScore = true
 			},
 			pal = {
 				product_id = "PD2DLCWOLFPACK13",
@@ -810,6 +810,16 @@ function PS4DLCManager:init()
 			},
 			opera = {
 				product_id = "PD2DLCSYDNEYCH15",
+				verified = false,
+				verified_for_TheBigScore = false
+			},
+			wild = {
+				product_id = "PD2DLCBIKERHST16",
+				verified = false,
+				verified_for_TheBigScore = false
+			},
+			born = {
+				product_id = "PD2DLCBIKERCHA17",
 				verified = false,
 				verified_for_TheBigScore = false
 			}

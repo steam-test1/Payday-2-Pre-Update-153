@@ -924,13 +924,17 @@ function PlayerManager:spawn_extra_ammo(unit)
 	end
 end
 
-function PlayerManager:on_killshot(killed_unit, variant, headshot)
+function PlayerManager:on_killshot(killed_unit, variant, headshot, weapon_id)
 	local player_unit = self:player_unit()
 	if not player_unit then
 		return
 	end
 	if CopDamage.is_civilian(killed_unit:base()._tweak_table) then
 		return
+	end
+	local weapon_melee = weapon_id and tweak_data.blackmarket and tweak_data.blackmarket.melee_weapons and tweak_data.blackmarket.melee_weapons[weapon_id] and true
+	if killed_unit:brain().surrendered and killed_unit:brain():surrendered() and (variant == "melee" or weapon_melee) then
+		managers.custom_safehouse:award("daily_honorable")
 	end
 	local equipped_unit = self:get_current_state()._equipped_unit
 	self._num_kills = self._num_kills + 1

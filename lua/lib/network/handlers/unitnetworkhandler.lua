@@ -3011,6 +3011,16 @@ function UnitNetworkHandler:sync_unit_spawn(parent_unit, spawn_unit, align_obj_n
 	parent_unit[parent_extension_name](parent_unit):spawn_unit(unit_id, align_obj_name, spawn_unit)
 end
 
+function UnitNetworkHandler:sync_unit_surrendered(unit, surrendered)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	if not (alive(unit) and unit:brain()) or not unit:brain().sync_surrender then
+		return
+	end
+	unit:brain():sync_surrender(surrendered)
+end
+
 function UnitNetworkHandler:run_spawn_unit_sequence(parent_unit, parent_extension_name, unit_id, sequence_name)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return

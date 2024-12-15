@@ -157,7 +157,7 @@ function ConnectionNetworkHandler:spawn_dropin_penalty(dead, bleed_out, health, 
 		return
 	end
 	managers.player:spawn_dropin_penalty(dead, bleed_out, health, used_deployable, used_cable_ties, used_body_bags)
-	if not managers.groupai:state():whisper_mode() and (game_state_machine:last_queued_state_name() == "ingame_clean" or game_state_machine:last_queued_state_name() == "ingame_mask_off" or game_state_machine:last_queued_state_name() == "ingame_civilian") then
+	if not managers.groupai:state():whisper_mode() and (game_state_machine:last_queued_state_name() == "ingame_mask_off" or game_state_machine:last_queued_state_name() == "ingame_civilian") then
 		managers.player:set_player_state("standard")
 	end
 end
@@ -841,4 +841,10 @@ function ConnectionNetworkHandler:sync_synced_unit_outfit(unit_id, outfit_type, 
 		return
 	end
 	managers.sync:on_received_synced_outfit(unit_id, outfit_type, outfit_string)
+end
+
+function ConnectionNetworkHandler:sync_safehouse_room_tier(room_name, room_tier)
+	if managers.custom_safehouse then
+		managers.custom_safehouse:set_host_room_tier(room_name, room_tier)
+	end
 end

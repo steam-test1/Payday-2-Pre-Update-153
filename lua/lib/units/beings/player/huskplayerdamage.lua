@@ -5,6 +5,11 @@ function HuskPlayerDamage:init(unit)
 	self._spine2_obj = unit:get_object(Idstring("Spine2"))
 	self._listener_holder = EventListenerHolder:new()
 	self._mission_damage_blockers = {}
+	local level_tweak = tweak_data.levels[managers.job:current_level_id()]
+	if level_tweak and level_tweak.is_safehouse and not level_tweak.is_safehouse_combat then
+		self:set_mission_damage_blockers("damage_fall_disabled", true)
+		self:set_mission_damage_blockers("invulnerable", true)
+	end
 end
 
 function HuskPlayerDamage:_call_listeners(damage_info)

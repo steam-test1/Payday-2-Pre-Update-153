@@ -690,7 +690,6 @@ function UpgradesTweakData:_init_pd2_values()
 	self.ecm_feedback_retrigger_interval = 240
 	self.ecm_feedback_retrigger_chance = 1
 	self.values.player.revive_damage_reduction_level = {1, 2}
-	self.values.trip_mine.marked_enemy_extra_damage = {true}
 	self.values.ecm_jammer.can_retrigger = {true}
 	self.values.player.panic_suppression = {true}
 	self.values.akimbo.extra_ammo_multiplier = {
@@ -6639,15 +6638,6 @@ function UpgradesTweakData:_trip_mine_definitions()
 		upgrade = {
 			category = "trip_mine",
 			upgrade = "explode_timer_delay",
-			value = 1
-		}
-	}
-	self.definitions.trip_mine_marked_enemy_extra_damage = {
-		category = "feature",
-		name_id = "menu_trip_mine_marked_enemy_extra_damage",
-		upgrade = {
-			category = "trip_mine",
-			upgrade = "marked_enemy_extra_damage",
 			value = 1
 		}
 	}

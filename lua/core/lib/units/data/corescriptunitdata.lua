@@ -23,6 +23,7 @@ CoreScriptUnitData.exists_in_stages = {
 CoreScriptUnitData.helper_type = "none"
 CoreScriptUnitData.disable_shadows = nil
 CoreScriptUnitData.disable_collision = nil
+CoreScriptUnitData.delayed_load = nil
 CoreScriptUnitData.hide_on_projection_light = nil
 CoreScriptUnitData.disable_on_ai_graph = nil
 if Application:editor() then

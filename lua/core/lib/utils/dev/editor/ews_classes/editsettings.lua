@@ -24,6 +24,9 @@ function EditUnitSettings:init(editor)
 	local disable_collision = EWS:CheckBox(panel, "Disable Collision", "")
 	disable_collision:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_disable_collision"), nil)
 	settings_sizer:add(disable_collision, 1, 5, "EXPAND,BOTTOM")
+	local delayed_load = EWS:CheckBox(panel, "Delayed Load", "")
+	delayed_load:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_delayed_load"), nil)
+	settings_sizer:add(delayed_load, 1, 5, "EXPAND,BOTTOM")
 	local hide_on_projection_light = EWS:CheckBox(panel, "Hide On Projection Light", "")
 	hide_on_projection_light:connect("EVT_COMMAND_CHECKBOX_CLICKED", callback(self, self, "set_hide_on_projection_light"), nil)
 	settings_sizer:add(hide_on_projection_light, 1, 5, "EXPAND,BOTTOM")
@@ -37,6 +40,7 @@ function EditUnitSettings:init(editor)
 	self._ctrls.cutscene_actor_toolbar = cutscene_toolbar
 	self._ctrls.disable_shadows = disable_shadows
 	self._ctrls.disable_collision = disable_collision
+	self._ctrls.delayed_load = delayed_load
 	self._ctrls.hide_on_projection_light = hide_on_projection_light
 	self._ctrls.disable_on_ai_graph = disable_on_ai_graph
 	panel:layout()
@@ -89,6 +93,15 @@ function EditUnitSettings:set_disable_collision()
 	end
 end
 
+function EditUnitSettings:set_delayed_load()
+	local delayed = self._ctrls.delayed_load:get_value()
+	for _, unit in ipairs(self._ctrls.units) do
+		if alive(unit) then
+			unit:unit_data().delayed_load = delayed
+		end
+	end
+end
+
 function EditUnitSettings:set_hide_on_projection_light()
 	for _, unit in ipairs(self._ctrls.units) do
 		if alive(unit) then
@@ -113,6 +126,7 @@ function EditUnitSettings:is_editable(unit, units)
 		self._ctrls.cutscene_actor_toolbar:set_tool_enabled("US_REMOVE_CUTSCENE_ACTOR", self._ctrls.unit:unit_data().cutscene_actor)
 		self._ctrls.disable_shadows:set_value(self._ctrls.unit:unit_data().disable_shadows)
 		self._ctrls.disable_collision:set_value(self._ctrls.unit:unit_data().disable_collision or false)
+		self._ctrls.delayed_load:set_value(self._ctrls.unit:unit_data().delayed_load or false)
 		self._ctrls.hide_on_projection_light:set_value(self._ctrls.unit:unit_data().hide_on_projection_light)
 		self._ctrls.disable_on_ai_graph:set_value(self._ctrls.unit:unit_data().disable_on_ai_graph)
 		return true

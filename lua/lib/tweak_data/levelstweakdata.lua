@@ -841,6 +841,7 @@ function LevelsTweakData:init()
 	self.kosugi.package = "packages/kosugi"
 	self.kosugi.cube = "cube_apply_heist_bank"
 	self.kosugi.ghost_bonus = 0.05
+	self.kosugi.ghost_required = true
 	self.kosugi.max_bags = 30
 	self.kosugi.ai_group_type = america
 	self.gallery = deep_clone(self.framing_frame_1)
@@ -1167,6 +1168,7 @@ function LevelsTweakData:init()
 	self.dark.cube = "cube_apply_heist_bank"
 	self.dark.max_bags = 20
 	self.dark.ghost_bonus = 0.15
+	self.dark.ghost_required = true
 	self.mad = {}
 	self.mad.name_id = "heist_mad_hl"
 	self.mad.briefing_id = "heist_mad_briefing"
@@ -1427,6 +1429,7 @@ function LevelsTweakData:init()
 	self.fish.package = "packages/lvl_fish"
 	self.fish.cube = "cube_apply_heist_bank"
 	self.fish.ghost_bonus = 0.1
+	self.fish.ghost_required = true
 	self.fish.max_bags = 9999
 	self.fish.ai_group_type = america
 	self._level_index = {

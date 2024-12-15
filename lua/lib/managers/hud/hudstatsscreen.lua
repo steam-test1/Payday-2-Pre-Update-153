@@ -460,9 +460,13 @@ function HUDStatsScreen:init()
 			h = 16,
 			blend_mode = "add"
 		})
+		local ghost_string = managers.localization:text("menu_ghostable_stage")
+		if managers.job:is_level_ghostable_required(managers.job:current_level_id()) then
+			ghost_string = managers.localization:text("menu_ghostable_stage_required")
+		end
 		local ghostable_text = day_wrapper_panel:text({
 			name = "ghostable_text",
-			text = managers.localization:text("menu_ghostable_stage"),
+			text = ghost_string,
 			align = "left",
 			vertical = "top",
 			blend_mode = "add",

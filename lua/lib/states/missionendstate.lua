@@ -31,8 +31,10 @@ function MissionEndState:at_enter(old_state, params)
 	managers.platform:set_playing(false)
 	managers.hud:remove_updator("point_of_no_return")
 	managers.hud:hide_stats_screen()
+	local job_tweak = tweak_data.levels[managers.job:current_job_id()]
+	local is_safehouse_combat = job_tweak and job_tweak.is_safehouse_combat
 	self._continue_block_timer = Application:time() + 1.5
-	if Network:is_server() then
+	if Network:is_server() and not is_safehouse_combat then
 		managers.network.matchmake:set_server_joinable(false)
 		if self._success then
 			for peer_id, data in pairs(managers.player:get_all_synced_carry()) do

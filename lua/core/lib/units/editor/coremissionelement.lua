@@ -1042,7 +1042,20 @@ function CoreMissionElement:append_elements_sorted()
 		return
 	end
 	local id = self:_current_element_id()
+	local found = false
+	for _, data in ipairs(self._hed.on_executed) do
+		if data.id == id then
+			found = true
+			break
+		end
+	end
+	if not found and #self._hed.on_executed > 0 then
+		id = self._hed.on_executed[1].id
+	end
 	CoreEWS.update_combobox_options(self._elements_params, self:_combobox_names_names(self._on_executed_units))
+	if #self._hed.on_executed < 1 then
+		return
+	end
 	self:set_on_executed_element(nil, id)
 end
 

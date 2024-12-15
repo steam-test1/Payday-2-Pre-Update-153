@@ -215,7 +215,7 @@ function CoreEditor:unit_output(unit)
 		for _, name in ipairs(unit:used_texture_names()) do
 			models_text = models_text .. t .. name .. n
 		end
-		self._unit_info:set_value(text)
+		self._unit_info:set_value(utf8.from_latin1(text))
 		self._gfx_unit_info:set_value(models_text)
 		for _, btn in ipairs(self._open_unit_file_buttons) do
 			self._unit_info_toolbar:set_tool_enabled(btn, true)

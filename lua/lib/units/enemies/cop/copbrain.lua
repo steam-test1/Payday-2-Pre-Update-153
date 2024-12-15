@@ -221,6 +221,7 @@ function CopBrain:save(save_data)
 		my_save_data.trade_flee_contour = true
 	end
 	my_save_data.team_id = self._logic_data.team.id
+	my_save_data.surrendered = self:is_current_logic("intimidated")
 	save_data.brain = my_save_data
 end
 
@@ -510,6 +511,10 @@ function CopBrain:on_alert(alert_data)
 		return
 	end
 	self._current_logic.on_alert(self._logic_data, alert_data)
+end
+
+function CopBrain:surrendered()
+	return self:is_current_logic("intimidated")
 end
 
 function CopBrain:filter_area_unsafe(nav_seg)

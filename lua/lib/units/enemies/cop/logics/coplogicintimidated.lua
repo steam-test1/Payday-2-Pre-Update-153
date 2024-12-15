@@ -42,6 +42,7 @@ function CopLogicIntimidated.enter(data, new_logic_name, enter_params)
 	managers.groupai:state():register_rescueable_hostage(data.unit, nil)
 	my_data.is_hostage = true
 	managers.groupai:state():on_hostage_state(true, data.key, true)
+	managers.network:session():send_to_peers_synched("sync_unit_surrendered", data.unit, true)
 end
 
 function CopLogicIntimidated.exit(data, new_logic_name, enter_params)
@@ -69,14 +70,11 @@ function CopLogicIntimidated.exit(data, new_logic_name, enter_params)
 	if my_data.is_hostage then
 		managers.groupai:state():on_hostage_state(false, data.key, true)
 	end
+	managers.network:session():send_to_peers_synched("sync_unit_surrendered", data.unit, false)
 end
 
 function CopLogicIntimidated.death_clbk(data, damage_info)
 	CopLogicIntimidated.super.death_clbk(data, damage_info)
-	local my_data = data.internal_data
-	if my_data and my_data.tied and damage_info.variant == "melee" then
-		managers.custom_safehouse:award("daily_honorable")
-	end
 end
 
 function CopLogicIntimidated.queued_update(rubbish, data)

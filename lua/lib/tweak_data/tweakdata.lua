@@ -3559,7 +3559,8 @@ Play the full version soon to get your full PAYDAY!]],
 				"mus",
 				"framing_frame",
 				"dark",
-				"friend"
+				"friend",
+				"fish"
 			}
 		},
 		trophy_bank_heists = {

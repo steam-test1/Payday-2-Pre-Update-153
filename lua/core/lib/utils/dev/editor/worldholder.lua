@@ -925,6 +925,9 @@ function CoreOldWorldDefinition:assign_unit_data(unit, data)
 		end
 		unit:set_shadows_disabled(data.disable_shadows)
 	end
+	if data.delayed_load then
+		unit:unit_data().delayed_load = data.delayed_load
+	end
 	if not is_editor and self._portal_slot_mask and unit:in_slot(self._portal_slot_mask) and not unit:unit_data().only_visible_in_editor then
 		managers.portal:add_unit(unit)
 	end
@@ -1378,6 +1381,7 @@ function CoreOldWorldDefinition:make_generic_data(in_data)
 	local cutscene_actor = in_data.cutscene_actor
 	local disable_shadows = in_data.disable_shadows
 	local disable_collision = in_data.disable_collision
+	local delayed_load = in_data.delayed_load
 	if generic then
 		data._unit_id = generic.unit_id
 		data._name_id = generic.name_id
@@ -1406,6 +1410,9 @@ function CoreOldWorldDefinition:make_generic_data(in_data)
 	if disable_collision then
 		data.disable_collision = disable_collision.value
 	end
+	if delayed_load then
+		data.delayed_load = delayed_load.value
+	end
 	data._editable_gui = in_data.editable_gui
 	return data
 end
@@ -1430,6 +1437,7 @@ function Generic:init(node)
 	node:for_each("cutscene_actor", callback(self, self, "cutscene_actor_settings"))
 	node:for_each("disable_shadows", callback(self, self, "parse_disable_shadows"))
 	node:for_each("disable_collision", callback(self, self, "parse_disable_collision"))
+	node:for_each("delayed_load", callback(self, self, "parse_delayed_load"))
 end
 
 function Generic:parse_orientation(node)
@@ -1516,6 +1524,10 @@ end
 
 function Generic:parse_disable_collision(node)
 	self.disable_collision = toboolean(node:parameter("value"))
+end
+
+function Generic:parse_delayed_load(node)
+	self.delayed_load = toboolean(node:parameter("value"))
 end
 
 function Generic:parse_exists_in_stage(node)

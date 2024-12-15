@@ -3145,8 +3145,8 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.swm_sydney.value = 0
 	self.masks.swm_sydney.texture_bundle_folder = "swm"
 	self.masks.swm_sydney.sort_number = 39
-	self.masks.swm_sydney.dlc = "swm_bundle"
-	self.masks.swm_sydney.global_value = "swm_bundle"
+	self.masks.swm_sydney.dlc = "swm"
+	self.masks.swm_sydney.global_value = "swm"
 	self.masks.sha_01 = {}
 	self.masks.sha_01.unit = "units/pd2_dlc_sha/masks/sha_01/msk_sha_01"
 	self.masks.sha_01.name_id = "bm_sha_01"

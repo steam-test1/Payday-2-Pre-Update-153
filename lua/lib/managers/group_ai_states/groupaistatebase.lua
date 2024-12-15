@@ -2302,7 +2302,7 @@ function GroupAIStateBase:spawn_one_teamAI(is_drop_in, char_name, pos, rotation,
 				end
 			end
 		else
-			if start then
+			if start or self:whisper_mode() then
 				local spawn_point = managers.network:session():get_next_spawn_point()
 				spawn_pos = spawn_point.pos_rot[1]
 				spawn_rot = spawn_point.pos_rot[2]

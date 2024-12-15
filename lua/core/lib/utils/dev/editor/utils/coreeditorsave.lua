@@ -22,6 +22,7 @@ function save_data_table(unit)
 	t.cutscene_actor = ud.cutscene_actor
 	t.disable_shadows = ud.disable_shadows
 	t.disable_collision = ud.disable_collision
+	t.delayed_load = ud.delayed_load
 	t.hide_on_projection_light = ud.hide_on_projection_light
 	t.disable_on_ai_graph = ud.disable_on_ai_graph
 	t.lights = _light_data_table(unit)

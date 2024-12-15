@@ -4674,6 +4674,11 @@ function GuiTweakData:init()
 	}
 	self.new_heists = {}
 	table.insert(self.new_heists, {
+		name_id = "menu_nh_wick_safe",
+		texture_path = "guis/textures/pd2/new_heists/wick_safe",
+		url = "http://www.overkillsoftware.com/games/johnwickheists/#safe"
+	})
+	table.insert(self.new_heists, {
 		name_id = "menu_nh_wick_heist",
 		texture_path = "guis/textures/pd2/new_heists/wick_heists",
 		url = "http://store.steampowered.com/app/591710"

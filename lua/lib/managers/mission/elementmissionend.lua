@@ -5,7 +5,10 @@ function ElementMissionEnd:init(...)
 	ElementMissionEnd.super.init(self, ...)
 end
 
-function ElementMissionEnd:client_on_executed(...)
+function ElementMissionEnd:client_on_executed(instigator)
+	if self._values.state == "leave_safehouse" and instigator:base().is_local_player then
+		MenuCallbackHandler:leave_safehouse()
+	end
 end
 
 function ElementMissionEnd:on_executed(instigator)
@@ -25,7 +28,7 @@ function ElementMissionEnd:on_executed(instigator)
 			game_state_machine:change_state_by_name("gameoverscreen")
 		elseif self._values.state == "leave" then
 			MenuCallbackHandler:leave_mission()
-		elseif self._values.state == "leave_safehouse" then
+		elseif self._values.state == "leave_safehouse" and instigator:base().is_local_player then
 			MenuCallbackHandler:leave_safehouse()
 		end
 	elseif Application:editor() then

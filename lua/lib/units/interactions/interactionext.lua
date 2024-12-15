@@ -412,6 +412,9 @@ function BaseInteractionExt:can_interact(player)
 	if self._host_only and not Network:is_server() then
 		return false
 	end
+	if self._disabled then
+		return false
+	end
 	if not self:_has_required_upgrade(alive(player) and player:movement() and player:movement().current_state_name and player:movement():current_state_name()) then
 		return false
 	end
@@ -438,11 +441,22 @@ function BaseInteractionExt:active()
 	return self._active
 end
 
+function BaseInteractionExt:set_disabled(disable)
+	self._disabled = disable
+end
+
+function BaseInteractionExt:disabled()
+	return self._disabled
+end
+
 function BaseInteractionExt:set_host_only(host_only)
 	self._host_only = host_only
 end
 
 function BaseInteractionExt:set_active(active, sync)
+	if active and self:disabled() then
+		return
+	end
 	if self._host_only and not Network:is_server() then
 		active = false
 	end
@@ -2351,7 +2365,7 @@ end
 
 function CivilianHeisterInteractionExt:update_character()
 	local character_name = CriminalsManager.convert_new_to_old_character_workname(self.character)
-	local character_tier = managers.custom_safehouse:get_room_current_tier(character_name)
+	local character_tier = managers.custom_safehouse:get_host_room_tier(character_name)
 	if self._unit:damage() and self.heister_data.character_material then
 		self._unit:damage():run_sequence_simple(self.heister_data.character_material)
 	end

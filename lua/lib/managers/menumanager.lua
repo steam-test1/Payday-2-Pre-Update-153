@@ -8714,6 +8714,9 @@ MenuChooseWeaponRewardInitiator = MenuChooseWeaponRewardInitiator or class()
 
 function MenuChooseWeaponRewardInitiator:modify_node(original_node, data)
 	local node = original_node
+	if data and data.reward_data then
+		node:parameters().reward_data = data.reward_data
+	end
 	local all_dlc_data = Global.dlc_manager.all_dlc_data
 	local weapon_tweak = tweak_data.weapon
 	local x_id, y_id, x_level, y_level, x_unlocked, y_unlocked, x_skill, y_skill, x_gv, y_gv, x_sn, y_sn
@@ -9073,7 +9076,12 @@ function MenuCallbackHandler:choice_challenge_get_weapon_mod_reward(item)
 		return false
 	end
 	local reward = {}
-	if managers.menu:active_menu().logic:selected_node():parameters().listed_weapon then
+	local params = managers.menu:active_menu().logic:selected_node():parameters()
+	if params.listed_weapon then
+		if params.reward_data then
+			print("managers.challenge:set_as_rewarded", unpack(params.reward_data))
+			managers.challenge:set_as_rewarded(unpack(params.reward_data))
+		end
 		local weapon_id = managers.menu:active_menu().logic:selected_node():parameters().listed_weapon
 		local global_value = managers.menu:active_menu().logic:selected_node():parameters().listed_global_value
 		local entry = MenuCallbackHandler:roll_challenge_give_weapon_mod(weapon_id, global_value)

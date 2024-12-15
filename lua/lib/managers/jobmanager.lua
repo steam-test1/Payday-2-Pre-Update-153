@@ -265,6 +265,11 @@ function JobManager:is_level_ghostable(level_id)
 	return ghost_bonus and 0 < ghost_bonus
 end
 
+function JobManager:is_level_ghostable_required(level_id)
+	local level_data = tweak_data.levels[level_id]
+	return level_data and level_data.ghost_required
+end
+
 function JobManager:_setup_job_heat()
 	local heat = {}
 	Global.job_manager.heat = heat

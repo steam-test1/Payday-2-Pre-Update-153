@@ -35,6 +35,7 @@ function CustomSafehouseManager:_setup()
 	end
 	self._global = Global.custom_safehouse_manager
 	self._global.prev_total = self._global.total
+	self._synced_room_tiers = {}
 	self:attempt_give_initial_coins()
 	self:check_if_new_daily_available()
 	managers.mission:add_global_event_listener("custom_safehouse_enter_safehouse", {
@@ -193,6 +194,38 @@ function CustomSafehouseManager:attempt_give_initial_coins()
 	if self:total_coins_earned() == 0 then
 		print("[Safehouse] adding initial coins! ", tweak_data.safehouse.rewards.initial)
 		self:add_coins(tweak_data.safehouse.rewards.initial)
+	end
+end
+
+function CustomSafehouseManager:get_host_room_tier(room_id)
+	if Network:is_server() then
+		return self:get_room_current_tier(room_id)
+	else
+		return self._synced_room_tiers[room_id] or self:get_room_current_tier(room_id)
+	end
+end
+
+function CustomSafehouseManager:set_host_room_tier(room_id, room_tier)
+	if Network:is_server() then
+		debug_pause("Trying to set host room tier on host! This should only happen for the client!")
+	else
+		self._synced_room_tiers[room_id] = room_tier
+	end
+end
+
+function CustomSafehouseManager:send_room_tiers(peer)
+	local send_func
+	if peer then
+		function send_func(room_name, room_tier)
+			managers.network:session():send_to_peer(peer, "sync_safehouse_room_tier", room_name, room_tier)
+		end
+	else
+		function send_func(room_name, room_tier)
+			managers.network:session():send_to_peers("sync_safehouse_room_tier", room_name, room_tier)
+		end
+	end
+	for name, v in pairs(self._global.rooms) do
+		send_func(name, v.tier_current)
 	end
 end
 

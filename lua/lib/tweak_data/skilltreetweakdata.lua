@@ -1024,23 +1024,6 @@ function SkillTreeTweakData:init()
 			cost = self.costs.hightierpro
 		}
 	}
-	self.skills.master_craftsman = {
-		name_id = "menu_master_craftsman_beta",
-		desc_id = "menu_master_craftsman_beta_desc",
-		icon_xy = {6, 9},
-		[1] = {
-			upgrades = {
-				"trip_mine_explosion_size_multiplier_1"
-			},
-			cost = self.costs.default
-		},
-		[2] = {
-			upgrades = {
-				"trip_mine_marked_enemy_extra_damage"
-			},
-			cost = self.costs.pro
-		}
-	}
 	self.skills.ecm_booster = {
 		name_id = "menu_ecm_booster_beta",
 		desc_id = "menu_ecm_booster_beta_desc",

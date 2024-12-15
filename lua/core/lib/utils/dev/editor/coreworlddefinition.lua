@@ -134,18 +134,7 @@ function WorldDefinition:_load_continent_package(path)
 	end
 	self._continent_packages = self._continent_packages or {}
 	if not PackageManager:loaded(path) then
-		local reverse = string.reverse(path)
-		local i = string.find(reverse, "/")
-		local name = string.reverse(string.sub(reverse, 1, i - 1))
-		if name == "delayed" then
-			function filter_pred(t, name)
-				return false
-			end
-			
-			PackageManager:load_filtered(path, filter_pred)
-		else
-			PackageManager:load(path)
-		end
+		PackageManager:load(path)
 		table.insert(self._continent_packages, path)
 	end
 end
@@ -264,7 +253,6 @@ function WorldDefinition:init_done()
 	self:_unload_package(self._current_world_init_package)
 	self._continent_definitions = nil
 	self._definition = nil
-	self._delayed_units = nil
 end
 
 function WorldDefinition:create(layer, offset)
@@ -388,7 +376,7 @@ function WorldDefinition:create(layer, offset)
 		if self._definition.statics then
 			for _, values in ipairs(self._definition.statics) do
 				local unit_data = values.unit_data
-				if not is_editor and unit_data.continent == "delayed" then
+				if not is_editor and unit_data.delayed_load then
 					self._delayed_units[unit_data.unit_id] = {
 						unit_data,
 						offset,
@@ -406,7 +394,7 @@ function WorldDefinition:create(layer, offset)
 			if continent.statics then
 				for _, values in ipairs(continent.statics) do
 					local unit_data = values.unit_data
-					if not is_editor and unit_data.continent == "delayed" then
+					if not is_editor and unit_data.delayed_load then
 						self._delayed_units[unit_data.unit_id] = {
 							unit_data,
 							offset,
@@ -808,6 +796,7 @@ function WorldDefinition:assign_unit_data(unit, data)
 	self:_setup_cutscene_actor(unit, data)
 	self:_setup_disable_shadow(unit, data)
 	self:_setup_disable_collision(unit, data)
+	self:_setup_delayed_load(unit, data)
 	self:_setup_hide_on_projection_light(unit, data)
 	self:_setup_disable_on_ai_graph(unit, data)
 	self:_add_to_portal(unit, data)
@@ -966,6 +955,13 @@ function WorldDefinition:_setup_disable_shadow(unit, data)
 		unit:unit_data().disable_shadows = data.disable_shadows
 	end
 	unit:set_shadows_disabled(data.disable_shadows)
+end
+
+function WorldDefinition:_setup_delayed_load(unit, data)
+	if not data.delayed_load then
+		return
+	end
+	unit:unit_data().delayed_load = data.delayed_load
 end
 
 function WorldDefinition:_setup_disable_collision(unit, data)

@@ -38,6 +38,7 @@ end
 require("lib/units/ScriptUnitData")
 require("lib/units/UnitBase")
 require("lib/units/SyncUnitData")
+require("lib/units/DLCFlaggedUnit")
 require("lib/units/beings/player/PlayerBase")
 require("lib/units/beings/player/PlayerCamera")
 require("lib/units/beings/player/PlayerSound")
@@ -436,6 +437,9 @@ function GameSetup:init_finalize()
 	tweak_data.gui.crime_net.locations = {}
 	self._keyboard = Input:keyboard()
 	managers.network.account:set_playing(true)
+	if Network:is_server() and managers.job:current_job_id() == "chill" then
+		managers.custom_safehouse:send_room_tiers()
+	end
 end
 
 function GameSetup:update(t, dt)

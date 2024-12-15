@@ -287,10 +287,17 @@ function DescriptionItem:init(panel, text, i, saved_descriptions)
 	local desc_string = managers.localization:text(briefing_id)
 	local is_level_ghostable = managers.job:is_level_ghostable(managers.job:current_level_id()) and managers.groupai and managers.groupai:state():whisper_mode()
 	if is_level_ghostable and Network:is_server() then
-		desc_string = desc_string .. [[
+		if managers.job:is_level_ghostable_required(managers.job:current_level_id()) then
+			desc_string = desc_string .. [[
+
+
+]] .. managers.localization:text("menu_ghostable_stage_required")
+		else
+			desc_string = desc_string .. [[
 
 
 ]] .. managers.localization:text("menu_ghostable_stage")
+		end
 	end
 	local desc_text = self._scroll_panel:text({
 		name = "description_text",
@@ -398,10 +405,17 @@ function DescriptionItem:on_whisper_mode_changed()
 		local desc_string = managers.localization:text(briefing_id)
 		local is_level_ghostable = managers.job:is_level_ghostable(managers.job:current_level_id()) and managers.groupai and managers.groupai:state():whisper_mode()
 		if is_level_ghostable then
-			desc_string = desc_string .. [[
+			if managers.job:is_level_ghostable_required(managers.job:current_level_id()) then
+				desc_string = desc_string .. [[
+
+
+]] .. managers.localization:text("menu_ghostable_stage_required")
+			else
+				desc_string = desc_string .. [[
 
 
 ]] .. managers.localization:text("menu_ghostable_stage")
+			end
 		end
 		self:set_description_text(desc_string)
 	end

@@ -1315,18 +1315,31 @@ function CustomSafehouseGuiRewardItem:trigger()
 			SimpleGUIEffectSpewer.claim_daily_reward(self._image:center_x(), self._image:center_y(), self._panel)
 			self._daily_page:set_animation_state("_update_hide_daily")
 		elseif managers.challenge:get_active_challenge(self._id) and managers.challenge:get_active_challenge(self._id).completed then
-			local reward = managers.challenge:on_give_reward(self._id, nil, self._order)
-			if reward then
-				managers.menu_component:post_event("menu_skill_investment")
-				self._glow:stop()
-				self._glow:set_alpha(0)
-				self:set_active(false)
-				if reward.choose_weapon_reward then
-					managers.menu:open_node("choose_weapon_reward_safehouse")
-				else
-					managers.menu:show_challenge_reward(reward)
+			if managers.challenge:is_choose_weapon_unrewarded(self._id, nil, self._order) then
+				managers.menu:open_node("choose_weapon_reward_safehouse", {
+					{
+						reward_data = {
+							self._id,
+							nil,
+							self._order
+						}
+					}
+				})
+			else
+				local reward = managers.challenge:on_give_reward(self._id, nil, self._order)
+				if reward then
+					managers.menu_component:post_event("menu_skill_investment")
+					self._glow:stop()
+					self._glow:set_alpha(0)
+					self:set_active(false)
+					if reward.choose_weapon_reward then
+						debug_pause("Trying to reward random weapon mod the wrong way!")
+						managers.menu:open_node("choose_weapon_reward_safehouse")
+					else
+						managers.menu:show_challenge_reward(reward)
+					end
+					self._daily_page:select_challenge(self._id)
 				end
-				self._daily_page:select_challenge(self._id)
 			end
 		elseif managers.tango:get_challenge(self._id) and managers.tango:get_challenge(self._id).completed and not managers.tango:get_challenge(self._id).rewarded and not managers.tango:has_already_claimed_reward(self._id, self._order) then
 			managers.menu_component:post_event("menu_skill_investment")

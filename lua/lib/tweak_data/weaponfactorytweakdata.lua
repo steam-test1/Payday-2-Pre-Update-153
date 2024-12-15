@@ -5085,11 +5085,7 @@ function WeaponFactoryTweakData:_init_aug()
 		a_obj = "a_m",
 		bullet_objects = {prefix = "g_bullet_", amount = 21},
 		unit = "units/payday2/weapons/wpn_fps_ass_aug_pts/wpn_fps_aug_m_pmag",
-		stats = {value = 1},
-		animations = {
-			reload = "reload",
-			reload_not_empty = "reload_not_empty"
-		}
+		stats = {value = 1}
 	}
 	self.parts.wpn_fps_aug_body_aug = {
 		type = "lower_reciever",
@@ -5141,6 +5137,10 @@ function WeaponFactoryTweakData:_init_aug()
 	self.wpn_fps_ass_aug = {}
 	self.wpn_fps_ass_aug.unit = "units/payday2/weapons/wpn_fps_ass_aug/wpn_fps_ass_aug"
 	self.wpn_fps_ass_aug.optional_types = {"barrel_ext", "gadget"}
+	self.wpn_fps_ass_aug.animations = {
+		reload = "reload",
+		reload_not_empty = "reload_not_empty"
+	}
 	self.wpn_fps_ass_aug.adds = {
 		wpn_fps_upg_fl_ass_smg_sho_peqbox = {
 			"wpn_fps_aug_ris_special"
@@ -28190,10 +28190,6 @@ function WeaponFactoryTweakData:_init_tng()
 		a_obj = "a_m",
 		unit = "units/pd2_dlc_tng/weapons/wpn_fps_ass_aug_m_quick/wpn_fps_ass_aug_m_quick",
 		stats = {value = 2, reload = 10},
-		animations = {
-			reload = "reload",
-			reload_not_empty = "reload_not_empty"
-		},
 		texture_bundle_folder = "tng",
 		dlc = "tango",
 		is_a_unlockable = true

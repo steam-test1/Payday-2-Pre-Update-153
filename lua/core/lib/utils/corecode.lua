@@ -149,6 +149,56 @@ function line_representation(x, seen, raw)
 	end
 end
 
+function add_prints(class_name, ignore_list)
+	local obj = _G[class_name]
+	local to_change = {}
+	ignore_list = ignore_list or {}
+	local ignore = {new = true}
+	for _, v in pairs(ignore_list) do
+		ignore[v] = true
+	end
+	for k, v in pairs(obj) do
+		if type(v) == "function" and not ignore[k] then
+			to_change[k] = function(...)
+				print("[" .. class_name .. "]" .. "." .. k, ...)
+				return v(...)
+			end
+		end
+	end
+	for k, v in pairs(to_change) do
+		obj[k] = v
+	end
+end
+
+function tag_print(tag, ...)
+	tag = "[" .. tag .. "]"
+	local do_things = function(tag, ...)
+		local str = ""
+		local need_front = true
+		for i = 1, select("#", ...) do
+			local s, lines = string.gsub(tostring(select(i, ...)), "\n", "\n" .. tag .. "\t")
+			if 0 < lines then
+				str = str .. "\n" .. tag .. "\t" .. s
+				need_front = true
+			else
+				if need_front then
+					str = str .. "\n" .. tag
+				end
+				str = str .. "\t" .. s
+				need_front = false
+			end
+		end
+		return str:sub(2)
+	end
+	print(do_things(tag, ...))
+end
+
+function make_tag_print(tag)
+	return function(...)
+		tag_print(tag, ...)
+	end
+end
+
 function full_representation(x, seen)
 	if DB:is_bundled() then
 		return "[N/A in bundle]"

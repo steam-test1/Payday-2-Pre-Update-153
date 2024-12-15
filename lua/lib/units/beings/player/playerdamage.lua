@@ -138,6 +138,11 @@ function PlayerDamage:init(unit)
 	managers.mission:add_global_event_listener("player_force_bleedout", {
 		"player_force_bleedout"
 	}, callback(self, self, "force_into_bleedout", false))
+	local level_tweak = tweak_data.levels[managers.job:current_level_id()]
+	if level_tweak and level_tweak.is_safehouse and not level_tweak.is_safehouse_combat then
+		self:set_mission_damage_blockers("damage_fall_disabled", true)
+		self:set_mission_damage_blockers("invulnerable", true)
+	end
 end
 
 function PlayerDamage:_init_standard_listeners()
@@ -1291,6 +1296,8 @@ function PlayerDamage:disable_berserker()
 		revives = Application:digest_value(self._revives, false)
 	})
 	self._check_berserker_done = false
+	managers.player:deactivate_temporary_upgrade("temporary", "berserker_damage_multiplier")
+	managers.network:session():send_to_peers("sync_swansong_timer", self._unit, 0, self:_max_health(), Application:digest_value(self._revives, false), managers.network:session():local_peer():id())
 end
 
 function PlayerDamage:on_downed()

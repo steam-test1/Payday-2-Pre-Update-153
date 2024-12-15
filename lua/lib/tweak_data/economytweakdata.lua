@@ -656,6 +656,38 @@ function EconomyTweakData:init()
 		}
 	}
 	self.contents.sfs_01_legendary.rarity = "legendary"
+	self.contents.wac_01 = {}
+	self.contents.wac_01.def_id = 10035
+	self.contents.wac_01.contains = {
+		weapon_skins = {
+			"mateba_wac",
+			"c96_wac",
+			"ksg_wac",
+			"glock_18c_wac",
+			"galil_wac",
+			"spas12_wac",
+			"amcar_wac",
+			"aa12_wac",
+			"mp9_wac",
+			"desertfox_wac",
+			"vhs_wac",
+			"mp7_wac",
+			"g26_wac",
+			"x_mp5_wac",
+			"msr_wac"
+		},
+		contents = {
+			"wac_01_legendary"
+		}
+	}
+	self.contents.wac_01_legendary = {}
+	self.contents.wac_01_legendary.def_id = 10036
+	self.contents.wac_01_legendary.contains = {
+		weapon_skins = {
+			"x_akmsu_wac"
+		}
+	}
+	self.contents.wac_01_legendary.rarity = "legendary"
 	self.safes.overkill_01 = {}
 	self.safes.overkill_01.def_id = 50000
 	self.safes.overkill_01.promo = true
@@ -804,6 +836,14 @@ function EconomyTweakData:init()
 	self.safes.sfs_01.unit_name = "units/payday2_cash/safes/sfs/safe/eco_safe_sfs"
 	self.safes.sfs_01.texture_bundle_folder = "cash/safes/sfs"
 	self.safes.sfs_01.market_link = "https://steamcommunity.com/market/listings/218620/Scarface%20Safe"
+	self.safes.wac_01 = {}
+	self.safes.wac_01.free = true
+	self.safes.wac_01.drill = "wac_01"
+	self.safes.wac_01.content = "wac_01"
+	self.safes.wac_01.name_id = "bm_menu_safe_wac_01"
+	self.safes.wac_01.unit_name = "units/payday2_cash/safes/wac/safe/eco_safe_wac"
+	self.safes.wac_01.texture_bundle_folder = "cash/safes/wac"
+	self.safes.wac_01.market_link = "https://steamcommunity.com/market/listings/218620/John%20Wick%20Safe"
 	self.drills.overkill_01 = {}
 	self.drills.overkill_01.safe = "overkill_01"
 	self.drills.overkill_01.def_id = 70000
@@ -923,6 +963,9 @@ function EconomyTweakData:init()
 	self.drills.sfs_01 = {}
 	self.drills.sfs_01.safe = "sfs_01"
 	self.drills.sfs_01.unit_name = "units/payday2_cash/safes/sfs/drill/eco_drill_sfs"
+	self.drills.wac_01 = {}
+	self.drills.wac_01.safe = "wac_01"
+	self.drills.wac_01.unit_name = "units/payday2_cash/safes/wac/drill/eco_drill_wac"
 	self.bonuses = {}
 	self.bonuses.concealment_p1 = {}
 	self.bonuses.concealment_p1.name_id = "bm_menu_bonus_concealment"
