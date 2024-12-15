@@ -235,6 +235,7 @@ function combobox(params)
 	local name_ctrlr
 	if name then
 		name_ctrlr = EWS:StaticText(panel, name, 0, "")
+		name_ctrlr:set_min_size(Vector3(0, -1, 0))
 		ctrl_sizer:add(name_ctrlr, name_proportions, 0, "ALIGN_CENTER_VERTICAL")
 	end
 	if sorted then
@@ -361,6 +362,7 @@ end
 function _name_ctrlr(params)
 	if params.name then
 		params.name_ctrlr = EWS:StaticText(params.panel, params.name, 0, "")
+		params.name_ctrlr:set_min_size(Vector3(0, -1, 0))
 		params.ctrl_sizer:add(params.name_ctrlr, params.name_proportions, 0, "ALIGN_CENTER_VERTICAL")
 	end
 end

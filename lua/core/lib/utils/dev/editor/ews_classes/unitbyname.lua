@@ -72,11 +72,13 @@ function UnitByName:init(name, unit_filter_function, ...)
 	self._list:connect("EVT_COMMAND_LIST_ITEM_ACTIVATED", callback(self, self, "_on_select_unit"), nil)
 	self._list:connect("EVT_CHAR", callback(self, self, "key_delete"), "")
 	self._list:connect("EVT_KEY_DOWN", callback(self, self, "key_cancel"), "")
+	self._list:set_min_size(Vector3(-1, 405, 0))
 	local button_sizer = EWS:BoxSizer("HORIZONTAL")
 	self:_build_buttons(panel, button_sizer)
 	panel_sizer:add(button_sizer, 0, 0, "ALIGN_RIGHT")
 	self._dialog_sizer:add(self._panel, 1, 0, "EXPAND")
 	self:fill_unit_list()
+	self._dialog:fit(self._panel)
 	self._dialog:set_visible(true)
 end
 

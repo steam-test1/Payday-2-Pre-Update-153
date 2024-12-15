@@ -9,7 +9,6 @@ function CoreCollapseBox:init(parent, orientation, caption, expanded_size, expan
 	self._box = style == "NO_BORDER" and EWS:BoxSizer("VERTICAL") or EWS:StaticBoxSizer(self._panel, "VERTICAL", "")
 	self._panel:set_sizer(self._box)
 	self._btn = EWS:Button(self._panel, "", "", "NO_BORDER")
-	self._btn:set_font_family("FONTFAMILY_TELETYPE")
 	self._btn:set_font_weight("FONTWEIGHT_BOLD")
 	self:connect("", "EVT_COMMAND_BUTTON_CLICKED", self._cb, self)
 	self._box:add(self._btn, 0, 0, "EXPAND")
