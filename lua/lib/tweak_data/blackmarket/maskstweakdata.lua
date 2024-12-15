@@ -3006,6 +3006,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.pdc16_clover.texture_bundle_folder = "pdc16"
 	self.masks.pdc16_clover.sort_number = 33
 	self.masks.pdc16_clover.global_value = "pdcon_2016"
+	self.masks.pdc16_clover.dlc = "pdcon_2016"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.masks) do
 		if free_dlcs[data.dlc] then

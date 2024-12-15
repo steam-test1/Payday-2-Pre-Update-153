@@ -450,7 +450,7 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.pdcon_2016.durability_multiplier = 1
 	self.global_values.pdcon_2016.drops = true
 	self.global_values.pdcon_2016.track = true
-	self.global_values.pdcon_2016.sort_number = 81
+	self.global_values.pdcon_2016.sort_number = 83
 	self.global_values.pdcon_2016.hide_unavailable = true
 	self.global_values.pdcon_2016.category = "global_event"
 	self.global_values.jigg = {}
