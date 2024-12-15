@@ -33,6 +33,7 @@ require("lib/tweak_data/VanSkinsTweakData")
 require("lib/tweak_data/EnvEffectTweakData")
 require("lib/tweak_data/CustomSafehouseTweakData")
 require("lib/tweak_data/TangoTweakData")
+require("lib/tweak_data/SubtitleTweakData")
 TweakData = TweakData or class()
 
 function TweakData:_init_wip_tweak_data()
@@ -605,6 +606,7 @@ function TweakData:init()
 	self.van = VanSkinsTweakData:new(self)
 	self.env_effect = EnvEffectTweakData:new()
 	self.tango = TangoTweakData:new(self)
+	self.subtitles = SubtitleTweakData:new(self)
 	self.EFFECT_QUALITY = 0.5
 	if SystemInfo:platform() == Idstring("X360") then
 		self.EFFECT_QUALITY = 0.5
@@ -3812,7 +3814,8 @@ Play the full version soon to get your full PAYDAY!]],
 		"shoutout_raid",
 		"jolly",
 		"cane",
-		"peta"
+		"peta",
+		"moon"
 	}
 	self.achievement.job_list.hector = {
 		"watchdogs_wrapper",

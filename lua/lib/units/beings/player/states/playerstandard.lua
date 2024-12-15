@@ -50,6 +50,13 @@ PlayerStandard.ANIM_STATES = {
 		tased_exit = Idstring("tased_exit"),
 		tased_boost = Idstring("tased_boost"),
 		tased_counter = Idstring("tazer_counter")
+	},
+	bipod = {
+		recoil = Idstring("bipod_recoil"),
+		recoil_steelsight = Idstring("bipod_recoil_steelsight"),
+		recoil_enter = Idstring("bipod_recoil_enter"),
+		recoil_loop = Idstring("bipod_recoil_loop"),
+		recoil_exit = Idstring("bipod_recoil_exit")
 	}
 }
 PlayerStandard.debug_bipod = nil

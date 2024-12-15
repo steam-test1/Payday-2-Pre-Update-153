@@ -34,10 +34,13 @@ function PlayerBipod:_enter(enter_data)
 		self._headbob = 0
 		self._target_headbob = 0
 		self._ext_camera:set_shaker_parameter("headbob", "amplitude", 0)
-		PlayerStandard.IDS_RECOIL = Idstring(tweak_data.animations.bipod_recoil .. "_" .. equipped_unit_id)
-		PlayerStandard.IDS_RECOIL_ENTER = Idstring(tweak_data.animations.bipod_recoil_enter .. "_" .. equipped_unit_id)
-		PlayerStandard.IDS_RECOIL_LOOP = Idstring(tweak_data.animations.bipod_recoil_loop .. "_" .. equipped_unit_id)
-		PlayerStandard.IDS_RECOIL_EXIT = Idstring(tweak_data.animations.bipod_recoil_exit .. "_" .. equipped_unit_id)
+		PlayerStandard.ANIM_STATES.bipod = {
+			recoil = Idstring(tweak_data.animations.bipod_recoil .. "_" .. equipped_unit_id),
+			recoil_enter = Idstring(tweak_data.animations.bipod_recoil_enter .. "_" .. equipped_unit_id),
+			recoil_loop = Idstring(tweak_data.animations.bipod_recoil_loop .. "_" .. equipped_unit_id),
+			recoil_exit = Idstring(tweak_data.animations.bipod_recoil_exit .. "_" .. equipped_unit_id)
+		}
+		self:set_animation_state("bipod")
 		self._unit:sound_source():post_event("wp_steady_in")
 		self:_stance_entered()
 		self:_husk_bipod_data()
@@ -66,10 +69,7 @@ function PlayerBipod:exit(state_data, new_state_name)
 	local exit_data = {}
 	exit_data.skip_equip = true
 	self._dye_risk = nil
-	PlayerStandard.IDS_RECOIL = Idstring("recoil")
-	PlayerStandard.IDS_RECOIL_ENTER = Idstring("recoil_enter")
-	PlayerStandard.IDS_RECOIL_LOOP = Idstring("recoil_loop")
-	PlayerStandard.IDS_RECOIL_EXIT = Idstring("recoil_exit")
+	self:set_animation_state("standard")
 	self._unit:sound_source():post_event("wp_steady_out")
 	local peer_id = managers.network:session():peer_by_unit(self._unit):id()
 	Application:trace("PlayerBipod:exit: ", peer_id)

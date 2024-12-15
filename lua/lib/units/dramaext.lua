@@ -60,10 +60,21 @@ function DramaExt:sound_callback(instance, event_type, unit, sound_source, label
 end
 
 function DramaExt:_subtitle_len(id)
-	local text = managers.localization:text(id)
-	local duration = text:len() * tweak_data.dialog.DURATION_PER_CHAR
+	local duration = self:_length_from_tweak(id)
+	if duration == nil then
+		local text = managers.localization:text(id)
+		duration = text:len() * tweak_data.dialog.DURATION_PER_CHAR
+	end
 	if duration < tweak_data.dialog.MINIMUM_DURATION then
 		duration = tweak_data.dialog.MINIMUM_DURATION
 	end
 	return duration
+end
+
+function DramaExt:_length_from_tweak(id)
+	local subtitles_tweak = tweak_data.subtitles.jobs[managers.job:current_real_job_id()]
+	if subtitles_tweak and subtitles_tweak[id] then
+		return subtitles_tweak[id] + tweak_data.subtitles.additional_time
+	end
+	return nil
 end
