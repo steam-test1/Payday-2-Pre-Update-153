@@ -11,7 +11,7 @@ function HUDBlackScreen:init(hud)
 		y = 0,
 		valign = "grow",
 		halign = "grow",
-		layer = 0
+		layer = 200
 	})
 	local mid_text = self._blackscreen_panel:text({
 		name = "mid_text",
@@ -135,6 +135,10 @@ function HUDBlackScreen:skip_circle_done()
 end
 
 function HUDBlackScreen:set_job_data()
+	self:_set_job_data()
+end
+
+function HUDBlackScreen:_set_job_data()
 	if not managers.job:has_active_job() then
 		return
 	end
@@ -180,89 +184,6 @@ function HUDBlackScreen:set_job_data()
 		risk_text:set_bottom(risk_panel:top())
 		risk_text:set_center_x(risk_panel:center_x())
 	end
-	do return end
-	local contact_data = managers.job:current_contact_data()
-	local job_data = managers.job:current_job_data()
-	if self._blackscreen_panel:child("job_panel") then
-		self._blackscreen_panel:remove(self._blackscreen_panel:child("job_panel"))
-	end
-	local job_panel = self._blackscreen_panel:panel({
-		visible = true,
-		name = "job_panel",
-		y = 0,
-		valign = "grow",
-		halign = "grow",
-		layer = 0
-	})
-	job_panel:hide()
-	job_panel:text({
-		name = "title",
-		text = managers.localization:text(job_data.name_id),
-		layer = 1,
-		align = "center",
-		vertical = "top",
-		font_size = tweak_data.hud.default_font_size,
-		font = tweak_data.hud.medium_font,
-		w = job_panel:w(),
-		h = 32
-	})
-	local contact_name = job_panel:text({
-		name = "contact_name",
-		text = managers.localization:text(contact_data.name_id),
-		layer = 1,
-		align = "left",
-		vertical = "top",
-		font_size = tweak_data.hud.default_font_size,
-		font = tweak_data.hud.medium_font,
-		w = job_panel:w(),
-		h = 32,
-		y = 50
-	})
-	local portrait = job_panel:bitmap({
-		name = "portrait",
-		texture = contact_data.image,
-		y = contact_name:bottom()
-	})
-	job_panel:text({
-		name = "payout",
-		text = "Payout: $1.000.000",
-		layer = 1,
-		align = "left",
-		vertical = "top",
-		font_size = tweak_data.hud.default_font_size,
-		font = tweak_data.hud.medium_font,
-		w = job_panel:w(),
-		h = 32,
-		y = portrait:bottom() + 32
-	})
-	self:_create_stages()
-	local level_data = managers.job:current_level_data()
-	local objective_title = job_panel:text({
-		name = "objective_title",
-		text = managers.localization:text("hud_objectives"),
-		layer = 1,
-		align = "left",
-		vertical = "top",
-		font_size = tweak_data.hud.default_font_size,
-		font = tweak_data.hud.medium_font,
-		w = job_panel:w(),
-		h = 32,
-		y = job_panel:h() / 2
-	})
-	local objective_text = job_panel:text({
-		name = "objective_text",
-		text = managers.localization:text(level_data.briefing_id),
-		layer = 1,
-		align = "left",
-		vertical = "top",
-		font_size = tweak_data.hud.small_font_size,
-		font = tweak_data.hud.small_font,
-		w = job_panel:w(),
-		h = 32,
-		y = job_panel:h() / 2 + 50,
-		wrap = true,
-		word_wrap = true
-	})
 end
 
 function HUDBlackScreen:_create_stages()

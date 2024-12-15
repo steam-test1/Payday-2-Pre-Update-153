@@ -1715,7 +1715,6 @@ function InteractionTweakData:init(tweak_data)
 	self.crate_loot.action_text_id = "hud_action_cracking_crate"
 	self.crate_loot.timer = 2
 	self.crate_loot.start_active = false
-	self.crate_loot.interact_distance = 130
 	self.crate_loot.sound_start = "bar_open_crate"
 	self.crate_loot.sound_interupt = "bar_open_crate_cancel"
 	self.crate_loot.sound_done = "bar_open_crate_finished"
@@ -1740,7 +1739,6 @@ function InteractionTweakData:init(tweak_data)
 	self.crate_loot_close.action_text_id = "hud_action_closing_crate"
 	self.crate_loot_close.timer = 2
 	self.crate_loot_close.start_active = false
-	self.crate_loot_close.interact_distance = 130
 	self.crate_loot_close.sound_start = "bar_close_crate"
 	self.crate_loot_close.sound_interupt = "bar_close_crate_cancel"
 	self.crate_loot_close.sound_done = "bar_close_crate_finished"
@@ -1809,14 +1807,12 @@ function InteractionTweakData:init(tweak_data)
 	self.votingmachine2 = {}
 	self.votingmachine2.text_id = "debug_interact_hack_ipad"
 	self.votingmachine2.timer = 5
-	self.votingmachine2.interact_distance = 130
 	self.votingmachine2.sound_start = "bar_keyboard"
 	self.votingmachine2.sound_interupt = "bar_keyboard_cancel"
 	self.votingmachine2.sound_done = "bar_keyboard_finished"
 	self.votingmachine2_jammed = {}
 	self.votingmachine2_jammed.text_id = "debug_interact_hack_ipad_jammed"
 	self.votingmachine2_jammed.timer = 5
-	self.votingmachine2.interact_distance = 130
 	self.votingmachine2_jammed.sound_start = "bar_keyboard"
 	self.votingmachine2_jammed.sound_interupt = "bar_keyboard_cancel"
 	self.votingmachine2_jammed.sound_done = "bar_keyboard_finished"

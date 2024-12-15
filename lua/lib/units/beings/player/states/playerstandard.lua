@@ -305,6 +305,9 @@ function PlayerStandard:update(t, dt)
 	self:_update_ground_ray()
 	self:_update_fwd_ray()
 	self:_update_check_actions(t, dt)
+	if self._menu_closed_fire_cooldown > 0 then
+		self._menu_closed_fire_cooldown = self._menu_closed_fire_cooldown - dt
+	end
 	self:_update_movement(t, dt)
 	self:_upd_nav_data()
 	managers.hud:_update_crosshair_offset(t, dt)
@@ -604,9 +607,6 @@ function PlayerStandard:_update_check_actions(t, dt, paused)
 		self._change_weapon_pressed_expire_t = nil
 	end
 	self:_update_steelsight_timers(t, dt)
-	if self._menu_closed_fire_cooldown > 0 then
-		self._menu_closed_fire_cooldown = self._menu_closed_fire_cooldown - dt
-	end
 	if input.btn_stats_screen_press then
 		self._unit:base():set_stats_screen_visible(true)
 	elseif input.btn_stats_screen_release then

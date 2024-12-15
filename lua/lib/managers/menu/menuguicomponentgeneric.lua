@@ -232,7 +232,7 @@ function MenuGuiComponentGeneric:_add_panels()
 	})
 	self._info_panel:set_world_top(self._page_panel:world_y())
 	self._info_panel:set_right(self._panel:w())
-	self._outline_panel = self._page_panel:panel({layer = 100})
+	self._outline_panel = self._page_panel:panel({layer = 10})
 	self._outline_box = BoxGuiObject:new(self._outline_panel, self._data.outline_data or {
 		sides = {
 			1,

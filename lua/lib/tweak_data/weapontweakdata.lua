@@ -13256,7 +13256,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.siltstone.CLIP_AMMO_MAX = 10
 	self.siltstone.NR_CLIPS_MAX = 3
 	self.siltstone.AMMO_MAX = self.siltstone.CLIP_AMMO_MAX * self.siltstone.NR_CLIPS_MAX
-	self.siltstone.AMMO_PICKUP = self:_pickup_chance(self.siltstone.AMMO_MAX, 5)
+	self.siltstone.AMMO_PICKUP = {0.7, 1}
 	self.siltstone.FIRE_MODE = "single"
 	self.siltstone.fire_mode_data = {}
 	self.siltstone.fire_mode_data.fire_rate = 1
@@ -13352,7 +13352,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.flint.CLIP_AMMO_MAX = 35
 	self.flint.NR_CLIPS_MAX = 3
 	self.flint.AMMO_MAX = self.flint.CLIP_AMMO_MAX * self.flint.NR_CLIPS_MAX
-	self.flint.AMMO_PICKUP = self:_pickup_chance(self.flint.AMMO_MAX, 3)
+	self.flint.AMMO_PICKUP = self:_pickup_chance(self.flint.AMMO_MAX, 1)
 	self.flint.FIRE_MODE = "auto"
 	self.flint.fire_mode_data = {}
 	self.flint.fire_mode_data.fire_rate = 0.092

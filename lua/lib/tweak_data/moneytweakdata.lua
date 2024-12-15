@@ -67,7 +67,7 @@ function MoneyTweakData:init(tweak_data)
 	self.bag_values.warhead = 4600
 	self.bag_values.unknown = 5000
 	self.bag_values.safe = 4600
-	self.bag_values.prototype = 3000
+	self.bag_values.prototype = 10000
 	self.bag_values.counterfeit_money = 1100
 	self.bag_values.masterpiece_painting = 10000
 	self.bag_values.master_server = 10000

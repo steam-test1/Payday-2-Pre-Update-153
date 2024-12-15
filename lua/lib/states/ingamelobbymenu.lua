@@ -169,13 +169,14 @@ end
 
 function IngameLobbyMenuState:set_lootdrop(drop_category, drop_item_id)
 	local global_value, item_category, item_id, max_pc, item_pc
+	local allow_loot_drop = true
 	if drop_item_id and drop_category then
 		global_value = managers.blackmarket:get_global_value(drop_category, drop_item_id)
 		item_category = drop_category
 		item_id = drop_item_id
 		max_pc = math.max(math.ceil(managers.experience:current_level() / 10), 1)
 		item_pc = math.ceil(4)
-	else
+	elseif allow_loot_drop then
 		self._lootdrop_data = {}
 		managers.lootdrop:new_make_drop(self._lootdrop_data)
 		global_value = self._lootdrop_data.global_value or "normal"

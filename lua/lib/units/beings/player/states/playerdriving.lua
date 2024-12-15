@@ -168,6 +168,9 @@ function PlayerDriving:update(t, dt)
 	self:_update_hud(t, input)
 	self:_update_action_timers(t, input)
 	self:_check_action_exit_vehicle(t, input)
+	if self._menu_closed_fire_cooldown > 0 then
+		self._menu_closed_fire_cooldown = self._menu_closed_fire_cooldown - dt
+	end
 	if self._seat.driving then
 		self:_update_check_actions_driver(t, dt, input)
 	elseif self._seat.allow_shooting or self._stance == PlayerDriving.STANCE_SHOOTING then
