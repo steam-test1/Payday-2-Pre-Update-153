@@ -1934,10 +1934,14 @@ function StatisticsManager:session_killed_by_weapon_category(category)
 	return count
 end
 
+function StatisticsManager:create_unified_weapon_name(weapon_id)
+	return string.gsub(weapon_id, "_npc", "")
+end
+
 function StatisticsManager:session_anyone_killed_by_weapon_category(category)
 	local count = 0
 	for weapon_id, data in pairs(self._global.session.killed_by_anyone.killed_by_weapon) do
-		if tweak_data:get_raw_value("weapon", string.gsub(weapon_id, "_npc", ""), "category") == category then
+		if tweak_data:get_raw_value("weapon", self:create_unified_weapon_name(weapon_id), "category") == category then
 			count = count + data.count
 		end
 	end
@@ -1947,7 +1951,7 @@ end
 function StatisticsManager:session_killed_by_weapon_category_except(category_table)
 	local count = 0
 	for weapon_id, data in pairs(self._global.session.killed_by_weapon) do
-		local category = tweak_data:get_raw_value("weapon", string.gsub(weapon_id, "_npc", ""), "category")
+		local category = tweak_data:get_raw_value("weapon", self:create_unified_weapon_name(weapon_id), "category")
 		if not table.contains(category_table, category) then
 			count = count + data.count
 		end
@@ -1958,7 +1962,7 @@ end
 function StatisticsManager:session_anyone_killed_by_weapon_category_except(category_table)
 	local count = 0
 	for weapon_id, data in pairs(self._global.session.killed_by_anyone.killed_by_weapon) do
-		local category = tweak_data:get_raw_value("weapon", string.gsub(weapon_id, "_npc", ""), "category")
+		local category = tweak_data:get_raw_value("weapon", self:create_unified_weapon_name(weapon_id), "category")
 		if not table.contains(category_table, category) then
 			count = count + data.count
 		end
@@ -1971,12 +1975,12 @@ function StatisticsManager:session_anyone_used_weapons()
 end
 
 function StatisticsManager:session_anyone_used_weapon(weapon_id)
-	return self._global.session.used_weapons[string.gsub(weapon_id, "_npc", "")]
+	return self._global.session.used_weapons[self:create_unified_weapon_name(weapon_id)]
 end
 
 function StatisticsManager:_session_anyone_used_weapon_except(weapon_id)
 	for id in pairs(self._global.session.used_weapons) do
-		if string.gsub(id, "_npc", "") ~= string.gsub(weapon_id, "_npc", "") then
+		if self:create_unified_weapon_name(id) ~= self:create_unified_weapon_name(weapon_id) then
 			return true
 		end
 	end
@@ -1985,14 +1989,14 @@ end
 function StatisticsManager:session_anyone_used_weapon_except(weapon_id)
 	if type(weapon_id) == "table" then
 		for id in pairs(self._global.session.used_weapons) do
-			if not table.contains(weapon_id, string.gsub(id, "_npc", "")) then
+			if not table.contains(weapon_id, self:create_unified_weapon_name(id)) then
 				return true
 			end
 		end
 		return false
 	else
 		for id in pairs(self._global.session.used_weapons) do
-			if id ~= string.gsub(weapon_id, "_npc", "") then
+			if id ~= self:create_unified_weapon_name(weapon_id) then
 				return true
 			end
 		end
@@ -2001,7 +2005,7 @@ end
 
 function StatisticsManager:session_anyone_used_weapon_category(category)
 	for weapon_id in pairs(self._global.session.used_weapons) do
-		if tweak_data:get_raw_value("weapon", string.gsub(weapon_id, "_npc", ""), "category") == category then
+		if tweak_data:get_raw_value("weapon", self:create_unified_weapon_name(weapon_id), "category") == category then
 			return true
 		end
 	end
@@ -2009,7 +2013,7 @@ end
 
 function StatisticsManager:session_anyone_used_weapon_category_except(category)
 	for weapon_id in pairs(self._global.session.used_weapons) do
-		if tweak_data:get_raw_value("weapon", string.gsub(weapon_id, "_npc", ""), "category") ~= category then
+		if tweak_data:get_raw_value("weapon", self:create_unified_weapon_name(weapon_id), "category") ~= category then
 			return true
 		end
 	end

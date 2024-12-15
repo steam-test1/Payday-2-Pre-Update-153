@@ -3,1060 +3,1489 @@ TipsTweakData = TipsTweakData or class()
 function TipsTweakData:init()
 	self.tips = {
 		{
-			tip_id = 1,
-			image = "tactics_headshots"
-		},
-		{
-			tip_id = 2,
+			category = "gameplay",
+			cat_index = 1,
 			image = "contact_bain"
 		},
 		{
-			tip_id = 3,
-			image = "general_ammo_pickups"
-		},
-		{
-			tip_id = 4,
-			image = "enemy_bulldozer"
-		},
-		{
-			tip_id = 5,
-			image = "weapon_mods"
-		},
-		{
-			tip_id = 6,
-			image = "tactics_shooting"
-		},
-		{
-			tip_id = 7,
-			image = "general_cameras"
-		},
-		{
-			tip_id = 8,
-			image = "enemy_guards"
-		},
-		{
-			tip_id = 9,
-			image = "tactics_casingmode"
-		},
-		{
-			tip_id = 10,
+			category = "gameplay",
+			cat_index = 10,
 			image = "general_loot"
 		},
 		{
-			tip_id = 11,
-			image = "general_loot"
+			category = "gameplay",
+			cat_index = 100,
+			image = "weapon_bow"
 		},
 		{
-			tip_id = 12,
-			image = "tactics_ghost"
-		},
-		{
-			tip_id = 13,
-			image = "contact_butcher"
-		},
-		{
-			tip_id = 14,
-			image = "heister_jimmy"
-		},
-		{
-			tip_id = 15,
-			image = "enemy_cloaker"
-		},
-		{
-			tip_id = 16,
-			image = "enemy_medic"
-		},
-		{
-			tip_id = 17,
-			image = "enemy_shield"
-		},
-		{tip_id = 18, image = "enemy_zeal"},
-		{
-			tip_id = 19,
-			image = "enemy_tazer"
-		},
-		{
-			tip_id = 20,
-			image = "enemy_sniper"
-		},
-		{
-			tip_id = 21,
-			image = "enemy_turret"
-		},
-		{
-			tip_id = 22,
-			image = "crimenet_fbifiles"
-		},
-		{
-			tip_id = 23,
-			image = "general_perks"
-		},
-		{
-			tip_id = 39,
-			image = "general_heisters"
-		},
-		{
-			tip_id = 40,
-			image = "tactics_bagweight"
-		},
-		{
-			tip_id = 41,
-			image = "enemy_tazer"
-		},
-		{
-			tip_id = 42,
-			image = "heister_jimmy"
-		},
-		{
-			tip_id = 43,
-			image = "heister_jimmy"
-		},
-		{
-			tip_id = 44,
-			image = "heister_jimmy"
-		},
-		{
-			tip_id = 45,
-			image = "heister_jimmy"
-		},
-		{
-			tip_id = 46,
-			image = "heister_jacket"
-		},
-		{
-			tip_id = 47,
-			image = "heister_jacket"
-		},
-		{
-			tip_id = 48,
-			image = "heister_jacket"
-		},
-		{
-			tip_id = 49,
-			image = "heister_jacket"
-		},
-		{
-			tip_id = 50,
-			image = "heister_jacket"
-		},
-		{
-			tip_id = 51,
-			image = "heister_scarface"
-		},
-		{
-			tip_id = 52,
-			image = "heister_scarface"
-		},
-		{
-			tip_id = 53,
-			image = "heister_scarface"
-		},
-		{
-			tip_id = 54,
-			image = "heister_hoxton"
-		},
-		{
-			tip_id = 55,
-			image = "heister_hoxton"
-		},
-		{
-			tip_id = 56,
-			image = "heister_hoxton"
-		},
-		{
-			tip_id = 57,
-			image = "heister_hoxton"
-		},
-		{
-			tip_id = 58,
-			image = "heister_sydney"
-		},
-		{
-			tip_id = 59,
-			image = "heister_sydney"
-		},
-		{
-			tip_id = 60,
-			image = "heister_sydney"
-		},
-		{
-			tip_id = 61,
-			image = "heister_sydney"
-		},
-		{
-			tip_id = 62,
-			image = "heister_wick"
-		},
-		{
-			tip_id = 63,
-			image = "heister_wick"
-		},
-		{
-			tip_id = 64,
-			image = "heister_wick"
-		},
-		{
-			tip_id = 65,
-			image = "heister_wick"
-		},
-		{
-			tip_id = 66,
-			image = "contact_bain"
-		},
-		{
-			tip_id = 67,
-			image = "contact_bain"
-		},
-		{
-			tip_id = 68,
-			image = "contact_bain"
-		},
-		{
-			tip_id = 69,
-			image = "contact_bain"
-		},
-		{
-			tip_id = 70,
-			image = "heister_dallas"
-		},
-		{
-			tip_id = 71,
-			image = "heister_dallas"
-		},
-		{
-			tip_id = 72,
-			image = "heister_dallas"
-		},
-		{
-			tip_id = 73,
-			image = "heister_dallas"
-		},
-		{
-			tip_id = 74,
-			image = "heister_wolf"
-		},
-		{
-			tip_id = 75,
-			image = "heister_wolf"
-		},
-		{
-			tip_id = 76,
-			image = "heister_wolf"
-		},
-		{
-			tip_id = 77,
-			image = "heister_wolf"
-		},
-		{
-			tip_id = 78,
-			image = "heister_bodhi"
-		},
-		{
-			tip_id = 79,
-			image = "heister_bodhi"
-		},
-		{
-			tip_id = 80,
-			image = "heister_bodhi"
-		},
-		{
-			tip_id = 81,
-			image = "heister_bodhi"
-		},
-		{
-			tip_id = 82,
-			image = "heister_chains"
-		},
-		{
-			tip_id = 83,
-			image = "heister_chains"
-		},
-		{
-			tip_id = 84,
-			image = "heister_chains"
-		},
-		{
-			tip_id = 85,
-			image = "heister_chains"
-		},
-		{
-			tip_id = 90,
-			image = "heister_houston"
-		},
-		{
-			tip_id = 91,
-			image = "heister_houston"
-		},
-		{
-			tip_id = 92,
-			image = "heister_houston"
-		},
-		{
-			tip_id = 93,
-			image = "heister_houston"
-		},
-		{
-			tip_id = 98,
-			image = "enemy_winters"
-		},
-		{
-			tip_id = 99,
-			image = "enemy_winters"
-		},
-		{
-			tip_id = 100,
-			image = "enemy_winters"
-		},
-		{
-			tip_id = 101,
-			image = "enemy_winters"
-		},
-		{
-			tip_id = 102,
-			image = "heister_rust"
-		},
-		{
-			tip_id = 103,
-			image = "heister_rust"
-		},
-		{
-			tip_id = 104,
-			image = "heister_rust"
-		},
-		{
-			tip_id = 105,
-			image = "heister_rust"
-		},
-		{
-			tip_id = 106,
-			image = "heister_sokol"
-		},
-		{
-			tip_id = 107,
-			image = "heister_sokol"
-		},
-		{
-			tip_id = 108,
-			image = "heister_sokol"
-		},
-		{
-			tip_id = 109,
-			image = "heister_sokol"
-		},
-		{
-			tip_id = 110,
-			image = "heister_jiro"
-		},
-		{
-			tip_id = 111,
-			image = "heister_jiro"
-		},
-		{
-			tip_id = 112,
-			image = "heister_jiro"
-		},
-		{
-			tip_id = 113,
-			image = "heister_jiro"
-		},
-		{
-			tip_id = 114,
-			image = "heister_dragan"
-		},
-		{
-			tip_id = 115,
-			image = "heister_dragan"
-		},
-		{
-			tip_id = 116,
-			image = "heister_dragan"
-		},
-		{
-			tip_id = 117,
-			image = "heister_dragan"
-		},
-		{
-			tip_id = 118,
-			image = "general_aldstone"
-		},
-		{
-			tip_id = 119,
-			image = "general_aldstone"
-		},
-		{
-			tip_id = 120,
-			image = "general_aldstone"
-		},
-		{
-			tip_id = 121,
-			image = "general_aldstone"
-		},
-		{
-			tip_id = 122,
-			image = "general_gage"
-		},
-		{
-			tip_id = 123,
-			image = "general_gage"
-		},
-		{
-			tip_id = 124,
-			image = "general_gage"
-		},
-		{
-			tip_id = 125,
-			image = "general_gage"
-		},
-		{
-			tip_id = 126,
-			image = "general_mckendrick"
-		},
-		{
-			tip_id = 127,
-			image = "general_mckendrick"
-		},
-		{
-			tip_id = 128,
-			image = "general_mckendrick"
-		},
-		{
-			tip_id = 129,
-			image = "contact_butcher"
-		},
-		{
-			tip_id = 130,
-			image = "contact_butcher"
-		},
-		{
-			tip_id = 131,
-			image = "general_interaction"
-		},
-		{
-			tip_id = 132,
-			image = "contact_bain"
-		},
-		{
-			tip_id = 133,
-			image = "weapon_primary_secondary"
-		},
-		{
-			tip_id = 134,
-			image = "weapon_akimbo"
-		},
-		{
-			tip_id = 135,
-			image = "equipment_ammobag"
-		},
-		{
-			tip_id = 136,
-			image = "enemy_bulldozer"
-		},
-		{
-			tip_id = 137,
-			image = "crimenet_safehouse"
-		},
-		{
-			tip_id = 138,
-			image = "enemy_cloaker"
-		},
-		{
-			tip_id = 139,
-			image = "tactics_convert"
-		},
-		{
-			tip_id = 140,
-			image = "crimenet_fbifiles"
-		},
-		{
-			tip_id = 141,
-			image = "tactics_headshots"
-		},
-		{
-			tip_id = 142,
-			image = "enemy_bulldozer"
-		},
-		{
-			tip_id = 143,
-			image = "weapon_tazer"
-		},
-		{
-			tip_id = 144,
-			image = "enemy_tazer"
-		},
-		{
-			tip_id = 145,
-			image = "enemy_sniper"
-		},
-		{
-			tip_id = 146,
-			image = "weapon_silencer"
-		},
-		{
-			tip_id = 147,
-			image = "weapon_firemodes"
-		},
-		{
-			tip_id = 148,
-			image = "tactics_marking_enemies"
-		},
-		{
-			tip_id = 149,
-			image = "tactics_helping_up"
-		},
-		{
-			tip_id = 150,
-			image = "weapon_inspect_gun"
-		},
-		{
-			tip_id = 151,
-			image = "weapon_gadgets"
-		},
-		{
-			tip_id = 152,
-			image = "general_mutators"
-		},
-		{
-			tip_id = 153,
-			image = "heister_jiro"
-		},
-		{
-			tip_id = 155,
-			image = "heister_bodhi"
-		},
-		{
-			tip_id = 156,
-			image = "general_cameras"
-		},
-		{
-			tip_id = 157,
-			image = "general_wanted_poster"
-		},
-		{
-			tip_id = 158,
-			image = "general_goats"
-		},
-		{
-			tip_id = 159,
-			image = "tactics_stealth"
-		},
-		{
-			tip_id = 160,
-			image = "general_cameras"
-		},
-		{
-			tip_id = 161,
-			image = "general_heisters"
-		},
-		{
-			tip_id = 162,
-			image = "tactics_convert"
-		},
-		{
-			tip_id = 163,
-			image = "tactics_medicbag"
-		},
-		{
-			tip_id = 164,
-			image = "tactics_medicbag"
-		},
-		{
-			tip_id = 165,
-			image = "general_hostages"
-		},
-		{
-			tip_id = 166,
-			image = "general_hostages"
-		},
-		{
-			tip_id = 167,
-			image = "tactics_medicbag"
-		},
-		{
-			tip_id = 168,
-			image = "enemy_cloaker"
-		},
-		{
-			tip_id = 169,
-			image = "general_heisters"
-		},
-		{
-			tip_id = 170,
-			image = "enemy_bulldozer"
-		},
-		{
-			tip_id = 171,
-			image = "enemy_cloaker"
-		},
-		{
-			tip_id = 172,
-			image = "tactics_ecm"
-		},
-		{
-			tip_id = 173,
-			image = "tactics_crossbows"
-		},
-		{
-			tip_id = 174,
-			image = "tactics_stealth"
-		},
-		{
-			tip_id = 175,
-			image = "general_ammo_pickups"
-		},
-		{
-			tip_id = 176,
-			image = "crimenet_offshore_payday"
-		},
-		{
-			tip_id = 177,
-			image = "general_achievements"
-		},
-		{
-			tip_id = 178,
-			image = "crimenet_basic_heists"
-		},
-		{
-			tip_id = 179,
-			image = "weapon_sniper"
-		},
-		{
-			tip_id = 180,
-			image = "equipment_ammobag"
-		},
-		{
-			tip_id = 181,
-			image = "enemy_melee"
-		},
-		{
-			tip_id = 182,
-			image = "enemy_bulldozer"
-		},
-		{
-			tip_id = 183,
-			image = "tactics_convert"
-		},
-		{
-			tip_id = 184,
-			image = "tactics_cover"
-		},
-		{
-			tip_id = 185,
-			image = "tactics_objectives"
-		},
-		{
-			tip_id = 186,
-			image = "tactics_stealth"
-		},
-		{
-			tip_id = 187,
-			image = "general_skills"
-		},
-		{
-			tip_id = 188,
-			image = "general_loot"
-		},
-		{
-			tip_id = 189,
-			image = "general_difficulty"
-		},
-		{
-			tip_id = 190,
-			image = "enemy_cloaker"
-		},
-		{
-			tip_id = 191,
-			image = "equipment_mines"
-		},
-		{
-			tip_id = 192,
-			image = "contact_bain"
-		},
-		{
-			tip_id = 193,
-			image = "general_equipment"
-		},
-		{
-			tip_id = 194,
-			image = "general_equipment"
-		},
-		{
-			tip_id = 195,
-			image = "general_loot"
-		},
-		{
-			tip_id = 196,
-			image = "weapon_mods"
-		},
-		{
-			tip_id = 197,
-			image = "general_perks"
-		},
-		{
-			tip_id = 198,
-			image = "enemy_medic"
-		},
-		{
-			tip_id = 199,
+			category = "gameplay",
+			cat_index = 101,
 			image = "enemy_flashbang"
 		},
 		{
-			tip_id = 200,
-			image = "general_heisters"
-		},
-		{
-			tip_id = 201,
-			image = "enemy_cloaker"
-		},
-		{
-			tip_id = 202,
-			image = "general_heisters"
-		},
-		{
-			tip_id = 203,
-			image = "tactics_ecm"
-		},
-		{
-			tip_id = 204,
-			image = "weapon_stats"
-		},
-		{
-			tip_id = 205,
-			image = "tactics_cover"
-		},
-		{
-			tip_id = 206,
-			image = "general_cameras"
-		},
-		{
-			tip_id = 207,
-			image = "general_loot"
-		},
-		{
-			tip_id = 208,
-			image = "tactics_ecm"
-		},
-		{
-			tip_id = 209,
-			image = "tactics_stealth"
-		},
-		{
-			tip_id = 210,
-			image = "general_bodybag"
-		},
-		{
-			tip_id = 211,
-			image = "enemy_sniper"
-		},
-		{
-			tip_id = 212,
-			image = "tactics_convert"
-		},
-		{
-			tip_id = 213,
-			image = "general_perks"
-		},
-		{
-			tip_id = 214,
-			image = "tactics_stealth"
-		},
-		{
-			tip_id = 215,
-			image = "general_maplayout"
-		},
-		{
-			tip_id = 216,
-			image = "general_cameras"
-		},
-		{
-			tip_id = 217,
-			image = "enemy_winters"
-		},
-		{
-			tip_id = 218,
-			image = "enemy_winters"
-		},
-		{
-			tip_id = 219,
-			image = "general_heisters"
-		},
-		{
-			tip_id = 220,
-			image = "general_cabletie"
-		},
-		{
-			tip_id = 221,
-			image = "general_medicbag"
-		},
-		{
-			tip_id = 222,
-			image = "enemy_shield"
-		},
-		{
-			tip_id = 223,
-			image = "enemy_shield"
-		},
-		{
-			tip_id = 224,
-			image = "general_cleanercosts"
-		},
-		{tip_id = 225, image = "weapon_bow"},
-		{tip_id = 226, image = "weapon_bow"},
-		{
-			tip_id = 227,
-			image = "weapon_reload"
-		},
-		{
-			tip_id = 228,
-			image = "enemy_flashbang"
-		},
-		{
-			tip_id = 229,
+			category = "gameplay",
+			cat_index = 102,
 			image = "general_doors"
 		},
 		{
-			tip_id = 230,
+			category = "gameplay",
+			cat_index = 103,
 			image = "tactics_stealth"
 		},
 		{
-			tip_id = 231,
+			category = "gameplay",
+			cat_index = 104,
 			image = "general_bodybag"
 		},
 		{
-			tip_id = 232,
+			category = "gameplay",
+			cat_index = 105,
 			image = "general_bodybag"
 		},
 		{
-			tip_id = 233,
+			category = "gameplay",
+			cat_index = 106,
 			image = "general_loot"
 		},
 		{
-			tip_id = 234,
+			category = "gameplay",
+			cat_index = 107,
 			image = "general_lasers"
 		},
 		{
-			tip_id = 235,
+			category = "gameplay",
+			cat_index = 108,
 			image = "tactics_ecm"
 		},
 		{
-			tip_id = 236,
+			category = "gameplay",
+			cat_index = 109,
 			image = "tactics_ecm"
 		},
 		{
-			tip_id = 237,
+			category = "gameplay",
+			cat_index = 11,
+			image = "tactics_ghost"
+		},
+		{
+			category = "gameplay",
+			cat_index = 110,
 			image = "tactics_ecm"
 		},
 		{
-			tip_id = 239,
-			image = "crimenet_heists"
+			category = "gameplay",
+			cat_index = 111,
+			image = "weapon_melee"
 		},
 		{
-			tip_id = 240,
-			image = "tactics_shooting"
+			category = "gameplay",
+			cat_index = 112,
+			image = "tactics_headshot"
 		},
 		{
-			tip_id = 241,
+			category = "gameplay",
+			cat_index = 113,
 			image = "enemy_turret"
 		},
 		{
-			tip_id = 242,
+			category = "gameplay",
+			cat_index = 114,
 			image = "enemy_turret"
 		},
 		{
-			tip_id = 243,
-			image = "general_escapevan"
-		},
-		{
-			tip_id = 244,
-			image = "general_loadout"
-		},
-		{
-			tip_id = 245,
+			category = "gameplay",
+			cat_index = 115,
 			image = "general_brokenwindow"
 		},
 		{
-			tip_id = 246,
+			category = "gameplay",
+			cat_index = 116,
 			image = "general_planks"
 		},
-		{tip_id = 247, image = "weapon_saw"},
 		{
-			tip_id = 248,
+			category = "gameplay",
+			cat_index = 117,
+			image = "weapon_saw"
+		},
+		{
+			category = "gameplay",
+			cat_index = 118,
 			image = "general_cabletie"
 		},
 		{
-			tip_id = 249,
+			category = "gameplay",
+			cat_index = 119,
 			image = "tactics_stealth"
 		},
 		{
-			tip_id = 250,
-			image = "tactics_ecm"
-		},
-		{
-			tip_id = 251,
-			image = "general_cameras"
-		},
-		{
-			tip_id = 252,
-			image = "general_cameras"
-		},
-		{
-			tip_id = 254,
-			image = "crimenet_stealth"
-		},
-		{
-			tip_id = 255,
-			image = "enemy_guards"
-		},
-		{
-			tip_id = 256,
-			image = "contact_hector"
-		},
-		{
-			tip_id = 257,
-			image = "contact_elephant"
-		},
-		{
-			tip_id = 258,
-			image = "contact_vlad"
-		},
-		{
-			tip_id = 259,
-			image = "tactics_reload"
-		},
-		{
-			tip_id = 260,
-			image = "enemy_winters"
-		},
-		{
-			tip_id = 261,
-			image = "tactics_shooting"
-		},
-		{
-			tip_id = 262,
-			image = "general_skills"
-		},
-		{
-			tip_id = 263,
-			image = "tactics_bagweight"
-		},
-		{
-			tip_id = 264,
-			image = "general_drill"
-		},
-		{
-			tip_id = 265,
-			image = "general_preplanning"
-		},
-		{
-			tip_id = 266,
-			image = "tactics_revive"
-		},
-		{tip_id = 267, image = "weapon_saw"},
-		{
-			tip_id = 268,
-			image = "tactics_stealth"
-		},
-		{
-			tip_id = 269,
-			image = "tactics_stealth"
-		},
-		{
-			tip_id = 270,
-			image = "general_hostages"
-		},
-		{
-			tip_id = 271,
-			image = "weapon_tripmine"
-		},
-		{
-			tip_id = 272,
-			image = "weapon_explosives"
-		},
-		{
-			tip_id = 273,
-			image = "general_civilians"
-		},
-		{
-			tip_id = 274,
+			category = "gameplay",
+			cat_index = 12,
 			image = "enemy_cloaker"
 		},
 		{
-			tip_id = 275,
-			image = "tactics_cover"
+			category = "gameplay",
+			cat_index = 120,
+			image = "tactics_ecm"
 		},
 		{
-			tip_id = 276,
-			image = "weapon_shotgun"
+			category = "gameplay",
+			cat_index = 121,
+			image = "general_cameras"
 		},
 		{
-			tip_id = 277,
-			image = "contact_hector"
+			category = "gameplay",
+			cat_index = 122,
+			image = "general_cameras"
 		},
 		{
-			tip_id = 278,
-			image = "heist_events"
+			category = "gameplay",
+			cat_index = 123,
+			image = "weapon_melee"
 		},
 		{
-			tip_id = 279,
-			image = "contact_dentist"
+			category = "gameplay",
+			cat_index = 124,
+			image = "enemy_guards"
 		},
 		{
-			tip_id = 281,
-			image = "contact_locke"
+			category = "gameplay",
+			cat_index = 125,
+			image = "tactics_reload"
 		},
 		{
-			tip_id = 282,
-			image = "tactics_cover"
+			category = "gameplay",
+			cat_index = 126,
+			image = "enemy_winters"
 		},
 		{
-			tip_id = 283,
-			image = "enemy_gensec"
-		},
-		{
-			tip_id = 284,
-			image = "enemy_bulldozer"
-		},
-		{
-			tip_id = 285,
-			image = "enemy_bulldozer"
-		},
-		{
-			tip_id = 286,
-			image = "enemy_shield"
-		},
-		{
-			tip_id = 287,
-			image = "enemy_shield"
-		},
-		{
-			tip_id = 288,
+			category = "gameplay",
+			cat_index = 127,
 			image = "tactics_shooting"
 		},
 		{
-			tip_id = 289,
+			category = "gameplay",
+			cat_index = 128,
+			image = "general_drill"
+		},
+		{
+			category = "gameplay",
+			cat_index = 129,
+			image = "general_preplanning"
+		},
+		{
+			category = "gameplay",
+			cat_index = 13,
+			image = "enemy_medic"
+		},
+		{
+			category = "gameplay",
+			cat_index = 130,
+			image = "tactics_revive"
+		},
+		{
+			category = "gameplay",
+			cat_index = 131,
+			image = "weapon_saw"
+		},
+		{
+			category = "gameplay",
+			cat_index = 132,
+			image = "tactics_stealth"
+		},
+		{
+			category = "gameplay",
+			cat_index = 133,
+			image = "general_hostages"
+		},
+		{
+			category = "gameplay",
+			cat_index = 134,
+			image = "weapon_tripmine"
+		},
+		{
+			category = "gameplay",
+			cat_index = 135,
+			image = "weapon_explosives"
+		},
+		{
+			category = "gameplay",
+			cat_index = 136,
+			image = "general_civilians"
+		},
+		{
+			category = "gameplay",
+			cat_index = 137,
+			image = "enemy_cloaker"
+		},
+		{
+			category = "gameplay",
+			cat_index = 138,
+			image = "tactics_cover"
+		},
+		{
+			category = "gameplay",
+			cat_index = 139,
+			image = "weapon_shotgun"
+		},
+		{
+			category = "gameplay",
+			cat_index = 14,
+			image = "enemy_shield"
+		},
+		{
+			category = "gameplay",
+			cat_index = 140,
+			image = "weapon_sniper"
+		},
+		{
+			category = "gameplay",
+			cat_index = 141,
+			image = "tactics_cover"
+		},
+		{
+			category = "gameplay",
+			cat_index = 15,
+			image = "enemy_zeal"
+		},
+		{
+			category = "gameplay",
+			cat_index = 16,
+			image = "enemy_tazer"
+		},
+		{
+			category = "gameplay",
+			cat_index = 17,
+			image = "enemy_sniper"
+		},
+		{
+			category = "gameplay",
+			cat_index = 18,
+			image = "enemy_turret"
+		},
+		{
+			category = "gameplay",
+			cat_index = 19,
+			image = "general_perks"
+		},
+		{
+			category = "gameplay",
+			cat_index = 2,
+			image = "general_ammo_pickups"
+		},
+		{
+			category = "gameplay",
+			cat_index = 20,
+			image = "general_mastermind"
+		},
+		{
+			category = "gameplay",
+			cat_index = 21,
+			image = "general_mastermind"
+		},
+		{
+			category = "gameplay",
+			cat_index = 22,
+			image = "general_mastermind"
+		},
+		{
+			category = "gameplay",
+			cat_index = 23,
+			image = "general_enforcer"
+		},
+		{
+			category = "gameplay",
+			cat_index = 24,
+			image = "general_enforcer"
+		},
+		{
+			category = "gameplay",
+			cat_index = 25,
+			image = "general_enforcer"
+		},
+		{
+			category = "gameplay",
+			cat_index = 26,
+			image = "general_technician"
+		},
+		{
+			category = "gameplay",
+			cat_index = 27,
+			image = "general_technician"
+		},
+		{
+			category = "gameplay",
+			cat_index = 28,
+			image = "general_technician"
+		},
+		{
+			category = "gameplay",
+			cat_index = 29,
+			image = "general_ghost"
+		},
+		{
+			category = "gameplay",
+			cat_index = 3,
+			image = "enemy_special_b"
+		},
+		{
+			category = "gameplay",
+			cat_index = 30,
+			image = "general_ghost"
+		},
+		{
+			category = "gameplay",
+			cat_index = 31,
+			image = "general_ghost"
+		},
+		{
+			category = "gameplay",
+			cat_index = 32,
+			image = "general_fugitive"
+		},
+		{
+			category = "gameplay",
+			cat_index = 33,
+			image = "general_fugitive"
+		},
+		{
+			category = "gameplay",
+			cat_index = 34,
+			image = "general_fugitive"
+		},
+		{
+			category = "gameplay",
+			cat_index = 35,
+			image = "tactics_bagweight"
+		},
+		{
+			category = "gameplay",
+			cat_index = 36,
+			image = "enemy_tazer"
+		},
+		{
+			category = "gameplay",
+			cat_index = 37,
+			image = "weapon_primary_secondary"
+		},
+		{
+			category = "gameplay",
+			cat_index = 38,
+			image = "weapon_saw"
+		},
+		{
+			category = "gameplay",
+			cat_index = 39,
+			image = "enemy_special_b"
+		},
+		{
+			category = "gameplay",
+			cat_index = 4,
+			image = "weapon_mods"
+		},
+		{
+			category = "gameplay",
+			cat_index = 40,
+			image = "enemy_cloaker"
+		},
+		{
+			category = "gameplay",
+			cat_index = 41,
+			image = "tactics_convert"
+		},
+		{
+			category = "gameplay",
+			cat_index = 42,
+			image = "tactics_headshot"
+		},
+		{
+			category = "gameplay",
+			cat_index = 43,
+			image = "enemy_bulldozer"
+		},
+		{
+			category = "gameplay",
+			cat_index = 44,
+			image = "contact_classics"
+		},
+		{
+			category = "gameplay",
+			cat_index = 45,
+			image = "enemy_tazer"
+		},
+		{
+			category = "gameplay",
+			cat_index = 46,
+			image = "enemy_sniper"
+		},
+		{
+			category = "gameplay",
+			cat_index = 47,
+			image = "weapon_silencer"
+		},
+		{
+			category = "gameplay",
+			cat_index = 48,
+			image = "weapon_firemodes"
+		},
+		{
+			category = "gameplay",
+			cat_index = 49,
+			image = "tactics_marking_enemies"
+		},
+		{
+			category = "gameplay",
+			cat_index = 5,
+			image = "tactics_shooting"
+		},
+		{
+			category = "gameplay",
+			cat_index = 50,
+			image = "general_civilians"
+		},
+		{
+			category = "gameplay",
+			cat_index = 51,
+			image = "general_cameras"
+		},
+		{
+			category = "gameplay",
+			cat_index = 52,
+			image = "general_cameras"
+		},
+		{
+			category = "gameplay",
+			cat_index = 53,
+			image = "tactics_convert"
+		},
+		{
+			category = "gameplay",
+			cat_index = 54,
+			image = "tactics_medicbag"
+		},
+		{
+			category = "gameplay",
+			cat_index = 55,
+			image = "tactics_medicbag"
+		},
+		{
+			category = "gameplay",
+			cat_index = 56,
+			image = "general_hostages"
+		},
+		{
+			category = "gameplay",
+			cat_index = 57,
+			image = "general_hostages"
+		},
+		{
+			category = "gameplay",
+			cat_index = 58,
+			image = "tactics_medicbag"
+		},
+		{
+			category = "gameplay",
+			cat_index = 59,
+			image = "enemy_cloaker"
+		},
+		{
+			category = "gameplay",
+			cat_index = 6,
+			image = "general_cameras"
+		},
+		{
+			category = "gameplay",
+			cat_index = 60,
+			image = "general_heisters"
+		},
+		{
+			category = "gameplay",
+			cat_index = 61,
+			image = "enemy_bulldozer"
+		},
+		{
+			category = "gameplay",
+			cat_index = 62,
+			image = "enemy_cloaker"
+		},
+		{
+			category = "gameplay",
+			cat_index = 63,
+			image = "tactics_ecm"
+		},
+		{
+			category = "gameplay",
+			cat_index = 64,
+			image = "tactics_crossbows"
+		},
+		{
+			category = "gameplay",
+			cat_index = 65,
+			image = "tactics_stealth"
+		},
+		{
+			category = "gameplay",
+			cat_index = 66,
+			image = "general_ammo_pickups"
+		},
+		{
+			category = "gameplay",
+			cat_index = 67,
+			image = "weapon_sniper"
+		},
+		{
+			category = "gameplay",
+			cat_index = 68,
+			image = "enemy_special_c"
+		},
+		{
+			category = "gameplay",
+			cat_index = 69,
+			image = "enemy_melee"
+		},
+		{
+			category = "gameplay",
+			cat_index = 7,
+			image = "enemy_guards"
+		},
+		{
+			category = "gameplay",
+			cat_index = 70,
+			image = "enemy_bulldozer"
+		},
+		{
+			category = "gameplay",
+			cat_index = 71,
+			image = "tactics_convert"
+		},
+		{
+			category = "gameplay",
+			cat_index = 72,
+			image = "tactics_cover"
+		},
+		{
+			category = "gameplay",
+			cat_index = 73,
+			image = "tactics_objectives"
+		},
+		{
+			category = "gameplay",
+			cat_index = 74,
+			image = "tactics_stealth"
+		},
+		{
+			category = "gameplay",
+			cat_index = 75,
+			image = "general_loot"
+		},
+		{
+			category = "gameplay",
+			cat_index = 76,
+			image = "enemy_special_c"
+		},
+		{
+			category = "gameplay",
+			cat_index = 77,
+			image = "equipment_mines"
+		},
+		{
+			category = "gameplay",
+			cat_index = 78,
+			image = "tactics_objectives"
+		},
+		{
+			category = "gameplay",
+			cat_index = 79,
+			image = "general_equipment"
+		},
+		{
+			category = "gameplay",
+			cat_index = 8,
+			image = "tactics_casingmode"
+		},
+		{
+			category = "gameplay",
+			cat_index = 80,
+			image = "general_equipment"
+		},
+		{
+			category = "gameplay",
+			cat_index = 81,
+			image = "enemy_medic"
+		},
+		{
+			category = "gameplay",
+			cat_index = 82,
+			image = "enemy_flashbang"
+		},
+		{
+			category = "gameplay",
+			cat_index = 83,
+			image = "tactics_objectives"
+		},
+		{
+			category = "gameplay",
+			cat_index = 84,
+			image = "enemy_cloaker"
+		},
+		{
+			category = "gameplay",
+			cat_index = 85,
+			image = "tactics_ecm"
+		},
+		{
+			category = "gameplay",
+			cat_index = 86,
+			image = "tactics_cover"
+		},
+		{
+			category = "gameplay",
+			cat_index = 87,
+			image = "general_cameras"
+		},
+		{
+			category = "gameplay",
+			cat_index = 88,
+			image = "general_loot"
+		},
+		{
+			category = "gameplay",
+			cat_index = 89,
+			image = "tactics_ecm"
+		},
+		{
+			category = "gameplay",
+			cat_index = 9,
+			image = "general_loot"
+		},
+		{
+			category = "gameplay",
+			cat_index = 90,
+			image = "tactics_stealth"
+		},
+		{
+			category = "gameplay",
+			cat_index = 91,
+			image = "general_bodybag"
+		},
+		{
+			category = "gameplay",
+			cat_index = 92,
+			image = "enemy_sniper"
+		},
+		{
+			category = "gameplay",
+			cat_index = 93,
+			image = "tactics_convert"
+		},
+		{
+			category = "gameplay",
+			cat_index = 94,
+			image = "tactics_stealth"
+		},
+		{
+			category = "gameplay",
+			cat_index = 95,
+			image = "enemy_guards"
+		},
+		{
+			category = "gameplay",
+			cat_index = 96,
+			image = "enemy_winters"
+		},
+		{
+			category = "gameplay",
+			cat_index = 97,
+			image = "enemy_winters"
+		},
+		{
+			category = "gameplay",
+			cat_index = 98,
+			image = "general_cabletie"
+		},
+		{
+			category = "gameplay",
+			cat_index = 99,
+			image = "enemy_shield"
+		},
+		{
+			category = "heister",
+			cat_index = 1,
+			image = "tactics_headshot"
+		},
+		{
+			category = "heister",
+			cat_index = 10,
+			image = "weapon_inspect_gun"
+		},
+		{
+			category = "heister",
+			cat_index = 11,
+			image = "weapon_gadgets"
+		},
+		{
+			category = "heister",
+			cat_index = 12,
+			image = "general_mutators"
+		},
+		{
+			category = "heister",
+			cat_index = 13,
+			image = "general_wanted_poster"
+		},
+		{
+			category = "heister",
+			cat_index = 14,
+			image = "tactics_stealth"
+		},
+		{
+			category = "heister",
+			cat_index = 15,
+			image = "general_mutators"
+		},
+		{
+			category = "heister",
+			cat_index = 16,
+			image = "crimenet_offshore_payday"
+		},
+		{
+			category = "heister",
+			cat_index = 17,
+			image = "general_achievements"
+		},
+		{
+			category = "heister",
+			cat_index = 18,
+			image = "crimenet_basic_heists"
+		},
+		{
+			category = "heister",
+			cat_index = 19,
 			image = "general_skills"
 		},
 		{
-			tip_id = 290,
+			category = "heister",
+			cat_index = 2,
+			image = "crimenet_fbifiles"
+		},
+		{
+			category = "heister",
+			cat_index = 20,
+			image = "general_difficulty"
+		},
+		{
+			category = "heister",
+			cat_index = 21,
+			image = "general_loot"
+		},
+		{
+			category = "heister",
+			cat_index = 22,
+			image = "weapon_mods"
+		},
+		{
+			category = "heister",
+			cat_index = 23,
+			image = "general_perks"
+		},
+		{
+			category = "heister",
+			cat_index = 24,
+			image = "general_equipment"
+		},
+		{
+			category = "heister",
+			cat_index = 25,
+			image = "weapon_stats"
+		},
+		{
+			category = "heister",
+			cat_index = 26,
+			image = "general_perks"
+		},
+		{
+			category = "heister",
+			cat_index = 27,
+			image = "general_maplayout"
+		},
+		{
+			category = "heister",
+			cat_index = 28,
+			image = "general_heisters"
+		},
+		{
+			category = "heister",
+			cat_index = 29,
+			image = "tactics_medicbag"
+		},
+		{
+			category = "heister",
+			cat_index = 3,
+			image = "general_heisters"
+		},
+		{
+			category = "heister",
+			cat_index = 30,
+			image = "enemy_shield"
+		},
+		{
+			category = "heister",
+			cat_index = 31,
+			image = "general_cleanercosts"
+		},
+		{
+			category = "heister",
+			cat_index = 32,
+			image = "weapon_bow"
+		},
+		{
+			category = "heister",
+			cat_index = 33,
+			image = "weapon_reload"
+		},
+		{
+			category = "heister",
+			cat_index = 34,
+			image = "crimenet_heists"
+		},
+		{
+			category = "heister",
+			cat_index = 35,
+			image = "general_escapevan"
+		},
+		{
+			category = "heister",
+			cat_index = 36,
+			image = "general_loadout"
+		},
+		{
+			category = "heister",
+			cat_index = 37,
+			image = "crimenet_stealth"
+		},
+		{
+			category = "heister",
+			cat_index = 38,
+			image = "contact_hector"
+		},
+		{
+			category = "heister",
+			cat_index = 39,
+			image = "contact_elephant"
+		},
+		{
+			category = "heister",
+			cat_index = 4,
+			image = "general_interaction"
+		},
+		{
+			category = "heister",
+			cat_index = 40,
+			image = "contact_vlad"
+		},
+		{
+			category = "heister",
+			cat_index = 41,
 			image = "general_skills"
 		},
 		{
-			tip_id = 291,
+			category = "heister",
+			cat_index = 42,
+			image = "tactics_bagweight"
+		},
+		{
+			category = "heister",
+			cat_index = 43,
+			image = "tactics_stealth"
+		},
+		{
+			category = "heister",
+			cat_index = 44,
+			image = "enemy_gensec"
+		},
+		{
+			category = "heister",
+			cat_index = 45,
+			image = "enemy_zeal"
+		},
+		{
+			category = "heister",
+			cat_index = 46,
+			image = "enemy_bulldozer"
+		},
+		{
+			category = "heister",
+			cat_index = 47,
+			image = "enemy_shield"
+		},
+		{
+			category = "heister",
+			cat_index = 48,
+			image = "general_heisters"
+		},
+		{
+			category = "heister",
+			cat_index = 49,
+			image = "tactics_shooting"
+		},
+		{
+			category = "heister",
+			cat_index = 5,
+			image = "contact_bain"
+		},
+		{
+			category = "heister",
+			cat_index = 50,
+			image = "general_skills"
+		},
+		{
+			category = "heister",
+			cat_index = 51,
+			image = "general_skills"
+		},
+		{
+			category = "heister",
+			cat_index = 52,
 			image = "crimenet_difficulty"
 		},
 		{
-			tip_id = 292,
-			image = "weapon_sniper"
+			category = "heister",
+			cat_index = 6,
+			image = "weapon_akimbo"
+		},
+		{
+			category = "heister",
+			cat_index = 7,
+			image = "crimenet_safehouse"
+		},
+		{
+			category = "heister",
+			cat_index = 8,
+			image = "crimenet_fbifiles"
+		},
+		{
+			category = "heister",
+			cat_index = 9,
+			image = "tactics_helping_up"
+		},
+		{
+			category = "trivia",
+			cat_index = 1,
+			image = "contact_butcher"
+		},
+		{
+			category = "trivia",
+			cat_index = 10,
+			image = "heister_jacket"
+		},
+		{
+			category = "trivia",
+			cat_index = 11,
+			image = "heister_scarface"
+		},
+		{
+			category = "trivia",
+			cat_index = 12,
+			image = "heister_scarface"
+		},
+		{
+			category = "trivia",
+			cat_index = 13,
+			image = "heister_scarface"
+		},
+		{
+			category = "trivia",
+			cat_index = 14,
+			image = "heister_scarface"
+		},
+		{
+			category = "trivia",
+			cat_index = 15,
+			image = "heister_hoxton"
+		},
+		{
+			category = "trivia",
+			cat_index = 16,
+			image = "heister_hoxton"
+		},
+		{
+			category = "trivia",
+			cat_index = 17,
+			image = "heister_hoxton"
+		},
+		{
+			category = "trivia",
+			cat_index = 18,
+			image = "heister_hoxton"
+		},
+		{
+			category = "trivia",
+			cat_index = 19,
+			image = "heister_sydney"
+		},
+		{
+			category = "trivia",
+			cat_index = 2,
+			image = "heister_jimmy"
+		},
+		{
+			category = "trivia",
+			cat_index = 20,
+			image = "heister_sydney"
+		},
+		{
+			category = "trivia",
+			cat_index = 21,
+			image = "heister_sydney"
+		},
+		{
+			category = "trivia",
+			cat_index = 22,
+			image = "heister_sydney"
+		},
+		{
+			category = "trivia",
+			cat_index = 23,
+			image = "heister_wick"
+		},
+		{
+			category = "trivia",
+			cat_index = 24,
+			image = "heister_wick"
+		},
+		{
+			category = "trivia",
+			cat_index = 25,
+			image = "heister_wick"
+		},
+		{
+			category = "trivia",
+			cat_index = 26,
+			image = "heister_wick"
+		},
+		{
+			category = "trivia",
+			cat_index = 27,
+			image = "contact_bain"
+		},
+		{
+			category = "trivia",
+			cat_index = 28,
+			image = "contact_bain"
+		},
+		{
+			category = "trivia",
+			cat_index = 29,
+			image = "contact_bain"
+		},
+		{
+			category = "trivia",
+			cat_index = 3,
+			image = "heister_jimmy"
+		},
+		{
+			category = "trivia",
+			cat_index = 30,
+			image = "contact_bain"
+		},
+		{
+			category = "trivia",
+			cat_index = 31,
+			image = "heister_dallas"
+		},
+		{
+			category = "trivia",
+			cat_index = 32,
+			image = "heister_dallas"
+		},
+		{
+			category = "trivia",
+			cat_index = 33,
+			image = "heister_dallas"
+		},
+		{
+			category = "trivia",
+			cat_index = 34,
+			image = "heister_dallas"
+		},
+		{
+			category = "trivia",
+			cat_index = 35,
+			image = "heister_wolf"
+		},
+		{
+			category = "trivia",
+			cat_index = 36,
+			image = "heister_wolf"
+		},
+		{
+			category = "trivia",
+			cat_index = 37,
+			image = "heister_wolf"
+		},
+		{
+			category = "trivia",
+			cat_index = 38,
+			image = "heister_wolf"
+		},
+		{
+			category = "trivia",
+			cat_index = 39,
+			image = "heister_bodhi"
+		},
+		{
+			category = "trivia",
+			cat_index = 4,
+			image = "heister_jimmy"
+		},
+		{
+			category = "trivia",
+			cat_index = 40,
+			image = "heister_bodhi"
+		},
+		{
+			category = "trivia",
+			cat_index = 41,
+			image = "heister_bodhi"
+		},
+		{
+			category = "trivia",
+			cat_index = 42,
+			image = "heister_bodhi"
+		},
+		{
+			category = "trivia",
+			cat_index = 43,
+			image = "heister_chains"
+		},
+		{
+			category = "trivia",
+			cat_index = 44,
+			image = "heister_chains"
+		},
+		{
+			category = "trivia",
+			cat_index = 45,
+			image = "heister_chains"
+		},
+		{
+			category = "trivia",
+			cat_index = 46,
+			image = "heister_chains"
+		},
+		{
+			category = "trivia",
+			cat_index = 47,
+			image = "heister_clover"
+		},
+		{
+			category = "trivia",
+			cat_index = 48,
+			image = "heister_clover"
+		},
+		{
+			category = "trivia",
+			cat_index = 49,
+			image = "heister_clover"
+		},
+		{
+			category = "trivia",
+			cat_index = 5,
+			image = "heister_jimmy"
+		},
+		{
+			category = "trivia",
+			cat_index = 50,
+			image = "heister_clover"
+		},
+		{
+			category = "trivia",
+			cat_index = 51,
+			image = "heister_houston"
+		},
+		{
+			category = "trivia",
+			cat_index = 52,
+			image = "heister_houston"
+		},
+		{
+			category = "trivia",
+			cat_index = 53,
+			image = "heister_houston"
+		},
+		{
+			category = "trivia",
+			cat_index = 54,
+			image = "heister_houston"
+		},
+		{
+			category = "trivia",
+			cat_index = 55,
+			image = "heister_bonnie"
+		},
+		{
+			category = "trivia",
+			cat_index = 56,
+			image = "heister_bonnie"
+		},
+		{
+			category = "trivia",
+			cat_index = 57,
+			image = "heister_bonnie"
+		},
+		{
+			category = "trivia",
+			cat_index = 58,
+			image = "heister_bonnie"
+		},
+		{
+			category = "trivia",
+			cat_index = 59,
+			image = "enemy_winters"
+		},
+		{
+			category = "trivia",
+			cat_index = 6,
+			image = "heister_jimmy"
+		},
+		{
+			category = "trivia",
+			cat_index = 60,
+			image = "enemy_winters"
+		},
+		{
+			category = "trivia",
+			cat_index = 61,
+			image = "enemy_winters"
+		},
+		{
+			category = "trivia",
+			cat_index = 62,
+			image = "enemy_winters"
+		},
+		{
+			category = "trivia",
+			cat_index = 63,
+			image = "heister_rust"
+		},
+		{
+			category = "trivia",
+			cat_index = 64,
+			image = "heister_rust"
+		},
+		{
+			category = "trivia",
+			cat_index = 65,
+			image = "heister_rust"
+		},
+		{
+			category = "trivia",
+			cat_index = 66,
+			image = "heister_rust"
+		},
+		{
+			category = "trivia",
+			cat_index = 67,
+			image = "heister_sokol"
+		},
+		{
+			category = "trivia",
+			cat_index = 68,
+			image = "heister_sokol"
+		},
+		{
+			category = "trivia",
+			cat_index = 69,
+			image = "heister_sokol"
+		},
+		{
+			category = "trivia",
+			cat_index = 7,
+			image = "heister_jacket"
+		},
+		{
+			category = "trivia",
+			cat_index = 70,
+			image = "heister_sokol"
+		},
+		{
+			category = "trivia",
+			cat_index = 71,
+			image = "heister_jiro"
+		},
+		{
+			category = "trivia",
+			cat_index = 72,
+			image = "heister_jiro"
+		},
+		{
+			category = "trivia",
+			cat_index = 73,
+			image = "heister_jiro"
+		},
+		{
+			category = "trivia",
+			cat_index = 74,
+			image = "heister_jiro"
+		},
+		{
+			category = "trivia",
+			cat_index = 75,
+			image = "heister_dragan"
+		},
+		{
+			category = "trivia",
+			cat_index = 76,
+			image = "heister_dragan"
+		},
+		{
+			category = "trivia",
+			cat_index = 77,
+			image = "heister_dragan"
+		},
+		{
+			category = "trivia",
+			cat_index = 78,
+			image = "heister_dragan"
+		},
+		{
+			category = "trivia",
+			cat_index = 79,
+			image = "general_aldstone"
+		},
+		{
+			category = "trivia",
+			cat_index = 8,
+			image = "heister_jacket"
+		},
+		{
+			category = "trivia",
+			cat_index = 80,
+			image = "general_aldstone"
+		},
+		{
+			category = "trivia",
+			cat_index = 81,
+			image = "general_aldstone"
+		},
+		{
+			category = "trivia",
+			cat_index = 82,
+			image = "general_aldstone"
+		},
+		{
+			category = "trivia",
+			cat_index = 83,
+			image = "general_gage"
+		},
+		{
+			category = "trivia",
+			cat_index = 84,
+			image = "general_gage"
+		},
+		{
+			category = "trivia",
+			cat_index = 85,
+			image = "general_gage"
+		},
+		{
+			category = "trivia",
+			cat_index = 86,
+			image = "general_gage"
+		},
+		{
+			category = "trivia",
+			cat_index = 87,
+			image = "general_mckendrick"
+		},
+		{
+			category = "trivia",
+			cat_index = 88,
+			image = "general_mckendrick"
+		},
+		{
+			category = "trivia",
+			cat_index = 89,
+			image = "general_mckendrick"
+		},
+		{
+			category = "trivia",
+			cat_index = 9,
+			image = "heister_jacket"
+		},
+		{
+			category = "trivia",
+			cat_index = 90,
+			image = "contact_butcher"
+		},
+		{
+			category = "trivia",
+			cat_index = 91,
+			image = "contact_butcher"
+		},
+		{
+			category = "trivia",
+			cat_index = 92,
+			image = "heister_jiro"
+		},
+		{
+			category = "trivia",
+			cat_index = 93,
+			image = "heister_bodhi"
+		},
+		{
+			category = "trivia",
+			cat_index = 94,
+			image = "general_goats"
+		},
+		{
+			category = "trivia",
+			cat_index = 95,
+			image = "contact_hector"
+		},
+		{
+			category = "trivia",
+			cat_index = 96,
+			image = "heist_events"
+		},
+		{
+			category = "trivia",
+			cat_index = 97,
+			image = "contact_dentist"
+		},
+		{
+			category = "trivia",
+			cat_index = 98,
+			image = "contact_classics"
+		},
+		{
+			category = "trivia",
+			cat_index = 99,
+			image = "contact_locke"
 		}
 	}
+	self.category_totals = {}
+	for _, tip in ipairs(self.tips) do
+		if not self.category_totals[tip.category] or tip.cat_index > self.category_totals[tip.category] then
+			self.category_totals[tip.category] = tip.cat_index
+		end
+	end
 end
 
 function TipsTweakData:get_a_tip()
-	local lvl = managers.experience:current_level()
-	local qualified_tips = {}
-	for i, tip in ipairs(self.tips) do
-		if not tip.unlock_lvl or lvl > tip.unlock_lvl then
-			table.insert(qualified_tips, i)
-		end
+	local tip = self.tips[math.random(#self.tips)]
+	local valid_image = DB:has(Idstring("texture"), "guis/textures/loading/hints/" .. tip.image)
+	if not valid_image then
+		Application:error("Warning: missing loading hint image: " .. tip.image)
+		return nil
 	end
-	return self.tips[qualified_tips[math.random(#qualified_tips)]]
+	local title_id = "loading_" .. tip.category .. "_title"
+	local text_id = "loading_" .. tip.category .. "_" .. tip.cat_index
+	return {
+		image = tip.image,
+		title = managers.localization:to_upper_text(title_id, {
+			index = tip.cat_index,
+			total = self.category_totals[tip.category]
+		}),
+		text = managers.localization:text(text_id)
+	}
 end

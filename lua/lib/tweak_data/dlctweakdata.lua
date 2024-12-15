@@ -63,6 +63,7 @@ function DLCTweakData:init(tweak_data)
 			grv = true,
 			mrm = 1,
 			fir = true,
+			pn2 = true,
 			rip = true,
 			pd2_goty = 1,
 			pd2_hw_boxing = true,
@@ -5785,6 +5786,11 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.pn2_bundle = {}
+	self.pn2_bundle.dlc = "has_pn2"
+	self.pn2_bundle.content = {}
+	self.pn2_bundle.content.loot_global_value = "pn2"
+	self.pn2_bundle.content.loot_drops = {}
 	self.mp2_bundle = {}
 	self.mp2_bundle.free = true
 	self.mp2_bundle.content = {}

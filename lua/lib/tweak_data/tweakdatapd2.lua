@@ -623,4 +623,13 @@ function TweakData:_init_pd2()
 			32
 		}
 	}
+	self.hud_icons.fir_grenade = {
+		texture = "guis/textures/pd2/equipment_02",
+		texture_rect = {
+			0,
+			32,
+			32,
+			32
+		}
+	}
 end

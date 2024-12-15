@@ -86,6 +86,9 @@ function LevelLoadingScreenGuiScript:init(scene_gui, res, progress, base_layer)
 	local background_fullpanel = self._back_drop_gui:get_new_background_layer()
 	local background_safepanel = self._back_drop_gui:get_new_background_layer()
 	self._back_drop_gui:set_panel_to_saferect(background_safepanel)
+	if not self._coords and arg.load_level_data.tip then
+		self._loading_hint = self:_make_loading_hint(background_safepanel, arg.load_level_data.tip)
+	end
 	self._indicator = background_safepanel:bitmap({
 		name = "indicator",
 		texture = "guis/textures/icon_loading",
@@ -203,6 +206,52 @@ end
 
 function LevelLoadingScreenGuiScript:update(progress, t, dt)
 	self._indicator:rotate(180 * dt)
+end
+
+function LevelLoadingScreenGuiScript:_make_loading_hint(parent, tip)
+	local container = parent:panel()
+	local hint_text_width = 450
+	local hint_title_top_offset = 5
+	local hint_image = container:bitmap({
+		texture = "guis/textures/loading/hints/" .. tip.image,
+		width = 192,
+		height = 192
+	})
+	local hint_title = container:text({
+		text = tip.title,
+		font = "fonts/font_medium_mf",
+		font_size = 20,
+		color = Color.white
+	})
+	local hint_box = container:panel()
+	local hint_text = hint_box:text({
+		text = tip.text,
+		font = "fonts/font_medium_mf",
+		font_size = 24,
+		color = Color.white,
+		width = hint_text_width,
+		wrap = true,
+		word_wrap = true
+	})
+	make_fine_text(hint_title)
+	make_fine_text(hint_text)
+	shrinkwrap(hint_box, {18, 18})
+	hint_box:set_width(hint_text_width + 36)
+	hint_title:set_position(hint_image:right(), hint_title_top_offset)
+	hint_box:set_position(hint_image:right(), hint_title:bottom() + 8)
+	BoxGuiObject:new(hint_box, {
+		sides = {
+			1,
+			1,
+			1,
+			1
+		}
+	})
+	shrinkwrap(container)
+	local bottom_margin = math.max(0, hint_box:bottom() + 20 - container:height())
+	container:set_center_x(parent:width() * 0.5 - 20)
+	container:set_bottom(parent:height() - bottom_margin)
+	return container
 end
 
 function LevelLoadingScreenGuiScript:destroy()

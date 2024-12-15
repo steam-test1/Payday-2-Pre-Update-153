@@ -1698,6 +1698,10 @@ FlameBulletBase.EFFECT_PARAMS = {
 	pushunits = tweak_data.upgrades
 }
 
+function FlameBulletBase:bullet_slotmask()
+	return managers.slot:get_mask("bullet_impact_targets_no_shields")
+end
+
 function FlameBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage, blank)
 	local hit_unit = col_ray.unit
 	local play_impact_flesh = false
@@ -1778,7 +1782,6 @@ function FlameBulletBase:give_fire_damage_dot(col_ray, weapon_unit, attacker_uni
 end
 
 function FlameBulletBase:play_impact_sound_and_effects(col_ray, no_sound)
-	managers.game_play_central:play_impact_sound_and_effects(self:_get_sound_and_effects_params(col_ray, no_sound))
 end
 
 DragonBreathBulletBase = DragonBreathBulletBase or class(InstantBulletBase)

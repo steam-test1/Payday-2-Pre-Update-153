@@ -346,7 +346,7 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 	self.projectiles.fir_com.unit = "units/pd2_dlc_fir/weapons/wpn_fps_gre_white/wpn_third_gre_white"
 	self.projectiles.fir_com.unit_dummy = "units/pd2_dlc_fir/weapons/wpn_fps_gre_white/wpn_fps_gre_white_husk"
 	self.projectiles.fir_com.sprint_unit = "units/pd2_dlc_fir/weapons/wpn_fps_gre_white/wpn_third_gre_white_sprint"
-	self.projectiles.fir_com.icon = "concussion_grenade"
+	self.projectiles.fir_com.icon = "fir_grenade"
 	self.projectiles.fir_com.throwable = true
 	self.projectiles.fir_com.max_amount = 6
 	self.projectiles.fir_com.animation = "throw_concussion"

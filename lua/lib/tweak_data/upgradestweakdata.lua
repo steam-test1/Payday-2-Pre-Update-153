@@ -2317,7 +2317,8 @@ function UpgradesTweakData:init(tweak_data)
 			"iceaxe",
 			"zeus",
 			"flint",
-			"oxide"
+			"oxide",
+			"sword"
 		}
 	}
 	self.level_tree[17] = {
@@ -8629,6 +8630,10 @@ function UpgradesTweakData:_melee_weapon_definitions()
 	self.definitions.oxide = {
 		category = "melee_weapon",
 		dlc = "grv"
+	}
+	self.definitions.sword = {
+		category = "melee_weapon",
+		dlc = "pn2"
 	}
 end
 

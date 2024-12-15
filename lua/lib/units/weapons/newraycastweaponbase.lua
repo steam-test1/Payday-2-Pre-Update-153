@@ -484,6 +484,13 @@ end
 function NewRaycastWeaponBase:zoom()
 	if self:is_second_sight_on() then
 		local gadget_zoom_stats = tweak_data.weapon.factory.parts[self._second_sight_data.part_id].stats.gadget_zoom
+		if not gadget_zoom_stats then
+			local tweak_stats = tweak_data.weapon.factory.parts[self._second_sight_data.part_id].stats
+			if not tweak_stats.gadget_zoom_add then
+				debug_pause("Invalid second sight:", self._second_sight_data.part_id)
+			end
+			gadget_zoom_stats = math.min(NewRaycastWeaponBase.super.zoom(self) + tweak_stats.gadget_zoom_add, #tweak_data.weapon.stats.zoom)
+		end
 		return tweak_data.weapon.stats.zoom[gadget_zoom_stats]
 	end
 	return NewRaycastWeaponBase.super.zoom(self)

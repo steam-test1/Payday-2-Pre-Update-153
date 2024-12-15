@@ -1244,6 +1244,12 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 		})
 		mw = math.max(mw, self:make_fine_text(join_text))
 		self:make_color_text(join_text, tweak_data.screen_colors.regular_color)
+		local friends_icon = legend_panel:bitmap({
+			texture = "guis/textures/pd2/crimenet_legend_join",
+			x = 10,
+			y = join_text:bottom(),
+			color = tweak_data.screen_colors.friend_color
+		})
 		local friends_text = legend_panel:text({
 			font = tweak_data.menu.pd2_small_font,
 			font_size = tweak_data.menu.pd2_small_font_size,
@@ -1292,6 +1298,12 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 		})
 		mw = math.max(mw, self:make_fine_text(ghost_text))
 		local next_y = ghost_text:bottom()
+		local mutated_icon = legend_panel:bitmap({
+			texture = "guis/textures/pd2/crimenet_legend_join",
+			x = 10,
+			y = next_y,
+			color = tweak_data.screen_colors.mutators_color_text
+		})
 		local mutated_text = legend_panel:text({
 			font = tweak_data.menu.pd2_small_font,
 			font_size = tweak_data.menu.pd2_small_font_size,
@@ -1303,6 +1315,23 @@ function CrimeNetGui:init(ws, fullscreeen_ws, node)
 		})
 		mw = math.max(mw, self:make_fine_text(mutated_text))
 		next_y = mutated_text:bottom()
+		local spree_icon = legend_panel:bitmap({
+			texture = "guis/textures/pd2/crimenet_legend_join",
+			x = 10,
+			y = next_y,
+			color = tweak_data.screen_colors.crime_spree_risk
+		})
+		local spree_text = legend_panel:text({
+			font = tweak_data.menu.pd2_small_font,
+			font_size = tweak_data.menu.pd2_small_font_size,
+			x = host_text:left(),
+			y = next_y,
+			text = managers.localization:to_upper_text("cn_crime_spree"),
+			blend_mode = "add",
+			color = tweak_data.screen_colors.crime_spree_risk
+		})
+		mw = math.max(mw, self:make_fine_text(spree_text))
+		next_y = spree_text:bottom()
 		local kick_none_icon = legend_panel:bitmap({
 			texture = "guis/textures/pd2/cn_kick_marker",
 			x = 10,

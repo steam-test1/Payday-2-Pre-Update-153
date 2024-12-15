@@ -13528,8 +13528,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.lemming.sounds.leave_steelsight = "pistol_steel_sight_exit"
 	self.lemming.sounds.dryfire = "secondary_dryfire"
 	self.lemming.timers = {}
-	self.lemming.timers.reload_not_empty = 1.52
-	self.lemming.timers.reload_empty = 2.32
+	self.lemming.timers.reload_not_empty = 1.5
+	self.lemming.timers.reload_empty = 2.15
 	self.lemming.timers.unequip = 0.5
 	self.lemming.timers.equip = 0.35
 	self.lemming.name_id = "bm_w_lemming"

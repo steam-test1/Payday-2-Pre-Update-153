@@ -7216,7 +7216,7 @@ function BlackMarketGui:input_focus()
 	if not self._enabled then
 		return
 	end
-	if managers.menu:is_pc_controller() then
+	if managers.menu:is_pc_controller() and managers.menu:active_menu().renderer:active_node_gui().name == "blackmarket_armor_node" then
 		local disallow = true
 		local panels = {
 			self._tab_scroll_panel,

@@ -2309,6 +2309,32 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.oxide.expire_t = 0.6
 	self.melee_weapons.oxide.repeat_expire_t = 0.8
 	self.melee_weapons.oxide.stats.concealment = 29
+	self.melee_weapons.sword = deep_clone(self.melee_weapons.kabar)
+	self.melee_weapons.sword.name_id = "bm_melee_sword"
+	self.melee_weapons.sword.dlc = "pn2"
+	self.melee_weapons.sword.texture_bundle_folder = "pn2"
+	self.melee_weapons.sword.anim_global_param = "melee_stab"
+	self.melee_weapons.sword.type = "knife"
+	self.melee_weapons.sword.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.sword.unit = "units/pd2_dlc_pn2/weapons/wpn_fps_mel_sword/wpn_fps_mel_sword"
+	self.melee_weapons.sword.third_unit = "units/pd2_dlc_pn2/weapons/wpn_fps_mel_sword/wpn_third_mel_sword"
+	self.melee_weapons.sword.stats.weapon_type = "sharp"
+	self.melee_weapons.sword.stats.min_damage = 3
+	self.melee_weapons.sword.stats.max_damage = 8
+	self.melee_weapons.sword.stats.min_damage_effect = 1
+	self.melee_weapons.sword.stats.max_damage_effect = 1
+	self.melee_weapons.sword.stats.charge_time = 2
+	self.melee_weapons.sword.stats.range = 150
+	self.melee_weapons.sword.sounds = {}
+	self.melee_weapons.sword.sounds.equip = "sword_equip"
+	self.melee_weapons.sword.sounds.hit_air = "sword_hit_air"
+	self.melee_weapons.sword.sounds.hit_gen = "sword_hit_gen"
+	self.melee_weapons.sword.sounds.hit_body = "sword_hit_body"
+	self.melee_weapons.sword.sounds.charge = "toothbrush_charge"
+	self.melee_weapons.sword.repeat_expire_t = 0.3
+	self.melee_weapons.sword.stats.concealment = 30
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.melee_weapons) do
 		if free_dlcs[data.dlc] then

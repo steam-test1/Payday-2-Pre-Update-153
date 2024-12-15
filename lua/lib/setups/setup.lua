@@ -290,6 +290,7 @@ function Setup:_start_loading_screen()
 		load_level_data.gui_tweak_data = tweak_data.load_level
 		load_level_data.menu_tweak_data = tweak_data.menu
 		load_level_data.scale_tweak_data = tweak_data.scale
+		load_level_data.tip = tweak_data.tips:get_a_tip()
 		if using_steam_controller then
 		else
 			local coords = tweak_data:get_controller_help_coords()

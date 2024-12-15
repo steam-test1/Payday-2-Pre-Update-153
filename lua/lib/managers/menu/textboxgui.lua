@@ -7,6 +7,12 @@ TextBoxGui.PRESETS.weapon_stats = {
 	x = 60,
 	bottom = 620
 }
+TextBoxGui.PRESETS.help_dialog = {
+	w = 540,
+	h = 270,
+	font = tweak_data.menu.pd2_small_font,
+	font_size = tweak_data.menu.pd2_small_font_size
+}
 
 function TextBoxGui:init(...)
 	self._target_alpha = {}

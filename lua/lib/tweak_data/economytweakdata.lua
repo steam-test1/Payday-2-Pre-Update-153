@@ -693,6 +693,61 @@ function EconomyTweakData:init()
 		}
 	}
 	self.contents.wac_01_legendary.rarity = "legendary"
+	self.contents.cs3_01 = {}
+	self.contents.cs3_01.def_id = 10037
+	self.contents.cs3_01.contains = {
+		weapon_skins = {
+			"judge_cs3",
+			"m95_cs3",
+			"peacemaker_cs3",
+			"arbiter_cs3",
+			"flint_cs3",
+			"aa12_cs3",
+			"new_mp5_cs3",
+			"saw_cs3",
+			"frankish_cs3",
+			"new_m4_cs3",
+			"sparrow_cs3",
+			"tti_cs3",
+			"new_raging_bull_cs3",
+			"huntsman_cs3",
+			"polymer_cs3"
+		},
+		contents = {
+			"cs3_01_legendary"
+		}
+	}
+	self.contents.cs3_01_legendary = {}
+	self.contents.cs3_01_legendary.def_id = 10038
+	self.contents.cs3_01_legendary.contains = {
+		weapon_skins = {"ppk_cs3"}
+	}
+	self.contents.cs3_01_legendary.rarity = "legendary"
+	self.bundles.cs3_01 = {}
+	self.bundles.cs3_01.def_id = 30002
+	self.bundles.cs3_01.dlc_id = "518760"
+	self.bundles.cs3_01.quality = "mint"
+	self.bundles.cs3_01.bonus = false
+	self.bundles.cs3_01.contains = {
+		weapon_skins = {
+			"judge_cs3",
+			"m95_cs3",
+			"peacemaker_cs3",
+			"arbiter_cs3",
+			"flint_cs3",
+			"aa12_cs3",
+			"new_mp5_cs3",
+			"saw_cs3",
+			"frankish_cs3",
+			"new_m4_cs3",
+			"sparrow_cs3",
+			"tti_cs3",
+			"new_raging_bull_cs3",
+			"huntsman_cs3",
+			"ppk_cs3",
+			"polymer_cs3"
+		}
+	}
 	self.contents.cvc_01 = {}
 	self.contents.cvc_01.def_id = 10039
 	self.contents.cvc_01.contains = {
@@ -862,6 +917,14 @@ function EconomyTweakData:init()
 	self.safes.wac_01.unit_name = "units/payday2_cash/safes/wac/safe/eco_safe_wac"
 	self.safes.wac_01.texture_bundle_folder = "cash/safes/wac"
 	self.safes.wac_01.market_link = "https://steamcommunity.com/market/listings/218620/John%20Wick%20Safe"
+	self.safes.cs3_01 = {}
+	self.safes.cs3_01.free = true
+	self.safes.cs3_01.drill = "cs3_01"
+	self.safes.cs3_01.content = "cs3_01"
+	self.safes.cs3_01.name_id = "bm_menu_safe_cs3_01"
+	self.safes.cs3_01.unit_name = "units/payday2_cash/safes/cs3/safe/eco_safe_cs3"
+	self.safes.cs3_01.texture_bundle_folder = "cash/safes/cs3"
+	self.safes.cs3_01.market_link = "https://steamcommunity.com/market/listings/218620/John%20Wick%20Safe"
 	self.safes.cvc_01 = {}
 	self.safes.cvc_01.free = true
 	self.safes.cvc_01.drill = "cvc_01"
@@ -992,6 +1055,9 @@ function EconomyTweakData:init()
 	self.drills.wac_01 = {}
 	self.drills.wac_01.safe = "wac_01"
 	self.drills.wac_01.unit_name = "units/payday2_cash/safes/wac/drill/eco_drill_wac"
+	self.drills.cs3_01 = {}
+	self.drills.cs3_01.safe = "cs3_01"
+	self.drills.cs3_01.unit_name = "units/payday2_cash/safes/cs3/drill/eco_drill_cs3"
 	self.drills.cvc_01 = {}
 	self.drills.cvc_01.safe = "cvc_01"
 	self.drills.cvc_01.unit_name = "units/payday2_cash/safes/cvc/drill/eco_drill_cvc"
