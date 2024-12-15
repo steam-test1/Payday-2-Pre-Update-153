@@ -119,18 +119,18 @@ function PlayerStandard:init(unit)
 end
 
 function PlayerStandard:get_animation(anim)
-	return self._current_anim_state[2][anim] or PlayerStandard.ANIM_STATES.standard[anim]
+	return PlayerStandard._current_anim_state[2][anim] or PlayerStandard.ANIM_STATES.standard[anim]
 end
 
 function PlayerStandard:set_animation_state(state_name)
 	if state_name and PlayerStandard.ANIM_STATES[state_name] then
-		self._current_anim_state = {
+		PlayerStandard._current_anim_state = {
 			state_name,
 			PlayerStandard.ANIM_STATES[state_name]
 		}
 	else
 		Application:error("No player animation states for state: ", tostring(state_name))
-		self._current_anim_state = {
+		PlayerStandard._current_anim_state = {
 			"standard",
 			PlayerStandard.ANIM_STATES.standard
 		}
@@ -138,7 +138,7 @@ function PlayerStandard:set_animation_state(state_name)
 end
 
 function PlayerStandard:current_anim_state_name()
-	return self._current_anim_state[1]
+	return PlayerStandard._current_anim_state[1]
 end
 
 function PlayerStandard:enter(state_data, enter_data)
@@ -2949,10 +2949,9 @@ function PlayerStandard:_is_cash_inspecting(t)
 end
 
 function PlayerStandard:_interupt_action_cash_inspect(t)
-	if not self:_is_cash_inspecting() then
-		return
+	if self:_is_cash_inspecting() then
+		self._ext_camera:play_redirect(Idstring("idle"))
 	end
-	self._ext_camera:play_redirect(self:get_animation("idle"))
 end
 
 function PlayerStandard:_update_omniscience(t, dt)

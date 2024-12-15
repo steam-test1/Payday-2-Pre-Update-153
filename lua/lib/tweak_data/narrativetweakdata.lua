@@ -4071,7 +4071,10 @@ function NarrativeTweakData:init(tweak_data)
 		}
 	}
 	self.jobs.friend.briefing_event = "Play_butcher_fri_cbf_01"
-	self.jobs.friend.debrief_event = nil
+	self.jobs.friend.debrief_event = {
+		"Play_btc_fri_end_a",
+		"Play_btc_fri_end_b"
+	}
 	self.jobs.friend.crimenet_callouts = {
 		"Play_butcher_fri_cnc_01"
 	}

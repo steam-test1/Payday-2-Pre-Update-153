@@ -33,6 +33,10 @@ function WeaponUnderbarrelLauncher:_fire_raycast(weapon_base, user_unit, from_po
 	else
 		unit = ProjectileBase.throw_projectile(projectile_type_index, from_pos, mvec_spread_direction, managers.network:session():local_peer():id())
 	end
+	managers.statistics:shot_fired({
+		hit = false,
+		weapon_unit = weapon_base._unit
+	})
 	self:on_shot()
 	weapon_base:check_bullet_objects()
 	return {}

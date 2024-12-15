@@ -754,7 +754,6 @@ function PlayerDamage:damage_melee(attack_data)
 	end
 	local dmg_mul = pm:damage_reduction_skill_multiplier("melee")
 	attack_data.damage = attack_data.damage * dmg_mul
-	self:_check_chico_heal(attack_data)
 	self._unit:sound():play("melee_hit_body", nil, nil)
 	local result = self:damage_bullet(attack_data)
 	local vars = {

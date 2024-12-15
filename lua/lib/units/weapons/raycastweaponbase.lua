@@ -1124,7 +1124,18 @@ function RaycastWeaponBase:set_ammo(ammo)
 end
 
 function RaycastWeaponBase:ammo_full()
-	return self:ammo_base():get_ammo_total() == self:ammo_base():get_ammo_max()
+	local is_full = function(ammo_base)
+		return ammo_base:get_ammo_total() == ammo_base:get_ammo_max()
+	end
+	if not is_full(self) then
+		return false
+	end
+	for _, gadget in ipairs(self:get_all_override_weapon_gadgets()) do
+		if gadget and gadget.ammo_base and not is_full(gadget:ammo_base()) then
+			return false
+		end
+	end
+	return true
 end
 
 function RaycastWeaponBase:clip_full()

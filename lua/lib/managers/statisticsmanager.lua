@@ -1281,7 +1281,8 @@ function StatisticsManager:_get_boom_guns()
 			"plainsrider",
 			"long",
 			"arbiter",
-			"ray"
+			"ray",
+			"contraband_m203"
 		}
 	end
 	return self._boom_guns

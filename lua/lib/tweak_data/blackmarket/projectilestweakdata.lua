@@ -355,7 +355,7 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 	self.projectiles.launcher_m203.unit = "units/pd2_dlc_chico/weapons/wpn_launcher_frag_m203/wpn_launcher_frag_m203"
 	self.projectiles.launcher_m203.add_trail_effect = true
 	self.projectiles.launcher_m203.dlc = "chico"
-	self.projectiles.launcher_m203.weapon_id = "gre_m203"
+	self.projectiles.launcher_m203.weapon_id = "contraband_m203"
 	self.projectiles.launcher_m203.time_cheat = 0.1
 	self._projectiles_index = {
 		"frag",

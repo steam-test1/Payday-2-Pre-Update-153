@@ -28,6 +28,8 @@ function WeaponAmmo:replenish()
 	local ammo_max_per_clip = self:calculate_ammo_max_per_clip()
 	local ammo_max = math.round((self:weapon_tweak_data().AMMO_MAX + managers.player:upgrade_value(self._name_id, "clip_amount_increase") * ammo_max_per_clip) * ammo_max_multiplier)
 	ammo_max_per_clip = math.min(ammo_max_per_clip, ammo_max)
+	self:set_ammo_max(ammo_max)
+	self:set_ammo_max_per_clip(ammo_max_per_clip)
 	self:set_ammo_total(ammo_max)
 	self:set_ammo_remaining_in_clip(ammo_max_per_clip)
 	self._ammo_pickup = self:weapon_tweak_data().AMMO_PICKUP
@@ -169,7 +171,4 @@ end
 
 function WeaponAmmo:get_ammo_remaining_in_clip()
 	return self._ammo_remaining_in_clip and self:digest_value(self._ammo_remaining_in_clip, false) or self:digest_value(self._ammo_remaining_in_clip2, false)
-end
-
-function WeaponAmmo:ammo_max()
 end
