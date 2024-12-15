@@ -140,33 +140,26 @@ function NewRaycastWeaponBase:clbk_assembly_complete(clbk, parts, blueprint)
 	if self._setup and self._setup.timer then
 		self:set_timer(self._setup.timer)
 	end
-	local magazine = managers.weapon_factory:get_part_from_weapon_by_type("magazine", self._parts)
-	if magazine then
-		local bullet_objects = managers.weapon_factory:get_part_data_type_from_weapon_by_type("magazine", "bullet_objects", self._parts)
-		if bullet_objects then
-			self._bullet_objects = {}
-			local prefix = bullet_objects.prefix
-			for i = 1, bullet_objects.amount do
-				local object = magazine.unit:get_object(Idstring(prefix .. i))
-				if object then
-					self._bullet_objects[i] = self._bullet_objects[i] or {}
-					table.insert(self._bullet_objects[i], object)
-				end
-			end
-		end
-	end
-	if not self._bullet_objects or #self._bullet_objects == 0 then
-		local ammo = managers.weapon_factory:get_part_from_weapon_by_type("ammo", self._parts)
-		if ammo then
-			local bullet_objects = managers.weapon_factory:get_part_data_type_from_weapon_by_type("ammo", "bullet_objects", self._parts)
+	local bullet_object_parts = {
+		"magazine",
+		"ammo",
+		"underbarrel"
+	}
+	self._bullet_objects = {}
+	for _, type in ipairs(bullet_object_parts) do
+		local type_part = managers.weapon_factory:get_part_from_weapon_by_type(type, self._parts)
+		if type_part then
+			local bullet_objects = managers.weapon_factory:get_part_data_type_from_weapon_by_type(type, "bullet_objects", self._parts)
 			if bullet_objects then
-				self._bullet_objects = {}
 				local prefix = bullet_objects.prefix
 				for i = 1, bullet_objects.amount do
-					local object = ammo.unit:get_object(Idstring(prefix .. i))
+					local object = type_part.unit:get_object(Idstring(prefix .. i))
 					if object then
 						self._bullet_objects[i] = self._bullet_objects[i] or {}
-						table.insert(self._bullet_objects[i], object)
+						table.insert(self._bullet_objects[i], {
+							object,
+							type_part.unit
+						})
 					end
 				end
 			end
@@ -324,11 +317,12 @@ function NewRaycastWeaponBase:got_silencer()
 	return self._silencer
 end
 
-function NewRaycastWeaponBase:_update_stats_values()
+function NewRaycastWeaponBase:_update_stats_values(disallow_replenish)
 	self:_check_sound_switch()
 	self._silencer = managers.weapon_factory:has_perk("silencer", self._factory_id, self._blueprint)
 	self._locked_fire_mode = (not managers.weapon_factory:has_perk("fire_mode_auto", self._factory_id, self._blueprint) or not ids_auto) and managers.weapon_factory:has_perk("fire_mode_single", self._factory_id, self._blueprint) and ids_single
-	self._fire_mode = self._locked_fire_mode or Idstring(self:weapon_tweak_data().FIRE_MODE or "single")
+	print("self:weapon_tweak_data().FIRE_MODE: ", self:_weapon_tweak_data_id(), self:weapon_tweak_data().FIRE_MODE)
+	self._fire_mode = self._locked_fire_mode or self:get_recorded_fire_mode(self:_weapon_tweak_data_id()) or Idstring(self:weapon_tweak_data().FIRE_MODE or "single")
 	self._ammo_data = managers.weapon_factory:get_ammo_data_from_weapon(self._factory_id, self._blueprint) or {}
 	self._can_shoot_through_shield = tweak_data.weapon[self._name_id].can_shoot_through_shield
 	self._can_shoot_through_enemy = tweak_data.weapon[self._name_id].can_shoot_through_enemy
@@ -446,7 +440,9 @@ function NewRaycastWeaponBase:_update_stats_values()
 	self._can_highlight = self._can_highlight_with_perk or self._can_highlight_with_skill
 	self:_check_second_sight()
 	self:_check_reticle_obj()
-	self:replenish()
+	if not disallow_replenish then
+		self:replenish()
+	end
 	local user_unit = self._setup and self._setup.user_unit
 	local current_state = alive(user_unit) and user_unit:movement() and user_unit:movement()._current_state
 	self._fire_rate_multiplier = managers.blackmarket:fire_rate_multiplier(self._name_id, self:weapon_tweak_data().category, self._silencer, nil, current_state, self._blueprint)
@@ -506,6 +502,10 @@ end
 
 function NewRaycastWeaponBase:_check_sound_switch()
 	local suppressed_switch = managers.weapon_factory:get_sound_switch("suppressed", self._factory_id, self._blueprint)
+	local override_gadget = self:gadget_overrides_weapon_functions()
+	if override_gadget then
+		suppressed_switch = nil
+	end
 	self._sound_fire:set_switch("suppressed", suppressed_switch or "regular")
 end
 
@@ -535,6 +535,13 @@ function NewRaycastWeaponBase:replenish()
 	self:set_ammo_total(ammo_max)
 	self:set_ammo_remaining_in_clip(ammo_max_per_clip)
 	self._ammo_pickup = tweak_data.weapon[self._name_id].AMMO_PICKUP
+	if self._assembly_complete then
+		for _, gadget in ipairs(self:get_all_override_weapon_gadgets()) do
+			if gadget and gadget.replenish then
+				gadget:replenish()
+			end
+		end
+	end
 	self:update_damage()
 end
 
@@ -594,6 +601,9 @@ function NewRaycastWeaponBase:stance_mod()
 end
 
 function NewRaycastWeaponBase:_get_tweak_data_weapon_animation(anim)
+	if self:gadget_overrides_weapon_functions() then
+		return self:gadget_function_override("_get_tweak_data_weapon_animation", anim)
+	end
 	return anim
 end
 
@@ -622,6 +632,8 @@ function NewRaycastWeaponBase:tweak_data_anim_play(anim, speed_multiplier)
 end
 
 function NewRaycastWeaponBase:tweak_data_anim_stop(anim)
+	local orig_anim = anim
+	anim = self:_get_tweak_data_weapon_animation(orig_anim)
 	local data = tweak_data.weapon.factory[self._factory_id]
 	if data.animations and data.animations[anim] then
 		local anim_name = data.animations[anim]
@@ -633,7 +645,7 @@ function NewRaycastWeaponBase:tweak_data_anim_stop(anim)
 			data.unit:anim_stop(Idstring(anim_name))
 		end
 	end
-	NewRaycastWeaponBase.super.tweak_data_anim_stop(self, anim)
+	NewRaycastWeaponBase.super.tweak_data_anim_stop(self, orig_anim)
 end
 
 function NewRaycastWeaponBase:_set_parts_enabled(enabled)
@@ -691,8 +703,26 @@ function NewRaycastWeaponBase:set_visibility_state(state)
 end
 
 function NewRaycastWeaponBase:fire_mode()
+	if self:gadget_overrides_weapon_functions() then
+		local firemode = self:gadget_function_override("fire_mode")
+		if firemode ~= nil then
+			return firemode
+		end
+	end
 	self._fire_mode = self._locked_fire_mode or self._fire_mode or Idstring(tweak_data.weapon[self._name_id].FIRE_MODE or "single")
 	return self._fire_mode == ids_single and "single" or "auto"
+end
+
+function NewRaycastWeaponBase:record_fire_mode()
+	self._recorded_fire_modes = self._recorded_fire_modes or {}
+	self._recorded_fire_modes[self:_weapon_tweak_data_id()] = self._fire_mode
+end
+
+function NewRaycastWeaponBase:get_recorded_fire_mode(id)
+	if self._recorded_fire_modes and self._recorded_fire_modes[self:_weapon_tweak_data_id()] then
+		return self._recorded_fire_modes[self:_weapon_tweak_data_id()]
+	end
+	return nil
 end
 
 function NewRaycastWeaponBase:recoil_wait()
@@ -706,6 +736,9 @@ function NewRaycastWeaponBase:recoil_wait()
 end
 
 function NewRaycastWeaponBase:can_toggle_firemode()
+	if self:gadget_overrides_weapon_functions() then
+		return self:gadget_function_override("can_toggle_firemode")
+	end
 	return tweak_data.weapon[self._name_id].CAN_TOGGLE_FIREMODE
 end
 
@@ -735,19 +768,21 @@ end
 
 function NewRaycastWeaponBase:check_bullet_objects()
 	if self._bullet_objects then
-		self:_update_bullet_objects(self:get_ammo_remaining_in_clip())
+		self:_update_bullet_objects("get_ammo_remaining_in_clip")
 	end
 end
 
 function NewRaycastWeaponBase:predict_bullet_objects()
-	self:_update_bullet_objects(self:get_ammo_total())
+	self:_update_bullet_objects("get_ammo_total")
 end
 
-function NewRaycastWeaponBase:_update_bullet_objects(ammo)
+function NewRaycastWeaponBase:_update_bullet_objects(ammo_func)
 	if self._bullet_objects then
 		for i, objects in pairs(self._bullet_objects) do
 			for _, object in ipairs(objects) do
-				object:set_visibility(i <= ammo)
+				local ammo_base = self:ammo_base()
+				local ammo = ammo_base[ammo_func](ammo_base)
+				object[1]:set_visibility(i <= ammo)
 			end
 		end
 	end
@@ -952,7 +987,7 @@ function NewRaycastWeaponBase:_get_spread(user_unit)
 	if not current_state then
 		return 0, 0
 	end
-	local spread_values = tweak_data.weapon[self._name_id].spread
+	local spread_values = self:weapon_tweak_data().spread
 	if not spread_values then
 		return 0, 0
 	end
@@ -1257,6 +1292,9 @@ function NewRaycastWeaponBase:update_reloading(t, dt, time_left)
 end
 
 function RaycastWeaponBase:reload_prefix()
+	if self:gadget_overrides_weapon_functions() then
+		return self:gadget_function_override("reload_prefix")
+	end
 	return ""
 end
 
@@ -1314,5 +1352,61 @@ function NewRaycastWeaponBase:destroy(unit)
 end
 
 function NewRaycastWeaponBase:is_single_shot()
+	if self:gadget_overrides_weapon_functions() then
+		local gadget_shot = self:gadget_function_override("is_single_shot")
+		if gadget_shot ~= nil then
+			return gadget_shot
+		end
+	end
 	return self:fire_mode() == "single"
+end
+
+function NewRaycastWeaponBase:gadget_overrides_weapon_functions()
+	if self._cached_gadget == nil and self._assembly_complete then
+		local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("underbarrel", self._factory_id, self._blueprint)
+		local gadget
+		for i, id in ipairs(gadgets) do
+			gadget = self._parts[id]
+			if gadget then
+				local gadget_base = (not gadget.unit or not gadget.unit:base()) and gadget.base and gadget:base()
+				if gadget_base and gadget_base:is_on() and gadget_base:overrides_weapon_firing() then
+					self._cached_gadget = gadget_base
+				end
+			end
+		end
+		if self._cached_gadget == nil then
+			self._cached_gadget = false
+		end
+	end
+	return self._cached_gadget
+end
+
+function NewRaycastWeaponBase:reset_cached_gadget()
+	self._cached_gadget = nil
+	self:gadget_overrides_weapon_functions()
+end
+
+function NewRaycastWeaponBase:get_all_override_weapon_gadgets()
+	if self._cached_gadgets == nil and self._assembly_complete then
+		self._cached_gadgets = {}
+		local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("underbarrel", self._factory_id, self._blueprint)
+		local gadget
+		for i, id in ipairs(gadgets) do
+			gadget = self._parts[id]
+			if gadget then
+				local gadget_base = gadget.unit:base()
+				if gadget_base and gadget_base:overrides_weapon_firing() then
+					table.insert(self._cached_gadgets, gadget_base)
+				end
+			end
+		end
+	end
+	return self._cached_gadgets
+end
+
+function NewRaycastWeaponBase:gadget_function_override(func, ...)
+	local gadget = self:gadget_overrides_weapon_functions()
+	if gadget and gadget[func] then
+		return gadget[func](gadget, ...)
+	end
 end

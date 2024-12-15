@@ -238,6 +238,18 @@ function BlackMarketTweakData:_init_characters(tweak_data)
 	self.characters.ai_wild.npc_unit = "units/pd2_dlc_wild/characters/npc_criminals_wild_1/wild_1/npc_criminal_wild_1"
 	self.characters.ai_wild.sequence = "var_mtr_wild"
 	self.characters.ai_wild.name_id = "bm_character_ai_wild"
+	self.characters.chico = {}
+	self.characters.chico.fps_unit = "units/pd2_dlc_chico/characters/npc_criminals_terry/fps_terry_mover"
+	self.characters.chico.npc_unit = "units/pd2_dlc_chico/characters/npc_criminals_terry/npc_criminal_terry"
+	self.characters.chico.menu_unit = "units/pd2_dlc_chico/characters/npc_criminals_terry/npc_criminal_terry_menu"
+	self.characters.chico.texture_bundle_folder = "chico"
+	self.characters.chico.sequence = "var_mtr_terry"
+	self.characters.chico.name_id = "bm_character_chico"
+	self.characters.chico.dlc = "chico"
+	self.characters.ai_chico = {}
+	self.characters.ai_chico.npc_unit = "units/pd2_dlc_chico/characters/npc_criminals_terry/terry/npc_criminal_terry"
+	self.characters.ai_chico.sequence = "var_mtr_terry"
+	self.characters.ai_chico.name_id = "bm_character_ai_chico"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.characters) do
 		if free_dlcs[data.dlc] then

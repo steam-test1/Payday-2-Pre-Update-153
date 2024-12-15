@@ -7584,7 +7584,6 @@ function BlackMarketGui:populate_grenades(data)
 	local index = 0
 	local guis_catalog, m_tweak_data, grenade_id
 	for i, grenades_data in ipairs(sort_data) do
-		print(inspect(grenades_data))
 		grenade_id = grenades_data[1]
 		m_tweak_data = tweak_data.blackmarket.projectiles[grenades_data[1]] or {}
 		guis_catalog = "guis/"

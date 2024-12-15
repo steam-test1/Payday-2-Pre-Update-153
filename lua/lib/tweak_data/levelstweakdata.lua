@@ -1345,6 +1345,21 @@ function LevelsTweakData:init()
 	self.chill_combat.is_safehouse = false
 	self.chill_combat.is_safehouse_combat = true
 	self.chill_combat.disable_mutators = true
+	self.friend = {}
+	self.friend.name_id = "heist_friend_hl"
+	self.friend.briefing_id = "heist_friend_hl_briefing"
+	self.friend.briefing_dialog = "Play_pln_fri_brf_01"
+	self.friend.world_name = "narratives/butcher/friend"
+	self.friend.intro_event = "Play_pln_fri_intro"
+	self.friend.outro_event = {
+		"Play_btc_fri_end_a",
+		"Play_btc_fri_end_b"
+	}
+	self.friend.package = "packages/lvl_friend"
+	self.friend.cube = "cube_apply_heist_bank"
+	self.friend.ghost_bonus = 0.15
+	self.friend.max_bags = 28
+	self.friend.ai_group_type = america
 	self.flat = {}
 	self.flat.name_id = "heist_flat_hl"
 	self.flat.briefing_id = "heist_flat_hl_briefing"
@@ -1470,6 +1485,7 @@ function LevelsTweakData:init()
 		"chew",
 		"chill",
 		"chill_combat",
+		"friend",
 		"flat",
 		"help",
 		"moon"

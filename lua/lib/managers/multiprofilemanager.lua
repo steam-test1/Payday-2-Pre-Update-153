@@ -34,6 +34,7 @@ function MultiProfileManager:load_current()
 	local blm = managers.blackmarket
 	local skt = managers.skilltree
 	skt:switch_skills(profile.skillset)
+	managers.player:check_skills()
 	skt:set_current_specialization(profile.perk_deck)
 	blm:equip_weapon("primaries", profile.primary)
 	blm:equip_weapon("secondaries", profile.secondary)

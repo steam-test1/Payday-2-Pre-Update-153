@@ -2899,3 +2899,62 @@ function UnitNetworkHandler:sync_flashbang_event(unit, event_id, sender)
 		unit:base():on_network_event(event_id)
 	end
 end
+
+function UnitNetworkHandler:sync_ability_hud(ability_id, time, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	local peer = self._verify_sender(sender)
+	if not peer then
+		return
+	end
+	local panel_id
+	for i, panel in ipairs(managers.hud._teammate_panels) do
+		if panel._peer_id == peer:id() then
+			panel_id = i
+			break
+		end
+	end
+	if panel_id then
+		managers.hud:activate_teammate_ability_radial(panel_id, time)
+	else
+		Application:error("HUD panel not found from peer id!")
+	end
+end
+
+function UnitNetworkHandler:sync_ability_hud_cooldown(ability_id, cooldown, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	local peer = self._verify_sender(sender)
+	if not peer then
+		return
+	end
+	local panel_id
+	for i, panel in ipairs(managers.hud._teammate_panels) do
+		if panel._peer_id == peer:id() then
+			panel_id = i
+			break
+		end
+	end
+	if panel_id then
+		managers.hud:set_teammate_ability_cooldown(panel_id, {cooldown = cooldown})
+	else
+		Application:error("HUD panel not found from peer id!")
+	end
+end
+
+function UnitNetworkHandler:sync_underbarrel_switch(selection_index, underbarrel_id, is_on, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	local peer = self._verify_sender(sender)
+	if not peer then
+		return
+	end
+	local unit = managers.criminals:character_unit_by_peer_id(peer:id())
+	if not unit then
+		return
+	end
+	unit:inventory():set_weapon_underbarrel(selection_index, underbarrel_id, is_on)
+end

@@ -122,6 +122,8 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_x_packrat_npc()
 	self:_init_data_rota_npc()
 	self:_init_data_arbiter_npc()
+	self:_init_data_contraband_npc()
+	self:_init_data_ray_npc()
 	self:_precalculate_values()
 end
 
@@ -339,6 +341,7 @@ function WeaponTweakData:_init_data_m4_npc()
 	self.m4_secondary_npc = deep_clone(self.m4_npc)
 	self.m4_secondary_npc.use_data.selection_index = 1
 	self.ak47_ass_npc = deep_clone(self.m4_npc)
+	self.sg417_npc = deep_clone(self.m4_npc)
 end
 
 function WeaponTweakData:_init_data_ak47_npc()
@@ -934,6 +937,8 @@ function WeaponTweakData:_init_data_ceiling_turret_module_npc()
 	self.ceiling_turret_module.challenges.group = "sentry_gun"
 	self.ceiling_turret_module.challenges.weapon = "sentry_gun"
 	self.ceiling_turret_module.suppression = 0.8
+	self.ceiling_turret_module_no_idle = deep_clone(self.ceiling_turret_module)
+	self.ceiling_turret_module_no_idle.CAN_GO_IDLE = false
 end
 
 function WeaponTweakData:_init_data_usp_npc()
@@ -2173,6 +2178,50 @@ function WeaponTweakData:_init_data_arbiter_npc()
 	self.arbiter_npc.suppression = 1
 end
 
+function WeaponTweakData:_init_data_contraband_npc()
+	self.contraband_npc.sounds.prefix = "contraband_npc"
+	self.contraband_npc.use_data.selection_index = 2
+	self.contraband_npc.DAMAGE = 2
+	self.contraband_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.contraband_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.contraband_npc.CLIP_AMMO_MAX = 20
+	self.contraband_npc.NR_CLIPS_MAX = 5
+	self.contraband_npc.auto.fire_rate = 0.15
+	self.contraband_npc.hold = "rifle"
+	self.contraband_npc.alert_size = 5000
+	self.contraband_npc.suppression = 1
+	self.contraband_m203_npc.sounds.prefix = "contrabandm203_npc"
+	self.contraband_m203_npc.use_data.selection_index = 2
+	self.contraband_m203_npc.DAMAGE = 2
+	self.contraband_m203_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.contraband_m203_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.contraband_m203_npc.no_trail = true
+	self.contraband_m203_npc.CLIP_AMMO_MAX = 1
+	self.contraband_m203_npc.NR_CLIPS_MAX = 4
+	self.contraband_m203_npc.auto.fire_rate = 0.1
+	self.contraband_m203_npc.hold = "rifle"
+	self.contraband_m203_npc.alert_size = 2800
+	self.contraband_m203_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_ray_npc()
+	self.ray_npc.sounds.prefix = "ray_npc"
+	self.ray_npc.use_data.selection_index = 2
+	self.ray_npc.DAMAGE = 2
+	self.ray_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.ray_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.ray_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.ray_npc.no_trail = true
+	self.ray_npc.CLIP_AMMO_MAX = 4
+	self.ray_npc.NR_CLIPS_MAX = 1
+	self.ray_npc.auto.fire_rate = 0.1
+	self.ray_npc.hold = "rifle"
+	self.ray_npc.animations = {}
+	self.ray_npc.animations.thq_align_anim = "thq"
+	self.ray_npc.alert_size = 2800
+	self.ray_npc.suppression = 1
+end
+
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
 	local autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, autohit_minigun_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default, aim_assist_minigun_default
 	if SystemInfo:platform() == Idstring("WIN32") then
@@ -2752,8 +2801,17 @@ end
 function WeaponTweakData:_pickup_chance(max_ammo, selection_index)
 	local low, high
 	if selection_index == 2 then
-		low = 0.01
-		high = 0.035
+		low = 0.03
+		high = 0.055
+	elseif selection_index == 3 then
+		low = 0.03
+		high = 0.055
+	elseif selection_index == 4 then
+		low = 0.05
+		high = 0.075
+	elseif selection_index == 5 then
+		low = 0.05
+		high = 0.075
 	else
 		low = 0.01
 		high = 0.035
@@ -2797,7 +2855,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_m4.CLIP_AMMO_MAX = 30
 	self.new_m4.NR_CLIPS_MAX = 5
 	self.new_m4.AMMO_MAX = self.new_m4.CLIP_AMMO_MAX * self.new_m4.NR_CLIPS_MAX
-	self.new_m4.AMMO_PICKUP = self:_pickup_chance(self.new_m4.AMMO_MAX, 1)
+	self.new_m4.AMMO_PICKUP = self:_pickup_chance(self.new_m4.AMMO_MAX, 3)
 	self.new_m4.FIRE_MODE = "auto"
 	self.new_m4.fire_mode_data = {}
 	self.new_m4.fire_mode_data.fire_rate = 0.1
@@ -2977,7 +3035,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mp9.CLIP_AMMO_MAX = 30
 	self.mp9.NR_CLIPS_MAX = 7
 	self.mp9.AMMO_MAX = self.mp9.CLIP_AMMO_MAX * self.mp9.NR_CLIPS_MAX
-	self.mp9.AMMO_PICKUP = self:_pickup_chance(self.mp9.AMMO_MAX, 1)
+	self.mp9.AMMO_PICKUP = self:_pickup_chance(self.mp9.AMMO_MAX, 2)
 	self.mp9.FIRE_MODE = "auto"
 	self.mp9.fire_mode_data = {}
 	self.mp9.fire_mode_data.fire_rate = 0.063
@@ -3250,7 +3308,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.amcar.CLIP_AMMO_MAX = 20
 	self.amcar.NR_CLIPS_MAX = 11
 	self.amcar.AMMO_MAX = self.amcar.CLIP_AMMO_MAX * self.amcar.NR_CLIPS_MAX
-	self.amcar.AMMO_PICKUP = self:_pickup_chance(self.amcar.AMMO_MAX, 1)
+	self.amcar.AMMO_PICKUP = self:_pickup_chance(self.amcar.AMMO_MAX, 2)
 	self.amcar.FIRE_MODE = "auto"
 	self.amcar.fire_mode_data = {}
 	self.amcar.fire_mode_data.fire_rate = 0.11
@@ -3424,7 +3482,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.olympic.CLIP_AMMO_MAX = 25
 	self.olympic.NR_CLIPS_MAX = 6
 	self.olympic.AMMO_MAX = self.olympic.CLIP_AMMO_MAX * self.olympic.NR_CLIPS_MAX
-	self.olympic.AMMO_PICKUP = self:_pickup_chance(self.olympic.AMMO_MAX, 1)
+	self.olympic.AMMO_PICKUP = self:_pickup_chance(self.olympic.AMMO_MAX, 3)
 	self.olympic.FIRE_MODE = "auto"
 	self.olympic.fire_mode_data = {}
 	self.olympic.fire_mode_data.fire_rate = 0.088
@@ -3510,7 +3568,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ak74.CLIP_AMMO_MAX = 30
 	self.ak74.NR_CLIPS_MAX = 5
 	self.ak74.AMMO_MAX = self.ak74.CLIP_AMMO_MAX * self.ak74.NR_CLIPS_MAX
-	self.ak74.AMMO_PICKUP = self:_pickup_chance(self.ak74.AMMO_MAX, 1)
+	self.ak74.AMMO_PICKUP = self:_pickup_chance(self.ak74.AMMO_MAX, 3)
 	self.ak74.FIRE_MODE = "auto"
 	self.ak74.fire_mode_data = {}
 	self.ak74.fire_mode_data.fire_rate = 0.092
@@ -3862,7 +3920,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.saiga.CLIP_AMMO_MAX = 7
 	self.saiga.NR_CLIPS_MAX = 10
 	self.saiga.AMMO_MAX = self.saiga.CLIP_AMMO_MAX * self.saiga.NR_CLIPS_MAX
-	self.saiga.AMMO_PICKUP = self:_pickup_chance(self.saiga.AMMO_MAX, 1)
+	self.saiga.AMMO_PICKUP = self:_pickup_chance(self.saiga.AMMO_MAX, 4)
 	self.saiga.FIRE_MODE = "auto"
 	self.saiga.fire_mode_data = {}
 	self.saiga.fire_mode_data.fire_rate = 0.18
@@ -3947,7 +4005,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.ak5.CLIP_AMMO_MAX = 30
 	self.ak5.NR_CLIPS_MAX = 5
 	self.ak5.AMMO_MAX = self.ak5.CLIP_AMMO_MAX * self.ak5.NR_CLIPS_MAX
-	self.ak5.AMMO_PICKUP = self:_pickup_chance(self.ak5.AMMO_MAX, 1)
+	self.ak5.AMMO_PICKUP = self:_pickup_chance(self.ak5.AMMO_MAX, 3)
 	self.ak5.FIRE_MODE = "auto"
 	self.ak5.fire_mode_data = {}
 	self.ak5.fire_mode_data.fire_rate = 0.085
@@ -4033,7 +4091,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.aug.CLIP_AMMO_MAX = 30
 	self.aug.NR_CLIPS_MAX = 5
 	self.aug.AMMO_MAX = self.aug.CLIP_AMMO_MAX * self.aug.NR_CLIPS_MAX
-	self.aug.AMMO_PICKUP = self:_pickup_chance(self.aug.AMMO_MAX, 1)
+	self.aug.AMMO_PICKUP = self:_pickup_chance(self.aug.AMMO_MAX, 3)
 	self.aug.FIRE_MODE = "auto"
 	self.aug.fire_mode_data = {}
 	self.aug.fire_mode_data.fire_rate = 0.08
@@ -4117,7 +4175,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.g36.CLIP_AMMO_MAX = 30
 	self.g36.NR_CLIPS_MAX = 8
 	self.g36.AMMO_MAX = self.g36.CLIP_AMMO_MAX * self.g36.NR_CLIPS_MAX
-	self.g36.AMMO_PICKUP = self:_pickup_chance(self.g36.AMMO_MAX, 1)
+	self.g36.AMMO_PICKUP = self:_pickup_chance(self.g36.AMMO_MAX, 2)
 	self.g36.FIRE_MODE = "auto"
 	self.g36.fire_mode_data = {}
 	self.g36.fire_mode_data.fire_rate = 0.085
@@ -4200,7 +4258,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.p90.CLIP_AMMO_MAX = 50
 	self.p90.NR_CLIPS_MAX = 3
 	self.p90.AMMO_MAX = self.p90.CLIP_AMMO_MAX * self.p90.NR_CLIPS_MAX
-	self.p90.AMMO_PICKUP = self:_pickup_chance(self.p90.AMMO_MAX, 1)
+	self.p90.AMMO_PICKUP = self:_pickup_chance(self.p90.AMMO_MAX, 3)
 	self.p90.FIRE_MODE = "auto"
 	self.p90.fire_mode_data = {}
 	self.p90.fire_mode_data.fire_rate = 0.066
@@ -4447,7 +4505,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.new_mp5.CLIP_AMMO_MAX = 30
 	self.new_mp5.NR_CLIPS_MAX = 7
 	self.new_mp5.AMMO_MAX = self.new_mp5.CLIP_AMMO_MAX * self.new_mp5.NR_CLIPS_MAX
-	self.new_mp5.AMMO_PICKUP = self:_pickup_chance(self.new_mp5.AMMO_MAX, 1)
+	self.new_mp5.AMMO_PICKUP = self:_pickup_chance(self.new_mp5.AMMO_MAX, 2)
 	self.new_mp5.FIRE_MODE = "auto"
 	self.new_mp5.fire_mode_data = {}
 	self.new_mp5.fire_mode_data.fire_rate = 0.08
@@ -4615,7 +4673,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mac10.CLIP_AMMO_MAX = 40
 	self.mac10.NR_CLIPS_MAX = 4
 	self.mac10.AMMO_MAX = self.mac10.CLIP_AMMO_MAX * self.mac10.NR_CLIPS_MAX
-	self.mac10.AMMO_PICKUP = self:_pickup_chance(self.mac10.AMMO_MAX, 1)
+	self.mac10.AMMO_PICKUP = self:_pickup_chance(self.mac10.AMMO_MAX, 3)
 	self.mac10.FIRE_MODE = "auto"
 	self.mac10.fire_mode_data = {}
 	self.mac10.fire_mode_data.fire_rate = 0.06
@@ -5509,7 +5567,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.s552.CLIP_AMMO_MAX = 30
 	self.s552.NR_CLIPS_MAX = 8
 	self.s552.AMMO_MAX = self.s552.CLIP_AMMO_MAX * self.s552.NR_CLIPS_MAX
-	self.s552.AMMO_PICKUP = self:_pickup_chance(self.s552.AMMO_MAX, 1)
+	self.s552.AMMO_PICKUP = self:_pickup_chance(self.s552.AMMO_MAX, 2)
 	self.s552.FIRE_MODE = "auto"
 	self.s552.fire_mode_data = {}
 	self.s552.fire_mode_data.fire_rate = 0.084
@@ -5679,7 +5737,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.mp7.CLIP_AMMO_MAX = 20
 	self.mp7.NR_CLIPS_MAX = 8
 	self.mp7.AMMO_MAX = self.mp7.CLIP_AMMO_MAX * self.mp7.NR_CLIPS_MAX
-	self.mp7.AMMO_PICKUP = self:_pickup_chance(self.mp7.AMMO_MAX, 1)
+	self.mp7.AMMO_PICKUP = self:_pickup_chance(self.mp7.AMMO_MAX, 3)
 	self.mp7.FIRE_MODE = "auto"
 	self.mp7.fire_mode_data = {}
 	self.mp7.fire_mode_data.fire_rate = 0.063
@@ -6343,7 +6401,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.msr.CLIP_AMMO_MAX = 10
 	self.msr.NR_CLIPS_MAX = 4
 	self.msr.AMMO_MAX = self.msr.CLIP_AMMO_MAX * self.msr.NR_CLIPS_MAX
-	self.msr.AMMO_PICKUP = {1, 1}
+	self.msr.AMMO_PICKUP = self:_pickup_chance(self.msr.AMMO_MAX, 5)
 	self.msr.FIRE_MODE = "single"
 	self.msr.fire_mode_data = {}
 	self.msr.fire_mode_data.fire_rate = 1
@@ -6624,7 +6682,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.benelli.CLIP_AMMO_MAX = 8
 	self.benelli.NR_CLIPS_MAX = 8
 	self.benelli.AMMO_MAX = self.benelli.CLIP_AMMO_MAX * self.benelli.NR_CLIPS_MAX
-	self.benelli.AMMO_PICKUP = self:_pickup_chance(self.benelli.AMMO_MAX, 1)
+	self.benelli.AMMO_PICKUP = self:_pickup_chance(self.benelli.AMMO_MAX, 4)
 	self.benelli.FIRE_MODE = "single"
 	self.benelli.fire_mode_data = {}
 	self.benelli.fire_mode_data.fire_rate = 0.14
@@ -6714,7 +6772,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.striker.CLIP_AMMO_MAX = 12
 	self.striker.NR_CLIPS_MAX = 6
 	self.striker.AMMO_MAX = self.striker.CLIP_AMMO_MAX * self.striker.NR_CLIPS_MAX
-	self.striker.AMMO_PICKUP = self:_pickup_chance(self.striker.AMMO_MAX, 1)
+	self.striker.AMMO_PICKUP = self:_pickup_chance(self.striker.AMMO_MAX, 4)
 	self.striker.FIRE_MODE = "single"
 	self.striker.fire_mode_data = {}
 	self.striker.fire_mode_data.fire_rate = 0.14
@@ -7078,7 +7136,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.galil.CLIP_AMMO_MAX = 30
 	self.galil.NR_CLIPS_MAX = 5
 	self.galil.AMMO_MAX = self.galil.CLIP_AMMO_MAX * self.galil.NR_CLIPS_MAX
-	self.galil.AMMO_PICKUP = self:_pickup_chance(self.galil.AMMO_MAX, 1)
+	self.galil.AMMO_PICKUP = self:_pickup_chance(self.galil.AMMO_MAX, 3)
 	self.galil.FIRE_MODE = "auto"
 	self.galil.fire_mode_data = {}
 	self.galil.fire_mode_data.fire_rate = 0.071
@@ -7165,7 +7223,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.famas.CLIP_AMMO_MAX = 30
 	self.famas.NR_CLIPS_MAX = 8
 	self.famas.AMMO_MAX = self.famas.CLIP_AMMO_MAX * self.famas.NR_CLIPS_MAX
-	self.famas.AMMO_PICKUP = self:_pickup_chance(self.famas.AMMO_MAX, 1)
+	self.famas.AMMO_PICKUP = self:_pickup_chance(self.famas.AMMO_MAX, 2)
 	self.famas.FIRE_MODE = "auto"
 	self.famas.fire_mode_data = {}
 	self.famas.fire_mode_data.fire_rate = 0.06
@@ -7251,7 +7309,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.scorpion.CLIP_AMMO_MAX = 20
 	self.scorpion.NR_CLIPS_MAX = 11
 	self.scorpion.AMMO_MAX = self.scorpion.CLIP_AMMO_MAX * self.scorpion.NR_CLIPS_MAX
-	self.scorpion.AMMO_PICKUP = self:_pickup_chance(self.scorpion.AMMO_MAX, 1)
+	self.scorpion.AMMO_PICKUP = self:_pickup_chance(self.scorpion.AMMO_MAX, 2)
 	self.scorpion.FIRE_MODE = "auto"
 	self.scorpion.fire_mode_data = {}
 	self.scorpion.fire_mode_data.fire_rate = 0.06
@@ -7338,7 +7396,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.tec9.CLIP_AMMO_MAX = 20
 	self.tec9.NR_CLIPS_MAX = 11
 	self.tec9.AMMO_MAX = self.tec9.CLIP_AMMO_MAX * self.tec9.NR_CLIPS_MAX
-	self.tec9.AMMO_PICKUP = self:_pickup_chance(self.tec9.AMMO_MAX, 1)
+	self.tec9.AMMO_PICKUP = self:_pickup_chance(self.tec9.AMMO_MAX, 2)
 	self.tec9.FIRE_MODE = "auto"
 	self.tec9.fire_mode_data = {}
 	self.tec9.fire_mode_data.fire_rate = 0.067
@@ -7425,7 +7483,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.uzi.CLIP_AMMO_MAX = 30
 	self.uzi.NR_CLIPS_MAX = 5
 	self.uzi.AMMO_MAX = self.uzi.CLIP_AMMO_MAX * self.uzi.NR_CLIPS_MAX
-	self.uzi.AMMO_PICKUP = self:_pickup_chance(self.uzi.AMMO_MAX, 1)
+	self.uzi.AMMO_PICKUP = self:_pickup_chance(self.uzi.AMMO_MAX, 3)
 	self.uzi.FIRE_MODE = "auto"
 	self.uzi.fire_mode_data = {}
 	self.uzi.fire_mode_data.fire_rate = 0.086
@@ -7956,7 +8014,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.spas12.CLIP_AMMO_MAX = 6
 	self.spas12.NR_CLIPS_MAX = 11
 	self.spas12.AMMO_MAX = self.spas12.CLIP_AMMO_MAX * self.spas12.NR_CLIPS_MAX
-	self.spas12.AMMO_PICKUP = self:_pickup_chance(self.spas12.AMMO_MAX, 1)
+	self.spas12.AMMO_PICKUP = self:_pickup_chance(self.spas12.AMMO_MAX, 4)
 	self.spas12.FIRE_MODE = "single"
 	self.spas12.fire_mode_data = {}
 	self.spas12.fire_mode_data.fire_rate = 0.2
@@ -8144,14 +8202,14 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.c96.use_data.selection_index = 1
 	self.c96.DAMAGE = 1
 	self.c96.CLIP_AMMO_MAX = 10
-	self.c96.NR_CLIPS_MAX = 15
+	self.c96.NR_CLIPS_MAX = 9
 	self.c96.AMMO_MAX = self.c96.CLIP_AMMO_MAX * self.c96.NR_CLIPS_MAX
 	self.c96.AMMO_PICKUP = self:_pickup_chance(self.c96.AMMO_MAX, 1)
 	self.c96.FIRE_MODE = "single"
 	self.c96.fire_mode_data = {}
-	self.c96.fire_mode_data.fire_rate = 0.125
+	self.c96.fire_mode_data.fire_rate = 0.166
 	self.c96.single = {}
-	self.c96.single.fire_rate = 0.125
+	self.c96.single.fire_rate = 0.166
 	self.c96.spread = {}
 	self.c96.spread.standing = self.new_m4.spread.standing
 	self.c96.spread.crouching = self.new_m4.spread.crouching
@@ -8190,8 +8248,8 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.c96.texture_bundle_folder = "gage_pack_historical"
 	self.c96.panic_suppression_chance = 0.2
 	self.c96.stats = {
-		damage = 37,
-		spread = 12,
+		damage = 65,
+		spread = 21,
 		recoil = 16,
 		spread_moving = 12,
 		zoom = 3,
@@ -8232,7 +8290,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.sterling.CLIP_AMMO_MAX = 20
 	self.sterling.NR_CLIPS_MAX = 11
 	self.sterling.AMMO_MAX = self.sterling.CLIP_AMMO_MAX * self.sterling.NR_CLIPS_MAX
-	self.sterling.AMMO_PICKUP = self:_pickup_chance(self.sterling.AMMO_MAX, 1)
+	self.sterling.AMMO_PICKUP = self:_pickup_chance(self.sterling.AMMO_MAX, 2)
 	self.sterling.FIRE_MODE = "auto"
 	self.sterling.fire_mode_data = {}
 	self.sterling.fire_mode_data.fire_rate = 0.11
@@ -8418,7 +8476,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m1928.CLIP_AMMO_MAX = 50
 	self.m1928.NR_CLIPS_MAX = 3
 	self.m1928.AMMO_MAX = self.m1928.CLIP_AMMO_MAX * self.m1928.NR_CLIPS_MAX
-	self.m1928.AMMO_PICKUP = self:_pickup_chance(self.m1928.AMMO_MAX, 1)
+	self.m1928.AMMO_PICKUP = self:_pickup_chance(self.m1928.AMMO_MAX, 3)
 	self.m1928.FIRE_MODE = "auto"
 	self.m1928.fire_mode_data = {}
 	self.m1928.fire_mode_data.fire_rate = 0.083
@@ -8509,7 +8567,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.l85a2.CLIP_AMMO_MAX = 30
 	self.l85a2.NR_CLIPS_MAX = 5
 	self.l85a2.AMMO_MAX = self.l85a2.CLIP_AMMO_MAX * self.l85a2.NR_CLIPS_MAX
-	self.l85a2.AMMO_PICKUP = self:_pickup_chance(self.l85a2.AMMO_MAX, 1)
+	self.l85a2.AMMO_PICKUP = self:_pickup_chance(self.l85a2.AMMO_MAX, 3)
 	self.l85a2.FIRE_MODE = "auto"
 	self.l85a2.fire_mode_data = {}
 	self.l85a2.fire_mode_data.fire_rate = 0.083
@@ -8600,7 +8658,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.vhs.CLIP_AMMO_MAX = 30
 	self.vhs.NR_CLIPS_MAX = 5
 	self.vhs.AMMO_MAX = self.vhs.CLIP_AMMO_MAX * self.vhs.NR_CLIPS_MAX
-	self.vhs.AMMO_PICKUP = self:_pickup_chance(self.vhs.AMMO_MAX, 1)
+	self.vhs.AMMO_PICKUP = self:_pickup_chance(self.vhs.AMMO_MAX, 3)
 	self.vhs.FIRE_MODE = "auto"
 	self.vhs.fire_mode_data = {}
 	self.vhs.fire_mode_data.fire_rate = 0.07
@@ -8970,7 +9028,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.cobray.CLIP_AMMO_MAX = 32
 	self.cobray.NR_CLIPS_MAX = 5
 	self.cobray.AMMO_MAX = self.cobray.CLIP_AMMO_MAX * self.cobray.NR_CLIPS_MAX
-	self.cobray.AMMO_PICKUP = self:_pickup_chance(self.cobray.AMMO_MAX, 1)
+	self.cobray.AMMO_PICKUP = self:_pickup_chance(self.cobray.AMMO_MAX, 3)
 	self.cobray.FIRE_MODE = "auto"
 	self.cobray.fire_mode_data = {}
 	self.cobray.fire_mode_data.fire_rate = 0.05
@@ -9645,7 +9703,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.aa12.CLIP_AMMO_MAX = 8
 	self.aa12.NR_CLIPS_MAX = 9
 	self.aa12.AMMO_MAX = self.aa12.CLIP_AMMO_MAX * self.aa12.NR_CLIPS_MAX
-	self.aa12.AMMO_PICKUP = self:_pickup_chance(self.aa12.AMMO_MAX, 1)
+	self.aa12.AMMO_PICKUP = self:_pickup_chance(self.aa12.AMMO_MAX, 4)
 	self.aa12.FIRE_MODE = "auto"
 	self.aa12.fire_mode_data = {}
 	self.aa12.fire_mode_data.fire_rate = 0.2
@@ -9838,7 +9896,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.winchester1874.CLIP_AMMO_MAX = 15
 	self.winchester1874.NR_CLIPS_MAX = 3
 	self.winchester1874.AMMO_MAX = self.winchester1874.CLIP_AMMO_MAX * self.winchester1874.NR_CLIPS_MAX
-	self.winchester1874.AMMO_PICKUP = self:_pickup_chance(self.winchester1874.AMMO_MAX, 1)
+	self.winchester1874.AMMO_PICKUP = self:_pickup_chance(self.winchester1874.AMMO_MAX, 5)
 	self.winchester1874.FIRE_MODE = "single"
 	self.winchester1874.fire_mode_data = {}
 	self.winchester1874.fire_mode_data.fire_rate = 0.7
@@ -10121,7 +10179,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.asval.CLIP_AMMO_MAX = 20
 	self.asval.NR_CLIPS_MAX = 11
 	self.asval.AMMO_MAX = self.asval.CLIP_AMMO_MAX * self.asval.NR_CLIPS_MAX
-	self.asval.AMMO_PICKUP = self:_pickup_chance(self.asval.AMMO_MAX, 1)
+	self.asval.AMMO_PICKUP = self:_pickup_chance(self.asval.AMMO_MAX, 2)
 	self.asval.FIRE_MODE = "auto"
 	self.asval.fire_mode_data = {}
 	self.asval.fire_mode_data.fire_rate = 0.067
@@ -10206,7 +10264,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.sub2000.use_data.selection_index = 2
 	self.sub2000.DAMAGE = 2
 	self.sub2000.CLIP_AMMO_MAX = 33
-	self.sub2000.NR_CLIPS_MAX = 3
+	self.sub2000.NR_CLIPS_MAX = 2
 	self.sub2000.AMMO_MAX = self.sub2000.CLIP_AMMO_MAX * self.sub2000.NR_CLIPS_MAX
 	self.sub2000.AMMO_PICKUP = self:_pickup_chance(self.sub2000.AMMO_MAX, 1)
 	self.sub2000.FIRE_MODE = "single"
@@ -10253,12 +10311,12 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.sub2000.global_value = "kenaz"
 	self.sub2000.texture_bundle_folder = "kenaz"
 	self.sub2000.stats = {
-		damage = 65,
-		spread = 21,
+		damage = 160,
+		spread = 19,
 		recoil = 9,
 		spread_moving = 16,
 		zoom = 3,
-		concealment = 25,
+		concealment = 27,
 		suppression = 4,
 		alert_size = 7,
 		extra_ammo = 6,
@@ -10296,7 +10354,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.wa2000.CLIP_AMMO_MAX = 10
 	self.wa2000.NR_CLIPS_MAX = 4
 	self.wa2000.AMMO_MAX = self.wa2000.CLIP_AMMO_MAX * self.wa2000.NR_CLIPS_MAX
-	self.wa2000.AMMO_PICKUP = self:_pickup_chance(self.wa2000.AMMO_MAX, 1)
+	self.wa2000.AMMO_PICKUP = self:_pickup_chance(self.wa2000.AMMO_MAX, 5)
 	self.wa2000.FIRE_MODE = "single"
 	self.wa2000.fire_mode_data = {}
 	self.wa2000.fire_mode_data.fire_rate = 0.5
@@ -10393,7 +10451,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.polymer.CLIP_AMMO_MAX = 30
 	self.polymer.NR_CLIPS_MAX = 5
 	self.polymer.AMMO_MAX = self.polymer.CLIP_AMMO_MAX * self.polymer.NR_CLIPS_MAX
-	self.polymer.AMMO_PICKUP = self:_pickup_chance(self.polymer.AMMO_MAX, 1)
+	self.polymer.AMMO_PICKUP = self:_pickup_chance(self.polymer.AMMO_MAX, 3)
 	self.polymer.FIRE_MODE = "auto"
 	self.polymer.fire_mode_data = {}
 	self.polymer.fire_mode_data.fire_rate = 0.05
@@ -10583,7 +10641,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.baka.CLIP_AMMO_MAX = 32
 	self.baka.NR_CLIPS_MAX = 7
 	self.baka.AMMO_MAX = self.baka.CLIP_AMMO_MAX * self.baka.NR_CLIPS_MAX
-	self.baka.AMMO_PICKUP = self:_pickup_chance(self.baka.AMMO_MAX, 1)
+	self.baka.AMMO_PICKUP = self:_pickup_chance(self.baka.AMMO_MAX, 2)
 	self.baka.FIRE_MODE = "auto"
 	self.baka.fire_mode_data = {}
 	self.baka.fire_mode_data.fire_rate = 0.05
@@ -11254,7 +11312,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m37.damage_far = 3000
 	self.m37.rays = 12
 	self.m37.CLIP_AMMO_MAX = 7
-	self.m37.NR_CLIPS_MAX = 6
+	self.m37.NR_CLIPS_MAX = 4
 	self.m37.AMMO_MAX = self.m37.CLIP_AMMO_MAX * self.m37.NR_CLIPS_MAX
 	self.m37.AMMO_PICKUP = self:_pickup_chance(self.m37.AMMO_MAX, 1)
 	self.m37.FIRE_MODE = "single"
@@ -11310,7 +11368,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.m37.global_value = "peta"
 	self.m37.panic_suppression_chance = 0.2
 	self.m37.stats = {
-		damage = 90,
+		damage = 155,
 		spread = 12,
 		recoil = 14,
 		spread_moving = 12,
@@ -11456,7 +11514,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.sr2.CLIP_AMMO_MAX = 32
 	self.sr2.NR_CLIPS_MAX = 5
 	self.sr2.AMMO_MAX = self.cobray.CLIP_AMMO_MAX * self.cobray.NR_CLIPS_MAX
-	self.sr2.AMMO_PICKUP = self:_pickup_chance(self.cobray.AMMO_MAX, 1)
+	self.sr2.AMMO_PICKUP = self:_pickup_chance(self.cobray.AMMO_MAX, 3)
 	self.sr2.FIRE_MODE = "auto"
 	self.sr2.fire_mode_data = {}
 	self.sr2.fire_mode_data.fire_rate = 0.08
@@ -11908,7 +11966,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.tecci.CLIP_AMMO_MAX = 100
 	self.tecci.NR_CLIPS_MAX = 2
 	self.tecci.AMMO_MAX = self.tecci.CLIP_AMMO_MAX * self.tecci.NR_CLIPS_MAX
-	self.tecci.AMMO_PICKUP = self:_pickup_chance(self.tecci.AMMO_MAX, 1)
+	self.tecci.AMMO_PICKUP = self:_pickup_chance(self.tecci.AMMO_MAX, 2)
 	self.tecci.FIRE_MODE = "auto"
 	self.tecci.fire_mode_data = {}
 	self.tecci.fire_mode_data.fire_rate = 0.09
@@ -12559,7 +12617,7 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.rota.CLIP_AMMO_MAX = 6
 	self.rota.NR_CLIPS_MAX = 9
 	self.rota.AMMO_MAX = self.rota.CLIP_AMMO_MAX * self.rota.NR_CLIPS_MAX
-	self.rota.AMMO_PICKUP = self:_pickup_chance(self.rota.AMMO_MAX, 1)
+	self.rota.AMMO_PICKUP = self:_pickup_chance(self.rota.AMMO_MAX, 4)
 	self.rota.FIRE_MODE = "single"
 	self.rota.fire_mode_data = {}
 	self.rota.fire_mode_data.fire_rate = 0.18
@@ -12714,6 +12772,297 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	}
 	self.arbiter.stats_modifiers = {damage = 10}
 	self.arbiter.unlock_func = "has_unlocked_arbiter"
+	self.contraband = {}
+	self.contraband.category = "assault_rifle"
+	self.contraband.damage_melee = damage_melee_default
+	self.contraband.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.contraband.sounds = {}
+	self.contraband.sounds.fire = "contraband_fire_single"
+	self.contraband.sounds.fire_single = "contraband_fire_single"
+	self.contraband.sounds.fire_auto = "contraband_fire"
+	self.contraband.sounds.stop_fire = "contraband_stop"
+	self.contraband.sounds.dryfire = "primary_dryfire"
+	self.contraband.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.contraband.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.contraband.timers = {}
+	self.contraband.timers.reload_not_empty = 2.55
+	self.contraband.timers.reload_empty = 3.2
+	self.contraband.timers.unequip = 0.6
+	self.contraband.timers.equip = 0.5
+	self.contraband.name_id = "bm_w_contraband"
+	self.contraband.desc_id = "bm_w_contraband_desc"
+	self.contraband.description_id = "des_contraband"
+	self.contraband.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.contraband.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.contraband.use_data = {}
+	self.contraband.use_data.selection_index = 2
+	self.contraband.DAMAGE = 1
+	self.contraband.CLIP_AMMO_MAX = 20
+	self.contraband.NR_CLIPS_MAX = 2
+	self.contraband.AMMO_MAX = self.contraband.CLIP_AMMO_MAX * self.contraband.NR_CLIPS_MAX
+	self.contraband.AMMO_PICKUP = self:_pickup_chance(self.contraband.AMMO_MAX, 1)
+	self.contraband.FIRE_MODE = "single"
+	self.contraband.fire_mode_data = {}
+	self.contraband.fire_mode_data.fire_rate = 0.098
+	self.contraband.CAN_TOGGLE_FIREMODE = true
+	self.contraband.auto = {}
+	self.contraband.auto.fire_rate = 0.098
+	self.contraband.spread = {}
+	self.contraband.spread.standing = self.new_m4.spread.standing
+	self.contraband.spread.crouching = self.new_m4.spread.crouching
+	self.contraband.spread.steelsight = self.new_m4.spread.steelsight
+	self.contraband.spread.moving_standing = self.new_m4.spread.moving_standing
+	self.contraband.spread.moving_crouching = self.new_m4.spread.moving_crouching
+	self.contraband.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.contraband.kick = {}
+	self.contraband.kick.standing = self.new_m4.kick.standing
+	self.contraband.kick.crouching = self.contraband.kick.standing
+	self.contraband.kick.steelsight = self.contraband.kick.standing
+	self.contraband.crosshair = {}
+	self.contraband.crosshair.standing = {}
+	self.contraband.crosshair.crouching = {}
+	self.contraband.crosshair.steelsight = {}
+	self.contraband.crosshair.standing.offset = 0.14
+	self.contraband.crosshair.standing.moving_offset = 0.8
+	self.contraband.crosshair.standing.kick_offset = 0.6
+	self.contraband.crosshair.crouching.offset = 0.1
+	self.contraband.crosshair.crouching.moving_offset = 0.6
+	self.contraband.crosshair.crouching.kick_offset = 0.4
+	self.contraband.crosshair.steelsight.hidden = true
+	self.contraband.crosshair.steelsight.offset = 0
+	self.contraband.crosshair.steelsight.moving_offset = 0
+	self.contraband.crosshair.steelsight.kick_offset = 0.14
+	self.contraband.shake = {}
+	self.contraband.shake.fire_multiplier = 1
+	self.contraband.shake.fire_steelsight_multiplier = -1
+	self.contraband.autohit = autohit_rifle_default
+	self.contraband.aim_assist = aim_assist_rifle_default
+	self.contraband.weapon_hold = "contraband"
+	self.contraband.animations = {}
+	self.contraband.animations.equip_id = "equip_contraband"
+	self.contraband.animations.recoil_steelsight = true
+	self.contraband.global_value = "chico"
+	self.contraband.texture_bundle_folder = "chico"
+	self.contraband.panic_suppression_chance = 0.2
+	self.contraband.stats = {
+		damage = 160,
+		spread = 19,
+		recoil = 12,
+		spread_moving = 15,
+		zoom = 3,
+		concealment = 8,
+		suppression = 8,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 9,
+		reload = 11
+	}
+	self.contraband_m203 = {}
+	self.contraband_m203.category = "grenade_launcher"
+	self.contraband_m203.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.contraband_m203.damage_melee = damage_melee_default
+	self.contraband_m203.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.contraband_m203.sounds = {}
+	self.contraband_m203.sounds.fire = "contrabandm203_fire"
+	self.contraband_m203.sounds.dryfire = "shotgun_dryfire"
+	self.contraband_m203.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.contraband_m203.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.contraband_m203.timers = {}
+	self.contraband_m203.timers.reload_not_empty = 2.45
+	self.contraband_m203.timers.reload_empty = 2.45
+	self.contraband_m203.timers.unequip = 0.6
+	self.contraband_m203.timers.equip = 0.6
+	self.contraband_m203.timers.equip_underbarrel = 0.4
+	self.contraband_m203.timers.unequip_underbarrel = 0.4
+	self.contraband_m203.name_id = "bm_w_contraband_m203"
+	self.contraband_m203.desc_id = "bm_w_contraband_m203_desc"
+	self.contraband_m203.description_id = "des_contraband_m203"
+	self.contraband_m203.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.contraband_m203.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.contraband_m203.use_data = {}
+	self.contraband_m203.use_data.selection_index = 3
+	self.contraband_m203.use_data.align_place = "right_hand"
+	self.contraband_m203.DAMAGE = 6
+	self.contraband_m203.damage_near = 2000
+	self.contraband_m203.damage_far = 3000
+	self.contraband_m203.rays = 6
+	self.contraband_m203.CLIP_AMMO_MAX = 1
+	self.contraband_m203.NR_CLIPS_MAX = 3
+	self.contraband_m203.AMMO_MAX = self.contraband_m203.CLIP_AMMO_MAX * self.contraband_m203.NR_CLIPS_MAX
+	self.contraband_m203.AMMO_PICKUP = self:_pickup_chance(20, 1)
+	self.contraband_m203.FIRE_MODE = "single"
+	self.contraband_m203.fire_mode_data = {}
+	self.contraband_m203.fire_mode_data.fire_rate = 0.75
+	self.contraband_m203.single = {}
+	self.contraband_m203.single.fire_rate = 0.75
+	self.contraband_m203.spread = {}
+	self.contraband_m203.spread.standing = self.r870.spread.standing
+	self.contraband_m203.spread.crouching = self.r870.spread.crouching
+	self.contraband_m203.spread.steelsight = self.r870.spread.steelsight
+	self.contraband_m203.spread.moving_standing = self.r870.spread.moving_standing
+	self.contraband_m203.spread.moving_crouching = self.r870.spread.moving_crouching
+	self.contraband_m203.spread.moving_steelsight = self.r870.spread.moving_steelsight
+	self.contraband_m203.kick = {}
+	self.contraband_m203.kick.standing = {
+		2.9,
+		3,
+		-0.5,
+		0.5
+	}
+	self.contraband_m203.kick.crouching = self.contraband_m203.kick.standing
+	self.contraband_m203.kick.steelsight = self.contraband_m203.kick.standing
+	self.contraband_m203.crosshair = {}
+	self.contraband_m203.crosshair.standing = {}
+	self.contraband_m203.crosshair.crouching = {}
+	self.contraband_m203.crosshair.steelsight = {}
+	self.contraband_m203.crosshair.standing.offset = 0.16
+	self.contraband_m203.crosshair.standing.moving_offset = 0.8
+	self.contraband_m203.crosshair.standing.kick_offset = 0.6
+	self.contraband_m203.crosshair.standing.hidden = true
+	self.contraband_m203.crosshair.crouching.offset = 0.08
+	self.contraband_m203.crosshair.crouching.moving_offset = 0.7
+	self.contraband_m203.crosshair.crouching.kick_offset = 0.4
+	self.contraband_m203.crosshair.crouching.hidden = true
+	self.contraband_m203.crosshair.steelsight.hidden = true
+	self.contraband_m203.crosshair.steelsight.offset = 0
+	self.contraband_m203.crosshair.steelsight.moving_offset = 0
+	self.contraband_m203.crosshair.steelsight.kick_offset = 0.1
+	self.contraband_m203.shake = {}
+	self.contraband_m203.shake.fire_multiplier = 2
+	self.contraband_m203.shake.fire_steelsight_multiplier = 2
+	self.contraband_m203.autohit = autohit_shotgun_default
+	self.contraband_m203.aim_assist = aim_assist_shotgun_default
+	self.contraband_m203.animations = {}
+	self.contraband_m203.animations.equip_id = "equip_contraband_m203"
+	self.contraband_m203.animations.recoil_steelsight = true
+	self.contraband_m203.global_value = "gage_pack_assault"
+	self.contraband_m203.texture_bundle_folder = "gage_pack_assault"
+	self.contraband_m203.panic_suppression_chance = 0.2
+	self.contraband_m203.ignore_damage_upgrades = true
+	self.contraband_m203.stats = {
+		damage = 130,
+		spread = 25,
+		recoil = 25,
+		spread_moving = 6,
+		zoom = 3,
+		concealment = 18,
+		suppression = 2,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1,
+		reload = 11
+	}
+	self.contraband_m203.stats_modifiers = {damage = 10}
+	self.ray = {}
+	self.ray.category = "grenade_launcher"
+	self.ray.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.ray.has_description = true
+	self.ray.projectile_type_index = 37
+	self.ray.damage_melee = damage_melee_default
+	self.ray.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.ray.sounds = {}
+	self.ray.sounds.fire = "ray_fire"
+	self.ray.sounds.dryfire = "shotgun_dryfire"
+	self.ray.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.ray.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.ray.timers = {}
+	self.ray.timers.reload_not_empty = 6
+	self.ray.timers.reload_empty = 5.75
+	self.ray.timers.unequip = 0.85
+	self.ray.timers.equip = 0.85
+	self.ray.name_id = "bm_w_ray"
+	self.ray.desc_id = "bm_w_ray_desc"
+	self.ray.description_id = "des_ray"
+	self.ray.muzzleflash = "effects/payday2/particles/weapons/50cal_auto_fps"
+	self.ray.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.ray.use_data = {}
+	self.ray.use_data.selection_index = 1
+	self.ray.use_data.align_place = "right_hand"
+	self.ray.DAMAGE = 6
+	self.ray.damage_near = 1000
+	self.ray.damage_far = 2000
+	self.ray.rays = 6
+	self.ray.CLIP_AMMO_MAX = 4
+	self.ray.NR_CLIPS_MAX = 2
+	self.ray.AMMO_MAX = self.ray.CLIP_AMMO_MAX * self.ray.NR_CLIPS_MAX
+	self.ray.AMMO_PICKUP = self:_pickup_chance(0, 1)
+	self.ray.FIRE_MODE = "single"
+	self.ray.fire_mode_data = {}
+	self.ray.fire_mode_data.fire_rate = 1
+	self.ray.single = {}
+	self.ray.single.fire_rate = 0.1
+	self.ray.spread = {}
+	self.ray.spread.standing = self.r870.spread.standing
+	self.ray.spread.crouching = self.r870.spread.crouching
+	self.ray.spread.steelsight = self.r870.spread.steelsight
+	self.ray.spread.moving_standing = self.r870.spread.moving_standing
+	self.ray.spread.moving_crouching = self.r870.spread.moving_crouching
+	self.ray.spread.moving_steelsight = self.r870.spread.moving_steelsight
+	self.ray.kick = {}
+	self.ray.kick.standing = {
+		2.9,
+		3,
+		-0.5,
+		0.5
+	}
+	self.ray.kick.crouching = self.ray.kick.standing
+	self.ray.kick.steelsight = self.ray.kick.standing
+	self.ray.crosshair = {}
+	self.ray.crosshair.standing = {}
+	self.ray.crosshair.crouching = {}
+	self.ray.crosshair.steelsight = {}
+	self.ray.crosshair.standing.offset = 0.16
+	self.ray.crosshair.standing.moving_offset = 0.8
+	self.ray.crosshair.standing.kick_offset = 0.6
+	self.ray.crosshair.standing.hidden = true
+	self.ray.crosshair.crouching.offset = 0.08
+	self.ray.crosshair.crouching.moving_offset = 0.7
+	self.ray.crosshair.crouching.kick_offset = 0.4
+	self.ray.crosshair.crouching.hidden = true
+	self.ray.crosshair.steelsight.hidden = true
+	self.ray.crosshair.steelsight.offset = 0
+	self.ray.crosshair.steelsight.moving_offset = 0
+	self.ray.crosshair.steelsight.kick_offset = 0.1
+	self.ray.shake = {}
+	self.ray.shake.fire_multiplier = 2
+	self.ray.shake.fire_steelsight_multiplier = 2
+	self.ray.headbob = {}
+	self.ray.headbob.multiplier = 0.3
+	self.ray.autohit = autohit_shotgun_default
+	self.ray.aim_assist = aim_assist_shotgun_default
+	self.ray.animations = {}
+	self.ray.animations.equip_id = "equip_ray"
+	self.ray.animations.recoil_steelsight = true
+	self.ray.animations.thq_align_anim = "thq"
+	self.ray.global_value = "friend"
+	self.ray.texture_bundle_folder = "friend"
+	self.ray.panic_suppression_chance = 0.2
+	self.ray.ignore_damage_upgrades = true
+	self.ray.stats = {
+		damage = 50,
+		spread = 25,
+		recoil = 25,
+		spread_moving = 25,
+		zoom = 3,
+		concealment = 5,
+		suppression = 2,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1,
+		reload = 11
+	}
+	self.ray.stats_modifiers = {damage = 100}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -13518,6 +13867,24 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.contraband_npc = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.contraband_m203_npc = {
+		usage = "r870",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.ray_npc = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -13647,4 +14014,8 @@ function WeaponTweakData:_precalculate_values()
 	self.x_packrat_npc.AMMO_MAX = self.x_packrat_npc.CLIP_AMMO_MAX * self.x_packrat_npc.NR_CLIPS_MAX
 	self.rota_npc.AMMO_MAX = self.rota_npc.CLIP_AMMO_MAX * self.rota_npc.NR_CLIPS_MAX
 	self.arbiter_npc.AMMO_MAX = self.arbiter_npc.CLIP_AMMO_MAX * self.arbiter_npc.NR_CLIPS_MAX
+	self.contraband_npc.AMMO_MAX = self.contraband_npc.CLIP_AMMO_MAX * self.contraband_npc.NR_CLIPS_MAX
+	self.contraband_m203_npc.AMMO_MAX = self.contraband_m203_npc.CLIP_AMMO_MAX * self.contraband_m203_npc.NR_CLIPS_MAX
+	self.ray_npc.AMMO_MAX = self.ray_npc.CLIP_AMMO_MAX * self.ray_npc.NR_CLIPS_MAX
+	self.sg417_npc.AMMO_MAX = self.sg417_npc.CLIP_AMMO_MAX * self.sg417_npc.NR_CLIPS_MAX
 end

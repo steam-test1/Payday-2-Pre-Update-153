@@ -426,3 +426,12 @@ function NewNPCRaycastWeaponBase:set_flashlight_light_lod_enabled(enabled)
 		self._flashlight_data.light:set_enable(false)
 	end
 end
+
+function NewNPCRaycastWeaponBase:set_underbarrel(underbarrel_id, enabled)
+	underbarrel_id = underbarrel_id .. "_npc"
+	if enabled then
+		self._name_id = underbarrel_id
+	else
+		self._name_id = self.name_id
+	end
+end

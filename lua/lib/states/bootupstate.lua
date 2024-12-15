@@ -127,7 +127,8 @@ function BootupState:setup()
 			width = res.x,
 			height = res.y,
 			padding = 200,
-			can_skip = true
+			can_skip = true,
+			limit_file_streamer = true
 		})
 	end
 	table.insert(self._play_data_list, {
@@ -296,6 +297,13 @@ function BootupState:play_next(is_skipped)
 		end
 	end
 	if self._play_data then
+		if self._play_data.limit_file_streamer then
+			managers.dyn_resource:set_file_streaming_chunk_size_mul(0.05, 10)
+			self._limit_file_streamer = true
+		elseif self._limit_file_streamer then
+			managers.dyn_resource:set_file_streaming_chunk_size_mul(1, 3)
+			self._limit_file_streamer = false
+		end
 		self._fade = self._play_data.fade_in and 0 or 1
 		if alive(self._gui_obj) then
 			self._panel:remove(self._gui_obj)

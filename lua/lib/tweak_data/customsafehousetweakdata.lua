@@ -119,6 +119,9 @@ function CustomSafehouseTweakData:_init_heisters(tweak_data)
 	self.heisters.wild = clone(self.heisters.base)
 	self.heisters.wild.character_material = "var_mtr_wild"
 	self.heisters.wild.voice = self:get_voice(tweak_data, "wild")
+	self.heisters.terry = clone(self.heisters.base)
+	self.heisters.terry.character_material = "var_mtr_terry"
+	self.heisters.terry.voice = self:get_voice(tweak_data, "chico")
 	self.heisters.butler = clone(self.heisters.base)
 	self.heisters.butler.character_material = ""
 	self.heisters.butler.voice = self:get_voice(tweak_data, "butler")
@@ -292,6 +295,13 @@ function CustomSafehouseTweakData:_init_safehouse_contractors(tweak_data)
 		name_id = "menu_wild",
 		character = "wild",
 		image_name = "rust",
+		weighting = heister_weighting,
+		dailies = {}
+	})
+	table.insert(self.contractors, {
+		name_id = "menu_terry",
+		character = "terry",
+		image_name = "terry",
 		weighting = heister_weighting,
 		dailies = {}
 	})
@@ -495,6 +505,18 @@ function CustomSafehouseTweakData:_init_safehouse_rooms(tweak_data)
 			"guis/dlcs/chill/textures/pd2/rooms/safehouse_room_preview_rust_lvl1",
 			"guis/dlcs/chill/textures/pd2/rooms/safehouse_room_preview_rust_lvl2",
 			"guis/dlcs/chill/textures/pd2/rooms/safehouse_room_preview_rust_lvl3"
+		}
+	})
+	table.insert(self.rooms, {
+		room_id = "terry",
+		name_id = "menu_terry",
+		title_id = "menu_cs_title_terry",
+		help_id = "menu_cs_help_terry",
+		tier_max = 3,
+		images = {
+			"guis/dlcs/chill/textures/pd2/rooms/safehouse_room_preview_scarface_lvl1",
+			"guis/dlcs/chill/textures/pd2/rooms/safehouse_room_preview_scarface_lvl2",
+			"guis/dlcs/chill/textures/pd2/rooms/safehouse_room_preview_scarface_lvl3"
 		}
 	})
 	table.insert(self.rooms, {
@@ -1064,6 +1086,42 @@ function CustomSafehouseTweakData:_init_trophies(tweak_data)
 		},
 		image_id = "safehouse_trophies_preview_spooky"
 	})
+	table.insert(self.trophies, {
+		id = "trophy_flamingo",
+		name_id = "trophy_flamingo",
+		desc_id = "trophy_flamingo_desc",
+		objective_id = "trophy_flamingo_objective",
+		objectives = {
+			self:_progress("trophy_flamingo", 20, {
+				name_id = "trophy_flamingo_progress"
+			})
+		},
+		show_progress = true,
+		image_id = "safehouse_trophies_preview_flamingo"
+	})
+	table.insert(self.trophies, {
+		id = "trophy_coke",
+		name_id = "trophy_coke",
+		desc_id = "trophy_coke_desc",
+		objective_id = "trophy_coke_objective",
+		objectives = {
+			self:_progress("trophy_coke", 24, {
+				name_id = "trophy_coke_progress"
+			})
+		},
+		show_progress = true,
+		image_id = "safehouse_trophies_preview_coke"
+	})
+	table.insert(self.trophies, {
+		id = "trophy_friendly_car",
+		name_id = "trophy_friendly_car",
+		desc_id = "trophy_friendly_car_desc",
+		objective_id = "trophy_friendly_car_objective",
+		objectives = {
+			self:_progress("trophy_friendly_car", 1)
+		},
+		image_id = "safehouse_trophies_preview_tonys_car"
+	})
 end
 
 function CustomSafehouseTweakData:get_trophy_data(id)
@@ -1452,7 +1510,8 @@ function CustomSafehouseTweakData:_init_map(tweak_data)
 		rooms = {
 			"old_hoxton",
 			"russian",
-			"clover"
+			"clover",
+			"terry"
 		}
 	})
 	table.insert(self.map.floors, {
@@ -1603,5 +1662,11 @@ function CustomSafehouseTweakData:_init_map(tweak_data)
 		x = 1350,
 		y = 900,
 		icon = "safehouse_character_icon_clover"
+	}
+	self.map.rooms.terry = {
+		x = 1325,
+		y = 700,
+		icon = "safehouse_character_icon_terry",
+		path = "guis/dlcs/chico/textures/pd2/blackmarket/icons/safehouse_icons/"
 	}
 end

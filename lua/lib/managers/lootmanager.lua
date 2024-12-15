@@ -132,15 +132,18 @@ function LootManager:sync_secure_loot(carry_id, multiplier_level, silent)
 end
 
 function LootManager:_check_secured(achievement, secured_data)
+	print("[LootManager:_check_secured]")
+	print(inspect(achievement))
+	print(inspect(secured_data))
 	local amount = 0
 	local total_amount = 0
 	local value = 0
 	for _, data in ipairs(self._global.secured) do
 		local found = false
 		local carry_id
-		if type(data.carry_id) == "table" then
-			for _, id in ipairs(data.carry_id) do
-				if id == secured_data.carry_id then
+		if type(secured_data.carry_id) == "table" then
+			for _, id in ipairs(secured_data.carry_id) do
+				if id == data.carry_id then
 					found = true
 					carry_id = id
 					break
@@ -164,6 +167,7 @@ function LootManager:_check_secured(achievement, secured_data)
 			end
 		end
 	end
+	print("Did we get it?", secured_data.total_amount and total_amount >= secured_data.total_amount or secured_data.amount and amount >= secured_data.amount or secured_data.value and value >= secured_data.value)
 	return secured_data.total_amount and total_amount >= secured_data.total_amount or secured_data.amount and amount >= secured_data.amount or secured_data.value and value >= secured_data.value
 end
 

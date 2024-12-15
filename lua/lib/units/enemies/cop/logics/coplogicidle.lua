@@ -934,8 +934,16 @@ function CopLogicIdle._get_priority_attention(data, attention_objects, reaction_
 					if not att_unit:movement():current_state()._moving and att_unit:movement():current_state():ducking() then
 						weight_mul = (weight_mul or 1) * managers.player:upgrade_value("player", "stand_still_crouch_camouflage_bonus", 1)
 					end
-				elseif att_unit:base() and att_unit:base().upgrade_value and att_unit:movement() and not att_unit:movement()._move_data and att_unit:movement()._pose_code and att_unit:movement()._pose_code == 2 then
-					weight_mul = (weight_mul or 1) * (att_unit:base():upgrade_value("player", "stand_still_crouch_camouflage_bonus") or 1)
+					if managers.player:has_activate_temporary_upgrade("temporary", "chico_injector") and managers.player:upgrade_value("player", "chico_preferred_target", false) then
+						weight_mul = (weight_mul or 1) * 1000
+					end
+				elseif att_unit:base() and att_unit:base().upgrade_value then
+					if att_unit:movement() and not att_unit:movement()._move_data and att_unit:movement()._pose_code and att_unit:movement()._pose_code == 2 then
+						weight_mul = (weight_mul or 1) * (att_unit:base():upgrade_value("player", "stand_still_crouch_camouflage_bonus") or 1)
+					end
+					if att_unit:base().has_activate_temporary_upgrade and att_unit:base():has_activate_temporary_upgrade("temporary", "chico_injector") and att_unit:base():upgrade_value("player", "chico_preferred_target") then
+						weight_mul = (weight_mul or 1) * 1000
+					end
 				end
 				if weight_mul and weight_mul ~= 1 then
 					weight_mul = 1 / weight_mul

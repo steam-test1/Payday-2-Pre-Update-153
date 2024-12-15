@@ -213,6 +213,8 @@ function WeaponFactoryTweakData:init()
 	self:_init_rota()
 	self:_init_tng()
 	self:_init_arbiter()
+	self:_init_contraband()
+	self:_init_ray()
 	self:create_ammunition()
 	self:_init_cc_material_config()
 	self:_init_bipods()
@@ -843,6 +845,10 @@ function WeaponFactoryTweakData:_init_sights()
 			},
 			wpn_fps_gre_arbiter = {
 				translation = Vector3(0, 0, -0.4),
+				rotation = Rotation(0, 0, 0)
+			},
+			wpn_fps_ass_contraband = {
+				translation = Vector3(-0.01, 5, -1.7),
 				rotation = Rotation(0, 0, 0)
 			}
 		},
@@ -1563,6 +1569,10 @@ function WeaponFactoryTweakData:_init_content_dlc2_dec16()
 			},
 			wpn_fps_gre_arbiter = {
 				translation = Vector3(0, 0, -0.4),
+				rotation = Rotation(0, 0, 0)
+			},
+			wpn_fps_ass_contraband = {
+				translation = Vector3(-0.01, 0, -1.68),
 				rotation = Rotation(0, 0, 0)
 			}
 		},
@@ -16464,10 +16474,11 @@ function WeaponFactoryTweakData:_init_c96()
 		is_a_unlockable = true,
 		stats = {
 			value = 1,
-			recoil = 1,
-			spread = 3,
-			damage = -3,
-			concealment = -3
+			recoil = 2,
+			spread = -2,
+			damage = 110,
+			concealment = -3,
+			total_ammo_mod = -10
 		},
 		animations = {
 			reload = "reload",
@@ -27860,6 +27871,10 @@ function WeaponFactoryTweakData:_init_tng()
 				translation = Vector3(-3, 0, -12.85),
 				rotation = Rotation(0, 0, -45)
 			},
+			wpn_fps_ass_contraband = {
+				translation = Vector3(-2.35, 0, -12),
+				rotation = Rotation(0, 0, -45)
+			},
 			wpn_fps_snp_m95 = {
 				translation = Vector3(-0.4, 5.8, -15.075),
 				rotation = Rotation(-0.4, 0, -45)
@@ -28492,4 +28507,290 @@ function WeaponFactoryTweakData:_init_arbiter()
 	}
 	self.wpn_fps_gre_arbiter_npc = deep_clone(self.wpn_fps_gre_arbiter)
 	self.wpn_fps_gre_arbiter_npc.unit = "units/pd2_dlc_tng/weapons/wpn_fps_gre_arbiter/wpn_fps_gre_arbiter_npc"
+end
+
+function WeaponFactoryTweakData:_init_contraband()
+	self.parts.wpn_fps_ass_contraband_b_standard = {
+		type = "barrel",
+		name_id = "bm_wp_contraband_b_standard",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_chico/weapons/wpn_fps_ass_contraband_pts/wpn_fps_ass_contraband_b_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_contraband_body_standard = {
+		type = "lower_receiver",
+		name_id = "bm_wp_contraband_body_standard",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_chico/weapons/wpn_fps_ass_contraband_pts/wpn_fps_ass_contraband_body_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_contraband_dh_standard = {
+		type = "drag_handle",
+		name_id = "bm_wp_contraband_dh_standard",
+		a_obj = "a_dh",
+		unit = "units/pd2_dlc_chico/weapons/wpn_fps_ass_contraband_pts/wpn_fps_ass_contraband_dh_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_contraband_fg_standard = {
+		type = "foregrip",
+		name_id = "bm_wp_contraband_fg_standard",
+		a_obj = "a_fg",
+		unit = "units/pd2_dlc_chico/weapons/wpn_fps_ass_contraband_pts/wpn_fps_ass_contraband_fg_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_contraband_g_standard = {
+		type = "grip",
+		name_id = "bm_wp_contraband_g_standard",
+		a_obj = "a_g",
+		unit = "units/pd2_dlc_chico/weapons/wpn_fps_ass_contraband_pts/wpn_fps_ass_contraband_g_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_contraband_gl_m203 = {
+		type = "underbarrel",
+		sub_type = "grenade_launcher",
+		name_id = "bm_wp_contraband_gl_m203",
+		bullet_objects = {prefix = "g_grenade_", amount = 1},
+		a_obj = "a_gl",
+		unit = "units/pd2_dlc_chico/weapons/wpn_fps_ass_contraband_pts/wpn_fps_ass_contraband_gl_m203",
+		stats = {value = 1},
+		animations = {bipod_reload = "reload_ul"},
+		perks = {
+			"underbarrel"
+		}
+	}
+	self.parts.wpn_fps_ass_contraband_m_standard = {
+		type = "magazine",
+		name_id = "bm_wp_contraband_m_standard",
+		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 2},
+		unit = "units/pd2_dlc_chico/weapons/wpn_fps_ass_contraband_pts/wpn_fps_ass_contraband_m_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_contraband_ns_standard = {
+		type = "barrel_ext",
+		name_id = "bm_wp_contraband_ns_standard",
+		a_obj = "a_ns",
+		parent = "barrel",
+		unit = "units/pd2_dlc_chico/weapons/wpn_fps_ass_contraband_pts/wpn_fps_ass_contraband_ns_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_contraband_o_standard = {
+		type = "sight",
+		name_id = "bm_wp_contraband_o_standard",
+		a_obj = "a_o",
+		unit = "units/pd2_dlc_chico/weapons/wpn_fps_ass_contraband_pts/wpn_fps_ass_contraband_o_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_contraband_s_standard = {
+		type = "stock",
+		name_id = "bm_wp_contraband_s_standard",
+		a_obj = "a_s",
+		unit = "units/pd2_dlc_chico/weapons/wpn_fps_ass_contraband_pts/wpn_fps_ass_contraband_s_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_contraband_bolt_standard = {
+		type = "extra",
+		name_id = "bm_wp_contraband_s_standard",
+		a_obj = "a_bolt",
+		unit = "units/pd2_dlc_chico/weapons/wpn_fps_ass_contraband_pts/wpn_fps_ass_contraband_bolt_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_ass_contraband_b_standard.third_unit = "units/pd2_dlc_chico/weapons/wpn_third_ass_contraband_pts/wpn_third_ass_contraband_b_standard"
+	self.parts.wpn_fps_ass_contraband_body_standard.third_unit = "units/pd2_dlc_chico/weapons/wpn_third_ass_contraband_pts/wpn_third_ass_contraband_body_standard"
+	self.parts.wpn_fps_ass_contraband_dh_standard.third_unit = "units/pd2_dlc_chico/weapons/wpn_third_ass_contraband_pts/wpn_third_ass_contraband_dh_standard"
+	self.parts.wpn_fps_ass_contraband_fg_standard.third_unit = "units/pd2_dlc_chico/weapons/wpn_third_ass_contraband_pts/wpn_third_ass_contraband_fg_standard"
+	self.parts.wpn_fps_ass_contraband_g_standard.third_unit = "units/pd2_dlc_chico/weapons/wpn_third_ass_contraband_pts/wpn_third_ass_contraband_g_standard"
+	self.parts.wpn_fps_ass_contraband_gl_m203.third_unit = "units/pd2_dlc_chico/weapons/wpn_third_ass_contraband_pts/wpn_third_ass_contraband_gl_m203"
+	self.parts.wpn_fps_ass_contraband_m_standard.third_unit = "units/pd2_dlc_chico/weapons/wpn_third_ass_contraband_pts/wpn_third_ass_contraband_m_standard"
+	self.parts.wpn_fps_ass_contraband_ns_standard.third_unit = "units/pd2_dlc_chico/weapons/wpn_third_ass_contraband_pts/wpn_third_ass_contraband_ns_standard"
+	self.parts.wpn_fps_ass_contraband_o_standard.third_unit = "units/pd2_dlc_chico/weapons/wpn_third_ass_contraband_pts/wpn_third_ass_contraband_o_standard"
+	self.parts.wpn_fps_ass_contraband_s_standard.third_unit = "units/pd2_dlc_chico/weapons/wpn_third_ass_contraband_pts/wpn_third_ass_contraband_s_standard"
+	self.parts.wpn_fps_ass_contraband_bolt_standard.third_unit = "units/pd2_dlc_chico/weapons/wpn_third_ass_contraband_pts/wpn_third_ass_contraband_bolt_standard"
+	self.wpn_fps_ass_contraband = {}
+	self.wpn_fps_ass_contraband.unit = "units/pd2_dlc_chico/weapons/wpn_fps_ass_contraband/wpn_fps_ass_contraband"
+	self.wpn_fps_ass_contraband.optional_types = {
+		"gadget",
+		"sight",
+		"barrel_ext"
+	}
+	self.wpn_fps_ass_contraband.animations = {
+		reload = "reload",
+		reload_not_empty = "reload_not_empty",
+		fire = "recoil",
+		fire_steelsight = "recoil",
+		bipod_reload = "bipod_reload",
+		bipod_fire = "bipod_recoil",
+		bipod_fire_steelsight = "bipod_recoil_zoom"
+	}
+	self.wpn_fps_ass_contraband.forbids = {
+		"wpn_fps_addon_ris"
+	}
+	self.wpn_fps_ass_contraband.adds = {}
+	self.wpn_fps_ass_contraband.default_blueprint = {
+		"wpn_fps_ass_contraband_b_standard",
+		"wpn_fps_ass_contraband_body_standard",
+		"wpn_fps_ass_contraband_dh_standard",
+		"wpn_fps_ass_contraband_fg_standard",
+		"wpn_fps_ass_contraband_g_standard",
+		"wpn_fps_ass_contraband_gl_m203",
+		"wpn_fps_ass_contraband_m_standard",
+		"wpn_fps_ass_contraband_ns_standard",
+		"wpn_fps_ass_contraband_o_standard",
+		"wpn_fps_ass_contraband_s_standard",
+		"wpn_fps_ass_contraband_bolt_standard"
+	}
+	self.wpn_fps_ass_contraband.uses_parts = {
+		"wpn_fps_ass_contraband_b_standard",
+		"wpn_fps_ass_contraband_body_standard",
+		"wpn_fps_ass_contraband_dh_standard",
+		"wpn_fps_ass_contraband_fg_standard",
+		"wpn_fps_ass_contraband_g_standard",
+		"wpn_fps_ass_contraband_gl_m203",
+		"wpn_fps_ass_contraband_m_standard",
+		"wpn_fps_ass_contraband_ns_standard",
+		"wpn_fps_ass_contraband_o_standard",
+		"wpn_fps_ass_contraband_s_standard",
+		"wpn_fps_ass_contraband_bolt_standard",
+		"wpn_fps_upg_i_singlefire",
+		"wpn_fps_upg_i_autofire",
+		"wpn_fps_upg_o_specter",
+		"wpn_fps_upg_o_aimpoint",
+		"wpn_fps_upg_o_docter",
+		"wpn_fps_upg_o_eotech",
+		"wpn_fps_upg_o_t1micro",
+		"wpn_fps_upg_o_cmore",
+		"wpn_fps_upg_o_aimpoint_2",
+		"wpn_fps_upg_o_acog",
+		"wpn_fps_upg_fl_ass_smg_sho_peqbox",
+		"wpn_fps_upg_fl_ass_smg_sho_surefire",
+		"wpn_fps_upg_ns_ass_smg_large",
+		"wpn_fps_upg_ns_ass_smg_medium",
+		"wpn_fps_upg_ns_ass_smg_small",
+		"wpn_fps_upg_ns_ass_smg_firepig",
+		"wpn_fps_upg_ns_ass_smg_stubby",
+		"wpn_fps_upg_ns_ass_smg_tank",
+		"wpn_fps_upg_o_eotech_xps",
+		"wpn_fps_upg_o_reflex",
+		"wpn_fps_upg_o_rx01",
+		"wpn_fps_upg_o_rx30",
+		"wpn_fps_upg_o_cs",
+		"wpn_fps_upg_ass_ns_jprifles",
+		"wpn_fps_upg_ass_ns_linear",
+		"wpn_fps_upg_ass_ns_surefire",
+		"wpn_fps_upg_fl_ass_peq15",
+		"wpn_fps_upg_fl_ass_laser",
+		"wpn_fps_upg_ass_ns_battle",
+		"wpn_fps_upg_fl_ass_utg",
+		"wpn_fps_upg_o_45rds",
+		"wpn_fps_upg_o_spot"
+	}
+	self.wpn_fps_ass_contraband_npc = deep_clone(self.wpn_fps_ass_contraband)
+	self.wpn_fps_ass_contraband_npc.unit = "units/pd2_dlc_chico/weapons/wpn_fps_ass_contraband/wpn_fps_ass_contraband_npc"
+end
+
+function WeaponFactoryTweakData:_init_ray()
+	self.parts.wpn_fps_gre_ray_body = {
+		type = "lower_reciever",
+		name_id = "bm_wp_gre_ray_body",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_friend/weapons/wpn_fps_gre_ray_pts/wpn_fps_gre_ray_body",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_gre_ray_bolt = {
+		type = "upper_reciever",
+		name_id = "bm_wp_gre_ray_body",
+		a_obj = "a_bolt",
+		unit = "units/pd2_dlc_friend/weapons/wpn_fps_gre_ray_pts/wpn_fps_gre_ray_bolt",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_gre_ray_magazine = {
+		type = "magazine",
+		name_id = "bm_wp_gre_ray_body",
+		a_obj = "a_m",
+		bullet_objects = {prefix = "g_rocket_", amount = 4},
+		unit = "units/pd2_dlc_friend/weapons/wpn_fps_gre_ray_pts/wpn_fps_gre_ray_magazine",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_gre_ray_magazine_handle = {
+		type = "foregrip",
+		name_id = "bm_wp_gre_ray_body",
+		a_obj = "a_handle",
+		unit = "units/pd2_dlc_friend/weapons/wpn_fps_gre_ray_pts/wpn_fps_gre_ray_magazine_handle",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_gre_ray_ring_back = {
+		type = "grip",
+		name_id = "bm_wp_gre_ray_body",
+		a_obj = "a_ring_back",
+		unit = "units/pd2_dlc_friend/weapons/wpn_fps_gre_ray_pts/wpn_fps_gre_ray_ring_back",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_gre_ray_ring_front = {
+		type = "stock",
+		name_id = "bm_wp_gre_ray_body",
+		a_obj = "a_ring_front",
+		unit = "units/pd2_dlc_friend/weapons/wpn_fps_gre_ray_pts/wpn_fps_gre_ray_ring_front",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_gre_ray_sight = {
+		type = "sight",
+		name_id = "bm_wp_gre_ray_body",
+		a_obj = "a_o",
+		unit = "units/pd2_dlc_friend/weapons/wpn_fps_gre_ray_pts/wpn_fps_gre_ray_sight",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_gre_ray_sight_lid = {
+		type = "drag_handle",
+		name_id = "bm_wp_gre_ray_body",
+		a_obj = "a_lid",
+		unit = "units/pd2_dlc_friend/weapons/wpn_fps_gre_ray_pts/wpn_fps_gre_ray_sight_lid",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_gre_ray_barrel = {
+		type = "barrel",
+		name_id = "bm_wp_gre_ray_body",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_friend/weapons/wpn_fps_gre_ray_pts/wpn_fps_gre_ray_barrel",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_gre_ray_body.third_unit = "units/pd2_dlc_friend/weapons/wpn_third_gre_ray_pts/wpn_third_gre_ray_body"
+	self.parts.wpn_fps_gre_ray_bolt.third_unit = "units/pd2_dlc_friend/weapons/wpn_third_gre_ray_pts/wpn_third_gre_ray_bolt"
+	self.parts.wpn_fps_gre_ray_magazine.third_unit = "units/pd2_dlc_friend/weapons/wpn_third_gre_ray_pts/wpn_third_gre_ray_magazine"
+	self.parts.wpn_fps_gre_ray_magazine_handle.third_unit = "units/pd2_dlc_friend/weapons/wpn_third_gre_ray_pts/wpn_third_gre_ray_magazine_handle"
+	self.parts.wpn_fps_gre_ray_ring_back.third_unit = "units/pd2_dlc_friend/weapons/wpn_third_gre_ray_pts/wpn_third_gre_ray_ring_back"
+	self.parts.wpn_fps_gre_ray_ring_front.third_unit = "units/pd2_dlc_friend/weapons/wpn_third_gre_ray_pts/wpn_third_gre_ray_ring_front"
+	self.parts.wpn_fps_gre_ray_sight.third_unit = "units/pd2_dlc_friend/weapons/wpn_third_gre_ray_pts/wpn_third_gre_ray_sight"
+	self.parts.wpn_fps_gre_ray_sight_lid.third_unit = "units/pd2_dlc_friend/weapons/wpn_third_gre_ray_pts/wpn_third_gre_ray_sight_lid"
+	self.wpn_fps_gre_ray = {}
+	self.wpn_fps_gre_ray.unit = "units/pd2_dlc_friend/weapons/wpn_fps_gre_ray/wpn_fps_gre_ray"
+	self.wpn_fps_gre_ray.animations = {
+		reload = "reload",
+		reload_not_empty = "reload_not_empty",
+		fire = "recoil",
+		fire_steelsight = "recoil_zoom"
+	}
+	self.wpn_fps_gre_ray.default_blueprint = {
+		"wpn_fps_gre_ray_body",
+		"wpn_fps_gre_ray_bolt",
+		"wpn_fps_gre_ray_magazine",
+		"wpn_fps_gre_ray_magazine_handle",
+		"wpn_fps_gre_ray_ring_back",
+		"wpn_fps_gre_ray_ring_front",
+		"wpn_fps_gre_ray_sight",
+		"wpn_fps_gre_ray_sight_lid",
+		"wpn_fps_gre_ray_barrel"
+	}
+	self.wpn_fps_gre_ray.uses_parts = {
+		"wpn_fps_gre_ray_body",
+		"wpn_fps_gre_ray_bolt",
+		"wpn_fps_gre_ray_magazine",
+		"wpn_fps_gre_ray_magazine_handle",
+		"wpn_fps_gre_ray_ring_back",
+		"wpn_fps_gre_ray_ring_front",
+		"wpn_fps_gre_ray_sight",
+		"wpn_fps_gre_ray_sight_lid",
+		"wpn_fps_gre_ray_barrel"
+	}
+	self.wpn_fps_gre_ray_npc = deep_clone(self.wpn_fps_gre_ray)
+	self.wpn_fps_gre_ray_npc.unit = "units/pd2_dlc_friend/weapons/wpn_fps_gre_ray/wpn_fps_gre_ray_npc"
 end

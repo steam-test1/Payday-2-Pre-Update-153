@@ -111,13 +111,17 @@ function PlayerManager:init()
 	self._player_timer = TimerManager:timer(ids_player) or TimerManager:make_timer(ids_player, TimerManager:pausable())
 	self._hostage_close_to_local_t = 0
 	self:_setup()
-	self._saw_panic_when_kill = self:has_category_upgrade("saw", "panic_when_kill")
 	self._crit_mul = 1
 	self._melee_dmg_mul = 1
-	self._unseen_strike = self:has_category_upgrade("player", "unseen_increased_crit_chance")
 	self._accuracy_multiplier = 1
 	self._damage_absorption = Application:digest_value(0, true)
 	self._consumable_upgrades = {}
+	self:check_skills()
+end
+
+function PlayerManager:check_skills()
+	self._saw_panic_when_kill = self:has_category_upgrade("saw", "panic_when_kill")
+	self._unseen_strike = self:has_category_upgrade("player", "unseen_increased_crit_chance")
 	if self:has_category_upgrade("pistol", "stacked_accuracy_bonus") then
 		local function start_expert_handling()
 			if self:is_current_weapon_of_category("pistol") and not self._coroutine_mgr:is_running(PlayerAction.ExpertHandling) then
@@ -130,9 +134,13 @@ function PlayerManager:init()
 		end
 		
 		self._message_system:register(Message.OnEnemyShot, self, start_expert_handling)
+	else
+		self._message_system:unregister(Message.OnEnemyShot, self)
 	end
 	if self:has_category_upgrade("pistol", "stacking_hit_damage_multiplier") then
 		self._message_system:register(Message.OnEnemyShot, "trigger_happy", callback(self, self, "_on_enter_trigger_happy_event"))
+	else
+		self._message_system:unregister(Message.OnEnemyShot, "trigger_happy")
 	end
 	if self:has_category_upgrade("player", "melee_damage_stacking") then
 		local function start_bloodthirst_base(weapon_unit, variant)
@@ -146,34 +154,56 @@ function PlayerManager:init()
 		end
 		
 		self._message_system:register(Message.OnEnemyKilled, "bloodthirst_base", start_bloodthirst_base)
+	else
+		self._message_system:unregister(Message.OnEnemyKilled, "bloodthirst_base")
 	end
 	if self:has_category_upgrade("player", "messiah_revive_from_bleed_out") then
 		self._messiah_charges = self:upgrade_value("player", "messiah_revive_from_bleed_out", 0)
 		self._max_messiah_charges = self._messiah_charges
 		self._message_system:register(Message.OnEnemyKilled, "messiah_revive_from_bleed_out", callback(self, self, "_on_messiah_event"))
+	else
+		self._messiah_charges = 0
+		self._max_messiah_charges = self._messiah_charges
+		self._message_system:unregister(Message.OnEnemyKilled, "messiah_revive_from_bleed_out")
 	end
 	if self:has_category_upgrade("player", "recharge_messiah") then
 		self._message_system:register(Message.OnDoctorBagUsed, "recharge_messiah", callback(self, self, "_on_messiah_recharge_event"))
+	else
+		self._message_system:unregister(Message.OnDoctorBagUsed, "recharge_messiah")
 	end
 	if self:has_category_upgrade("player", "double_drop") then
 		self._target_kills = self:upgrade_value("player", "double_drop", 0)
 		self._message_system:register(Message.OnEnemyKilled, "double_ammo_drop", callback(self, self, "_on_spawn_extra_ammo_event"))
+	else
+		self._target_kills = 0
+		self._message_system:unregister(Message.OnEnemyKilled, "double_ammo_drop")
 	end
 	if self:has_category_upgrade("temporary", "single_shot_fast_reload") then
 		self._message_system:register(Message.OnLethalHeadShot, "activate_aggressive_reload", callback(self, self, "_on_activate_aggressive_reload_event"))
+	else
+		self._message_system:unregister(Message.OnLethalHeadShot, "activate_aggressive_reload")
 	end
 	if self:has_category_upgrade("player", "head_shot_ammo_return") then
 		self._ammo_efficiency = self:upgrade_value("player", "head_shot_ammo_return", nil)
 		self._message_system:register(Message.OnHeadShot, "ammo_efficiency", callback(self, self, "_on_enter_ammo_efficiency_event"))
+	else
+		self._ammo_efficiency = nil
+		self._message_system:unregister(Message.OnHeadShot, "ammo_efficiency")
 	end
 	if self:has_category_upgrade("player", "melee_kill_increase_reload_speed") then
 		self._message_system:register(Message.OnEnemyKilled, "bloodthirst_reload_speed", callback(self, self, "_on_enemy_killed_bloodthirst"))
+	else
+		self._message_system:unregister(Message.OnEnemyKilled, "bloodthirst_reload_speed")
 	end
 	if self:has_category_upgrade("player", "super_syndrome") then
 		self._super_syndrome_count = self:upgrade_value("player", "super_syndrome")
+	else
+		self._super_syndrome_count = 0
 	end
 	if self:has_category_upgrade("player", "run_and_shoot") then
 		self.RUN_AND_SHOOT = true
+	else
+		self.RUN_AND_SHOOT = false
 	end
 end
 
@@ -472,6 +502,10 @@ function PlayerManager:update(t, dt)
 		if data ~= 0 then
 			self._coroutine_mgr:add_coroutine(PlayerAction.UnseenStrike, PlayerAction.UnseenStrike, self, data.min_time, data.max_duration, data.crit_chance)
 		end
+	end
+	local equipped_grenade = managers.blackmarket:equipped_grenade()
+	if self:player_unit() and equipped_grenade and tweak_data.blackmarket.projectiles[equipped_grenade] and tweak_data.blackmarket.projectiles[equipped_grenade].ability then
+		self:update_ability_hud(equipped_grenade)
 	end
 end
 
@@ -899,7 +933,7 @@ function PlayerManager:on_killshot(killed_unit, variant, headshot)
 		self:_on_enter_shock_and_awe_event()
 	end
 	self._message_system:notify(Message.OnEnemyKilled, nil, equipped_unit, variant, killed_unit)
-	if self._saw_panic_when_kill then
+	if self._saw_panic_when_kill and variant ~= "melee" then
 		local equipped_unit = self:get_current_state()._equipped_unit:base()
 		if equipped_unit:weapon_tweak_data().category == "saw" then
 			local pos = player_unit:position()
@@ -1106,8 +1140,8 @@ function PlayerManager:on_headshot_dealt()
 	end
 end
 
-function PlayerManager:on_lethal_headshot_dealt()
-	if not self:player_unit() then
+function PlayerManager:on_lethal_headshot_dealt(attacker_unit)
+	if not self:player_unit() or attacker_unit ~= self:player_unit() then
 		return
 	end
 	self._message_system:notify(Message.OnLethalHeadShot, nil, nil)
@@ -1716,6 +1750,7 @@ function PlayerManager:body_armor_skill_multiplier(override_armor)
 	multiplier = multiplier + self:get_hostage_bonus_multiplier("armor") - 1
 	multiplier = multiplier + self:upgrade_value("player", "perk_armor_loss_multiplier", 1) - 1
 	multiplier = multiplier + self:upgrade_value("player", tostring(override_armor or managers.blackmarket:equipped_armor(true, true)) .. "_armor_multiplier", 1) - 1
+	multiplier = multiplier + self:upgrade_value("player", "chico_armor_multiplier", 1) - 1
 	return multiplier
 end
 
@@ -3263,7 +3298,11 @@ function PlayerManager:_set_grenade(params)
 	local amount = params.amount
 	local icon = tweak_data.icon
 	self:update_grenades_amount_to_peers(grenade, amount)
-	managers.hud:set_teammate_grenades(HUDManager.PLAYER_PANEL, {amount = amount, icon = icon})
+	managers.hud:set_teammate_grenades(HUDManager.PLAYER_PANEL, {
+		amount = amount,
+		icon = icon,
+		ability = tweak_data.ability
+	})
 end
 
 function PlayerManager:add_grenade_amount(amount, sync)
@@ -3298,9 +3337,17 @@ function PlayerManager:set_synced_grenades(peer_id, grenade, amount, register_pe
 	if character_data and character_data.panel_id then
 		local icon = tweak_data.blackmarket.projectiles[grenade].icon
 		if only_update_amount then
-			managers.hud:set_teammate_grenades_amount(character_data.panel_id, {icon = icon, amount = amount})
+			managers.hud:set_teammate_grenades_amount(character_data.panel_id, {
+				icon = icon,
+				amount = amount,
+				ability = tweak_data.blackmarket.projectiles[grenade].ability
+			})
 		else
-			managers.hud:set_teammate_grenades(character_data.panel_id, {icon = icon, amount = amount})
+			managers.hud:set_teammate_grenades(character_data.panel_id, {
+				icon = icon,
+				amount = amount,
+				ability = tweak_data.blackmarket.projectiles[grenade].ability
+			})
 		end
 	end
 	if register_peer_id and 0 < register_peer_id then
@@ -3963,6 +4010,12 @@ function PlayerManager:on_enter_custody(_player, already_dead)
 		Application:error("[PlayerManager:on_enter_custody] Unable to get player")
 		return
 	end
+	if player == self:player_unit() then
+		local equipped_grenade = managers.blackmarket:equipped_grenade()
+		if equipped_grenade and tweak_data.blackmarket.projectiles[equipped_grenade] and tweak_data.blackmarket.projectiles[equipped_grenade].ability then
+			self:reset_ability_hud()
+		end
+	end
 	managers.mission:call_global_event("player_in_custody")
 	local peer_id = managers.network:session():local_peer():id()
 	if self._super_syndrome_count and self._super_syndrome_count > 0 and not self._action_mgr:is_running("stockholm_syndrome_trade") then
@@ -4028,4 +4081,85 @@ function PlayerManager:on_hallowSPOOCed()
 		end
 		self._halloween_t = t + 30
 	end
+end
+
+function PlayerManager:activate_ability(ability)
+	if not self:player_unit() then
+		return
+	end
+	self:activate_temporary_upgrade("temporary", ability)
+	local t = TimerManager:game():time()
+	local tweak = tweak_data.blackmarket.projectiles[ability]
+	self["_cooldown_" .. ability] = t + tweak.base_cooldown
+	
+	local function speed_up_on_kill()
+		managers.player:speed_up_ability_cooldown(ability, 1)
+	end
+	
+	self:register_message(Message.OnEnemyKilled, "speed_up_" .. ability, speed_up_on_kill)
+	if tweak.sounds and tweak.sounds.activate then
+		self:player_unit():sound():play(tweak.sounds.activate)
+	end
+	managers.network:session():send_to_peers("sync_ability_hud", self:temporary_upgrade_index("temporary", ability), self:upgrade_value("temporary", ability)[2])
+end
+
+function PlayerManager:has_active_ability_cooldown(ability)
+	return self:get_ability_cooldown(ability) and true or false
+end
+
+function PlayerManager:get_ability_cooldown(ability)
+	if not ability then
+		return
+	end
+	if self["_cooldown_" .. ability] then
+		local t = TimerManager:game():time()
+		if t >= self["_cooldown_" .. ability] then
+			self["_cooldown_" .. ability] = nil
+		end
+	end
+	return self["_cooldown_" .. ability]
+end
+
+function PlayerManager:speed_up_ability_cooldown(ability, time)
+	if not self:has_active_ability_cooldown(ability) then
+		return
+	end
+	self["_cooldown_" .. ability] = self["_cooldown_" .. ability] - time
+end
+
+function PlayerManager:get_ability_cooldown_left(ability)
+	if not self:has_active_ability_cooldown(ability) then
+		return
+	end
+	local t = TimerManager:game():time()
+	return self:get_ability_cooldown(ability) - t
+end
+
+local last_synced_cooldown
+
+function PlayerManager:update_ability_hud(ability)
+	local tweak = tweak_data.blackmarket.projectiles[ability]
+	if not self:has_active_ability_cooldown(ability) then
+		if self._should_reset_ability_hud then
+			self:reset_ability_hud()
+			if tweak.sounds and tweak.sounds.cooldown and alive(self:player_unit()) then
+				self:player_unit():sound():play(tweak.sounds.cooldown)
+			end
+		end
+		return
+	end
+	local base_cooldown = tweak.base_cooldown
+	local cooldown = self:get_ability_cooldown_left(ability)
+	managers.hud:set_player_ability_cooldown({cooldown = cooldown})
+	self._should_reset_ability_hud = true
+	if cooldown ~= last_synced_cooldown and managers.network:session() then
+		managers.network:session():send_to_peers("sync_ability_hud_cooldown", self:temporary_upgrade_index("temporary", ability), cooldown)
+		last_synced_cooldown = cooldown
+	end
+end
+
+function PlayerManager:reset_ability_hud()
+	managers.hud:set_player_ability_cooldown({0})
+	managers.hud:set_player_ability_radial({current = 0, total = 1})
+	self._should_reset_ability_hud = nil
 end

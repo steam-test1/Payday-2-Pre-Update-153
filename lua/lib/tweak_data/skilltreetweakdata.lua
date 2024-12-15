@@ -3617,6 +3617,68 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck16_9",
 				desc_id = "menu_deck16_9_desc"
 			}
+		},
+		{
+			name_id = "menu_st_spec_17",
+			desc_id = "menu_st_spec_17_desc",
+			dlc = "chico",
+			{
+				upgrades = {
+					"temporary_chico_injector_1",
+					"chico_injector"
+				},
+				cost = 200,
+				icon_xy = {0, 0},
+				texture_bundle_folder = "chico",
+				name_id = "menu_deck17_1",
+				desc_id = "menu_deck17_1_desc"
+			},
+			deck2,
+			{
+				upgrades = {
+					"player_chico_armor_multiplier_1"
+				},
+				cost = 400,
+				icon_xy = {1, 0},
+				texture_bundle_folder = "chico",
+				name_id = "menu_deck17_3",
+				desc_id = "menu_deck17_3_desc"
+			},
+			deck4,
+			{
+				upgrades = {
+					"player_chico_preferred_target"
+				},
+				cost = 1000,
+				icon_xy = {2, 0},
+				texture_bundle_folder = "chico",
+				name_id = "menu_deck17_5",
+				desc_id = "menu_deck17_5_desc"
+			},
+			deck6,
+			{
+				upgrades = {
+					"player_chico_armor_multiplier_2",
+					"player_chico_injector_low_health_multiplier"
+				},
+				cost = 2400,
+				icon_xy = {3, 0},
+				texture_bundle_folder = "chico",
+				name_id = "menu_deck17_7",
+				desc_id = "menu_deck17_7_desc"
+			},
+			deck8,
+			{
+				upgrades = {
+					"player_chico_armor_multiplier_3",
+					"player_chico_injector_health_to_speed"
+				},
+				cost = 4000,
+				icon_xy = {0, 1},
+				texture_bundle_folder = "chico",
+				name_id = "menu_deck17_9",
+				desc_id = "menu_deck17_9_desc"
+			}
 		}
 	}
 end

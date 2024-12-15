@@ -12,7 +12,6 @@ function NPCRaycastWeaponBase:init(unit)
 		self._player_manager = managers.player
 		self._unit = unit
 		self._name_id = self.name_id or "m4_npc"
-		self.name_id = nil
 		self._bullet_slotmask = managers.slot:get_mask("bullet_impact_targets")
 		self._blank_slotmask = managers.slot:get_mask("bullet_blank_impact_targets")
 		self:_create_use_setups()

@@ -1116,6 +1116,9 @@ function FPCameraPlayerBase:spawn_melee_item()
 				local graphic_obj = unit:get_object(graphic_obj_name)
 				graphic_obj:set_visibility(Idstring(a_object) == align_obj_name)
 			end
+			if alive(unit) and unit:damage() and unit:damage():has_sequence("game") then
+				unit:damage():run_sequence_simple("game")
+			end
 			table.insert(self._melee_item_units, unit)
 		end
 		self:play_anim_melee_item("charge")

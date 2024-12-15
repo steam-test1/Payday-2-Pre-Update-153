@@ -57,6 +57,15 @@ PlayerStandard.ANIM_STATES = {
 		recoil_enter = Idstring("bipod_recoil_enter"),
 		recoil_loop = Idstring("bipod_recoil_loop"),
 		recoil_exit = Idstring("bipod_recoil_exit")
+	},
+	underbarrel = {
+		equip = Idstring("underbarrel_equip"),
+		unequip = Idstring("underbarrel_unequip"),
+		start_running = Idstring("underbarrel_start_running"),
+		stop_running = Idstring("underbarrel_stop_running"),
+		melee = Idstring("underbarrel_melee"),
+		melee_miss = Idstring("underbarrel_melee_miss"),
+		idle = Idstring("underbarrel_idle")
 	}
 }
 PlayerStandard.debug_bipod = nil
@@ -289,6 +298,7 @@ function PlayerStandard:update(t, dt)
 	self:_upd_nav_data()
 	managers.hud:_update_crosshair_offset(t, dt)
 	self:_update_omniscience(t, dt)
+	self:_upd_stance_switch_delay(t, dt)
 	if self._last_equipped then
 		if self._last_equipped ~= self._equipped_unit then
 			self._equipped_visibility_timer = t + 0.1
@@ -611,8 +621,11 @@ function PlayerStandard:_update_check_actions(t, dt, paused)
 	self:_check_action_ladder(t, input)
 	self:_check_action_zipline(t, input)
 	self:_check_action_cash_inspect(t, input)
-	new_action = new_action or self:_check_action_deploy_bipod(t, input)
-	self:_check_action_change_equipment(input)
+	if not new_action then
+		new_action = self:_check_action_deploy_bipod(t, input)
+		new_action = new_action or self:_check_action_deploy_underbarrel(t, input)
+	end
+	self:_check_action_change_equipment(t, input)
 	self:_check_action_duck(t, input)
 	self:_check_action_steelsight(t, input)
 	self:_find_pickups(t)
@@ -624,6 +637,7 @@ local mvec_move_dir_normalized = Vector3()
 
 function PlayerStandard:_update_movement(t, dt)
 	local anim_data = self._unit:anim_data()
+	local weapon_tweak_data = tweak_data.weapon[self._equipped_unit and self._equipped_unit:base() and self._equipped_unit:base():get_name_id()]
 	local pos_new
 	self._target_headbob = self._target_headbob or 0
 	self._headbob = self._headbob or 0
@@ -679,6 +693,9 @@ function PlayerStandard:_update_movement(t, dt)
 		mvector3.add(pos_new, self._pos)
 		self._target_headbob = self:_get_walk_headbob()
 		self._target_headbob = self._target_headbob * self._move_dir:length()
+		if weapon_tweak_data and weapon_tweak_data.headbob and weapon_tweak_data.headbob.multiplier then
+			self._target_headbob = self._target_headbob * weapon_tweak_data.headbob.multiplier
+		end
 	elseif not mvector3.is_zero(self._last_velocity_xy) then
 		local decceleration = self._state_data.in_air and 250 or math.lerp(2000, 1500, math.min(self._last_velocity_xy:length() / tweak_data.player.movement_state.standard.movement.speed.RUNNING_MAX, 1))
 		local achieved_walk_vel = math.step(self._last_velocity_xy, Vector3(), decceleration * dt)
@@ -693,7 +710,11 @@ function PlayerStandard:_update_movement(t, dt)
 		self:_update_crosshair_offset()
 	end
 	if self._headbob ~= self._target_headbob then
-		self._headbob = math.step(self._headbob, self._target_headbob, dt / 4)
+		local ratio = 4
+		if weapon_tweak_data and weapon_tweak_data.headbob and weapon_tweak_data.headbob.speed_ratio then
+			ratio = weapon_tweak_data.headbob.speed_ratio
+		end
+		self._headbob = math.step(self._headbob, self._target_headbob, dt / ratio)
 		self._ext_camera:set_shaker_parameter("headbob", "amplitude", self._headbob)
 	end
 	if pos_new then
@@ -1118,6 +1139,8 @@ function PlayerStandard:_check_action_throw_projectile(t, input)
 	local projectile_entry = managers.blackmarket:equipped_projectile()
 	if tweak_data.blackmarket.projectiles[projectile_entry].is_a_grenade then
 		return self:_check_action_throw_grenade(t, input)
+	elseif tweak_data.blackmarket.projectiles[projectile_entry].ability then
+		return self:_check_action_use_ability(t, input)
 	end
 	if not managers.player:can_throw_grenade() then
 		self._state_data.projectile_throw_wanted = nil
@@ -1329,6 +1352,22 @@ function PlayerStandard:_is_throwing_grenade()
 	return self._camera_unit_anim_data.throwing or self._state_data.throw_grenade_expire_t and true or false
 end
 
+function PlayerStandard:_check_action_use_ability(t, input)
+	local action_wanted = input.btn_throw_grenade_press
+	if not action_wanted then
+		return
+	end
+	local equipped_ability = managers.blackmarket:equipped_grenade()
+	if not managers.player:has_inactivate_temporary_upgrade("temporary", equipped_ability) then
+		return
+	end
+	if managers.player:has_active_ability_cooldown(equipped_ability) and t < managers.player:get_ability_cooldown(equipped_ability) then
+		return
+	end
+	managers.player:activate_ability(equipped_ability)
+	return action_wanted
+end
+
 function PlayerStandard:_check_action_interact(t, input)
 	local keyboard = self._controller.TYPE == "pc" or managers.controller:get_default_wrapper_type() == "pc"
 	local new_action, timer, interact_object
@@ -1353,7 +1392,7 @@ function PlayerStandard:_check_action_interact(t, input)
 		force_secondary_intimidate = true
 	end
 	if input.btn_interact_release then
-		if self._start_intimidate then
+		if self._start_intimidate and not self:_action_interact_forbidden() then
 			if t < self._start_intimidate_t + secondary_delay then
 				self:_start_action_intimidate(t)
 				self._start_intimidate = false
@@ -1362,7 +1401,7 @@ function PlayerStandard:_check_action_interact(t, input)
 			self:_interupt_action_interact()
 		end
 	end
-	if (self._start_intimidate or force_secondary_intimidate) and (not keyboard and t > self._start_intimidate_t + secondary_delay or force_secondary_intimidate) then
+	if (self._start_intimidate or force_secondary_intimidate) and not self:_action_interact_forbidden() and (not keyboard and t > self._start_intimidate_t + secondary_delay or force_secondary_intimidate) then
 		self:_start_action_intimidate(t, true)
 		self._start_intimidate = false
 	end
@@ -1374,9 +1413,13 @@ function PlayerStandard:_action_interact_forbidden()
 	return action_forbidden
 end
 
-function PlayerStandard:_check_action_change_equipment(input)
+function PlayerStandard:_check_action_change_equipment(t, input)
 	if input.btn_change_equipment and managers.player:has_category_upgrade("player", "second_deployable") then
 		self:_switch_equipment()
+		if self:is_deploying() then
+			self:_interupt_action_use_item()
+			self:_start_action_use_item(t)
+		end
 	end
 end
 
@@ -2806,6 +2849,89 @@ function PlayerStandard:_check_action_deploy_bipod(t, input)
 	return new_action
 end
 
+function PlayerStandard:_upd_stance_switch_delay(t, dt)
+	if self._stance_switch_delay ~= nil then
+		self._stance_switch_delay = self._stance_switch_delay - dt
+		if self._stance_switch_delay <= 0 then
+			self._stance_switch_delay = nil
+		end
+	end
+end
+
+function PlayerStandard:is_switching_stances()
+	return self._stance_switch_delay ~= nil
+end
+
+function PlayerStandard:set_stance_switch_delay(delay)
+	self._stance_switch_delay = delay
+end
+
+function PlayerStandard:_is_underbarrel_attachment_active(weapon_unit)
+	local weapon = (weapon_unit or self._equipped_unit):base()
+	local underbarrel_names = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("underbarrel", weapon._factory_id, weapon._blueprint)
+	if underbarrel_names and underbarrel_names[1] then
+		local underbarrel = weapon._parts[underbarrel_names[1]]
+		if underbarrel then
+			local underbarrel_base = underbarrel.unit:base()
+			return underbarrel_base:is_on()
+		end
+	end
+	return false
+end
+
+function PlayerStandard:_check_action_deploy_underbarrel(t, input)
+	local new_action
+	local action_forbidden = false
+	if not input.btn_deploy_bipod then
+		return new_action
+	end
+	action_forbidden = self:in_steelsight() or self:_is_throwing_projectile() or self:_is_meleeing() or self:is_equipping() or self:_changing_weapon() or self:shooting() or self:_is_reloading() or self:is_switching_stances() or self:_interacting() or self:running() and not managers.player.RUN_AND_SHOOT
+	if not action_forbidden then
+		local weapon = self._equipped_unit:base()
+		local underbarrel_names = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("underbarrel", weapon._factory_id, weapon._blueprint)
+		if underbarrel_names and underbarrel_names[1] then
+			local underbarrel = weapon._parts[underbarrel_names[1]]
+			if underbarrel then
+				local underbarrel_base = underbarrel.unit:base()
+				local underbarrel_tweak = tweak_data.weapon[underbarrel_base.name_id]
+				if weapon.record_fire_mode then
+					weapon:record_fire_mode()
+				end
+				underbarrel_base:toggle()
+				new_action = true
+				if weapon.reset_cached_gadget then
+					weapon:reset_cached_gadget()
+				end
+				if weapon._update_stats_values then
+					weapon:_update_stats_values(true)
+				end
+				local anim_ids
+				local switch_delay = 1
+				if underbarrel_base:is_on() then
+					anim_ids = Idstring("underbarrel_enter_" .. weapon.name_id)
+					switch_delay = underbarrel_tweak.timers.equip_underbarrel
+					self:set_animation_state("underbarrel")
+				else
+					anim_ids = Idstring("underbarrel_exit_" .. weapon.name_id)
+					switch_delay = underbarrel_tweak.timers.unequip_underbarrel
+					self:set_animation_state("standard")
+				end
+				if anim_ids then
+					self._ext_camera:play_redirect(anim_ids, 1)
+				end
+				self:set_animation_weapon_hold(nil)
+				self:set_stance_switch_delay(switch_delay)
+				if alive(self._equipped_unit) then
+					managers.hud:set_ammo_amount(self._equipped_unit:base():selection_index(), self._equipped_unit:base():ammo_info())
+					managers.hud:set_teammate_weapon_firemode(HUDManager.PLAYER_PANEL, self._unit:inventory():equipped_selection(), self._equipped_unit:base():fire_mode())
+				end
+				managers.network:session():send_to_peers_synched("sync_underbarrel_switch", self._equipped_unit:base():selection_index(), underbarrel_base.name_id, underbarrel_base:is_on())
+			end
+		end
+	end
+	return new_action
+end
+
 function PlayerStandard:_check_action_cash_inspect(t, input)
 	if not input.btn_cash_inspect_press then
 		return
@@ -3029,7 +3155,7 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 	local new_action
 	local action_wanted = input.btn_primary_attack_state or input.btn_primary_attack_release
 	if action_wanted then
-		local action_forbidden = self:_is_reloading() or self:_changing_weapon() or self:_is_meleeing() or self._use_item_expire_t or self:_interacting() or self:_is_throwing_projectile() or self:_is_deploying_bipod()
+		local action_forbidden = self:_is_reloading() or self:_changing_weapon() or self:_is_meleeing() or self._use_item_expire_t or self:_interacting() or self:_is_throwing_projectile() or self:_is_deploying_bipod() or self:is_switching_stances()
 		if not action_forbidden then
 			self._queue_reload_interupt = nil
 			local start_shooting = false
@@ -3362,12 +3488,31 @@ end
 
 function PlayerStandard:_start_action_equip_weapon(t)
 	if self._change_weapon_data.next then
+		local next_equip = self._ext_inventory:get_next_selection()
+		next_equip = next_equip and next_equip.unit
+		if next_equip then
+			local state = self:_is_underbarrel_attachment_active(next_equip) and "underbarrel" or "standard"
+			self:set_animation_state(state)
+		end
 		self._ext_inventory:equip_next(false)
 	elseif self._change_weapon_data.previous then
+		local prev_equip = self._ext_inventory:get_previous_selection()
+		prev_equip = prev_equip and next_equip.unit
+		if prev_equip then
+			local state = self:_is_underbarrel_attachment_active(prev_equip) and "underbarrel" or "standard"
+			self:set_animation_state(state)
+		end
 		self._ext_inventory:equip_previous(false)
 	elseif self._change_weapon_data.selection_wanted then
+		local select_equip = self._ext_inventory:get_selected(self._change_weapon_data.selection_wanted)
+		select_equip = select_equip and select_equip.unit
+		if select_equip then
+			local state = self:_is_underbarrel_attachment_active(select_equip) and "underbarrel" or "standard"
+			self:set_animation_state(state)
+		end
 		self._ext_inventory:equip_selection(self._change_weapon_data.selection_wanted, false)
 	end
+	self:set_animation_weapon_hold(nil)
 	local speed_multiplier = self:_get_swap_speed_multiplier()
 	self._equipped_unit:base():tweak_data_anim_stop("unequip")
 	self._equipped_unit:base():tweak_data_anim_play("equip", speed_multiplier)
@@ -3466,6 +3611,7 @@ function PlayerStandard:_get_dir_str_from_vec(fwd, dir_vec)
 	else
 		return "left"
 	end
+	managers.network:session():send_to_peers_synched("sync_underbarrel_switch", self._equipped_unit:base():selection_index(), underbarrel_base.name_id, underbarrel_base:is_on())
 end
 
 function PlayerStandard:get_movement_state()

@@ -1119,6 +1119,32 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.tango.track = true
 	self.global_values.tango.sort_number = 116
 	self.global_values.tango.category = "dlc"
+	self.global_values.chico = {}
+	self.global_values.chico.name_id = "bm_global_value_chico"
+	self.global_values.chico.desc_id = "menu_l_global_value_chico"
+	self.global_values.chico.unlock_id = "bm_global_value_chico_unlock"
+	self.global_values.chico.color = Color(255, 255, 212, 0) / 255
+	self.global_values.chico.dlc = true
+	self.global_values.chico.chance = 1
+	self.global_values.chico.value_multiplier = 1
+	self.global_values.chico.durability_multiplier = 1
+	self.global_values.chico.drops = true
+	self.global_values.chico.track = true
+	self.global_values.chico.sort_number = 300
+	self.global_values.chico.category = "dlc"
+	self.global_values.friend = {}
+	self.global_values.friend.name_id = "bm_global_value_friend"
+	self.global_values.friend.desc_id = "menu_l_global_value_friend"
+	self.global_values.friend.unlock_id = "bm_global_value_friend_unlock"
+	self.global_values.friend.color = Color(255, 255, 212, 0) / 255
+	self.global_values.friend.dlc = true
+	self.global_values.friend.chance = 1
+	self.global_values.friend.value_multiplier = 1
+	self.global_values.friend.durability_multiplier = 1
+	self.global_values.friend.drops = true
+	self.global_values.friend.track = true
+	self.global_values.friend.sort_number = 301
+	self.global_values.friend.category = "dlc"
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.global_values.sweettooth = {}
 		self.global_values.sweettooth.name_id = "bm_global_value_sweettooth"
@@ -1177,7 +1203,9 @@ function LootDropTweakData:init(tweak_data)
 		"born",
 		"sparkle",
 		"rota",
-		"tango"
+		"tango",
+		"chico",
+		"friend"
 	}
 	self:_create_global_value_list_map()
 end

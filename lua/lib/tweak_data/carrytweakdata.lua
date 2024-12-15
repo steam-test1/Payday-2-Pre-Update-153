@@ -629,6 +629,12 @@ function CarryTweakData:init(tweak_data)
 	self.robot_toy.unit = "units/payday2/pickups/gen_pku_cage_bag/gen_pku_cage_bag"
 	self.robot_toy.visual_unit_name = "units/payday2/characters/npc_acc_cage_bag_1/npc_acc_cage_bag_1"
 	self.robot_toy.AI_carry = {SO_category = "enemies"}
+	self.yayo = {}
+	self.yayo.type = "coke_light"
+	self.yayo.name_id = "hud_carry_yayo"
+	self.yayo.bag_value = "coke"
+	self.yayo.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
+	self.yayo.AI_carry = {SO_category = "enemies"}
 end
 
 function CarryTweakData:get_carry_ids()

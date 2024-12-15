@@ -86,6 +86,16 @@ function BlackMarketManager:_setup_grenades()
 			grenades[grenade_id].level = weapon_level
 			grenades[grenade_id].skill_based = not is_default and weapon_level == 0 and not tweak_data.blackmarket.projectiles[grenade_id].dlc
 		end
+		if grenade.ability then
+			grenades[grenade_id] = {
+				unlocked = false,
+				equipped = false,
+				level = 0,
+				skill_based = true,
+				amount = 0,
+				ability = true
+			}
+		end
 	end
 	grenades[self._defaults.grenade].equipped = false
 	grenades[self._defaults.grenade].unlocked = false
@@ -378,6 +388,13 @@ function BlackMarketManager:equipped_projectile()
 	return self:equipped_grenade()
 end
 
+function BlackMarketManager:has_equipped_ability()
+	local id = self:equipped_grenade()
+	if id then
+		return tweak_data.blackmarket.projectiles[id] and tweak_data.blackmarket.projectiles[id].ability and true or false
+	end
+end
+
 function BlackMarketManager:equipped_grenade()
 	local forced_throwable = self:forced_throwable()
 	if forced_throwable then
@@ -392,6 +409,8 @@ function BlackMarketManager:equipped_grenade()
 		grenade = Global.blackmarket_manager.grenades[grenade_id]
 		if data.throwable and grenade.equipped and grenade.unlocked then
 			return grenade_id, grenade.amount or 0
+		elseif data.ability and grenade.equipped and grenade.unlocked then
+			return grenade_id, 1
 		end
 	end
 	return self._defaults.grenade, Global.blackmarket_manager.grenades[self._defaults.grenade].amount
@@ -2197,7 +2216,14 @@ function BlackMarketManager:get_dropable_mods_by_weapon_id(weapon_id, weapon_dat
 		dropable_mods[category] = dropable_mods[category] or {}
 		for _, part_id in ipairs(data) do
 			local part = all_mods[part_id]
-			if part and (part.pcs or part.pc) then
+			local unique = true
+			for i, prev_part in ipairs(dropable_mods[category]) do
+				if prev_part[1] == part_id then
+					unique = false
+					break
+				end
+			end
+			if part and unique and (part.pcs or part.pc) then
 				local global_value = part.infamous and "infamous" or "normal"
 				local is_infamous = part.infamous
 				local part_dropable = true
@@ -3287,6 +3313,9 @@ function BlackMarketManager:on_aquired_grenade(upgrade, id, loading)
 		self._global.new_drops.normal.grenades = self._global.new_drops.normal.grenades or {}
 		self._global.new_drops.normal.grenades[id] = true
 	end
+	if self._global.grenades[id].ability then
+		self:equip_grenade(id)
+	end
 end
 
 function BlackMarketManager:on_unaquired_grenade(upgrade, id)
@@ -3576,6 +3605,7 @@ function BlackMarketManager:buy_and_modify_weapon(category, slot, global_value, 
 		managers.blackmarket:view_weapon(category, slot, nil, nil, BlackMarketGui.get_crafting_custom_data())
 		managers.blackmarket:clear_preview_blueprint()
 	end
+	managers.weapon_factory:change_part_blueprint_only(self._global.crafted_items[category][slot].factory_id, part_id, self:get_preview_blueprint(category, slot))
 	self:modify_weapon(category, slot, global_value, part_id)
 	if not free_of_charge then
 		managers.money:on_buy_weapon_modification(self._global.crafted_items[category][slot].weapon_id, part_id, global_value)
@@ -3804,7 +3834,6 @@ function BlackMarketManager:get_sorted_grenades(hide_locked)
 	local m_tweak_data = tweak_data.blackmarket.projectiles
 	local l_tweak_data = tweak_data.lootdrop.global_values
 	for id, d in pairs(Global.blackmarket_manager.grenades) do
-		print("id ", inspect(id))
 		if not hide_locked or d.unlocked then
 			table.insert(sort_data, {id, d})
 		end
@@ -3816,6 +3845,9 @@ function BlackMarketManager:get_sorted_grenades(hide_locked)
 		y_td = m_tweak_data[y[1]]
 		if xd.unlocked ~= yd.unlocked then
 			return xd.unlocked
+		end
+		if xd.ability ~= yd.ability then
+			return xd.ability
 		end
 		x_gv = x_td.global_value or x_td.dlc or "normal"
 		y_gv = y_td.global_value or y_td.dlc or "normal"
@@ -4930,6 +4962,7 @@ end
 
 function BlackMarketManager:get_cosmetics_by_weapon_id(weapon_id)
 	local cosmetic_tweak = tweak_data.blackmarket.weapon_skins
+	weapon_id = tweak_data.weapon[weapon_id].parent_weapon_id or weapon_id
 	local cosmetics = {}
 	for id, data in pairs(cosmetic_tweak) do
 		if weapon_id == data.weapon_id then
@@ -5280,6 +5313,7 @@ function BlackMarketManager:load(data)
 		end
 		for grenade, data in pairs(self._global.grenades) do
 			self._global.grenades[grenade].skill_based = false
+			self._global.grenades[grenade].skill_based = self._global.grenades[grenade].ability and true or false
 		end
 		self._global.equipped_grenade = nil
 		self._global.melee_weapons = default_global.melee_weapons or {}

@@ -215,6 +215,24 @@ function HUDTeammate:init(i, teammates_panel, is_player, width)
 	})
 	radial_custom:set_color(Color(1, 0, 0, 0))
 	radial_custom:hide()
+	local radial_ability = radial_health_panel:bitmap({
+		name = "radial_ability",
+		texture = "guis/dlcs/chico/textures/pd2/hud_fearless",
+		texture_rect = {
+			0,
+			0,
+			64,
+			64
+		},
+		render_template = "VertexColorTexturedRadial",
+		blend_mode = "add",
+		alpha = 1,
+		w = radial_health_panel:w(),
+		h = radial_health_panel:h(),
+		layer = 5
+	})
+	radial_ability:set_color(Color(1, 0, 0, 0))
+	radial_ability:hide()
 	if main_player then
 		local radial_rip = radial_health_panel:bitmap({
 			name = "radial_rip",
@@ -1260,16 +1278,57 @@ function HUDTeammate:set_grenades(data)
 	self:set_grenades_amount(data)
 end
 
+function HUDTeammate:set_ability_cooldown(data)
+	if not PlayerBase.USE_GRENADES then
+		return
+	end
+	data.cooldown = data.cooldown and math.ceil(data.cooldown) or 0
+	local teammate_panel = self._panel:child("player")
+	local grenades_panel = self._player_panel:child("grenades_panel")
+	local amount = grenades_panel:child("amount")
+	self:_set_amount_string(amount, data.cooldown)
+	amount:set_visible(data.cooldown > 0)
+end
+
+function HUDTeammate:set_ability_radial(data)
+	local teammate_panel = self._panel:child("player")
+	local radial_health_panel = teammate_panel:child("radial_health_panel")
+	local radial_ability = radial_health_panel:child("radial_ability")
+	local red = data.current / data.total
+	radial_ability:set_color(Color(1, red, 1, 1))
+	radial_ability:set_visible(0 < red)
+end
+
+function HUDTeammate:activate_ability_radial(time)
+	local teammate_panel = self._panel:child("player")
+	local radial_health_panel = teammate_panel:child("radial_health_panel")
+	local radial_ability = radial_health_panel:child("radial_ability")
+	
+	local function anim(o)
+		radial_ability:set_visible(true)
+		over(time, function(p)
+			radial_ability:set_color(Color(1, math.lerp(1, 0, p), 1, 1))
+		end)
+		radial_ability:set_visible(false)
+	end
+	
+	radial_ability:animate(anim)
+end
+
 function HUDTeammate:set_grenades_amount(data)
 	if not PlayerBase.USE_GRENADES then
 		return
 	end
-	local teammate_panel = self._panel:child("player")
-	local grenades_panel = self._player_panel:child("grenades_panel")
-	local amount = grenades_panel:child("amount")
-	grenades_panel:child("grenades"):set_visible(data.amount ~= 0)
-	self:_set_amount_string(amount, data.amount)
-	amount:set_visible(data.amount ~= 0)
+	if data.ability then
+		self:set_ability_cooldown(data)
+	else
+		local teammate_panel = self._panel:child("player")
+		local grenades_panel = self._player_panel:child("grenades_panel")
+		local amount = grenades_panel:child("amount")
+		grenades_panel:child("grenades"):set_visible(data.amount ~= 0)
+		self:_set_amount_string(amount, data.amount)
+		amount:set_visible(data.amount ~= 0)
+	end
 end
 
 function HUDTeammate:set_carry_info(carry_id, value)

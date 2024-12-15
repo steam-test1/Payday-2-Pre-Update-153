@@ -454,8 +454,8 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.fireaxe.sounds.hit_gen = "fire_axe_hit_gen"
 	self.melee_weapons.fireaxe.sounds.hit_body = "fire_axe_hit_body"
 	self.melee_weapons.fireaxe.sounds.charge = "knife_charge"
-	self.melee_weapons.fireaxe.stats.min_damage = 7
-	self.melee_weapons.fireaxe.stats.max_damage = 45
+	self.melee_weapons.fireaxe.stats.min_damage = 3
+	self.melee_weapons.fireaxe.stats.max_damage = 20
 	self.melee_weapons.fireaxe.stats.min_damage_effect = 1
 	self.melee_weapons.fireaxe.stats.max_damage_effect = 1
 	self.melee_weapons.fireaxe.stats.charge_time = 4
@@ -626,8 +626,8 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.freedom.unit = "units/pd2_dlc_gage_historical/weapons/wpn_fps_mel_freedom/wpn_fps_mel_freedom"
 	self.melee_weapons.freedom.third_unit = "units/pd2_dlc_gage_historical/weapons/wpn_third_mel_freedom/wpn_third_mel_freedom"
 	self.melee_weapons.freedom.stats.weapon_type = "sharp"
-	self.melee_weapons.freedom.stats.min_damage = 7
-	self.melee_weapons.freedom.stats.max_damage = 45
+	self.melee_weapons.freedom.stats.min_damage = 3
+	self.melee_weapons.freedom.stats.max_damage = 20
 	self.melee_weapons.freedom.stats.min_damage_effect = 1
 	self.melee_weapons.freedom.stats.max_damage_effect = 1
 	self.melee_weapons.freedom.stats.charge_time = 3
@@ -1005,8 +1005,8 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.mining_pick.unit = "units/pd2_dlc_west/weapons/wpn_fps_mel_miningpick/wpn_fps_mel_miningpick"
 	self.melee_weapons.mining_pick.third_unit = "units/pd2_dlc_west/weapons/wpn_third_mel_miningpick/wpn_third_mel_miningpick"
 	self.melee_weapons.mining_pick.stats.weapon_type = "sharp"
-	self.melee_weapons.mining_pick.stats.min_damage = 7
-	self.melee_weapons.mining_pick.stats.max_damage = 45
+	self.melee_weapons.mining_pick.stats.min_damage = 3
+	self.melee_weapons.mining_pick.stats.max_damage = 20
 	self.melee_weapons.mining_pick.stats.min_damage_effect = 1
 	self.melee_weapons.mining_pick.stats.max_damage_effect = 1
 	self.melee_weapons.mining_pick.stats.charge_time = 4
@@ -1478,8 +1478,8 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.sandsteel.sounds.charge = "sandsteel_charge"
 	self.melee_weapons.sandsteel.stats = {}
 	self.melee_weapons.sandsteel.stats.weapon_type = "sharp"
-	self.melee_weapons.sandsteel.stats.min_damage = 7
-	self.melee_weapons.sandsteel.stats.max_damage = 45
+	self.melee_weapons.sandsteel.stats.min_damage = 3
+	self.melee_weapons.sandsteel.stats.max_damage = 20
 	self.melee_weapons.sandsteel.stats.min_damage_effect = 1
 	self.melee_weapons.sandsteel.stats.max_damage_effect = 1
 	self.melee_weapons.sandsteel.stats.charge_time = 4
@@ -1515,8 +1515,8 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.great.sounds.charge = "great_charge"
 	self.melee_weapons.great.stats = {}
 	self.melee_weapons.great.stats.weapon_type = "sharp"
-	self.melee_weapons.great.stats.min_damage = 7
-	self.melee_weapons.great.stats.max_damage = 45
+	self.melee_weapons.great.stats.min_damage = 3
+	self.melee_weapons.great.stats.max_damage = 20
 	self.melee_weapons.great.stats.min_damage_effect = 1
 	self.melee_weapons.great.stats.max_damage_effect = 1
 	self.melee_weapons.great.stats.charge_time = 4
@@ -1551,8 +1551,8 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.beardy.sounds.charge = "beardy_charge"
 	self.melee_weapons.beardy.stats = {}
 	self.melee_weapons.beardy.stats.weapon_type = "sharp"
-	self.melee_weapons.beardy.stats.min_damage = 7
-	self.melee_weapons.beardy.stats.max_damage = 45
+	self.melee_weapons.beardy.stats.min_damage = 3
+	self.melee_weapons.beardy.stats.max_damage = 20
 	self.melee_weapons.beardy.stats.min_damage_effect = 1
 	self.melee_weapons.beardy.stats.max_damage_effect = 1
 	self.melee_weapons.beardy.stats.charge_time = 4
@@ -1738,8 +1738,8 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.iceaxe.sounds.hit_gen = "mining_pick_hit_gen"
 	self.melee_weapons.iceaxe.sounds.hit_body = "mining_pick_hit_body"
 	self.melee_weapons.iceaxe.sounds.charge = "mining_pick_charge"
-	self.melee_weapons.iceaxe.stats.min_damage = 7
-	self.melee_weapons.iceaxe.stats.max_damage = 45
+	self.melee_weapons.iceaxe.stats.min_damage = 3
+	self.melee_weapons.iceaxe.stats.max_damage = 20
 	self.melee_weapons.iceaxe.stats.min_damage_effect = 1
 	self.melee_weapons.iceaxe.stats.max_damage_effect = 1
 	self.melee_weapons.iceaxe.stats.charge_time = 4
@@ -1893,8 +1893,8 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.pitchfork.sounds.charge = "pitchfork_charge"
 	self.melee_weapons.pitchfork.stats = {}
 	self.melee_weapons.pitchfork.stats.weapon_type = "sharp"
-	self.melee_weapons.pitchfork.stats.min_damage = 7
-	self.melee_weapons.pitchfork.stats.max_damage = 45
+	self.melee_weapons.pitchfork.stats.min_damage = 3
+	self.melee_weapons.pitchfork.stats.max_damage = 20
 	self.melee_weapons.pitchfork.stats.min_damage_effect = 1
 	self.melee_weapons.pitchfork.stats.max_damage_effect = 1
 	self.melee_weapons.pitchfork.stats.charge_time = 4
@@ -1967,8 +1967,8 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.nin.sounds.charge = "nin_charge"
 	self.melee_weapons.nin.stats = {}
 	self.melee_weapons.nin.stats.weapon_type = "sharp"
-	self.melee_weapons.nin.stats.min_damage = 7
-	self.melee_weapons.nin.stats.max_damage = 45
+	self.melee_weapons.nin.stats.min_damage = 3
+	self.melee_weapons.nin.stats.max_damage = 20
 	self.melee_weapons.nin.stats.min_damage_effect = 1
 	self.melee_weapons.nin.stats.max_damage_effect = 1
 	self.melee_weapons.nin.stats.charge_time = 4
@@ -2117,8 +2117,8 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.road.sounds.charge = "road_charge"
 	self.melee_weapons.road.stats = {}
 	self.melee_weapons.road.stats.weapon_type = "blunt"
-	self.melee_weapons.road.stats.min_damage = 7
-	self.melee_weapons.road.stats.max_damage = 45
+	self.melee_weapons.road.stats.min_damage = 3
+	self.melee_weapons.road.stats.max_damage = 20
 	self.melee_weapons.road.stats.min_damage_effect = 1
 	self.melee_weapons.road.stats.max_damage_effect = 1
 	self.melee_weapons.road.stats.charge_time = 4
@@ -2135,6 +2135,80 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 		var4_attack = {anim = "var2"},
 		charge = {anim = "charge", loop = true}
 	}
+	self.melee_weapons.cs = {}
+	self.melee_weapons.cs.name_id = "bm_melee_cs"
+	self.melee_weapons.cs.animation = nil
+	self.melee_weapons.cs.anim_attack_vars = {
+		"var1",
+		"var2",
+		"var3",
+		"var4"
+	}
+	self.melee_weapons.cs.anim_global_param = "melee_cs"
+	self.melee_weapons.cs.dlc = "chico"
+	self.melee_weapons.cs.texture_bundle_folder = "chico"
+	self.melee_weapons.cs.type = "blunt"
+	self.melee_weapons.cs.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.cs.unit = "units/pd2_dlc_chico/weapons/wpn_fps_mel_cs/wpn_fps_mel_cs"
+	self.melee_weapons.cs.third_unit = "units/pd2_dlc_chico/weapons/wpn_fps_mel_cs/wpn_third_mel_cs"
+	self.melee_weapons.cs.sounds = {}
+	self.melee_weapons.cs.sounds.equip = "cs_equip"
+	self.melee_weapons.cs.sounds.hit_air = "cs_hit_air"
+	self.melee_weapons.cs.sounds.hit_gen = "cs_hit_gen"
+	self.melee_weapons.cs.sounds.hit_body = "cs_hit_body"
+	self.melee_weapons.cs.sounds.charge = "cs_charge"
+	self.melee_weapons.cs.stats = {}
+	self.melee_weapons.cs.stats.weapon_type = "blunt"
+	self.melee_weapons.cs.stats.min_damage = 3
+	self.melee_weapons.cs.stats.max_damage = 20
+	self.melee_weapons.cs.stats.min_damage_effect = 1
+	self.melee_weapons.cs.stats.max_damage_effect = 1
+	self.melee_weapons.cs.stats.charge_time = 4
+	self.melee_weapons.cs.stats.range = 185
+	self.melee_weapons.cs.stats.concealment = 25
+	self.melee_weapons.cs.stats.remove_weapon_movement_penalty = true
+	self.melee_weapons.cs.repeat_expire_t = 2
+	self.melee_weapons.cs.expire_t = 1.2
+	self.melee_weapons.cs.melee_damage_delay = 0.35
+	self.melee_weapons.brick = {}
+	self.melee_weapons.brick.name_id = "bm_melee_brick"
+	self.melee_weapons.brick.animation = nil
+	self.melee_weapons.brick.anim_attack_vars = {
+		"var1",
+		"var2",
+		"var1",
+		"var2"
+	}
+	self.melee_weapons.brick.anim_global_param = "melee_brick"
+	self.melee_weapons.brick.dlc = "friend"
+	self.melee_weapons.brick.texture_bundle_folder = "friend"
+	self.melee_weapons.brick.type = "blunt"
+	self.melee_weapons.brick.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.brick.unit = "units/pd2_dlc_friend/weapons/wpn_fps_mel_brick/wpn_fps_mel_brick"
+	self.melee_weapons.brick.third_unit = "units/pd2_dlc_friend/weapons/wpn_fps_mel_brick/wpn_third_mel_brick"
+	self.melee_weapons.brick.sounds = {}
+	self.melee_weapons.brick.sounds.equip = "brick_equip"
+	self.melee_weapons.brick.sounds.hit_air = "brick_hit_air"
+	self.melee_weapons.brick.sounds.hit_gen = "brick_hit_gen"
+	self.melee_weapons.brick.sounds.hit_body = "brick_hit_body"
+	self.melee_weapons.brick.sounds.charge = "brick_charge"
+	self.melee_weapons.brick.stats = {}
+	self.melee_weapons.brick.stats.weapon_type = "blunt"
+	self.melee_weapons.brick.stats.min_damage = 3
+	self.melee_weapons.brick.stats.max_damage = 8
+	self.melee_weapons.brick.stats.min_damage_effect = 1
+	self.melee_weapons.brick.stats.max_damage_effect = 1
+	self.melee_weapons.brick.stats.charge_time = 2
+	self.melee_weapons.brick.stats.range = 185
+	self.melee_weapons.brick.stats.concealment = 30
+	self.melee_weapons.brick.stats.remove_weapon_movement_penalty = true
+	self.melee_weapons.brick.repeat_expire_t = 2
+	self.melee_weapons.brick.expire_t = 1.2
+	self.melee_weapons.brick.melee_damage_delay = 0.06
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.melee_weapons) do
 		if free_dlcs[data.dlc] then

@@ -1292,6 +1292,32 @@ function BlackMarketTweakData:_init_materials(tweak_data)
 	self.materials.midnight_camo.value = 0
 	self.materials.midnight_camo.material_amount = 0
 	self.materials.midnight_camo.dlc = "tango"
+	self.materials.oxidized_copper = {}
+	self.materials.oxidized_copper.name_id = "bm_mtl_oxidized_copper"
+	self.materials.oxidized_copper.pcs = {}
+	self.materials.oxidized_copper.texture = "units/pd2_dlc_friend/masks/materials/matcap_oxidized_copper_df"
+	self.materials.oxidized_copper.value = 0
+	self.materials.oxidized_copper.material_amount = 0
+	self.materials.oxidized_copper.dlc = "friend"
+	self.materials.golden_hour = {}
+	self.materials.golden_hour.name_id = "bm_mtl_golden_hour"
+	self.materials.golden_hour.pcs = {}
+	self.materials.golden_hour.texture = "units/pd2_dlc_friend/masks/materials/matcap_golden_hour_df"
+	self.materials.golden_hour.value = 0
+	self.materials.golden_hour.dlc = "friend"
+	self.materials.red_velvet = {}
+	self.materials.red_velvet.name_id = "bm_mtl_red_velvet"
+	self.materials.red_velvet.pcs = {}
+	self.materials.red_velvet.texture = "units/pd2_dlc_friend/masks/materials/matcap_red_velvet_df"
+	self.materials.red_velvet.value = 0
+	self.materials.red_velvet.dlc = "friend"
+	self.materials.black_marble = {}
+	self.materials.black_marble.name_id = "bm_mtl_black_marble"
+	self.materials.black_marble.pcs = {}
+	self.materials.black_marble.texture = "units/pd2_dlc_friend/masks/materials/matcap_black_marble_df"
+	self.materials.black_marble.value = 0
+	self.materials.black_marble.material_amount = 0
+	self.materials.black_marble.dlc = "friend"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.materials) do
 		if free_dlcs[data.dlc] then

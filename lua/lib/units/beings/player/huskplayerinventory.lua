@@ -158,3 +158,12 @@ function HuskPlayerInventory._get_weapon_name_from_sync_index(w_index)
 		return fps_id
 	end
 end
+
+function HuskPlayerInventory:set_weapon_underbarrel(selection_index, underbarrel_id, is_on)
+	selection_index = 2
+	local selection = self._available_selections[selection_index]
+	if not selection then
+		return
+	end
+	selection.unit:base():set_underbarrel(underbarrel_id, is_on)
+end

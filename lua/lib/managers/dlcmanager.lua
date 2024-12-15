@@ -403,6 +403,14 @@ function GenericDLCManager:has_tango()
 	return self:is_dlc_unlocked("tango")
 end
 
+function GenericDLCManager:has_chico()
+	return self:is_dlc_unlocked("chico")
+end
+
+function GenericDLCManager:has_friend()
+	return self:is_dlc_unlocked("friend")
+end
+
 function GenericDLCManager:has_goty_all_dlc_bundle_2014()
 	return self:has_goty_weapon_bundle_2014() and self:has_goty_heist_bundle_2014() and self:is_dlcs_unlocked({
 		"character_pack_clover"
@@ -1188,6 +1196,8 @@ function WINDLCManager:init()
 			nyck_bundle = {app_id = "218620", no_install = true},
 			urf_bundle = {app_id = "218620", no_install = true},
 			tango = {app_id = "548420", no_install = true},
+			friend = {app_id = "548421", no_install = true},
+			chico = {app_id = "548422", no_install = true},
 			pd2_clan = {
 				source_id = "103582791433980119"
 			},

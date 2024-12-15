@@ -2020,6 +2020,30 @@ function BlackMarketTweakData:_init_textures(tweak_data)
 	self.textures.bullets.texture = "units/pd2_dlc_tng/masks/patterns/pattern_bullets_df"
 	self.textures.bullets.value = 0
 	self.textures.bullets.dlc = "tango"
+	self.textures.liberty_flame = {}
+	self.textures.liberty_flame.name_id = "bm_txt_liberty_flame"
+	self.textures.liberty_flame.pcs = {}
+	self.textures.liberty_flame.texture = "units/pd2_dlc_friend/masks/patterns/pattern_liberty_flame_df"
+	self.textures.liberty_flame.value = 0
+	self.textures.liberty_flame.dlc = "friend"
+	self.textures.diablada = {}
+	self.textures.diablada.name_id = "bm_txt_diablada"
+	self.textures.diablada.pcs = {}
+	self.textures.diablada.texture = "units/pd2_dlc_friend/masks/patterns/pattern_diablada_df"
+	self.textures.diablada.value = 0
+	self.textures.diablada.dlc = "friend"
+	self.textures.scar_mask = {}
+	self.textures.scar_mask.name_id = "bm_txt_scar_mask"
+	self.textures.scar_mask.pcs = {}
+	self.textures.scar_mask.texture = "units/pd2_dlc_friend/masks/patterns/pattern_scar_mask_df"
+	self.textures.scar_mask.value = 0
+	self.textures.scar_mask.dlc = "friend"
+	self.textures.my_little = {}
+	self.textures.my_little.name_id = "bm_txt_pattern_my_little_df"
+	self.textures.my_little.pcs = {}
+	self.textures.my_little.texture = "units/pd2_dlc_friend/masks/patterns/pattern_my_little_df"
+	self.textures.my_little.value = 0
+	self.textures.my_little.dlc = "friend"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.textures) do
 		if free_dlcs[data.dlc] then

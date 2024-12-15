@@ -10,7 +10,7 @@ function WeaponGadgetBase:set_npc()
 end
 
 function WeaponGadgetBase:set_state(on, sound_source, current_state)
-	if not self:is_bipod() then
+	if not self:is_bipod() and not self:is_underbarrel() then
 		self:_set_on(on, sound_source)
 	end
 	self:_check_state(current_state)
@@ -55,6 +55,14 @@ end
 
 function WeaponGadgetBase:is_bipod()
 	return false
+end
+
+function WeaponGadgetBase:is_underbarrel()
+	return false
+end
+
+function WeaponGadgetBase:overrides_weapon_firing()
+	return self:is_underbarrel()
 end
 
 function WeaponGadgetBase:destroy(unit)

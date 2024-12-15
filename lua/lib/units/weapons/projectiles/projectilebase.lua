@@ -110,7 +110,7 @@ function ProjectileBase:throw(params)
 		if physic_effect then
 			World:play_physic_effect(physic_effect, self._unit)
 		end
-		if tweak_entry.throwable and tweak_entry.add_trail_effect then
+		if tweak_entry.add_trail_effect then
 			self:add_trail_effect(tweak_entry.add_trail_effect)
 		end
 		local unit_name = tweak_entry.sprint_unit
@@ -212,6 +212,7 @@ function ProjectileBase:load(data)
 end
 
 function ProjectileBase:destroy()
+	self:remove_trail_effect()
 end
 
 function ProjectileBase.throw_projectile(projectile_type, pos, dir, owner_peer_id)
@@ -245,6 +246,15 @@ function ProjectileBase.throw_projectile(projectile_type, pos, dir, owner_peer_i
 end
 
 function ProjectileBase:add_trail_effect()
+	managers.game_play_central:add_projectile_trail(self._unit, self._unit:orientation_object())
+	self._added_trail_effect = true
+end
+
+function ProjectileBase:remove_trail_effect()
+	if self._added_trail_effect then
+		managers.game_play_central:remove_projectile_trail(self._unit)
+		self._added_trail_effect = nil
+	end
 end
 
 function ProjectileBase.check_time_cheat(projectile_type, owner_peer_id)

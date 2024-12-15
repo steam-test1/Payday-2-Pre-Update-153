@@ -1390,6 +1390,16 @@ function MenuCallbackHandler:dlc_buy_tango_pc()
 	Steam:overlay_activate("store", 548420)
 end
 
+function MenuCallbackHandler:dlc_buy_friend_pc()
+	print("[MenuCallbackHandler:dlc_buy_friend_pc]")
+	Steam:overlay_activate("store", 548421)
+end
+
+function MenuCallbackHandler:dlc_buy_chico_pc()
+	print("[MenuCallbackHandler:dlc_buy_chico_pc]")
+	Steam:overlay_activate("store", 548422)
+end
+
 function MenuCallbackHandler:dlc_buy_ps3()
 	print("[MenuCallbackHandler:dlc_buy_ps3]")
 	managers.dlc:buy_product("dlc1")
@@ -1467,6 +1477,8 @@ end
 
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
+		"friend",
+		"chico",
 		"tango",
 		"pim",
 		"born",
@@ -1641,6 +1653,14 @@ end
 
 function MenuCallbackHandler:visible_callback_tango()
 	return self:is_dlc_latest_locked("tango")
+end
+
+function MenuCallbackHandler:visible_callback_friend()
+	return self:is_dlc_latest_locked("friend")
+end
+
+function MenuCallbackHandler:visible_callback_chico()
+	return self:is_dlc_latest_locked("chico")
 end
 
 function MenuCallbackHandler:not_has_all_dlcs()

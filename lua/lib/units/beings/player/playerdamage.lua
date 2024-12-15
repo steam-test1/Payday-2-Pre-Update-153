@@ -271,6 +271,15 @@ function PlayerDamage:update(unit, t, dt)
 		self._armor_stored_health_max_set = true
 		self:update_armor_stored_health()
 	end
+	if managers.player:has_activate_temporary_upgrade("temporary", "chico_injector") then
+		self._chico_injector_active = true
+		local total_time = managers.player:upgrade_value("temporary", "chico_injector")[2]
+		local current_time = managers.player:get_activate_temporary_expire_time("temporary", "chico_injector") - t
+		managers.hud:set_player_ability_radial({current = current_time, total = total_time})
+	elseif self._chico_injector_active then
+		managers.hud:set_player_ability_radial({current = 0, total = 1})
+		self._chico_injector_active = nil
+	end
 	local is_berserker_active = managers.player:has_activate_temporary_upgrade("temporary", "berserker_damage_multiplier")
 	if self._check_berserker_done then
 		if is_berserker_active then
@@ -293,6 +302,9 @@ function PlayerDamage:update(unit, t, dt)
 					revives = Application:digest_value(self._revives, false)
 				})
 				self:force_into_bleedout()
+				if not self._bleed_out then
+					self._disable_next_swansong = true
+				end
 			end
 		else
 			local expire_time = managers.player:get_activate_temporary_expire_time("temporary", "berserker_damage_multiplier")
@@ -742,6 +754,7 @@ function PlayerDamage:damage_melee(attack_data)
 	end
 	local dmg_mul = pm:damage_reduction_skill_multiplier("melee")
 	attack_data.damage = attack_data.damage * dmg_mul
+	self:_check_chico_heal(attack_data)
 	self._unit:sound():play("melee_hit_body", nil, nil)
 	local result = self:damage_bullet(attack_data)
 	local vars = {
@@ -861,6 +874,7 @@ function PlayerDamage:damage_bullet(attack_data)
 	if not attack_data.ignore_suppression and not self:is_suppressed() then
 		return
 	end
+	self:_check_chico_heal(attack_data)
 	local armor_reduction_multiplier = 0
 	if 0 >= self:get_real_armor() then
 		armor_reduction_multiplier = 1
@@ -941,6 +955,32 @@ function PlayerDamage:_calc_health_damage(attack_data)
 	return health_subtracted
 end
 
+function PlayerDamage:_check_chico_heal(attack_data)
+	if managers.player:has_activate_temporary_upgrade("temporary", "chico_injector") then
+		local dmg_to_hp_ratio = managers.player:temporary_upgrade_value("temporary", "chico_injector", 0)
+		if managers.player:has_category_upgrade("player", "chico_injector_low_health_multiplier") then
+			local upg_values = managers.player:upgrade_value("player", "chico_injector_low_health_multiplier")
+			if self:health_ratio() < upg_values[1] then
+				dmg_to_hp_ratio = dmg_to_hp_ratio + upg_values[2]
+			end
+		end
+		local health_received = attack_data.damage * dmg_to_hp_ratio
+		if managers.player:has_category_upgrade("player", "chico_injector_health_to_speed") and self:get_real_health() + health_received > self:_max_health() then
+			self._injector_overflow = self._injector_overflow or 0
+			local diff = self:_max_health() - self:get_real_health()
+			self:restore_health(diff, true)
+			health_received = health_received - diff
+			self._injector_overflow = self._injector_overflow + health_received
+			local upg_values = managers.player:upgrade_value("player", "chico_injector_health_to_speed")
+			local times = math.floor(self._injector_overflow / upg_values[1])
+			managers.player:speed_up_ability_cooldown("chico_injector", upg_values[2] * times)
+			self._injector_overflow = self._injector_overflow - upg_values[1] * times
+		else
+			self:restore_health(health_received, true)
+		end
+	end
+end
+
 function PlayerDamage:_send_damage_drama(attack_data, health_subtracted)
 	local dmg_percent = health_subtracted / self._HEALTH_INIT
 	local attacker
@@ -975,6 +1015,7 @@ function PlayerDamage:damage_killzone(attack_data)
 	if self._bleed_out then
 		return
 	end
+	self:_check_chico_heal(attack_data)
 	local armor_reduction_multiplier = 0
 	if 0 >= self:get_real_armor() then
 		armor_reduction_multiplier = 1
@@ -1076,6 +1117,7 @@ function PlayerDamage:damage_explosion(attack_data)
 	end
 	local dmg_mul = managers.player:damage_reduction_skill_multiplier("explosion")
 	attack_data.damage = damage * dmg_mul
+	self:_check_chico_heal(attack_data)
 	local armor_subtracted = self:_calc_armor_damage(attack_data)
 	attack_data.damage = attack_data.damage - (armor_subtracted or 0)
 	local health_subtracted = self:_calc_health_damage(attack_data)
@@ -1111,6 +1153,7 @@ function PlayerDamage:damage_fire(attack_data)
 	end
 	local dmg_mul = managers.player:damage_reduction_skill_multiplier("fire")
 	attack_data.damage = damage * dmg_mul
+	self:_check_chico_heal(attack_data)
 	local armor_subtracted = self:_calc_armor_damage(attack_data)
 	attack_data.damage = attack_data.damage - (armor_subtracted or 0)
 	local health_subtracted = self:_calc_health_damage(attack_data)
@@ -1158,7 +1201,7 @@ function PlayerDamage:_check_bleed_out(can_activate_berserker, ignore_movement_s
 		end
 		if can_activate_berserker and not self._check_berserker_done then
 			local has_berserker_skill = managers.player:has_category_upgrade("temporary", "berserker_damage_multiplier")
-			if has_berserker_skill then
+			if has_berserker_skill and not self._disable_next_swansong then
 				managers.hud:set_teammate_condition(HUDManager.PLAYER_PANEL, "mugshot_swansong", managers.localization:text("debug_mugshot_downed"))
 				managers.player:activate_temporary_upgrade("temporary", "berserker_damage_multiplier")
 				self._current_state = nil
@@ -1168,6 +1211,7 @@ function PlayerDamage:_check_bleed_out(can_activate_berserker, ignore_movement_s
 				end
 				self._listener_holder:call("on_enter_swansong")
 			end
+			self._disable_next_swansong = nil
 		end
 		self._hurt_value = 0.2
 		self._damage_to_hot_stack = {}

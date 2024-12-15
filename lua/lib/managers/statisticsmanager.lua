@@ -17,7 +17,9 @@ StatisticsManager.special_unit_ids = {
 	"chavez_boss",
 	"mobster_boss",
 	"hector_boss",
-	"hector_boss_no_armor"
+	"hector_boss_no_armor",
+	"drug_lord_boss",
+	"drug_lord_boss_stealth"
 }
 
 function StatisticsManager:init()
@@ -155,6 +157,27 @@ function StatisticsManager:_setup(reset)
 			tied = 0
 		},
 		hector_boss_no_armor = {
+			count = 0,
+			head_shots = 0,
+			melee = 0,
+			explosion = 0,
+			tied = 0
+		},
+		bolivian = {
+			count = 0,
+			head_shots = 0,
+			melee = 0,
+			explosion = 0,
+			tied = 0
+		},
+		drug_lord_boss = {
+			count = 0,
+			head_shots = 0,
+			melee = 0,
+			explosion = 0,
+			tied = 0
+		},
+		drug_lord_boss_stealth = {
 			count = 0,
 			head_shots = 0,
 			melee = 0,
@@ -583,6 +606,10 @@ function StatisticsManager:aquired_money(amount)
 	self:_increment_misc("cash", amount * 1000)
 end
 
+function StatisticsManager:aquired_coins(coins)
+	self:_increment_misc("coins", coins)
+end
+
 function StatisticsManager:mission_stats(name)
 	self._global.session.mission_stats = self._global.session.mission_stats or {}
 	self._global.session.mission_stats[name] = (self._global.session.mission_stats[name] or 0) + 1
@@ -703,6 +730,58 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 		method = "set",
 		value = cash_found and 0 or 1
 	}
+	local current_coins = managers.custom_safehouse:coins()
+	local coins_found = false
+	local coin_buckets = {
+		0,
+		24,
+		48,
+		72,
+		96,
+		120,
+		144,
+		168,
+		192,
+		216,
+		240,
+		264,
+		288,
+		312,
+		336,
+		360,
+		384,
+		408,
+		432,
+		456,
+		480,
+		500,
+		600,
+		700,
+		800,
+		900,
+		1000
+	}
+	stats.player_coins = {
+		type = "int",
+		method = "set",
+		value = math.floor(current_coins)
+	}
+	for i = #coin_buckets, 1, -1 do
+		if not coins_found and current_coins > coin_buckets[i] then
+			stats["player_coins_" .. tostring(coin_buckets[i])] = {
+				type = "int",
+				method = "set",
+				value = 1
+			}
+			coins_found = true
+		else
+			stats["player_coins_" .. tostring(coin_buckets[i])] = {
+				type = "int",
+				method = "set",
+				value = 0
+			}
+		end
+	end
 	stats.gadget_used_ammo_bag = {
 		type = "int",
 		value = session.misc.deploy_ammo or 0
@@ -1201,7 +1280,8 @@ function StatisticsManager:_get_boom_guns()
 			"hunter",
 			"plainsrider",
 			"long",
-			"arbiter"
+			"arbiter",
+			"ray"
 		}
 	end
 	return self._boom_guns

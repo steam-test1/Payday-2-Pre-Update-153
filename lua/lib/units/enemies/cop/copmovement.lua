@@ -132,6 +132,12 @@ CopMovement._gadgets = {
 	},
 	muzzle_flash = {
 		Idstring("units/pd2_dlc_chill/characters/npc_acc_muzzle_flash/muzzle_flash")
+	},
+	contraband_gun = {
+		Idstring("units/pd2_dlc_chico/weapons/gen_prop_contraband/gen_prop_contraband")
+	},
+	cigar = {
+		Idstring("units/pd2_dlc_friend/props/sfm_prop_cigar/sfm_prop_cigar")
 	}
 }
 local action_variants = {
@@ -187,6 +193,10 @@ action_variants.medic = clone(security_variant)
 action_variants.medic.heal = MedicActionHeal
 action_variants.biker_boss = security_variant
 action_variants.chavez_boss = security_variant
+action_variants.bolivian = security_variant
+action_variants.bolivian_indoors = security_variant
+action_variants.drug_lord_boss = security_variant
+action_variants.drug_lord_boss_stealth = security_variant
 action_variants.cop_scared = security_variant
 action_variants.security_undominatable = security_variant
 action_variants.civilian = {

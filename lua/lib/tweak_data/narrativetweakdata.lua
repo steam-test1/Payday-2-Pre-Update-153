@@ -4056,6 +4056,67 @@ function NarrativeTweakData:init(tweak_data)
 		to = chill_combat_marker_dot_color_to,
 		speed = 10
 	}
+	self.jobs.friend = {}
+	self.jobs.friend.name_id = "heist_friend"
+	self.jobs.friend.briefing_id = "heist_friend_crimenet"
+	self.jobs.friend.contact = "the_butcher"
+	self.jobs.friend.region = "street"
+	self.jobs.friend.jc = 30
+	self.jobs.friend.dlc = "friend"
+	self.jobs.friend.chain = {
+		{
+			level_id = "friend",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
+	}
+	self.jobs.friend.briefing_event = "Play_butcher_fri_cbf_01"
+	self.jobs.friend.debrief_event = nil
+	self.jobs.friend.crimenet_callouts = {
+		"Play_butcher_fri_cnc_01"
+	}
+	self.jobs.friend.crimenet_videos = {
+		"cn_cro1",
+		"cn_cro2",
+		"cn_cro3"
+	}
+	self.jobs.friend.payout = {
+		180000,
+		270000,
+		360000,
+		620000,
+		380000,
+		380000,
+		380000
+	}
+	self.jobs.friend.contract_cost = {
+		47000,
+		94000,
+		235000,
+		470000,
+		600000,
+		600000,
+		600000
+	}
+	self.jobs.friend.contract_visuals = {}
+	self.jobs.friend.contract_visuals.min_mission_xp = {
+		17000,
+		17000,
+		17000,
+		17000,
+		17000,
+		17000,
+		17000
+	}
+	self.jobs.friend.contract_visuals.max_mission_xp = {
+		35000,
+		35000,
+		35000,
+		35000,
+		35000,
+		35000,
+		35000
+	}
 	self.jobs.moon = {}
 	self.jobs.moon.name_id = "heist_moon"
 	self.jobs.moon.briefing_id = "heist_moon_crimenet"
@@ -4298,6 +4359,7 @@ function NarrativeTweakData:init(tweak_data)
 		"born",
 		"chill",
 		"chill_combat",
+		"friend",
 		"flat",
 		"help",
 		"moon"

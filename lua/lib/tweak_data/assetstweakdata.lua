@@ -203,7 +203,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"hox_3",
 		"arena",
 		"red2",
-		"dark"
+		"dark",
+		"friend"
 	}
 	self.bodybags_bag.visible_if_locked = true
 	self.bodybags_bag.unlock_desc_id = "menu_asset_bodybags_bag_desc"
@@ -270,7 +271,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"chew",
 		"flat",
 		"help",
-		"moon"
+		"moon",
+		"friend"
 	}
 	self.grenade_crate.visible_if_locked = true
 	self.grenade_crate.unlock_desc_id = "menu_asset_grenade_crate_desc"
@@ -309,7 +311,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"chew",
 		"flat",
 		"help",
-		"moon"
+		"moon",
+		"friend"
 	}
 	self.ammo_bag.visible_if_locked = true
 	self.ammo_bag.unlock_desc_id = "menu_asset_ammo_desc"
@@ -345,7 +348,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"chew",
 		"flat",
 		"help",
-		"moon"
+		"moon",
+		"friend"
 	}
 	self.health_bag.visible_if_locked = true
 	self.health_bag.unlock_desc_id = "menu_asset_health_desc"
@@ -355,7 +359,8 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.camera_access.name_id = "menu_asset_cam"
 	self.camera_access.texture = "guis/textures/pd2/mission_briefing/assets/big_oil/day2/asset03"
 	self.camera_access.stages = {
-		"example_level"
+		"example_level",
+		"friend"
 	}
 	self.camera_access.visible_if_locked = true
 	self.camera_access.unlock_desc_id = "menu_asset_cam_desc"
@@ -1061,6 +1066,19 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.moon_mall_pamflet.name_id = "menu_asset_moon_mall_pamflet"
 	self.moon_mall_pamflet.texture = "guis/dlcs/moon/textures/pd2/mission_briefing/assets/moon_mall_pamflet"
 	self.moon_mall_pamflet.stages = {"moon"}
+	self.recon_intel = {}
+	self.recon_intel.name_id = "menu_asset_recon_intel"
+	self.recon_intel.texture = "guis/dlcs/friend/textures/pd2/mission_briefing/assets/recon_intel"
+	self.recon_intel.stages = {"friend"}
+	self.recon_intel.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 1)
+	self.recon_intel.no_mystery = true
+	self.rope_ladder = {}
+	self.rope_ladder.name_id = "menu_asset_rope_ladder"
+	self.rope_ladder.unlock_desc_id = "menu_asset_rope_ladder_desc"
+	self.rope_ladder.texture = "guis/dlcs/friend/textures/pd2/mission_briefing/assets/rope_ladder"
+	self.rope_ladder.stages = {"friend"}
+	self.rope_ladder.money_lock = tweak_data:get_value("money_manager", "mission_asset_cost_small", 2)
+	self.rope_ladder.no_mystery = true
 end
 
 function AssetsTweakData:_init_debug_assets(tweak_data)

@@ -13,9 +13,18 @@ function MedicDamage:heal_unit(unit)
 	if t < self._heal_cooldown_t + tweak_data.medic.cooldown then
 		return false
 	end
+	if self._unit:anim_data() and self._unit:anim_data().act then
+		return false
+	end
 	local tweak_table = unit:base()._tweak_table
 	if table.contains(tweak_data.medic.disabled_units, tweak_table) then
 		return false
+	end
+	if unit:brain() and unit:brain()._logic_data then
+		local team = unit:brain()._logic_data.team
+		if team and team.id ~= "law1" and (not team.friends or not team.friends.law1) then
+			return false
+		end
 	end
 	if unit:brain() and unit:brain()._logic_data and unit:brain()._logic_data.is_converted then
 		return false

@@ -130,6 +130,7 @@ function PlayerBleedOut:_update_check_actions(t, dt)
 	new_action = new_action or self:_check_action_equip(t, input)
 	new_action = new_action or self:_check_action_interact(t, input)
 	new_action = new_action or self:_check_action_steelsight(t, input)
+	new_action = new_action or self:_check_action_deploy_underbarrel(t, input)
 	PlayerCarry._check_use_item(self, t, input)
 end
 

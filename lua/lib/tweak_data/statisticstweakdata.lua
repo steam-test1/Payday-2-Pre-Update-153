@@ -102,7 +102,8 @@ function StatisticsTweakData:statistics_table()
 		"chill_combat",
 		"flat",
 		"help",
-		"moon"
+		"moon",
+		"friend"
 	}
 	local job_list = {
 		"jewelry_store",
@@ -174,7 +175,8 @@ function StatisticsTweakData:statistics_table()
 		"chill_combat",
 		"flat",
 		"help",
-		"moon"
+		"moon",
+		"friend"
 	}
 	local mask_list = {
 		"character_locked",
@@ -514,7 +516,11 @@ function StatisticsTweakData:statistics_table()
 		"win_donald",
 		"win_donald_mega",
 		"moon_paycheck_chains",
-		"moon_paycheck_dallas"
+		"moon_paycheck_dallas",
+		"sfm_01",
+		"sfm_02",
+		"chc_terry",
+		"chc_terry_begins"
 	}
 	local weapon_list = {
 		"ak5",
@@ -626,7 +632,9 @@ function StatisticsTweakData:statistics_table()
 		"desertfox",
 		"x_packrat",
 		"rota",
-		"arbiter"
+		"arbiter",
+		"contraband",
+		"ray"
 	}
 	local melee_list = {
 		"weapon",
@@ -704,7 +712,9 @@ function StatisticsTweakData:statistics_table()
 		"ballistic",
 		"zeus",
 		"wing",
-		"road"
+		"road",
+		"brick",
+		"cs"
 	}
 	local grenade_list = {
 		"frag",
@@ -758,7 +768,11 @@ function StatisticsTweakData:statistics_table()
 		"biker_boss",
 		"cop_female",
 		"security_undominatable",
-		"medic"
+		"medic",
+		"bolivian",
+		"bolivian_indoors",
+		"drug_lord_boss",
+		"drug_lord_boss_stealth"
 	}
 	local armor_list = {
 		"level_1",
@@ -785,7 +799,8 @@ function StatisticsTweakData:statistics_table()
 		"bodhi",
 		"jimmy",
 		"sydney",
-		"wild"
+		"wild",
+		"chico"
 	}
 	local deployable_list = {
 		"ammo_bag",

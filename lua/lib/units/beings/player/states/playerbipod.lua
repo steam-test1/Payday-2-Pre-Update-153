@@ -267,6 +267,8 @@ function PlayerBipod:_check_action_throw_projectile(t, input)
 	local projectile_entry = managers.blackmarket:equipped_projectile()
 	if tweak_data.blackmarket.projectiles[projectile_entry].is_a_grenade then
 		return self:_check_action_throw_grenade(t, input)
+	elseif tweak_data.blackmarket.projectiles[projectile_entry].ability then
+		return self:_check_action_use_ability(t, input)
 	end
 	local action_forbidden = not PlayerBase.USE_GRENADES or not managers.player:can_throw_grenade() or not self:_projectile_repeat_allowed()
 	if input.btn_projectile_press and not action_forbidden then

@@ -5397,4 +5397,91 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.friend_bundle = {}
+	self.friend_bundle.content = {}
+	self.friend_bundle.content.loot_global_value = "friend"
+	self.friend_bundle.dlc = "has_friend"
+	self.friend_bundle.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "sfm_02",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "golden_hour",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "scar_mask",
+			amount = 1
+		}
+	}
+	self.ach_friend_4 = {}
+	self.ach_friend_4.dlc = "has_achievement"
+	self.ach_friend_4.achievement_id = "friend_4"
+	self.ach_friend_4.content = {}
+	self.ach_friend_4.content.loot_global_value = "friend"
+	self.ach_friend_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "sfm_04",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "black_marble",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "diablada",
+			amount = 1
+		}
+	}
+	self.ach_friend_5 = {}
+	self.ach_friend_5.dlc = "has_achievement"
+	self.ach_friend_5.achievement_id = "friend_5"
+	self.ach_friend_5.content = {}
+	self.ach_friend_5.content.loot_global_value = "friend"
+	self.ach_friend_5.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "sfm_01",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "oxidized_copper",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "liberty_flame",
+			amount = 1
+		}
+	}
+	self.ach_friend_6 = {}
+	self.ach_friend_6.dlc = "has_achievement"
+	self.ach_friend_6.achievement_id = "friend_6"
+	self.ach_friend_6.content = {}
+	self.ach_friend_6.content.loot_global_value = "friend"
+	self.ach_friend_6.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "sfm_03",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "red_velvet",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "my_little",
+			amount = 1
+		}
+	}
 end

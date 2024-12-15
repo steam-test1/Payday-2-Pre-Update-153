@@ -149,6 +149,15 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 	self.projectiles.launcher_incendiary_arbiter.no_cheat_count = true
 	self.projectiles.launcher_incendiary_arbiter.impact_detonation = true
 	self.projectiles.launcher_incendiary_arbiter.time_cheat = 0.2
+	self.projectiles.rocket_ray_frag = {}
+	self.projectiles.rocket_ray_frag.name_id = "bm_rocket_frag"
+	self.projectiles.rocket_ray_frag.unit = "units/pd2_dlc_friend/weapons/wpn_third_ray_fired_rocket/wpn_third_ray_fired_rocket"
+	self.projectiles.rocket_ray_frag.weapon_id = "ray"
+	self.projectiles.rocket_ray_frag.no_cheat_count = true
+	self.projectiles.rocket_ray_frag.impact_detonation = true
+	self.projectiles.rocket_ray_frag.time_cheat = 1
+	self.projectiles.rocket_ray_frag.physic_effect = Idstring("physic_effects/anti_gravitate")
+	self.projectiles.rocket_ray_frag.adjust_z = 0
 	self.projectiles.west_arrow = {}
 	self.projectiles.west_arrow.name_id = "bm_launcher_frag"
 	self.projectiles.west_arrow.unit = "units/pd2_dlc_west/weapons/wpn_prj_west_arrow/wpn_prj_west_arrow"
@@ -329,6 +338,25 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 	self.projectiles.frag_com.repeat_expire_t = 1.5
 	self.projectiles.frag_com.is_a_grenade = true
 	self.projectiles.frag_com.dlc = "pd2_clan"
+	self.projectiles.chico_injector = {}
+	self.projectiles.chico_injector.name_id = "bm_ability_chico_injector"
+	self.projectiles.chico_injector.desc_id = "bm_ability_chico_injector_desc"
+	self.projectiles.chico_injector.icon = "chico_injector"
+	self.projectiles.chico_injector.ability = "chico_injector"
+	self.projectiles.chico_injector.texture_bundle_folder = "chico"
+	self.projectiles.chico_injector.dlc = "chico"
+	self.projectiles.chico_injector.base_cooldown = 30
+	self.projectiles.chico_injector.max_amount = 1
+	self.projectiles.chico_injector.sounds = {
+		activate = "perkdeck_activate",
+		cooldown = "perkdeck_cooldown_over"
+	}
+	self.projectiles.launcher_m203 = deep_clone(self.projectiles.launcher_frag)
+	self.projectiles.launcher_m203.unit = "units/pd2_dlc_chico/weapons/wpn_launcher_frag_m203/wpn_launcher_frag_m203"
+	self.projectiles.launcher_m203.add_trail_effect = true
+	self.projectiles.launcher_m203.dlc = "chico"
+	self.projectiles.launcher_m203.weapon_id = "gre_m203"
+	self.projectiles.launcher_m203.time_cheat = 0.1
 	self._projectiles_index = {
 		"frag",
 		"launcher_frag",
@@ -363,7 +391,10 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 		"frag_com",
 		"concussion",
 		"launcher_frag_arbiter",
-		"launcher_incendiary_arbiter"
+		"launcher_incendiary_arbiter",
+		"chico_injector",
+		"launcher_m203",
+		"rocket_ray_frag"
 	}
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.projectiles) do

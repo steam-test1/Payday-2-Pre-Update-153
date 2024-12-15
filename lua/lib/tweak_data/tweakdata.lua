@@ -384,7 +384,8 @@ function TweakData:init()
 		"bodhi",
 		"jimmy",
 		"sydney",
-		"wild"
+		"wild",
+		"chico"
 	}
 	self.criminals.characters = {
 		{
@@ -560,6 +561,17 @@ function TweakData:init()
 				color_id = 4,
 				voice = "rb16",
 				ai_mask_id = "rust",
+				mask_id = 4
+			}
+		},
+		{
+			name = "chico",
+			static_data = {
+				ai_character_id = "ai_chico",
+				ssuffix = "x",
+				color_id = 4,
+				voice = "rb17",
+				ai_mask_id = "chc_terry",
 				mask_id = 4
 			}
 		}
@@ -2077,6 +2089,17 @@ Play the full version soon to get your full PAYDAY!]],
 			difficulty = overkill_and_above,
 			job = "roberts"
 		},
+		stealth_election_day = {
+			award = "bob_3",
+			stealth = true,
+			job = "election_day"
+		},
+		death_stealth_election_day = {
+			award = "bob_7",
+			difficulty = deathwish_and_above,
+			stealth = true,
+			job = "election_day"
+		},
 		easywish_ukranian = {
 			award = "pick_1",
 			difficulty = easywish_and_above,
@@ -2339,6 +2362,11 @@ Play the full version soon to get your full PAYDAY!]],
 			award = "moon_1",
 			difficulty = easywish_and_above,
 			job = "moon"
+		},
+		easywish_friend = {
+			award = "friend_1",
+			difficulty = easywish_and_above,
+			job = "friend"
 		},
 		complete_pines_easywish = {
 			award = "pick_59",
@@ -2627,6 +2655,11 @@ Play the full version soon to get your full PAYDAY!]],
 			difficulty = deathwish_and_above,
 			job = "moon"
 		},
+		death_friend = {
+			award = "friend_2",
+			difficulty = deathwish_and_above,
+			job = "friend"
+		},
 		complete_pines_deathwish = {
 			award = "deer_5",
 			difficulty = deathwish_and_above,
@@ -2908,6 +2941,11 @@ Play the full version soon to get your full PAYDAY!]],
 			award = "moon_3",
 			difficulty = sm_wish_and_above,
 			job = "moon"
+		},
+		sm_wish_moon = {
+			award = "friend_3",
+			difficulty = sm_wish_and_above,
+			job = "friend"
 		},
 		complete_pines_sm_wish = {
 			award = "axe_59",
@@ -3574,6 +3612,15 @@ Play the full version soon to get your full PAYDAY!]],
 				"chill_combat"
 			}
 		},
+		trophy_friendly_car = {
+			trophy_stat = "trophy_friendly_car",
+			complete_job = true,
+			difficulty = easywish_and_above,
+			job = "friend",
+			stealth = false,
+			equipped_team = {num_skills = 0, perk_deck = 14},
+			num_players = 4
+		},
 		daily_classics = {
 			trophy_stat = "daily_classics",
 			jobs = {
@@ -3791,7 +3838,8 @@ Play the full version soon to get your full PAYDAY!]],
 						"coke",
 						"coke_light",
 						"coke_pure",
-						"present"
+						"present",
+						"yayo"
 					},
 					amount = 1
 				}
@@ -3802,6 +3850,16 @@ Play the full version soon to get your full PAYDAY!]],
 			jobs = {"gallery"},
 			secured = {carry_id = "painting", total_amount = 9},
 			is_dropin = false
+		},
+		trophy_coke = {
+			trophy_stat = "trophy_coke",
+			jobs = {"friend"},
+			secured = {
+				{
+					carry_id = {"yayo"},
+					amount = 1
+				}
+			}
 		}
 	}
 	self.achievement.job_list = {}
@@ -3858,7 +3916,8 @@ Play the full version soon to get your full PAYDAY!]],
 	}
 	self.achievement.job_list.the_butcher = {
 		"crojob_wrapper",
-		"crojob1"
+		"crojob1",
+		"friend"
 	}
 	self.achievement.job_list.classic = {
 		"red2",
@@ -4613,6 +4672,7 @@ Play the full version soon to get your full PAYDAY!]],
 		},
 		{track = "track_48"},
 		{track = "track_49"},
+		{track = "track_50", lock = "friend"},
 		{
 			track = "track_32_lcv"
 		},
@@ -5253,6 +5313,12 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.concussion.name_id = "bm_concussion"
 	self.projectiles.concussion.sound_event = "concussion_explosion"
 	self.projectiles.concussion.duration = {min = 4, additional = 10}
+	self.projectiles.launcher_m203 = deep_clone(self.projectiles.launcher_frag)
+	self.projectiles.launcher_m203.projectile_trail = true
+	self.projectiles.rocket_ray_frag = deep_clone(self.projectiles.launcher_rocket)
+	self.projectiles.rocket_ray_frag.damage = 500
+	self.projectiles.rocket_ray_frag.projectile_trail = true
+	self.projectiles.rocket_ray_frag.adjust_z = 0
 	self.voting = {}
 	self.voting.timeout = 30
 	self.voting.cooldown = 50
@@ -5279,11 +5345,7 @@ Play the full version soon to get your full PAYDAY!]],
 	self.medic.radius = 400
 	self.medic.cooldown = 3
 	self.medic.debug_drawing = false
-	self.medic.disabled_units = {
-		"spooc",
-		"biker",
-		"gangster"
-	}
+	self.medic.disabled_units = {"spooc"}
 	self:_init_wip_tweak_data()
 	self:set_difficulty()
 	self:set_mode()

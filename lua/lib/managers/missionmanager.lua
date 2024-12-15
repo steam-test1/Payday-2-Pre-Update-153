@@ -193,6 +193,7 @@ function MissionManager:init(...)
 		"pku_toothbrush",
 		"tripmine_exploded",
 		"cloaker_loot",
+		"pku_usb_drive",
 		"pku_diamond_necklace",
 		"pku_wine",
 		"pku_expensive_wine",

@@ -279,6 +279,14 @@ function CopDamage:is_friendly_fire(unit)
 	return not unit:movement():team().foes[self._unit:movement():team().id]
 end
 
+function CopDamage:check_medic_heal()
+	if self._unit:anim_data() and self._unit:anim_data().act then
+		return false
+	end
+	local medic = managers.enemy:get_nearby_medic(self._unit)
+	return medic and medic:character_damage():heal_unit(self._unit)
+end
+
 function CopDamage:damage_bullet(attack_data)
 	if self._dead or self._invulnerable then
 		return
@@ -381,15 +389,14 @@ function CopDamage:damage_bullet(attack_data)
 		damage = math.min(damage, self._health - 1)
 	end
 	if damage >= self._health then
-		local medic = managers.enemy:get_nearby_medic(self._unit)
-		if medic and medic:character_damage():heal_unit(self._unit) then
+		if self:check_medic_heal() then
 			result = {
 				type = "healed",
 				variant = attack_data.variant
 			}
 		else
 			if head then
-				managers.player:on_lethal_headshot_dealt()
+				managers.player:on_lethal_headshot_dealt(attack_data.attacker_unit)
 				if damage > math.random(10) then
 					self:_spawn_head_gadget({
 						position = attack_data.col_ray.body:position(),
@@ -638,7 +645,7 @@ function CopDamage.is_civilian(type)
 end
 
 function CopDamage.is_gangster(type)
-	return type == "gangster" or type == "biker_escape" or type == "mobster" or type == "mobster_boss" or type == "biker" or type == "biker_boss"
+	return type == "gangster" or type == "biker_escape" or type == "mobster" or type == "mobster_boss" or type == "biker" or type == "biker_boss" or type == "bolivian" or type == "drug_lord_boss" or type == "drug_lord_boss_stealth"
 end
 
 function CopDamage.is_cop(type)
@@ -653,7 +660,7 @@ end
 function CopDamage:_comment_death(unit, type, special_comment)
 	if special_comment then
 		PlayerStandard.say_line(unit:sound(), special_comment)
-	elseif type == "tank" then
+	elseif type == "tank" or type == "tank_hw" then
 		PlayerStandard.say_line(unit:sound(), "g30x_any")
 	elseif type == "spooc" then
 		PlayerStandard.say_line(unit:sound(), "g33x_any")
@@ -669,7 +676,7 @@ function CopDamage:_comment_death(unit, type, special_comment)
 end
 
 function CopDamage:_AI_comment_death(unit, type)
-	if type == "tank" then
+	if type == "tank" or type == "tank_hw" then
 		unit:sound():say("g30x_any", true)
 	elseif type == "spooc" then
 		unit:sound():say("g33x_any", true)
@@ -714,8 +721,7 @@ function CopDamage:damage_fire(attack_data)
 		damage = math.min(damage, self._health - 1)
 	end
 	if damage >= self._health then
-		local medic = managers.enemy:get_nearby_medic(self._unit)
-		if medic and medic:character_damage():heal_unit(self._unit) then
+		if self:check_medic_heal() then
 			result = {
 				type = "healed",
 				variant = attack_data.variant
@@ -862,8 +868,7 @@ function CopDamage:damage_dot(attack_data)
 		damage = math.min(damage, self._health - 1)
 	end
 	if damage >= self._health then
-		local medic = managers.enemy:get_nearby_medic(self._unit)
-		if medic and medic:character_damage():heal_unit(self._unit) then
+		if self:check_medic_heal() then
 			attack_data.variant = "healed"
 			result = {
 				type = "healed",
@@ -958,8 +963,7 @@ function CopDamage:damage_explosion(attack_data)
 		damage = math.min(damage, self._health - 1)
 	end
 	if damage >= self._health then
-		local medic = managers.enemy:get_nearby_medic(self._unit)
-		if medic and medic:character_damage():heal_unit(self._unit) then
+		if self:check_medic_heal() then
 			attack_data.variant = "healed"
 			result = {
 				type = "healed",
@@ -1257,8 +1261,7 @@ function CopDamage:damage_melee(attack_data)
 		damage = math.min(damage, self._health - 1)
 	end
 	if damage >= self._health then
-		local medic = managers.enemy:get_nearby_medic(self._unit)
-		if medic and medic:character_damage():heal_unit(self._unit) then
+		if self:check_medic_heal() then
 			result = {
 				type = "healed",
 				variant = attack_data.variant
@@ -1551,11 +1554,22 @@ function CopDamage:_remove_debug_gui()
 	end
 end
 
+function CopDamage:_check_friend_4(attack_data)
+	if tweak_data:difficulty_to_index(Global.game_settings.difficulty) >= 5 then
+		local weapon_unit = attack_data.weapon_unit or attack_data.attacker_unit
+		local projectile_entry = weapon_unit and weapon_unit:base()._projectile_entry
+		if (self._unit:base()._tweak_table == "drug_lord_boss" or self._unit:base()._tweak_table == "drug_lord_boss_stealth") and projectile_entry == "rocket_ray_frag" then
+			managers.achievment:award("friend_4")
+		end
+	end
+end
+
 function CopDamage:die(attack_data)
 	if self._immortal then
 		debug_pause("Immortal character died!")
 	end
 	local variant = attack_data.variant
+	self:_check_friend_4(attack_data)
 	CopDamage.MAD_3_ACHIEVEMENT(attack_data)
 	self:_remove_debug_gui()
 	self._unit:base():set_slot(self._unit, 17)
@@ -2511,6 +2525,7 @@ function CopDamage:load(data)
 	if data.char_dmg.is_converted then
 		self._unit:set_slot(16)
 		managers.groupai:state():sync_converted_enemy(self._unit)
+		self:set_mover_collision_state(false)
 		local add_contour = true
 		local tweak_name = alive(self._unit) and self._unit:base() and self._unit:base()._tweak_table
 		if tweak_name then

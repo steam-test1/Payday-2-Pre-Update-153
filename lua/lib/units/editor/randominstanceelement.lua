@@ -35,16 +35,6 @@ function RandomInstanceElement:draw_links_selected(t, dt, selected_unit)
 end
 
 function RandomInstanceElement:draw_links_unselected(t, dt, selected_unit)
-	RandomInstanceElement.super.draw_links_unselected(self, t, dt, selected_unit)
-	local instance_layer = managers.editor:layer("Instances")
-	for i, instance_data in ipairs(self._hed.instances) do
-		local inst_data = managers.world_instance:get_instance_data_by_name(instance_data.instance)
-		if inst_data then
-			self:_draw_instance_link(t, dt, instance_data.instance, 0.8)
-		else
-			table.remove(self._hed.instances, i)
-		end
-	end
 end
 
 function RandomInstanceElement:_draw_instance_link(t, dt, instance_name, color_multiplier)

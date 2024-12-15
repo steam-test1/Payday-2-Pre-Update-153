@@ -92,7 +92,7 @@ function PlayerMaskOff:_update_check_actions(t, dt)
 	self:_check_action_jump(t, input)
 	self:_check_action_duck(t, input)
 	self:_check_action_run(t, input)
-	self:_check_action_change_equipment(input)
+	self:_check_action_change_equipment(t, input)
 end
 
 function PlayerMaskOff:_check_action_interact(t, input)

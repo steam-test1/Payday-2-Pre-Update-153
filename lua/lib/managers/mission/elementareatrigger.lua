@@ -201,7 +201,8 @@ function ElementAreaTrigger:project_instigators()
 					"expensive_vine",
 					"women_shoes",
 					"vr_headset",
-					"diamond_necklace"
+					"diamond_necklace",
+					"yayo"
 				}
 				if table.contains(carry_list, carry_id) then
 					return true

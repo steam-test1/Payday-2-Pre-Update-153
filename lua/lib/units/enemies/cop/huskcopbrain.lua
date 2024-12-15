@@ -1,5 +1,6 @@
 HuskCopBrain = HuskCopBrain or class()
 HuskCopBrain._NET_EVENTS = {weapon_laser_on = 1, weapon_laser_off = 2}
+HuskCopBrain._get_radio_id = CopBrain._get_radio_id
 
 function HuskCopBrain:init(unit)
 	self._unit = unit

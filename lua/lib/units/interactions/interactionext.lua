@@ -1107,6 +1107,9 @@ end
 GrenadeCrateInteractionExt = GrenadeCrateInteractionExt or class(UseInteractionExt)
 
 function GrenadeCrateInteractionExt:_interact_blocked(player)
+	if managers.blackmarket:has_equipped_ability() then
+		return true, false, "ability_no_grenade_pickup"
+	end
 	return managers.player:got_max_grenades()
 end
 
@@ -1484,7 +1487,8 @@ function IntimitateInteractionExt:_at_interact_start(player, timer)
 			return
 		end
 		self._in_progress = true
-		player:sound():say("dsp_radio_checking_1", true, true)
+		local event = self._unit:brain():_get_radio_id("dsp_radio_checking_1")
+		player:sound():say(event, true, true)
 		if Network:is_server() then
 			self._unit:brain():on_alarm_pager_interaction("started")
 		elseif managers.enemy:get_corpse_unit_data_from_key(self._unit:key()) then
@@ -1502,7 +1506,8 @@ function IntimitateInteractionExt:_at_interact_interupt(player, complete)
 		if not self._in_progress then
 			return
 		end
-		player:sound():say("dsp_stop_all", true, false)
+		local stop = self._unit:brain():_get_radio_id("dsp_stop_all")
+		player:sound():say(stop, true, false)
 		if not complete then
 			self._unit:base():set_material_state(true)
 			if Network:is_server() then
