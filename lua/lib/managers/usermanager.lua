@@ -681,6 +681,21 @@ function GenericUserManager:load(data, cache_version)
 	else
 		Global.debug_post_effects_enabled = true
 	end
+	self:sanitize_settings()
+end
+
+function GenericUserManager:sanitize_settings()
+	local color_grading = self:get_setting("video_color_grading")
+	local color_grading_valid = false
+	for _, cg in ipairs(_G.tweak_data.color_grading) do
+		if color_grading == cg.value then
+			color_grading_valid = true
+			break
+		end
+	end
+	if not color_grading_valid then
+		self:set_setting("video_color_grading", nil)
+	end
 end
 
 Xbox360UserManager = Xbox360UserManager or class(GenericUserManager)

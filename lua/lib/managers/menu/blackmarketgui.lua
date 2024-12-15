@@ -10883,7 +10883,8 @@ function BlackMarketGui:equip_armor_skin_callback(data)
 end
 
 function BlackMarketGui:preview_armor_skin_callback(data)
-	managers.menu_scene:preview_character_skin(data.name, nil, {
+	local skin = tweak_data.economy:get_armor_skin_id(data.name)
+	managers.menu_scene:preview_character_skin(skin, nil, {
 		done = callback(self, self, "_open_character_preview_node"),
 		textures_retrieved = callback(self, self, "_character_preview_textures_retrieved"),
 		texture_loaded = callback(self, self, "_character_preview_texture_loaded")

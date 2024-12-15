@@ -168,6 +168,10 @@ function CrossbowWeaponBase:init(unit)
 	self._client_authoritative = true
 end
 
+function CrossbowWeaponBase:should_reload_immediately()
+	return true
+end
+
 function CrossbowWeaponBase:charge_fail()
 	return false
 end

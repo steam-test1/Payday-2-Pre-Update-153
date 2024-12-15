@@ -918,6 +918,9 @@ function CrimeNetManager:join_quick_play_game()
 					skip_level = attributes_mutators
 				end
 			end
+			if not skip_level and attribute_list[i].crime_spree and 0 <= attribute_list[i].crime_spree then
+				skip_level = true
+			end
 			if not skip_level and managers.network.matchmake:is_server_ok(false, room.owner_id, attributes_numbers) then
 				local owner_level = room.owner_level and tonumber(room.owner_level)
 				if owner_level and min_level <= owner_level and max_level >= owner_level then

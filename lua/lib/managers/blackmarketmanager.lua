@@ -404,7 +404,8 @@ function BlackMarketManager:set_equipped_armor_skin(skin_id)
 	end
 	Global.blackmarket_manager.equipped_armor_skin = skin_id
 	if managers.menu_scene and alive(managers.menu_scene._character_unit) then
-		managers.menu_scene._character_unit:base():set_cosmetics_data(skin_id)
+		local skin = tweak_data.economy:get_armor_skin_id(skin_id)
+		managers.menu_scene._character_unit:base():set_cosmetics_data(skin)
 		managers.menu_scene._character_unit:base():_apply_cosmetics({})
 	end
 	MenuCallbackHandler:_update_outfit_information()
@@ -412,7 +413,7 @@ end
 
 function BlackMarketManager:equipped_armor_skin()
 	if Global.blackmarket_manager.equipped_armor_skin then
-		return Global.blackmarket_manager.equipped_armor_skin
+		return tweak_data.economy:get_armor_skin_id(Global.blackmarket_manager.equipped_armor_skin)
 	end
 	return self._defaults.armor_skin
 end

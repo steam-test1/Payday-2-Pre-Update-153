@@ -1074,6 +1074,12 @@ function MenuCallbackHandler:steam_find_item_from_community(item, data)
 		}, callback(MenuCallbackHandler, MenuCallbackHandler, "on_steam_transaction_over"))
 		Steam:overlay_activate("url", tweak_data.economy:create_weapon_skin_market_search_url(weapon_id, cosmetic_id))
 		managers.menu:show_buying_tradable_item_dialog()
+	elseif cosmetic_id and data.armor then
+		managers.network.account:add_overlay_listener("steam_transaction_tradable_item", {
+			"overlay_close"
+		}, callback(MenuCallbackHandler, MenuCallbackHandler, "on_steam_transaction_over"))
+		Steam:overlay_activate("url", tweak_data.economy:create_armor_skin_market_search_url(data.cosmetic_id))
+		managers.menu:show_buying_tradable_item_dialog()
 	end
 end
 

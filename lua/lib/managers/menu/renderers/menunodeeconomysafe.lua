@@ -482,7 +482,6 @@ function MenuNodeEconomySafe:_build_result_panel()
 	local item_data = (tweak_data.economy[self._result.category] or tweak_data.blackmarket[self._result.category])[self._result.entry]
 	local rarity_data = tweak_data.economy.rarities[item_data.rarity]
 	local safe_rect_pixels = managers.gui_data:scaled_size()
-	local quality_data = tweak_data.economy.qualities[self._result.quality]
 	local w_pad = 200
 	local width = 800
 	local x = 0
@@ -495,10 +494,8 @@ function MenuNodeEconomySafe:_build_result_panel()
 		h = 132
 	})
 	local name_text = managers.localization:text(item_data.name_id)
-	local quality_text = managers.localization:text(quality_data.name_id)
-	if self._result.category == "armor_skins" then
-		quality_text = ""
-	end
+	local quality_data = self._result.quality and tweak_data.economy.qualities[self._result.quality] or nil
+	local quality_text = quality_data and managers.localization:text(quality_data.name_id) or ""
 	local result_text = managers.localization:to_upper_text("menu_cash_safe_result", {quality = quality_text, name = name_text})
 	local name = self._result_panel:text({
 		name = "name",

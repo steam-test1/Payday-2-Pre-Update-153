@@ -236,7 +236,7 @@ function CriminalsManager:set_unit(name, unit)
 				if unit:armor_skin() then
 					local outfit = managers.blackmarket:unpack_outfit_from_string(peer:profile().outfit_string)
 					if outfit.armor_skin then
-						unit:armor_skin():set_cosmetics_data(outfit.armor_skin, true)
+						unit:armor_skin():set_cosmetics_data(tweak_data.economy:get_armor_skin_id(outfit.armor_skin), true)
 					end
 				end
 			end

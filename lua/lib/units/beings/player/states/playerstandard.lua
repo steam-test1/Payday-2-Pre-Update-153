@@ -3239,7 +3239,7 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 						end
 						self._equipped_unit:base():tweak_data_anim_stop("fire")
 					elseif fire_mode == "single" then
-						if input.btn_primary_attack_press then
+						if input.btn_primary_attack_press or self._equipped_unit:base().should_reload_immediately and self._equipped_unit:base():should_reload_immediately() then
 							self:_start_action_reload_enter(t)
 						end
 					else

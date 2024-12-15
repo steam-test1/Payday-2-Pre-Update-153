@@ -39,6 +39,7 @@ function CrimeSpreeModifierDetailsPage:init(...)
 	end
 	self._next_panel = self:panel():panel({h = next_modifiers_h})
 	local name_id = managers.crime_spree:in_progress() and "menu_cs_next_modifiers" or "menu_cs_not_in_progress"
+	local name_color = managers.crime_spree:in_progress() and tweak_data.screen_colors.text or tweak_data.screen_colors.important_1
 	local params = {
 		loud = managers.crime_spree:next_modifier_level("loud") - managers.crime_spree:server_spree_level(),
 		stealth = managers.crime_spree:next_modifier_level("stealth") - managers.crime_spree:server_spree_level()
@@ -52,7 +53,7 @@ function CrimeSpreeModifierDetailsPage:init(...)
 		layer = 1,
 		x = padding,
 		y = padding * 0.5,
-		color = Color.white,
+		color = name_color,
 		font = tweak_data.menu.pd2_small_font,
 		font_size = tweak_data.menu.pd2_small_font_size,
 		h = tweak_data.menu.pd2_small_font_size

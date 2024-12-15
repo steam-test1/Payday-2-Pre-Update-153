@@ -1,6 +1,6 @@
 NetworkMatchMakingSTEAM = NetworkMatchMakingSTEAM or class()
 NetworkMatchMakingSTEAM.OPEN_SLOTS = 4
-NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.68.193"
+NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.68.194"
 
 function NetworkMatchMakingSTEAM:init()
 	cat_print("lobby", "matchmake = NetworkMatchMakingSTEAM")
@@ -371,15 +371,17 @@ function NetworkMatchMakingSTEAM:search_lobby(friends_only, no_filters)
 			self.browser:set_lobby_filter("job_class_min", min_ply_jc, "equalto_or_greater_than")
 			self.browser:set_lobby_filter("job_class_max", max_ply_jc, "equalto_less_than")
 		end
-		if Global.game_settings.gamemode_filter == GamemodeCrimeSpree.id then
-			local min_level = 0
-			if 0 <= Global.game_settings.crime_spree_max_lobby_diff then
-				min_level = managers.crime_spree:spree_level() - (Global.game_settings.crime_spree_max_lobby_diff or 0)
-				min_level = math.max(min_level, 0)
+		if not no_filters then
+			if Global.game_settings.gamemode_filter == GamemodeCrimeSpree.id then
+				local min_level = 0
+				if 0 <= Global.game_settings.crime_spree_max_lobby_diff then
+					min_level = managers.crime_spree:spree_level() - (Global.game_settings.crime_spree_max_lobby_diff or 0)
+					min_level = math.max(min_level, 0)
+				end
+				self.browser:set_lobby_filter("crime_spree", min_level, "equalto_or_greater_than")
+			elseif Global.game_settings.gamemode_filter == GamemodeStandard.id then
+				self.browser:set_lobby_filter("crime_spree", -1, "equalto_less_than")
 			end
-			self.browser:set_lobby_filter("crime_spree", min_level, "equalto_or_greater_than")
-		elseif Global.game_settings.gamemode_filter == GamemodeStandard.id then
-			self.browser:set_lobby_filter("crime_spree", -1, "equalto_less_than")
 		end
 		if not no_filters then
 			for key, data in pairs(self._lobby_filters) do

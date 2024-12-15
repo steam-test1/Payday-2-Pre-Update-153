@@ -1131,6 +1131,15 @@ function EconomyTweakData:create_weapon_skin_market_search_url(weapon_id, cosmet
 	return nil
 end
 
+function EconomyTweakData:create_armor_skin_market_search_url(cosmetic_id)
+	local cosmetic_name = tweak_data.economy.armor_skins[cosmetic_id] and managers.localization:text(tweak_data.economy.armor_skins[cosmetic_id].name_id)
+	if cosmetic_name then
+		cosmetic_name = string.gsub(cosmetic_name, " ", "+")
+		return string.gsub("http://steamcommunity.com/market/search?appid=218620&q=" .. cosmetic_name .. "+", "++", "+")
+	end
+	return nil
+end
+
 function EconomyTweakData:create_market_link_url(category, entry)
 	return self[category] and self[category][entry] and self[category][entry].market_link
 end

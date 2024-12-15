@@ -1179,7 +1179,7 @@ end
 function MenuSceneManager:set_character_mask_by_id(mask_id, blueprint, unit, peer_id, character_name)
 	mask_id = managers.blackmarket:get_real_mask_id(mask_id, peer_id, character_name)
 	local unit_name = managers.blackmarket:mask_unit_name_by_mask_id(mask_id, peer_id, character_name)
-	self:set_character_mask(unit_name, unit, peer_id, mask_id, callback(self, self, "clbk_mask_loaded", blueprint))
+	self:set_character_mask(unit_name, unit, character_name, mask_id, callback(self, self, "clbk_mask_loaded", blueprint))
 	local owner_unit = unit or self._character_unit
 	self:_check_character_mask_sequence(owner_unit, mask_id, peer_id, character_name)
 end
@@ -1191,11 +1191,16 @@ function MenuSceneManager:clbk_mask_loaded(blueprint, mask_unit)
 	end
 end
 
-function MenuSceneManager:set_character_mask(mask_name_str, unit, peer_id, mask_id, ready_clbk)
+function MenuSceneManager:set_character_mask(mask_name_str, unit, peer_id_or_char, mask_id, ready_clbk)
+	print(mask_name_str, unit, peer_id_or_char, mask_id, ready_clbk)
+	local character_name = type(peer_id_or_char) == "string" and peer_id_or_char
+	local peer_id = type(peer_id_or_char) == "number" and peer_id_or_char
 	unit = unit or self._character_unit
 	local mask_name = Idstring(mask_name_str)
 	local old_mask_data = self._mask_units[unit:key()]
 	if old_mask_data and old_mask_data.mask_name == mask_name then
+		old_mask_data.peer_id = peer_id
+		old_mask_data.character_name = character_name
 		if old_mask_data.ready then
 			ready_clbk(old_mask_data.mask_unit)
 		else
@@ -1210,6 +1215,7 @@ function MenuSceneManager:set_character_mask(mask_name_str, unit, peer_id, mask_
 		mask_unit = false,
 		mask_name = mask_name,
 		peer_id = peer_id,
+		character_name = character_name,
 		mask_id = mask_id,
 		ready = false,
 		ready_clbk = ready_clbk
@@ -1248,7 +1254,7 @@ function MenuSceneManager:clbk_mask_unit_loaded(mask_data_param, status, asset_t
 end
 
 function MenuSceneManager:update_mask_offset(mask_data)
-	local char = managers.blackmarket:get_real_character(nil, mask_data.peer_id)
+	local char = managers.blackmarket:get_real_character(mask_data.character_name, mask_data.peer_id)
 	local mask_tweak = tweak_data.blackmarket.masks[mask_data.mask_id]
 	if mask_tweak and mask_tweak.offsets and mask_tweak.offsets[char] then
 		local char_tweak = mask_tweak.offsets[char]

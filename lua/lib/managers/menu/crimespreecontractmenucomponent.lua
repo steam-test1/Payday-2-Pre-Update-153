@@ -121,6 +121,7 @@ function CrimeSpreeContractMenuComponent:_setup()
 		x = padding,
 		y = padding
 	})
+	CrimeNetGui.make_color_text(self, self._desc_text, tweak_data.screen_colors.important_1)
 	if managers.crime_spree:in_progress() then
 		self:_setup_continue_crime_spree(text_w, text_h)
 	else

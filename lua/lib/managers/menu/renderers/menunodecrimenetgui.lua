@@ -3991,6 +3991,10 @@ function MenuNodeOpenContainerGui:setup(half_fade)
 	local y = content_padding
 	local new_content, c_td
 	for i, content in ipairs(contents) do
+		local is_weapon_skin = content.category == "weapon_skins"
+		local show_skins = is_weapon_skin
+		local is_armor_skin = content.category == "armor_skins"
+		show_skins = show_skins or is_armor_skin
 		c_td = (content.category == "weapon_skins" and tweak_data.blackmarket.weapon_skins or tweak_data.economy[content.category])[content.entry]
 		new_content = content_panel:panel({
 			name = i,
@@ -4000,11 +4004,29 @@ function MenuNodeOpenContainerGui:setup(half_fade)
 			h = size / 2,
 			layer = 1
 		})
-		if content.category == "weapon_skins" then
-			local texture_path, rarity_path = managers.blackmarket:get_weapon_icon_path(c_td.weapon_id, {
-				id = content.entry
-			})
-			self:request_texture(texture_path, new_content, true)
+		if is_weapon_skin or is_armor_skin then
+			local texture_path, rarity_path
+			if is_weapon_skin then
+				texture_path, rarity_path = managers.blackmarket:get_weapon_icon_path(c_td.weapon_id, {
+					id = content.entry
+				})
+				self:request_texture(texture_path, new_content, true)
+			elseif is_armor_skin then
+				local guis_catalog = "guis/"
+				local bundle_folder = c_td.texture_bundle_folder
+				if bundle_folder then
+					guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+				end
+				texture_path = guis_catalog .. "armor_skins/" .. content.entry
+				rarity_path = managers.blackmarket:get_cosmetic_rarity_bg(c_td.rarity or "common")
+				local scale = 0.7
+				local armor_panel = new_content:panel({
+					w = new_content:w() * scale,
+					h = new_content:h() * scale
+				})
+				armor_panel:set_center(new_content:w() * 0.5, new_content:h() * 0.5)
+				self:request_texture(texture_path, armor_panel, true)
+			end
 			local rarity_bitmap = new_content:bitmap({
 				name = i .. "_bg",
 				texture = rarity_path,
@@ -4040,21 +4062,38 @@ function MenuNodeOpenContainerGui:setup(half_fade)
 				}
 			})
 			select_box:set_color(Color(0, 0, 0, 0))
-			table.insert(self._text_buttons, {
-				panel = new_content,
-				text = nil,
-				blur = nil,
-				highlighted = false,
-				clbk = callback(self, self, "weapon_cosmetics_callback"),
-				image = select_box,
-				highlighted_color = Color(1, 1, 1),
-				default_color = Color(0, 0, 0, 0),
-				params = {
-					weapon_id = c_td.weapon_id,
-					cosmetic_id = content.entry,
-					quality = "mint"
-				}
-			})
+			if is_weapon_skin then
+				table.insert(self._text_buttons, {
+					panel = new_content,
+					text = nil,
+					blur = nil,
+					highlighted = false,
+					clbk = callback(self, self, "weapon_cosmetics_callback"),
+					image = select_box,
+					highlighted_color = Color(1, 1, 1),
+					default_color = Color(0, 0, 0, 0),
+					params = {
+						weapon_id = c_td.weapon_id,
+						cosmetic_id = content.entry,
+						quality = "mint"
+					}
+				})
+			elseif is_armor_skin then
+				table.insert(self._text_buttons, {
+					panel = new_content,
+					text = nil,
+					blur = nil,
+					highlighted = false,
+					clbk = callback(self, self, "armor_cosmetics_callback"),
+					image = select_box,
+					highlighted_color = Color(1, 1, 1),
+					default_color = Color(0, 0, 0, 0),
+					params = {
+						armor = true,
+						cosmetic_id = content.entry
+					}
+				})
+			end
 		else
 			if content.category == "contents" and c_td.rarity == "legendary" then
 				self:request_texture(content.texture_path or "guis/dlcs/cash/textures/pd2/safe_raffle/icon_legendary", new_content, true)
@@ -4109,38 +4148,74 @@ function MenuNodeOpenContainerGui:update_info(button)
 	self._selected_button = button
 	self._info_panel:clear()
 	if button then
-		local title_text = self._info_panel:text({
-			text = utf8.to_upper(managers.weapon_factory:get_weapon_name_by_weapon_id(button.params.weapon_id)) .. " | " .. managers.localization:to_upper_text(tweak_data.blackmarket.weapon_skins[button.params.cosmetic_id].name_id),
-			font = tweak_data.menu.pd2_small_font,
-			font_size = tweak_data.menu.pd2_small_font_size,
-			color = tweak_data.economy.rarities[tweak_data.blackmarket.weapon_skins[button.params.cosmetic_id].rarity].color,
-			blend_mode = "add",
-			wrap = true,
-			wrap_word = true
-		})
-		make_fine_text(title_text)
-		local desc, colors = InventoryDescription.create_description_item({
-			instance_id = 0,
-			entry = button.params.cosmetic_id,
-			category = "weapon_skins",
-			quality = nil,
-			bonus = nil
-		}, tweak_data.blackmarket.weapon_skins[button.params.cosmetic_id], {
-			default = tweak_data.screen_colors.text,
-			mods = tweak_data.screen_colors.text
-		}, true)
-		local desc_text = self._info_panel:text({
-			text = desc,
-			font = tweak_data.menu.pd2_small_font,
-			font_size = tweak_data.menu.pd2_small_font_size,
-			color = tweak_data.screen_colors.text,
-			wrap = true,
-			word_wrap = true,
-			blend_mode = "add"
-		})
-		managers.menu_component:add_colors_to_text_object(desc_text, unpack(colors))
-		make_fine_text(desc_text)
-		desc_text:set_top(title_text:bottom() + 5)
+		if button.params.weapon_id then
+			local title_text = self._info_panel:text({
+				text = utf8.to_upper(managers.weapon_factory:get_weapon_name_by_weapon_id(button.params.weapon_id)) .. " | " .. managers.localization:to_upper_text(tweak_data.blackmarket.weapon_skins[button.params.cosmetic_id].name_id),
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				color = tweak_data.economy.rarities[tweak_data.blackmarket.weapon_skins[button.params.cosmetic_id].rarity].color,
+				blend_mode = "add",
+				wrap = true,
+				wrap_word = true
+			})
+			make_fine_text(title_text)
+			local desc, colors = InventoryDescription.create_description_item({
+				instance_id = 0,
+				entry = button.params.cosmetic_id,
+				category = "weapon_skins",
+				quality = nil,
+				bonus = nil
+			}, tweak_data.blackmarket.weapon_skins[button.params.cosmetic_id], {
+				default = tweak_data.screen_colors.text,
+				mods = tweak_data.screen_colors.text
+			}, true)
+			local desc_text = self._info_panel:text({
+				text = desc,
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				color = tweak_data.screen_colors.text,
+				wrap = true,
+				word_wrap = true,
+				blend_mode = "add"
+			})
+			managers.menu_component:add_colors_to_text_object(desc_text, unpack(colors))
+			make_fine_text(desc_text)
+			desc_text:set_top(title_text:bottom() + 5)
+		elseif button.params.armor then
+			local c_td = tweak_data.economy.armor_skins[button.params.cosmetic_id]
+			local title_text = self._info_panel:text({
+				text = utf8.to_upper(managers.localization:to_upper_text(c_td.name_id)),
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				color = tweak_data.economy.rarities[c_td.rarity].color,
+				blend_mode = "add",
+				wrap = true,
+				wrap_word = true
+			})
+			make_fine_text(title_text)
+			local desc, colors = InventoryDescription.create_description_item({
+				instance_id = 0,
+				entry = button.params.cosmetic_id,
+				category = "armor_skins",
+				quality = nil,
+				bonus = nil
+			}, c_td, {
+				default = tweak_data.screen_colors.text,
+				mods = tweak_data.screen_colors.text
+			}, true)
+			local desc_text = self._info_panel:text({
+				text = desc,
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				color = tweak_data.screen_colors.text,
+				wrap = true,
+				word_wrap = true,
+				blend_mode = "add"
+			})
+			managers.menu_component:add_colors_to_text_object(desc_text, unpack(colors))
+			make_fine_text(desc_text)
+			desc_text:set_top(title_text:bottom() + 5)
+		end
 	end
 	self:update_legends(button)
 end
@@ -4148,50 +4223,63 @@ end
 function MenuNodeOpenContainerGui:update_legends(button)
 	self._legend_panel:clear()
 	if button then
-		local preview_text = self._legend_panel:text({
-			text = managers.localization:to_upper_text("menu_mouse_preview"),
-			font = tweak_data.menu.pd2_small_font,
-			font_size = tweak_data.menu.pd2_small_font_size,
-			color = tweak_data.screen_colors.text
-		})
-		make_fine_text(preview_text)
-		local search_text = self._legend_panel:text({
-			text = managers.localization:to_upper_text("menu_mouse_search_market"),
-			font = tweak_data.menu.pd2_small_font,
-			font_size = tweak_data.menu.pd2_small_font_size,
-			color = tweak_data.screen_colors.text
-		})
-		make_fine_text(search_text)
-		local preview_icon = self._legend_panel:bitmap({
-			name = "icon",
-			texture = "guis/textures/pd2/mouse_buttons",
-			texture_rect = {
-				18,
-				1,
-				17,
-				23
-			},
-			w = 17,
-			h = 23,
-			blend_mode = "add"
-		})
-		local search_icon = self._legend_panel:bitmap({
-			name = "icon",
-			texture = "guis/textures/pd2/mouse_buttons",
-			texture_rect = {
-				1,
-				1,
-				17,
-				23
-			},
-			w = 17,
-			h = 23,
-			blend_mode = "add"
-		})
-		preview_text:set_right(self._legend_panel:w())
-		preview_icon:set_right(preview_text:left())
-		search_text:set_right(preview_icon:left() - 4)
-		search_icon:set_right(search_text:left())
+		local show_preview, show_search
+		if button.params.weapon_id then
+			show_preview = true
+			show_search = true
+		elseif button.params.armor then
+			show_preview = false
+			show_search = true
+		end
+		local preview_text, preview_icon, search_text, search_icon
+		if show_preview then
+			preview_text = self._legend_panel:text({
+				text = managers.localization:to_upper_text("menu_mouse_preview"),
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				color = tweak_data.screen_colors.text
+			})
+			make_fine_text(preview_text)
+			preview_icon = self._legend_panel:bitmap({
+				name = "icon",
+				texture = "guis/textures/pd2/mouse_buttons",
+				texture_rect = {
+					18,
+					1,
+					17,
+					23
+				},
+				w = 17,
+				h = 23,
+				blend_mode = "add"
+			})
+			preview_text:set_right(self._legend_panel:w())
+			preview_icon:set_right(preview_text:left())
+		end
+		if show_search then
+			search_text = self._legend_panel:text({
+				text = managers.localization:to_upper_text("menu_mouse_search_market"),
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				color = tweak_data.screen_colors.text
+			})
+			make_fine_text(search_text)
+			search_icon = self._legend_panel:bitmap({
+				name = "icon",
+				texture = "guis/textures/pd2/mouse_buttons",
+				texture_rect = {
+					1,
+					1,
+					17,
+					23
+				},
+				w = 17,
+				h = 23,
+				blend_mode = "add"
+			})
+			search_text:set_right(show_preview and preview_icon:left() - 4 or self._legend_panel:w())
+			search_icon:set_right(search_text:left())
+		end
 	end
 end
 
@@ -4209,6 +4297,13 @@ function MenuNodeOpenContainerGui:weapon_cosmetics_callback(button, data)
 			})
 			managers.menu_component:hide_blackmarket_gui()
 		end)
+	elseif button == Idstring("0") then
+		MenuCallbackHandler:steam_find_item_from_community(nil, data)
+	end
+end
+
+function MenuNodeOpenContainerGui:armor_cosmetics_callback(button, data)
+	if button == Idstring("1") then
 	elseif button == Idstring("0") then
 		MenuCallbackHandler:steam_find_item_from_community(nil, data)
 	end
