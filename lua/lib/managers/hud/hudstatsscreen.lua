@@ -740,18 +740,16 @@ function HUDStatsScreen:_create_stats_screen_profile(profile_wrapper_panel)
 			potential_level_up_text:animate(callback(self, self, "_animate_text_pulse"), exp_gain_ring, exp_ring)
 		end
 	end
-	if Global.music_manager.current_track then
-		local track_text = profile_wrapper_panel:text({
-			name = "track_text",
-			text = utf8.to_upper(managers.localization:text("menu_es_playing_track")) .. " " .. managers.music:current_track_string(),
-			font_size = tweak_data.menu.pd2_small_font_size,
-			font = tweak_data.menu.pd2_small_font,
-			color = tweak_data.screen_colors.text,
-			x = 4,
-			y = 4
-		})
-		managers.hud:make_fine_text(track_text)
-	end
+	local track_text = profile_wrapper_panel:text({
+		name = "track_text",
+		text = utf8.to_upper(managers.localization:text("menu_es_playing_track")) .. " " .. managers.music:current_track_string(),
+		font_size = tweak_data.menu.pd2_small_font_size,
+		font = tweak_data.menu.pd2_small_font,
+		color = tweak_data.screen_colors.text,
+		x = 4,
+		y = 4
+	})
+	managers.hud:make_fine_text(track_text)
 end
 
 function HUDStatsScreen:on_whisper_mode_changed()

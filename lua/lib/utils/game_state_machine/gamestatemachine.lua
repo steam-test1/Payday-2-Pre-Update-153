@@ -40,7 +40,10 @@ function GameStateMachine:init()
 	local setup_boot = not self._is_boot_intro_done and not Application:editor()
 	local setup_title = (setup_boot or self._is_boot_from_sign_out) and not Application:editor()
 	local states = {}
+	self._controller_enabled_count = 1
 	local empty = GameState:new("empty", self)
+	self._empty_state = empty
+	CoreGameStateMachine.GameStateMachine.init(self, empty)
 	local editor = EditorState:new(self)
 	local world_camera = WorldCameraState:new(self)
 	local bootup = BootupState:new(self, setup_boot)

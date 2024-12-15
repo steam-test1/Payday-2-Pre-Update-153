@@ -57,6 +57,7 @@ function MissionEndState:at_enter(old_state, params)
 				end
 			end
 		end
+		managers.criminals:save_current_character_names()
 	end
 	local player = managers.player:player_unit()
 	if player then

@@ -286,7 +286,7 @@ function MenuInput:next_item()
 			if v:parameters().name == current_item_name then
 				for check = 1, #items - 1 do
 					local next_item = items[(i + check - 1) % #items + 1]
-					if next_item:visible() and next_item.TYPE ~= "divider" then
+					if next_item:visible() and not next_item.no_select then
 						self._logic:select_item(next_item:parameters().name, true)
 						done = true
 						break
@@ -310,7 +310,7 @@ function MenuInput:prev_item()
 			if v:parameters().name == current_item_name then
 				for check = 1, #items - 1 do
 					local prev_item = items[(i - check - 1) % #items + 1]
-					if prev_item:visible() and prev_item.TYPE ~= "divider" then
+					if prev_item:visible() and not prev_item.no_select then
 						self._logic:select_item(prev_item:parameters().name, true)
 						done = true
 						break

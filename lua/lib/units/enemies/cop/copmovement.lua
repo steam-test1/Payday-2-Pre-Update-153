@@ -144,6 +144,9 @@ CopMovement._gadgets = {
 	},
 	microphone = {
 		Idstring("units/pd2_dlc_arena/weapons/wpn_third_mel_microphone/wpn_third_mel_microphone")
+	},
+	vodka_bottle = {
+		Idstring("units/pd2_dlc_slu/props/slu_prop_vodka_bottle/slu_prop_vodka_bottle")
 	}
 }
 local action_variants = {

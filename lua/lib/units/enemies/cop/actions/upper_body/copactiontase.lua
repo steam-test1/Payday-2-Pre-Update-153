@@ -194,7 +194,7 @@ function CopActionTase:update(t)
 	end
 	if self._ext_anim.reload or self._ext_anim.equip then
 	elseif self._discharging then
-		local vis_ray = self._unit:raycast("ray", shoot_from_pos, target_pos, "slot_mask", self._line_of_fire_slotmask, "ignore_unit", self._tasing_local_unit, "report")
+		local vis_ray = self._unit:raycast("ray", shoot_from_pos, target_pos, "slot_mask", self._line_of_fire_slotmask, "sphere_cast_radius", self._w_usage_tweak.tase_sphere_cast_radius, "ignore_unit", self._tasing_local_unit, "report")
 		if not self._tasing_local_unit:movement():tased() or vis_ray then
 			if Network:is_server() then
 				self._expired = true
@@ -223,7 +223,7 @@ function CopActionTase:update(t)
 					self._expired = true
 				end
 			else
-				local vis_ray = self._unit:raycast("ray", shoot_from_pos, target_pos, "slot_mask", self._line_of_fire_slotmask, "ignore_unit", self._tasing_local_unit, "report")
+				local vis_ray = self._unit:raycast("ray", shoot_from_pos, target_pos, "slot_mask", self._line_of_fire_slotmask, "sphere_cast_radius", self._w_usage_tweak.tase_sphere_cast_radius, "ignore_unit", self._tasing_local_unit, "report")
 				if not vis_ray then
 					self._common_data.ext_network:send("action_tase_event", 3)
 					local attack_data = {

@@ -4,6 +4,7 @@ end
 GuiDataManager = GuiDataManager or class()
 
 function GuiDataManager:init(scene_gui, res, safe_rect_pixels, safe_rect, static_aspect_ratio)
+	self._ws_size_data = {}
 	self._scene_gui = scene_gui
 	self._static_resolution = res
 	self._safe_rect_pixels = safe_rect_pixels
@@ -184,27 +185,32 @@ function GuiDataManager:_setup_workspace_data()
 end
 
 function GuiDataManager:layout_workspace(ws)
-	ws:set_screen(self._saferect_data.w, self._saferect_data.h, self._saferect_data.x, self._saferect_data.y, self._saferect_data.on_screen_width)
+	self:_set_layout(ws, self._saferect_data)
 end
 
 function GuiDataManager:layout_fullscreen_workspace(ws)
-	ws:set_screen(self._fullrect_data.w, self._fullrect_data.h, self._fullrect_data.x, self._fullrect_data.y, self._fullrect_data.on_screen_width)
+	self:_set_layout(ws, self._fullrect_data)
 end
 
 function GuiDataManager:layout_fullscreen_16_9_workspace(ws)
-	ws:set_screen(self._fullrect_16_9_data.w, self._fullrect_16_9_data.h, self._fullrect_16_9_data.x, self._fullrect_16_9_data.y, self._fullrect_16_9_data.on_screen_width)
+	self:_set_layout(ws, self._fullrect_16_9_data)
 end
 
 function GuiDataManager:layout_corner_saferect_workspace(ws)
-	ws:set_screen(self._corner_saferect_data.w, self._corner_saferect_data.h, self._corner_saferect_data.x, self._corner_saferect_data.y, self._corner_saferect_data.on_screen_width)
+	self:_set_layout(ws, self._corner_saferect_data)
 end
 
 function GuiDataManager:layout_1280_workspace(ws)
-	ws:set_screen(self._fullrect_1280_data.w, self._fullrect_1280_data.h, self._fullrect_1280_data.x, self._fullrect_1280_data.y, self._fullrect_1280_data.on_screen_width)
+	self:_set_layout(ws, self._fullrect_1280_data)
 end
 
 function GuiDataManager:layout_corner_saferect_1280_workspace(ws)
-	ws:set_screen(self._corner_saferect_1280_data.w, self._corner_saferect_1280_data.h, self._corner_saferect_1280_data.x, self._corner_saferect_1280_data.y, self._corner_saferect_1280_data.on_screen_width)
+	self:_set_layout(ws, self._corner_saferect_1280_data)
+end
+
+function GuiDataManager:_set_layout(ws, screen_data)
+	self._ws_size_data[ws] = screen_data
+	ws:set_screen(screen_data.w, screen_data.h, screen_data.x, screen_data.y, screen_data.on_screen_width)
 end
 
 function GuiDataManager:scaled_size()
@@ -236,6 +242,23 @@ end
 
 function GuiDataManager:full_1280_size()
 	return self._fullrect_1280_data
+end
+
+function GuiDataManager:convert_pos(...)
+	local x, y = self:convert_pos_float(...)
+	return math.round(x), math.round(y)
+end
+
+function GuiDataManager:convert_pos_float(from_ws, to_ws, in_x, in_y)
+	local from = self._ws_size_data[from_ws]
+	local to = self._ws_size_data[to_ws]
+	if not from or not to then
+		return
+	end
+	local scale = from.on_screen_width / from.w
+	local x, y = in_x * scale + from.x, in_y * scale + from.y
+	local scale = to.on_screen_width / to.w
+	return (x - to.x) / scale, (y - to.y) / scale
 end
 
 function GuiDataManager:full_to_full_16_9(in_x, in_y)

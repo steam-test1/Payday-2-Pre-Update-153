@@ -241,6 +241,7 @@ end
 
 function ZipLine:sync_set_user(unit)
 	self._booked_by_peer_id = nil
+	local old_unit = self._user_unit
 	self._user_unit = unit
 	self._synced_user = alive(self._user_unit) and true or nil
 	if self._user_unit then

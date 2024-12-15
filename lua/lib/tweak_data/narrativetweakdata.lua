@@ -238,6 +238,24 @@ function NarrativeTweakData:init(tweak_data)
 	self.contacts.the_continental.package = "packages/contact_continental"
 	self.contacts.the_continental.assets_gui = Idstring("guis/mission_briefing/preload_contact_continental")
 	self.jobs = {}
+	self.stages = {}
+	self.stages.firestarter_1 = {
+		level_id = "firestarter_1",
+		type_id = "heist_type_hijack",
+		type = "d"
+	}
+	self.stages.firestarter_2 = {
+		level_id = "firestarter_2",
+		type_id = "heist_type_stealth",
+		type = "d"
+	}
+	self.stages.firestarter_3 = {
+		level_id = "firestarter_3",
+		type_id = "heist_type_knockover",
+		type = "d",
+		mission = "default",
+		mission_filter = {5}
+	}
 	self.jobs.firestarter = {}
 	self.jobs.firestarter.name_id = "heist_firestarter"
 	self.jobs.firestarter.briefing_id = "heist_firestarter_crimenet"
@@ -245,23 +263,9 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.firestarter.contact = "hector"
 	self.jobs.firestarter.jc = 50
 	self.jobs.firestarter.chain = {
-		{
-			level_id = "firestarter_1",
-			type_id = "heist_type_hijack",
-			type = "d"
-		},
-		{
-			level_id = "firestarter_2",
-			type_id = "heist_type_stealth",
-			type = "d"
-		},
-		{
-			level_id = "firestarter_3",
-			type_id = "heist_type_knockover",
-			type = "d",
-			mission = "default",
-			mission_filter = {5}
-		}
+		self.stages.firestarter_1,
+		self.stages.firestarter_2,
+		self.stages.firestarter_3
 	}
 	self.jobs.firestarter.briefing_event = "hct_firestarter_brf"
 	self.jobs.firestarter.debrief_event = "hct_firestarter_debrief"
@@ -317,6 +321,21 @@ function NarrativeTweakData:init(tweak_data)
 		44000,
 		44000
 	}
+	self.stages.alex_1 = {
+		level_id = "alex_1",
+		type_id = "heist_type_survive",
+		type = "d"
+	}
+	self.stages.alex_2 = {
+		level_id = "alex_2",
+		type_id = "heist_type_survive",
+		type = "d"
+	}
+	self.stages.alex_3 = {
+		level_id = "alex_3",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.alex = {}
 	self.jobs.alex.name_id = "heist_alex"
 	self.jobs.alex.briefing_id = "heist_alex_crimenet"
@@ -324,21 +343,9 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.alex.contact = "hector"
 	self.jobs.alex.jc = 40
 	self.jobs.alex.chain = {
-		{
-			level_id = "alex_1",
-			type_id = "heist_type_survive",
-			type = "d"
-		},
-		{
-			level_id = "alex_2",
-			type_id = "heist_type_survive",
-			type = "d"
-		},
-		{
-			level_id = "alex_3",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.alex_1,
+		self.stages.alex_2,
+		self.stages.alex_3
 	}
 	self.jobs.alex.briefing_event = "hct_rats_brf_speak"
 	self.jobs.alex.debrief_event = "hct_rats_debrief"
@@ -393,6 +400,26 @@ function NarrativeTweakData:init(tweak_data)
 		96000,
 		96000,
 		96000
+	}
+	self.stages.welcome_to_the_jungle_1_d = {
+		level_id = "welcome_to_the_jungle_1",
+		type_id = "heist_type_assault",
+		type = "e",
+		mission_filter = {1},
+		world_setting = "day"
+	}
+	self.stages.welcome_to_the_jungle_1_n = {
+		level_id = "welcome_to_the_jungle_1_night",
+		type_id = "heist_type_assault",
+		type = "e",
+		mission_filter = {1},
+		world_setting = "night"
+	}
+	self.stages.welcome_to_the_jungle_2 = {
+		level_id = "welcome_to_the_jungle_2",
+		type_id = "heist_type_stealth",
+		type = "e",
+		mission_filter = {1}
 	}
 	self.jobs.welcome_to_the_jungle_wrapper = {}
 	self.jobs.welcome_to_the_jungle_wrapper.name_id = "heist_welcome_to_the_jungle"
@@ -482,38 +509,34 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.welcome_to_the_jungle.job_wrapper = nil
 	self.jobs.welcome_to_the_jungle.package = "packages/job_bigoil"
 	self.jobs.welcome_to_the_jungle.chain = {
-		{
-			level_id = "welcome_to_the_jungle_1",
-			type_id = "heist_type_assault",
-			type = "e",
-			mission_filter = {1},
-			world_setting = "day"
-		},
-		{
-			level_id = "welcome_to_the_jungle_2",
-			type_id = "heist_type_stealth",
-			type = "e",
-			mission_filter = {1}
-		}
+		self.stages.welcome_to_the_jungle_1_d,
+		self.stages.welcome_to_the_jungle_2
 	}
 	self.jobs.welcome_to_the_jungle_prof = deep_clone(self.jobs.welcome_to_the_jungle)
 	self.jobs.welcome_to_the_jungle_night = deep_clone(self.jobs.welcome_to_the_jungle)
 	self.jobs.welcome_to_the_jungle_night.chain = {
-		{
-			level_id = "welcome_to_the_jungle_1_night",
-			type_id = "heist_type_assault",
-			type = "e",
-			mission_filter = {1},
-			world_setting = "night"
-		},
-		{
-			level_id = "welcome_to_the_jungle_2",
-			type_id = "heist_type_stealth",
-			type = "e",
-			mission_filter = {1}
-		}
+		self.stages.welcome_to_the_jungle_1_n,
+		self.stages.welcome_to_the_jungle_2
 	}
 	self.jobs.welcome_to_the_jungle_night_prof = deep_clone(self.jobs.welcome_to_the_jungle_night)
+	self.stages.framing_frame_1 = {
+		level_id = "framing_frame_1",
+		type_id = "heist_type_knockover",
+		type = "e",
+		mission_filter = {1}
+	}
+	self.stages.framing_frame_2 = {
+		level_id = "framing_frame_2",
+		type_id = "heist_type_trade",
+		type = "e",
+		mission_filter = {1}
+	}
+	self.stages.framing_frame_3 = {
+		level_id = "framing_frame_3",
+		type_id = "heist_type_stealth",
+		type = "e",
+		mission_filter = {1}
+	}
 	self.jobs.framing_frame = {}
 	self.jobs.framing_frame.name_id = "heist_framing_frame"
 	self.jobs.framing_frame.briefing_id = "heist_framing_frame_crimenet"
@@ -521,24 +544,9 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.framing_frame.contact = "the_elephant"
 	self.jobs.framing_frame.jc = 50
 	self.jobs.framing_frame.chain = {
-		{
-			level_id = "framing_frame_1",
-			type_id = "heist_type_knockover",
-			type = "e",
-			mission_filter = {1}
-		},
-		{
-			level_id = "framing_frame_2",
-			type_id = "heist_type_trade",
-			type = "e",
-			mission_filter = {1}
-		},
-		{
-			level_id = "framing_frame_3",
-			type_id = "heist_type_stealth",
-			type = "e",
-			mission_filter = {1}
-		}
+		self.stages.framing_frame_1,
+		self.stages.framing_frame_2,
+		self.stages.framing_frame_3
 	}
 	self.jobs.framing_frame.briefing_event = "elp_framing_brf"
 	self.jobs.framing_frame.debrief_event = "elp_framing_debrief"
@@ -586,6 +594,30 @@ function NarrativeTweakData:init(tweak_data)
 		42000,
 		42000,
 		42000
+	}
+	self.stages.watchdogs_1_d = {
+		level_id = "watchdogs_1",
+		type_id = "heist_type_survive",
+		type = "d",
+		world_setting = "day"
+	}
+	self.stages.watchdogs_1_n = {
+		level_id = "watchdogs_1_night",
+		type_id = "heist_type_survive",
+		type = "d",
+		world_setting = "night"
+	}
+	self.stages.watchdogs_2_d = {
+		level_id = "watchdogs_2_day",
+		type_id = "heist_type_survive",
+		type = "d",
+		world_setting = "day"
+	}
+	self.stages.watchdogs_2_n = {
+		level_id = "watchdogs_2",
+		type_id = "heist_type_survive",
+		type = "d",
+		world_setting = "night"
 	}
 	self.jobs.watchdogs_wrapper = {}
 	self.jobs.watchdogs_wrapper.name_id = "heist_watchdogs"
@@ -650,33 +682,18 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.watchdogs = {}
 	self.jobs.watchdogs.package = "packages/job_watchdogs"
 	self.jobs.watchdogs.chain = {
-		{
-			level_id = "watchdogs_1",
-			type_id = "heist_type_survive",
-			type = "d",
-			world_setting = "day"
-		},
-		{
-			level_id = "watchdogs_2_day",
-			type_id = "heist_type_survive",
-			type = "d",
-			world_setting = "day"
-		}
+		self.stages.watchdogs_1_d,
+		self.stages.watchdogs_2_n
 	}
 	self.jobs.watchdogs_night = deep_clone(self.jobs.watchdogs)
 	self.jobs.watchdogs_night.chain = {
-		{
-			level_id = "watchdogs_1_night",
-			type_id = "heist_type_survive",
-			type = "d",
-			world_setting = "night"
-		},
-		{
-			level_id = "watchdogs_2",
-			type_id = "heist_type_survive",
-			type = "d",
-			world_setting = "night"
-		}
+		self.stages.watchdogs_1_n,
+		self.stages.watchdogs_2_d
+	}
+	self.stages.nightclub = {
+		level_id = "nightclub",
+		type_id = "heist_type_assault",
+		type = "d"
 	}
 	self.jobs.nightclub = {}
 	self.jobs.nightclub.name_id = "heist_nightclub"
@@ -686,11 +703,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.nightclub.contact = "vlad"
 	self.jobs.nightclub.jc = 30
 	self.jobs.nightclub.chain = {
-		{
-			level_id = "nightclub",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.nightclub
 	}
 	self.jobs.nightclub.briefing_event = "vld_nightclub_brf"
 	self.jobs.nightclub.debrief_event = "vld_nightclub_debrief"
@@ -739,6 +752,11 @@ function NarrativeTweakData:init(tweak_data)
 		12000,
 		12000
 	}
+	self.stages.ukrainian_job = {
+		level_id = "ukrainian_job",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.ukrainian_job = {}
 	self.jobs.ukrainian_job.name_id = "heist_ukrainian_job"
 	self.jobs.ukrainian_job.briefing_id = "heist_ukrainian_job_crimenet"
@@ -747,11 +765,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.ukrainian_job.region = "street"
 	self.jobs.ukrainian_job.jc = 20
 	self.jobs.ukrainian_job.chain = {
-		{
-			level_id = "ukrainian_job",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.ukrainian_job
 	}
 	self.jobs.ukrainian_job.briefing_event = "vld_ukranian_brf"
 	self.jobs.ukrainian_job.debrief_event = "vld_ukranian_debrief"
@@ -812,6 +826,11 @@ function NarrativeTweakData:init(tweak_data)
 		100000,
 		100000
 	}
+	self.stages.jewelry_store = {
+		level_id = "jewelry_store",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.jewelry_store = {}
 	self.jobs.jewelry_store.name_id = "heist_jewelry_store"
 	self.jobs.jewelry_store.briefing_id = "heist_jewelry_store_crimenet"
@@ -820,11 +839,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.jewelry_store.region = "street"
 	self.jobs.jewelry_store.jc = 10
 	self.jobs.jewelry_store.chain = {
-		{
-			level_id = "jewelry_store",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.jewelry_store
 	}
 	self.jobs.jewelry_store.briefing_event = "pln_jewelrystore_stage1_brf_speak"
 	self.jobs.jewelry_store.debrief_event = nil
@@ -880,6 +895,11 @@ function NarrativeTweakData:init(tweak_data)
 		8000,
 		8000
 	}
+	self.stages.four_stores = {
+		level_id = "four_stores",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.four_stores = {}
 	self.jobs.four_stores.name_id = "heist_four_stores"
 	self.jobs.four_stores.briefing_id = "heist_four_stores_crimenet"
@@ -888,11 +908,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.four_stores.region = "street"
 	self.jobs.four_stores.jc = 20
 	self.jobs.four_stores.chain = {
-		{
-			level_id = "four_stores",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.four_stores
 	}
 	self.jobs.four_stores.briefing_event = "vld_fourstores_brf"
 	self.jobs.four_stores.debrief_event = "vld_fourstores_debrief"
@@ -925,6 +941,11 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.four_stores.contract_visuals = {}
 	self.jobs.four_stores.contract_visuals.min_mission_xp = 6000
 	self.jobs.four_stores.contract_visuals.max_mission_xp = 6000
+	self.stages.mallcrasher = {
+		level_id = "mallcrasher",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.mallcrasher = {}
 	self.jobs.mallcrasher.name_id = "heist_mallcrasher"
 	self.jobs.mallcrasher.briefing_id = "heist_mallcrasher_crimenet"
@@ -933,11 +954,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.mallcrasher.region = "street"
 	self.jobs.mallcrasher.jc = 20
 	self.jobs.mallcrasher.chain = {
-		{
-			level_id = "mallcrasher",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.mallcrasher
 	}
 	self.jobs.mallcrasher.briefing_event = "vld_mallcrashers_brf"
 	self.jobs.mallcrasher.debrief_event = "vld_mallcrashers_debrief"
@@ -986,6 +1003,14 @@ function NarrativeTweakData:init(tweak_data)
 		6000,
 		6000
 	}
+	self.stages.branchbank_random = {
+		level_id = "branchbank",
+		type_id = "heist_type_assault",
+		type = "d",
+		mission = "standalone",
+		mission_filter = {4},
+		briefing_dialog = nil
+	}
 	self.jobs.branchbank = {}
 	self.jobs.branchbank.name_id = "heist_branchbank"
 	self.jobs.branchbank.briefing_id = "heist_branchbank_crimenet"
@@ -994,14 +1019,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.branchbank.region = "street"
 	self.jobs.branchbank.jc = 30
 	self.jobs.branchbank.chain = {
-		{
-			level_id = "branchbank",
-			type_id = "heist_type_assault",
-			type = "d",
-			mission = "standalone",
-			mission_filter = {4},
-			briefing_dialog = nil
-		}
+		self.stages.branchbank_random
 	}
 	self.jobs.branchbank.briefing_event = "pln_branchbank_random_brf_speak"
 	self.jobs.branchbank.debrief_event = nil
@@ -1071,6 +1089,15 @@ function NarrativeTweakData:init(tweak_data)
 		200000,
 		200000
 	}
+	self.stages.branchbank_deposit = {
+		level_id = "branchbank",
+		type_id = "heist_type_assault",
+		type = "d",
+		mission = "standalone",
+		mission_filter = {1},
+		briefing_dialog = "Play_pln_branchbank_depositbox_stage1_brief",
+		briefing_id = "heist_branchbank_deposit_briefing"
+	}
 	self.jobs.branchbank_deposit = {}
 	self.jobs.branchbank_deposit.name_id = "heist_branchbank_deposit"
 	self.jobs.branchbank_deposit.briefing_id = "heist_branchbank_deposit_crimenet"
@@ -1079,15 +1106,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.branchbank_deposit.region = "street"
 	self.jobs.branchbank_deposit.jc = 30
 	self.jobs.branchbank_deposit.chain = {
-		{
-			level_id = "branchbank",
-			type_id = "heist_type_assault",
-			type = "d",
-			mission = "standalone",
-			mission_filter = {1},
-			briefing_dialog = "Play_pln_branchbank_depositbox_stage1_brief",
-			briefing_id = "heist_branchbank_deposit_briefing"
-		}
+		self.stages.branchbank_deposit
 	}
 	self.jobs.branchbank_deposit.briefing_event = "pln_branchbank_depositbox_brf_speak"
 	self.jobs.branchbank_deposit.debrief_event = nil
@@ -1136,6 +1155,15 @@ function NarrativeTweakData:init(tweak_data)
 		12000,
 		12000
 	}
+	self.stages.branchbank_cash = {
+		level_id = "branchbank",
+		type_id = "heist_type_assault",
+		type = "d",
+		mission = "standalone",
+		mission_filter = {2},
+		briefing_dialog = "Play_pln_branchbank_cash_stage1_brief",
+		briefing_id = "heist_branchbank_cash_briefing"
+	}
 	self.jobs.branchbank_cash = {}
 	self.jobs.branchbank_cash.name_id = "heist_branchbank_cash"
 	self.jobs.branchbank_cash.briefing_id = "heist_branchbank_cash_crimenet"
@@ -1144,15 +1172,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.branchbank_cash.region = "street"
 	self.jobs.branchbank_cash.jc = 30
 	self.jobs.branchbank_cash.chain = {
-		{
-			level_id = "branchbank",
-			type_id = "heist_type_assault",
-			type = "d",
-			mission = "standalone",
-			mission_filter = {2},
-			briefing_dialog = "Play_pln_branchbank_cash_stage1_brief",
-			briefing_id = "heist_branchbank_cash_briefing"
-		}
+		self.stages.branchbank_cash
 	}
 	self.jobs.branchbank_cash.briefing_event = "pln_branchbank_cash_brf_speak"
 	self.jobs.branchbank_cash.debrief_event = nil
@@ -1201,6 +1221,15 @@ function NarrativeTweakData:init(tweak_data)
 		12000,
 		12000
 	}
+	self.stages.branchbank_gold = {
+		level_id = "branchbank",
+		type_id = "heist_type_assault",
+		type = "d",
+		mission = "standalone",
+		mission_filter = {3},
+		briefing_dialog = "Play_pln_branchbank_gold_stage1_brief",
+		briefing_id = "heist_branchbank_gold_briefing"
+	}
 	self.jobs.branchbank_gold = {}
 	self.jobs.branchbank_gold.name_id = "heist_branchbank_gold"
 	self.jobs.branchbank_gold.briefing_id = "heist_branchbank_gold_crimenet"
@@ -1209,15 +1238,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.branchbank_gold.region = "street"
 	self.jobs.branchbank_gold.jc = 30
 	self.jobs.branchbank_gold.chain = {
-		{
-			level_id = "branchbank",
-			type_id = "heist_type_assault",
-			type = "d",
-			mission = "standalone",
-			mission_filter = {3},
-			briefing_dialog = "Play_pln_branchbank_gold_stage1_brief",
-			briefing_id = "heist_branchbank_gold_briefing"
-		}
+		self.stages.branchbank_gold
 	}
 	self.jobs.branchbank_gold.briefing_event = "pln_branchbank_gold_brf_speak"
 	self.jobs.branchbank_gold.debrief_event = nil
@@ -1287,6 +1308,36 @@ function NarrativeTweakData:init(tweak_data)
 		200000,
 		200000
 	}
+	self.stages.election_day_1 = {
+		level_id = "election_day_1",
+		type_id = "heist_type_assault",
+		type = "e",
+		mission_filter = {1}
+	}
+	self.stages.election_day_2 = {
+		level_id = "election_day_2",
+		type_id = "heist_type_assault",
+		type = "e",
+		mission_filter = {1}
+	}
+	self.stages.election_day_3 = {
+		level_id = "election_day_3",
+		type_id = "heist_type_knockover",
+		type = "e",
+		mission_filter = {1}
+	}
+	self.stages.election_day_3_skip1 = {
+		level_id = "election_day_3_skip1",
+		type_id = "heist_type_knockover",
+		type = "e",
+		mission_filter = {1}
+	}
+	self.stages.election_day_3_skip2 = {
+		level_id = "election_day_3_skip2",
+		type_id = "heist_type_knockover",
+		type = "e",
+		mission_filter = {1}
+	}
 	self.jobs.election_day = {}
 	self.jobs.election_day.name_id = "heist_election_day"
 	self.jobs.election_day.briefing_id = "heist_election_day_crimenet"
@@ -1294,37 +1345,12 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.election_day.contact = "the_elephant"
 	self.jobs.election_day.jc = 40
 	self.jobs.election_day.chain = {
+		self.stages.election_day_1,
 		{
-			level_id = "election_day_1",
-			type_id = "heist_type_assault",
-			type = "e",
-			mission_filter = {1}
-		},
-		{
-			{
-				level_id = "election_day_2",
-				type_id = "heist_type_assault",
-				type = "e",
-				mission_filter = {1}
-			},
-			{
-				level_id = "election_day_3",
-				type_id = "heist_type_knockover",
-				type = "e",
-				mission_filter = {1}
-			},
-			{
-				level_id = "election_day_3_skip1",
-				type_id = "heist_type_knockover",
-				type = "e",
-				mission_filter = {1}
-			},
-			{
-				level_id = "election_day_3_skip2",
-				type_id = "heist_type_knockover",
-				type = "e",
-				mission_filter = {1}
-			}
+			self.stages.election_day_2,
+			self.stages.election_day_3,
+			self.stages.election_day_3_skip1,
+			self.stages.election_day_3_skip2
 		}
 	}
 	self.jobs.election_day.briefing_event = "elp_election_brf"
@@ -1374,6 +1400,12 @@ function NarrativeTweakData:init(tweak_data)
 		44000,
 		44000
 	}
+	self.stages.safehouse = {
+		level_id = "safehouse",
+		type_id = "heist_type_assault",
+		type = "d",
+		briefing_id = Global.mission_manager and Global.mission_manager.saved_job_values.playedSafeHouseBefore and "heist_safehouse_briefing_2" or nil
+	}
 	self.jobs.safehouse = {}
 	self.jobs.safehouse.name_id = "heist_safehouse"
 	self.jobs.safehouse.briefing_id = "heist_safehouse_crimenet"
@@ -1385,12 +1417,7 @@ function NarrativeTweakData:init(tweak_data)
 	end
 	self.jobs.safehouse.jc = 5
 	self.jobs.safehouse.chain = {
-		{
-			level_id = "safehouse",
-			type_id = "heist_type_assault",
-			type = "d",
-			briefing_id = Global.mission_manager and Global.mission_manager.saved_job_values.playedSafeHouseBefore and "heist_safehouse_briefing_2" or nil
-		}
+		self.stages.safehouse
 	}
 	self.jobs.safehouse.briefing_event = nil
 	self.jobs.safehouse.debrief_event = nil
@@ -1444,6 +1471,13 @@ function NarrativeTweakData:init(tweak_data)
 		200000,
 		200000
 	}
+	self.stages.arm_cro = {
+		level_id = "arm_cro",
+		type_id = "heist_type_assault",
+		type = "d",
+		mission_filter = {4},
+		briefing_dialog = nil
+	}
 	self.jobs.arm_cro = {}
 	self.jobs.arm_cro.name_id = "heist_arm_cro"
 	self.jobs.arm_cro.briefing_id = "heist_arm_cro_crimenet"
@@ -1452,13 +1486,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.arm_cro.region = "street"
 	self.jobs.arm_cro.jc = 30
 	self.jobs.arm_cro.chain = {
-		{
-			level_id = "arm_cro",
-			type_id = "heist_type_assault",
-			type = "d",
-			mission_filter = {4},
-			briefing_dialog = nil
-		}
+		self.stages.arm_cro
 	}
 	self.jobs.arm_cro.briefing_event = "pln_at1_cbf_01"
 	self.jobs.arm_cro.debrief_event = nil
@@ -1515,6 +1543,13 @@ function NarrativeTweakData:init(tweak_data)
 		12000,
 		12000
 	}
+	self.stages.arm_und = {
+		level_id = "arm_und",
+		type_id = "heist_type_assault",
+		type = "d",
+		mission_filter = {4},
+		briefing_dialog = nil
+	}
 	self.jobs.arm_und = {}
 	self.jobs.arm_und.name_id = "heist_arm_und"
 	self.jobs.arm_und.briefing_id = "heist_arm_und_crimenet"
@@ -1523,13 +1558,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.arm_und.region = "street"
 	self.jobs.arm_und.jc = 30
 	self.jobs.arm_und.chain = {
-		{
-			level_id = "arm_und",
-			type_id = "heist_type_assault",
-			type = "d",
-			mission_filter = {4},
-			briefing_dialog = nil
-		}
+		self.stages.arm_und
 	}
 	self.jobs.arm_und.briefing_event = "pln_at1_cbf_01"
 	self.jobs.arm_und.debrief_event = nil
@@ -1586,6 +1615,13 @@ function NarrativeTweakData:init(tweak_data)
 		12000,
 		12000
 	}
+	self.stages.arm_hcm = {
+		level_id = "arm_hcm",
+		type_id = "heist_type_assault",
+		type = "d",
+		mission_filter = {4},
+		briefing_dialog = nil
+	}
 	self.jobs.arm_hcm = {}
 	self.jobs.arm_hcm.name_id = "heist_arm_hcm"
 	self.jobs.arm_hcm.briefing_id = "heist_arm_hcm_crimenet"
@@ -1594,13 +1630,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.arm_hcm.region = "street"
 	self.jobs.arm_hcm.jc = 30
 	self.jobs.arm_hcm.chain = {
-		{
-			level_id = "arm_hcm",
-			type_id = "heist_type_assault",
-			type = "d",
-			mission_filter = {4},
-			briefing_dialog = nil
-		}
+		self.stages.arm_hcm
 	}
 	self.jobs.arm_hcm.briefing_event = "pln_at1_cbf_01"
 	self.jobs.arm_hcm.debrief_event = nil
@@ -1657,6 +1687,13 @@ function NarrativeTweakData:init(tweak_data)
 		12000,
 		12000
 	}
+	self.stages.arm_par = {
+		level_id = "arm_par",
+		type_id = "heist_type_assault",
+		type = "d",
+		mission_filter = {4},
+		briefing_dialog = nil
+	}
 	self.jobs.arm_par = {}
 	self.jobs.arm_par.name_id = "heist_arm_par"
 	self.jobs.arm_par.briefing_id = "heist_arm_par_crimenet"
@@ -1665,13 +1702,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.arm_par.region = "street"
 	self.jobs.arm_par.jc = 30
 	self.jobs.arm_par.chain = {
-		{
-			level_id = "arm_par",
-			type_id = "heist_type_assault",
-			type = "d",
-			mission_filter = {4},
-			briefing_dialog = nil
-		}
+		self.stages.arm_par
 	}
 	self.jobs.arm_par.briefing_event = "pln_at1_cbf_01"
 	self.jobs.arm_par.debrief_event = nil
@@ -1728,6 +1759,13 @@ function NarrativeTweakData:init(tweak_data)
 		12000,
 		12000
 	}
+	self.stages.arm_fac = {
+		level_id = "arm_fac",
+		type_id = "heist_type_assault",
+		type = "d",
+		mission_filter = {4},
+		briefing_dialog = nil
+	}
 	self.jobs.arm_fac = {}
 	self.jobs.arm_fac.name_id = "heist_arm_fac"
 	self.jobs.arm_fac.briefing_id = "heist_arm_fac_crimenet"
@@ -1736,13 +1774,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.arm_fac.region = "street"
 	self.jobs.arm_fac.jc = 30
 	self.jobs.arm_fac.chain = {
-		{
-			level_id = "arm_fac",
-			type_id = "heist_type_assault",
-			type = "d",
-			mission_filter = {4},
-			briefing_dialog = nil
-		}
+		self.stages.arm_fac
 	}
 	self.jobs.arm_fac.briefing_event = "pln_at1_cbf_01"
 	self.jobs.arm_fac.debrief_event = nil
@@ -1799,6 +1831,13 @@ function NarrativeTweakData:init(tweak_data)
 		12000,
 		12000
 	}
+	self.stages.arm_for = {
+		level_id = "arm_for",
+		type_id = "heist_type_assault",
+		type = "d",
+		mission_filter = {4},
+		briefing_dialog = nil
+	}
 	self.jobs.arm_for = {}
 	self.jobs.arm_for.name_id = "heist_arm_for"
 	self.jobs.arm_for.briefing_id = "heist_arm_for_crimenet"
@@ -1807,13 +1846,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.arm_for.jc = 70
 	self.jobs.arm_for.package = "packages/job_arm_for"
 	self.jobs.arm_for.chain = {
-		{
-			level_id = "arm_for",
-			type_id = "heist_type_assault",
-			type = "d",
-			mission_filter = {4},
-			briefing_dialog = nil
-		}
+		self.stages.arm_for
 	}
 	self.jobs.arm_for.briefing_event = "pln_tr1b_cbf_01"
 	self.jobs.arm_for.debrief_event = nil
@@ -1870,6 +1903,11 @@ function NarrativeTweakData:init(tweak_data)
 		36000,
 		36000
 	}
+	self.stages.rat = {
+		level_id = "rat",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.rat = {}
 	self.jobs.rat.name_id = "heist_rat"
 	self.jobs.rat.briefing_id = "heist_rat_crimenet"
@@ -1878,11 +1916,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.rat.jc = 60
 	self.jobs.rat.package = "packages/narr_rat"
 	self.jobs.rat.chain = {
-		{
-			level_id = "rat",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.rat
 	}
 	self.jobs.rat.briefing_event = "pln_rt1b_cbf_01"
 	self.jobs.rat.debrief_event = {
@@ -1936,6 +1970,11 @@ function NarrativeTweakData:init(tweak_data)
 		9600000,
 		9600000
 	}
+	self.stages.family = {
+		level_id = "family",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.family = {}
 	self.jobs.family.name_id = "heist_family"
 	self.jobs.family.briefing_id = "heist_family_crimenet"
@@ -1944,11 +1983,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.family.region = "street"
 	self.jobs.family.jc = 20
 	self.jobs.family.chain = {
-		{
-			level_id = "family",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.family
 	}
 	self.jobs.family.briefing_event = "pln_fj1_cbf_01"
 	self.jobs.family.debrief_event = nil
@@ -2004,6 +2039,13 @@ function NarrativeTweakData:init(tweak_data)
 		20000,
 		20000
 	}
+	self.stages.big = {
+		level_id = "big",
+		type_id = "heist_type_assault",
+		type = "d",
+		mission_filter = {1},
+		world_setting = "day"
+	}
 	self.jobs.big = {}
 	self.jobs.big.name_id = "heist_big"
 	self.jobs.big.briefing_id = "heist_big_crimenet"
@@ -2012,13 +2054,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.big.region = "street"
 	self.jobs.big.jc = 60
 	self.jobs.big.chain = {
-		{
-			level_id = "big",
-			type_id = "heist_type_assault",
-			type = "d",
-			mission_filter = {1},
-			world_setting = "day"
-		}
+		self.stages.big
 	}
 	self.jobs.big.briefing_event = "gus_bb1_cbf_01"
 	self.jobs.big.debrief_event = "gus_bb1_debrief_01"
@@ -2069,6 +2105,11 @@ function NarrativeTweakData:init(tweak_data)
 		45000
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then
+		self.stages.roberts = {
+			level_id = "roberts",
+			type_id = "heist_type_assault",
+			type = "d"
+		}
 		self.jobs.roberts = {}
 		self.jobs.roberts.name_id = "heist_roberts"
 		self.jobs.roberts.briefing_id = "heist_roberts_crimenet"
@@ -2077,11 +2118,7 @@ function NarrativeTweakData:init(tweak_data)
 		self.jobs.roberts.region = "street"
 		self.jobs.roberts.jc = 40
 		self.jobs.roberts.chain = {
-			{
-				level_id = "roberts",
-				type_id = "heist_type_assault",
-				type = "d"
-			}
+			self.stages.roberts
 		}
 		self.jobs.roberts.briefing_event = "pln_cs1_cbf_01"
 		self.jobs.roberts.debrief_event = nil
@@ -2138,6 +2175,11 @@ function NarrativeTweakData:init(tweak_data)
 			22000
 		}
 	end
+	self.stages.kosugi = {
+		level_id = "kosugi",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.kosugi = {}
 	self.jobs.kosugi.name_id = "heist_kosugi"
 	self.jobs.kosugi.briefing_id = "heist_kosugi_crimenet"
@@ -2146,11 +2188,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.kosugi.jc = 30
 	self.jobs.kosugi.package = "packages/narr_kosugi"
 	self.jobs.kosugi.chain = {
-		{
-			level_id = "kosugi",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.kosugi
 	}
 	self.jobs.kosugi.briefing_event = "pln_ko1_cbf_01"
 	self.jobs.kosugi.debrief_event = nil
@@ -2215,6 +2253,16 @@ function NarrativeTweakData:init(tweak_data)
 		22000,
 		22000
 	}
+	self.stages.mia_1 = {
+		level_id = "mia_1",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
+	self.stages.mia_2 = {
+		level_id = "mia_2",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.mia = {}
 	self.jobs.mia.name_id = "heist_mia"
 	self.jobs.mia.briefing_id = "heist_mia_crimenet"
@@ -2223,16 +2271,8 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.mia.jc = 60
 	self.jobs.mia.package = "packages/narr_mia"
 	self.jobs.mia.chain = {
-		{
-			level_id = "mia_1",
-			type_id = "heist_type_assault",
-			type = "d"
-		},
-		{
-			level_id = "mia_2",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.mia_1,
+		self.stages.mia_2
 	}
 	self.jobs.mia.briefing_event = "dentist_hm1_cnc_01"
 	self.jobs.mia.debrief_event = "dentist_hm1_debrief_01_01"
@@ -2292,6 +2332,12 @@ function NarrativeTweakData:init(tweak_data)
 		69000,
 		69000
 	}
+	self.stages.gallery = {
+		level_id = "gallery",
+		type_id = "heist_type_knockover",
+		type = "e",
+		mission_filter = {2}
+	}
 	self.jobs.gallery = {}
 	self.jobs.gallery.name_id = "heist_gallery"
 	self.jobs.gallery.briefing_id = "heist_gallery_crimenet"
@@ -2300,12 +2346,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.gallery.region = "street"
 	self.jobs.gallery.jc = 20
 	self.jobs.gallery.chain = {
-		{
-			level_id = "gallery",
-			type_id = "heist_type_knockover",
-			type = "e",
-			mission_filter = {2}
-		}
+		self.stages.gallery
 	}
 	self.jobs.gallery.briefing_event = "pln_art_cbf_01"
 	self.jobs.gallery.debrief_event = nil
@@ -2355,6 +2396,16 @@ function NarrativeTweakData:init(tweak_data)
 		12000,
 		12000
 	}
+	self.stages.hox_1 = {
+		level_id = "hox_1",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
+	self.stages.hox_2 = {
+		level_id = "hox_2",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.hox = {}
 	self.jobs.hox.name_id = "heist_hox"
 	self.jobs.hox.briefing_id = "heist_hox_crimenet"
@@ -2362,16 +2413,8 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.hox.region = "street"
 	self.jobs.hox.jc = 60
 	self.jobs.hox.chain = {
-		{
-			level_id = "hox_1",
-			type_id = "heist_type_assault",
-			type = "d"
-		},
-		{
-			level_id = "hox_2",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.hox_1,
+		self.stages.hox_2
 	}
 	self.jobs.hox.briefing_event = "dentist_hb1_cbf_01"
 	self.jobs.hox.debrief_event = nil
@@ -2432,6 +2475,11 @@ function NarrativeTweakData:init(tweak_data)
 		53400,
 		53400
 	}
+	self.stages.pines = {
+		level_id = "pines",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.pines = {}
 	self.jobs.pines.name_id = "heist_pines"
 	self.jobs.pines.briefing_id = "heist_pines_crimenet"
@@ -2440,11 +2488,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.pines.region = "street"
 	self.jobs.pines.jc = 40
 	self.jobs.pines.chain = {
-		{
-			level_id = "pines",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.pines
 	}
 	self.jobs.pines.briefing_event = "vld_cp1_cbf_01"
 	self.jobs.pines.debrief_event = nil
@@ -2501,6 +2545,11 @@ function NarrativeTweakData:init(tweak_data)
 		2408000
 	}
 	self.jobs.pines.is_christmas_heist = true
+	self.stages.mus = {
+		level_id = "mus",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.mus = {}
 	self.jobs.mus.name_id = "heist_mus"
 	self.jobs.mus.briefing_id = "heist_mus_crimenet"
@@ -2509,11 +2558,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.mus.region = "street"
 	self.jobs.mus.jc = 50
 	self.jobs.mus.chain = {
-		{
-			level_id = "mus",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.mus
 	}
 	self.jobs.mus.briefing_event = "dentist_hd1_cbf_01"
 	self.jobs.mus.debrief_event = {
@@ -2570,6 +2615,11 @@ function NarrativeTweakData:init(tweak_data)
 		36000,
 		36000
 	}
+	self.stages.cage = {
+		level_id = "cage",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.cage = {}
 	self.jobs.cage.name_id = "heist_cage"
 	self.jobs.cage.briefing_id = "heist_cage_crimenet"
@@ -2578,11 +2628,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.cage.region = "street"
 	self.jobs.cage.jc = 30
 	self.jobs.cage.chain = {
-		{
-			level_id = "cage",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.cage
 	}
 	self.jobs.cage.briefing_event = "pln_ch1_cbf_01"
 	self.jobs.cage.debrief_event = "pln_ch1_end_01"
@@ -2631,6 +2677,11 @@ function NarrativeTweakData:init(tweak_data)
 		13000,
 		13000
 	}
+	self.stages.hox_3 = {
+		level_id = "hox_3",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.hox_3 = {}
 	self.jobs.hox_3.name_id = "heist_hox_3"
 	self.jobs.hox_3.briefing_id = "heist_hox_3_crimenet"
@@ -2639,11 +2690,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.hox_3.region = "street"
 	self.jobs.hox_3.jc = 40
 	self.jobs.hox_3.chain = {
-		{
-			level_id = "hox_3",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.hox_3
 	}
 	self.jobs.hox_3.briefing_event = "hoxton_hb3_cbf_01"
 	self.jobs.hox_3.debrief_event = "hoxton_hb3_debrief_01"
@@ -2696,6 +2743,12 @@ function NarrativeTweakData:init(tweak_data)
 		26000,
 		26000
 	}
+	self.stages.crojob1 = {
+		level_id = "crojob2",
+		type_id = "heist_type_assault",
+		type = "d",
+		mission_filter = {1}
+	}
 	self.jobs.crojob1 = {}
 	self.jobs.crojob1.name_id = "heist_crojob1"
 	self.jobs.crojob1.briefing_id = "heist_crojob1_crimenet"
@@ -2703,12 +2756,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.crojob1.contact = "the_butcher"
 	self.jobs.crojob1.jc = 60
 	self.jobs.crojob1.chain = {
-		{
-			level_id = "crojob2",
-			type_id = "heist_type_assault",
-			type = "d",
-			mission_filter = {1}
-		}
+		self.stages.crojob1
 	}
 	self.jobs.crojob1.briefing_event = "butcher_cr1_cbf_02"
 	self.jobs.crojob1.debrief_event = {
@@ -2836,6 +2884,32 @@ function NarrativeTweakData:init(tweak_data)
 		41500
 	}
 	self.jobs.crojob_wrapper.dlc = "the_bomb"
+	self.stages.crojob2_d = {
+		level_id = "crojob3",
+		type_id = "heist_type_survive",
+		type = "d",
+		world_setting = "day"
+	}
+	self.stages.crojob2_n = {
+		level_id = "crojob3_night",
+		type_id = "heist_type_survive",
+		type = "d",
+		world_setting = "night"
+	}
+	self.jobs.crojob2 = {}
+	self.jobs.crojob2.package = "packages/job_crojob"
+	self.jobs.crojob2.chain = {
+		self.stages.crojob2_d
+	}
+	self.jobs.crojob2_night = deep_clone(self.jobs.crojob2)
+	self.jobs.crojob2_night.chain = {
+		self.stages.crojob2_n
+	}
+	self.stages.shoutout_raid = {
+		level_id = "shoutout_raid",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.shoutout_raid = {}
 	self.jobs.shoutout_raid.name_id = "heist_shoutout_raid"
 	self.jobs.shoutout_raid.briefing_id = "heist_shoutout_raid_crimenet"
@@ -2844,11 +2918,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.shoutout_raid.region = "street"
 	self.jobs.shoutout_raid.jc = 30
 	self.jobs.shoutout_raid.chain = {
-		{
-			level_id = "shoutout_raid",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.shoutout_raid
 	}
 	self.jobs.shoutout_raid.briefing_event = "vld_ko1b_cbf_01_01"
 	self.jobs.shoutout_raid.debrief_event = nil
@@ -2897,24 +2967,10 @@ function NarrativeTweakData:init(tweak_data)
 		34000,
 		34000
 	}
-	self.jobs.crojob2 = {}
-	self.jobs.crojob2.package = "packages/job_crojob"
-	self.jobs.crojob2.chain = {
-		{
-			level_id = "crojob3",
-			type_id = "heist_type_survive",
-			type = "d",
-			world_setting = "day"
-		}
-	}
-	self.jobs.crojob2_night = deep_clone(self.jobs.crojob2)
-	self.jobs.crojob2_night.chain = {
-		{
-			level_id = "crojob3_night",
-			type_id = "heist_type_survive",
-			type = "d",
-			world_setting = "night"
-		}
+	self.stages.arena = {
+		level_id = "arena",
+		type_id = "heist_type_assault",
+		type = "d"
 	}
 	self.jobs.arena = {}
 	self.jobs.arena.name_id = "heist_arena"
@@ -2923,11 +2979,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.arena.region = "street"
 	self.jobs.arena.jc = 60
 	self.jobs.arena.chain = {
-		{
-			level_id = "arena",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.arena
 	}
 	self.jobs.arena.briefing_event = "pln_al1_cbf_01_01"
 	self.jobs.arena.debrief_event = nil
@@ -2977,6 +3029,12 @@ function NarrativeTweakData:init(tweak_data)
 		51600,
 		51600
 	}
+	self.stages.kenaz = {
+		level_id = "kenaz",
+		type_id = "heist_type_assault",
+		type = "e",
+		mission_filter = {1}
+	}
 	self.jobs.kenaz = {}
 	self.jobs.kenaz.name_id = "heist_kenaz_full"
 	self.jobs.kenaz.briefing_id = "heist_kenaz_crimenet"
@@ -2984,12 +3042,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.kenaz.contact = "the_dentist"
 	self.jobs.kenaz.jc = 70
 	self.jobs.kenaz.chain = {
-		{
-			level_id = "kenaz",
-			type_id = "heist_type_assault",
-			type = "e",
-			mission_filter = {1}
-		}
+		self.stages.kenaz
 	}
 	self.jobs.kenaz.briefing_event = "dentist_ca1_cbf_01"
 	self.jobs.kenaz.debrief_event = {
@@ -3046,6 +3099,11 @@ function NarrativeTweakData:init(tweak_data)
 		67500,
 		67500
 	}
+	self.stages.jolly = {
+		level_id = "jolly",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.jolly = {}
 	self.jobs.jolly.name_id = "heist_jolly"
 	self.jobs.jolly.briefing_id = "heist_jolly_crimenet"
@@ -3054,11 +3112,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.jolly.region = "street"
 	self.jobs.jolly.jc = 30
 	self.jobs.jolly.chain = {
-		{
-			level_id = "jolly",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.jolly
 	}
 	self.jobs.jolly.contract_visuals = {}
 	self.jobs.jolly.contract_visuals.min_mission_xp = {
@@ -3107,6 +3161,11 @@ function NarrativeTweakData:init(tweak_data)
 		1400000,
 		1400000
 	}
+	self.stages.red2 = {
+		level_id = "red2",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.red2 = {}
 	self.jobs.red2.name_id = "heist_red2"
 	self.jobs.red2.briefing_id = "heist_red2_crimenet"
@@ -3115,11 +3174,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.red2.region = "street"
 	self.jobs.red2.jc = 60
 	self.jobs.red2.chain = {
-		{
-			level_id = "red2",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.red2
 	}
 	self.jobs.red2.briefing_event = "pln_fwb_cbf_01"
 	self.jobs.red2.debrief_event = "pln_fwb_34"
@@ -3170,6 +3225,11 @@ function NarrativeTweakData:init(tweak_data)
 		34000,
 		34000
 	}
+	self.stages.dinner = {
+		level_id = "dinner",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.dinner = {}
 	self.jobs.dinner.name_id = "heist_dinner"
 	self.jobs.dinner.briefing_id = "heist_dinner_crimenet"
@@ -3178,11 +3238,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.dinner.region = "street"
 	self.jobs.dinner.jc = 30
 	self.jobs.dinner.chain = {
-		{
-			level_id = "dinner",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.dinner
 	}
 	self.jobs.dinner.briefing_event = "pln_dn1_cbf_01"
 	self.jobs.dinner.debrief_event = "pln_dn1_31"
@@ -3231,6 +3287,11 @@ function NarrativeTweakData:init(tweak_data)
 		40000,
 		40000
 	}
+	self.stages.pbr = {
+		level_id = "pbr",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.pbr = {}
 	self.jobs.pbr.name_id = "heist_pbr"
 	self.jobs.pbr.briefing_id = "heist_pbr_crimenet"
@@ -3240,11 +3301,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.pbr.dlc = "berry"
 	self.jobs.pbr.jc = 30
 	self.jobs.pbr.chain = {
-		{
-			level_id = "pbr",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.pbr
 	}
 	self.jobs.pbr.briefing_event = "loc_jr1_cbf_01"
 	self.jobs.pbr.debrief_event = nil
@@ -3291,6 +3348,11 @@ function NarrativeTweakData:init(tweak_data)
 		32000,
 		32000
 	}
+	self.stages.pbr2 = {
+		level_id = "pbr2",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.pbr2 = {}
 	self.jobs.pbr2.name_id = "heist_pbr2"
 	self.jobs.pbr2.briefing_id = "heist_pbr2_crimenet"
@@ -3300,11 +3362,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.pbr2.dlc = "berry"
 	self.jobs.pbr2.jc = 30
 	self.jobs.pbr2.chain = {
-		{
-			level_id = "pbr2",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.pbr2
 	}
 	self.jobs.pbr2.briefing_event = "loc_jr2_cbf_01"
 	self.jobs.pbr2.debrief_event = nil
@@ -3351,6 +3409,11 @@ function NarrativeTweakData:init(tweak_data)
 		31100,
 		31100
 	}
+	self.stages.pal = {
+		level_id = "pal",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.pal = {}
 	self.jobs.pal.name_id = "heist_pal"
 	self.jobs.pal.briefing_id = "heist_pal_crimenet"
@@ -3360,11 +3423,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.pal.dlc = "pal"
 	self.jobs.pal.jc = 30
 	self.jobs.pal.chain = {
-		{
-			level_id = "pal",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.pal
 	}
 	self.jobs.pal.briefing_event = "pln_pal_cbf_01"
 	self.jobs.pal.debrief_event = nil
@@ -3413,6 +3472,11 @@ function NarrativeTweakData:init(tweak_data)
 		3621000,
 		3621000
 	}
+	self.stages.cane = {
+		level_id = "cane",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.cane = {}
 	self.jobs.cane.name_id = "heist_cane"
 	self.jobs.cane.briefing_id = "heist_cane_crimenet"
@@ -3421,11 +3485,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.cane.region = "street"
 	self.jobs.cane.jc = 10
 	self.jobs.cane.chain = {
-		{
-			level_id = "cane",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.cane
 	}
 	self.jobs.cane.briefing_event = "vld_can_cbf_01"
 	self.jobs.cane.debrief_event = nil
@@ -3455,6 +3515,7 @@ function NarrativeTweakData:init(tweak_data)
 		80000,
 		80000
 	}
+	self.jobs.cane.is_christmas_heist = true
 	self.jobs.cane.contract_visuals = {}
 	self.jobs.cane.contract_visuals.min_mission_xp = {
 		10900,
@@ -3474,7 +3535,11 @@ function NarrativeTweakData:init(tweak_data)
 		6218000,
 		6218000
 	}
-	self.jobs.cane.is_christmas_heist = true
+	self.stages.nail = {
+		level_id = "nail",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.nail = {}
 	self.jobs.nail.name_id = "heist_nail"
 	self.jobs.nail.briefing_id = "heist_nail_crimenet"
@@ -3483,11 +3548,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.nail.region = "street"
 	self.jobs.nail.jc = 30
 	self.jobs.nail.chain = {
-		{
-			level_id = "nail",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.nail
 	}
 	self.jobs.nail.briefing_event = "pln_nai_cbf_01"
 	self.jobs.nail.debrief_event = nil
@@ -3517,6 +3578,7 @@ function NarrativeTweakData:init(tweak_data)
 		100000,
 		100000
 	}
+	self.jobs.nail.is_halloween_level = true
 	self.jobs.nail.contract_visuals = {}
 	self.jobs.nail.contract_visuals.min_mission_xp = {
 		20000,
@@ -3536,7 +3598,16 @@ function NarrativeTweakData:init(tweak_data)
 		3785000,
 		3785000
 	}
-	self.jobs.nail.is_halloween_level = true
+	self.stages.peta_1 = {
+		level_id = "peta",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
+	self.stages.peta_2 = {
+		level_id = "peta2",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.peta = {}
 	self.jobs.peta.name_id = "heist_peta"
 	self.jobs.peta.briefing_id = "heist_peta_crimenet"
@@ -3546,16 +3617,8 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.peta.dlc = "peta"
 	self.jobs.peta.jc = 30
 	self.jobs.peta.chain = {
-		{
-			level_id = "peta",
-			type_id = "heist_type_assault",
-			type = "d"
-		},
-		{
-			level_id = "peta2",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.peta_1,
+		self.stages.peta_2
 	}
 	self.jobs.peta.briefing_event = "vld_pt1_cbf_01"
 	self.jobs.peta.debrief_event = nil
@@ -3606,6 +3669,11 @@ function NarrativeTweakData:init(tweak_data)
 		122000,
 		122000
 	}
+	self.stages.man = {
+		level_id = "man",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.man = {}
 	self.jobs.man.name_id = "heist_man"
 	self.jobs.man.briefing_id = "heist_man_crimenet"
@@ -3614,11 +3682,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.man.dlc = "pal"
 	self.jobs.man.jc = 30
 	self.jobs.man.chain = {
-		{
-			level_id = "man",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.man
 	}
 	self.jobs.man.briefing_event = "pln_man_cbf_01"
 	self.jobs.man.debrief_event = nil
@@ -3667,6 +3731,11 @@ function NarrativeTweakData:init(tweak_data)
 		28500,
 		28500
 	}
+	self.stages.dark = {
+		level_id = "dark",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.dark = {}
 	self.jobs.dark.name_id = "heist_dark"
 	self.jobs.dark.briefing_id = "heist_dark_crimenet"
@@ -3674,11 +3743,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.dark.region = "street"
 	self.jobs.dark.jc = 30
 	self.jobs.dark.chain = {
-		{
-			level_id = "dark",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.dark
 	}
 	self.jobs.dark.briefing_event = "rb14_drk_cbf_01"
 	self.jobs.dark.debrief_event = nil
@@ -3723,6 +3788,11 @@ function NarrativeTweakData:init(tweak_data)
 		32000,
 		32000
 	}
+	self.stages.mad = {
+		level_id = "mad",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.mad = {}
 	self.jobs.mad.name_id = "heist_mad"
 	self.jobs.mad.briefing_id = "heist_mad_crimenet"
@@ -3730,11 +3800,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.mad.region = "street"
 	self.jobs.mad.jc = 30
 	self.jobs.mad.chain = {
-		{
-			level_id = "mad",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.mad
 	}
 	self.jobs.mad.briefing_event = "rb14_mad_cbf_01"
 	self.jobs.mad.debrief_event = nil
@@ -3779,6 +3845,16 @@ function NarrativeTweakData:init(tweak_data)
 		46000,
 		46000
 	}
+	self.stages.born = {
+		level_id = "born",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
+	self.stages.chew = {
+		level_id = "chew",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.born = {}
 	self.jobs.born.name_id = "heist_born"
 	self.jobs.born.briefing_id = "heist_born_crimenet"
@@ -3787,16 +3863,8 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.born.jc = 30
 	self.jobs.born.dlc = "born"
 	self.jobs.born.chain = {
-		{
-			level_id = "born",
-			type_id = "heist_type_assault",
-			type = "d"
-		},
-		{
-			level_id = "chew",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.born,
+		self.stages.chew
 	}
 	self.jobs.born.briefing_event = "elp_brn_cbf_01"
 	self.jobs.born.debrief_event = nil
@@ -3854,6 +3922,26 @@ function NarrativeTweakData:init(tweak_data)
 		14000,
 		14000
 	}
+	self.stages.short_1_1 = {
+		level_id = "short1_stage1",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
+	self.stages.short_1_2 = {
+		level_id = "short1_stage2",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
+	self.stages.short_2_1 = {
+		level_id = "short2_stage1",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
+	self.stages.short_2_2 = {
+		level_id = "short2_stage2b",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.short = {}
 	self.jobs.short.name_id = "heist_short"
 	self.jobs.short.briefing_id = "heist_short1_stage1_crimenet"
@@ -3861,26 +3949,10 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.short.region = "street"
 	self.jobs.short.jc = 10
 	self.jobs.short.chain = {
-		{
-			level_id = "short1_stage1",
-			type_id = "heist_type_assault",
-			type = "d"
-		},
-		{
-			level_id = "short1_stage2",
-			type_id = "heist_type_assault",
-			type = "d"
-		},
-		{
-			level_id = "short2_stage1",
-			type_id = "heist_type_assault",
-			type = "d"
-		},
-		{
-			level_id = "short2_stage2b",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.short_1_1,
+		self.stages.short_1_2,
+		self.stages.short_2_1,
+		self.stages.short_2_2
 	}
 	self.jobs.short.briefing_event = "pln_sh11_cbf_01"
 	self.jobs.short.debrief_event = nil
@@ -3910,16 +3982,8 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.short1.region = "street"
 	self.jobs.short1.jc = 10
 	self.jobs.short1.chain = {
-		{
-			level_id = "short1_stage1",
-			type_id = "heist_type_assault",
-			type = "d"
-		},
-		{
-			level_id = "short1_stage2",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.short_1_1,
+		self.stages.short_1_2
 	}
 	self.jobs.short1.briefing_event = "pln_sh11_cbf_01"
 	self.jobs.short1.debrief_event = nil
@@ -3949,16 +4013,8 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.short2.region = "street"
 	self.jobs.short2.jc = 10
 	self.jobs.short2.chain = {
-		{
-			level_id = "short2_stage1",
-			type_id = "heist_type_assault",
-			type = "d"
-		},
-		{
-			level_id = "short2_stage2b",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.short_2_1,
+		self.stages.short_2_2
 	}
 	self.jobs.short2.briefing_event = "pln_sh21_cbf_01"
 	self.jobs.short2.debrief_event = nil
@@ -3985,6 +4041,18 @@ function NarrativeTweakData:init(tweak_data)
 		{job = "short1"},
 		{job = "short2"}
 	}
+	self.stages.chill = {
+		level_id = "chill",
+		type_id = "heist_type_assault",
+		type = "d",
+		mission_filter = {1}
+	}
+	self.stages.chill_combat = {
+		level_id = "chill_combat",
+		type_id = "heist_type_assault",
+		type = "d",
+		mission_filter = {2}
+	}
 	self.jobs.chill = {}
 	self.jobs.chill.name_id = "heist_chill"
 	self.jobs.chill.briefing_id = "heist_chill_crimenet"
@@ -3992,12 +4060,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.chill.region = "street"
 	self.jobs.chill.jc = 30
 	self.jobs.chill.chain = {
-		{
-			level_id = "chill",
-			type_id = "heist_type_assault",
-			type = "d",
-			mission_filter = {1}
-		}
+		self.stages.chill
 	}
 	self.jobs.chill.briefing_event = "pln_sh21_cbf_01"
 	self.jobs.chill.debrief_event = nil
@@ -4029,12 +4092,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.chill_combat.region = "street"
 	self.jobs.chill_combat.jc = 30
 	self.jobs.chill_combat.chain = {
-		{
-			level_id = "chill_combat",
-			type_id = "heist_type_assault",
-			type = "d",
-			mission_filter = {2}
-		}
+		self.stages.chill_combat
 	}
 	self.jobs.chill_combat.briefing_event = "pln_sfr_cbf_01"
 	self.jobs.chill_combat.debrief_event = nil
@@ -4061,6 +4119,11 @@ function NarrativeTweakData:init(tweak_data)
 		to = chill_combat_marker_dot_color_to,
 		speed = 10
 	}
+	self.stages.friend = {
+		level_id = "friend",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.friend = {}
 	self.jobs.friend.name_id = "heist_friend"
 	self.jobs.friend.briefing_id = "heist_friend_crimenet"
@@ -4069,11 +4132,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.friend.jc = 30
 	self.jobs.friend.dlc = "friend"
 	self.jobs.friend.chain = {
-		{
-			level_id = "friend",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.friend
 	}
 	self.jobs.friend.briefing_event = "Play_butcher_fri_cbf_01"
 	self.jobs.friend.debrief_event = {
@@ -4125,6 +4184,11 @@ function NarrativeTweakData:init(tweak_data)
 		35000,
 		35000
 	}
+	self.stages.moon = {
+		level_id = "moon",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.moon = {}
 	self.jobs.moon.name_id = "heist_moon"
 	self.jobs.moon.briefing_id = "heist_moon_crimenet"
@@ -4132,11 +4196,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.moon.region = "street"
 	self.jobs.moon.jc = 30
 	self.jobs.moon.chain = {
-		{
-			level_id = "moon",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.moon
 	}
 	self.jobs.moon.briefing_event = "vld_moon_cbf_01"
 	self.jobs.moon.debrief_event = nil
@@ -4186,6 +4246,11 @@ function NarrativeTweakData:init(tweak_data)
 		17800,
 		17800
 	}
+	self.stages.spa = {
+		level_id = "spa",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.spa = {}
 	self.jobs.spa.name_id = "heist_spa"
 	self.jobs.spa.briefing_id = "heist_spa_crimenet"
@@ -4195,11 +4260,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.spa.region = "street"
 	self.jobs.spa.jc = 30
 	self.jobs.spa.chain = {
-		{
-			level_id = "spa",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.spa
 	}
 	self.jobs.spa.briefing_event = "pln_spa_cbf_01"
 	self.jobs.spa.debrief_event = nil
@@ -4250,6 +4311,11 @@ function NarrativeTweakData:init(tweak_data)
 		30000,
 		30000
 	}
+	self.stages.fish = {
+		level_id = "fish",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.fish = {}
 	self.jobs.fish.name_id = "heist_fish"
 	self.jobs.fish.briefing_id = "heist_fish_crimenet"
@@ -4258,11 +4324,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.fish.region = "street"
 	self.jobs.fish.jc = 30
 	self.jobs.fish.chain = {
-		{
-			level_id = "fish",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.fish
 	}
 	self.jobs.fish.briefing_event = "cha_fish_cbf_01"
 	self.jobs.fish.debrief_event = nil
@@ -4309,6 +4371,11 @@ function NarrativeTweakData:init(tweak_data)
 		15000,
 		15000
 	}
+	self.stages.flat = {
+		level_id = "flat",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.flat = {}
 	self.jobs.flat.name_id = "heist_flat"
 	self.jobs.flat.briefing_id = "heist_flat_crimenet"
@@ -4316,11 +4383,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.flat.region = "street"
 	self.jobs.flat.jc = 30
 	self.jobs.flat.chain = {
-		{
-			level_id = "flat",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.flat
 	}
 	self.jobs.flat.briefing_event = "pln_flt_cbf_01"
 	self.jobs.flat.debrief_event = nil
@@ -4369,6 +4432,11 @@ function NarrativeTweakData:init(tweak_data)
 		30500,
 		30500
 	}
+	self.stages.help = {
+		level_id = "help",
+		type_id = "heist_type_assault",
+		type = "d"
+	}
 	self.jobs.help = {}
 	self.jobs.help.name_id = "heist_help"
 	self.jobs.help.briefing_id = "heist_help_crimenet"
@@ -4376,11 +4444,7 @@ function NarrativeTweakData:init(tweak_data)
 	self.jobs.help.region = "street"
 	self.jobs.help.jc = 30
 	self.jobs.help.chain = {
-		{
-			level_id = "help",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
+		self.stages.help
 	}
 	self.jobs.help.briefing_event = "pln_hlp_cbf_01"
 	self.jobs.help.debrief_event = nil
@@ -4410,6 +4474,8 @@ function NarrativeTweakData:init(tweak_data)
 		900000,
 		900000
 	}
+	self.jobs.help.objective_stinger = "hlp_stinger_objectivecomplete"
+	self.jobs.help.is_halloween_level = true
 	self.jobs.help.contract_visuals = {}
 	self.jobs.help.contract_visuals.min_mission_xp = {
 		14000,
@@ -4429,8 +4495,6 @@ function NarrativeTweakData:init(tweak_data)
 		8507150,
 		8507150
 	}
-	self.jobs.help.objective_stinger = "hlp_stinger_objectivecomplete"
-	self.jobs.help.is_halloween_level = true
 	self._jobs_index = {
 		"jewelry_store",
 		"four_stores",

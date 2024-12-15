@@ -632,6 +632,9 @@ function PlayerInventory:all_out_of_ammo()
 	return true
 end
 
+function PlayerInventory:anim_cbk_spawn_character_mask(unit)
+end
+
 function PlayerInventory:anim_clbk_equip_exit(unit)
 	self:set_mask_visibility(true)
 end

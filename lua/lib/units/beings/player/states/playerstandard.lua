@@ -734,6 +734,10 @@ function PlayerStandard:_update_movement(t, dt)
 	end
 	local cur_pos = pos_new or self._pos
 	self:_update_network_jump(cur_pos, false)
+	self:_update_network_position(t, dt, cur_pos, pos_new)
+end
+
+function PlayerStandard:_update_network_position(t, dt, cur_pos, pos_new)
 	local move_dis = mvector3.distance_sq(cur_pos, self._last_sent_pos)
 	if self:is_network_move_allowed() and (22500 < move_dis or 400 < move_dis and (t - self._last_sent_pos_t > 1.5 or not pos_new)) then
 		self._ext_network:send("action_walk_nav_point", cur_pos)
@@ -912,7 +916,8 @@ function PlayerStandard:_get_max_walk_speed(t)
 	if managers.player:has_activate_temporary_upgrade("temporary", "increased_movement_speed") then
 		multiplier = multiplier * managers.player:temporary_upgrade_value("temporary", "increased_movement_speed", 1)
 	end
-	return movement_speed * multiplier
+	local final_speed = movement_speed * multiplier
+	return final_speed
 end
 
 function PlayerStandard:_start_action_steelsight(t)

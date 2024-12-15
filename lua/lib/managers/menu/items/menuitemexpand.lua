@@ -118,7 +118,7 @@ function MenuItemExpand:collaps(node, row_item)
 	local need_repos = false
 	for i, eitem in ipairs(self._items) do
 		local type = eitem:type()
-		if (type == "expand" or type == "weapon_expand" or type == "weapon_upgrade_expand") and eitem:expanded() then
+		if (type == "expand" or type == "weapon_expand") and eitem:expanded() then
 			eitem:toggle()
 			node:_reload_expand(eitem)
 		end

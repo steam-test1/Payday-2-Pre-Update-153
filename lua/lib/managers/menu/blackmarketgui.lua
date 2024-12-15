@@ -1846,7 +1846,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 	self._pages = #self._data > 1 or self._data.show_tabs
 	local grid_size = self._panel:h() - 70
 	local grid_h_mul = self._data.panel_grid_h_mul or GRID_H_MUL
-	local grid_panel_w = self._panel:w() * WIDTH_MULTIPLIER
+	local grid_panel_w = self._panel:w() * WIDTH_MULTIPLIER * (self._data.panel_grid_w_mul or 1)
 	local grid_panel_h = grid_size * grid_h_mul
 	local square_w = grid_panel_w / 3
 	local square_h = grid_panel_h / 3
@@ -4282,6 +4282,7 @@ function BlackMarketGui:show_stats()
 	local name = weapon and weapon.weapon_id or self._slot_data.name
 	local category = self._slot_data.category
 	local slot = self._slot_data.slot
+	local hide_stats = false
 	local value = 0
 	local tweak_stats = tweak_data.weapon.stats
 	local modifier_stats = tweak_data.weapon[name] and tweak_data.weapon[name].stats_modifiers
@@ -4886,7 +4887,9 @@ function BlackMarketGui:show_stats()
 		end
 	end
 	modslist_panel:set_top(y + 10)
-	self._stats_panel:show()
+	if not hide_stats then
+		self._stats_panel:show()
+	end
 end
 
 function BlackMarketGui:_start_rename_item(category, slot)
@@ -5688,7 +5691,7 @@ function BlackMarketGui:update_info_text()
 			updated_texts[2].text = managers.weapon_factory:get_weapon_name_by_weapon_id(slot_data.weapon_id)
 		end
 		if not slot_data.unlocked then
-			local safe = self:get_safe_for_cosmetic(slot_data.name)
+			local safe = self:get_safe_for_economy_item(slot_data.name)
 			safe = safe and safe.name_id or "invalid skin"
 			local macros = {
 				safe = managers.localization:text(safe)
@@ -5729,7 +5732,7 @@ function BlackMarketGui:update_info_text()
 				name = slot_data.name_localized
 			})
 			updated_texts[1].resource_color = tweak_data.screen_colors.text
-			if slot_data.cosmetic_id then
+			if slot_data.category == "weapon_skins" then
 				updated_texts[1].text = ""
 				local name_string = ""
 				if slot_data.weapon_id then
@@ -12253,26 +12256,19 @@ function BlackMarketGui:reload()
 	self:_post_reload()
 end
 
-function BlackMarketGui:get_safe_for_cosmetic(cosmetic_id)
-	local find_safe_name = function(cosmetic_id)
+function BlackMarketGui:get_safe_for_economy_item(id)
+	local find_safe_name = function(id)
 		for safe_id, safe_data in pairs(tweak_data.economy.contents) do
-			if safe_data.contains.weapon_skins then
-				for _, skin_id in ipairs(safe_data.contains.weapon_skins) do
-					if cosmetic_id == skin_id then
-						return safe_id
-					end
-				end
-			end
-			if safe_data.contains.contents then
-				for _, skin_id in ipairs(safe_data.contains.contents) do
-					if cosmetic_id == skin_id then
+			for category, tbl in pairs(safe_data.contains) do
+				for _, item_id in ipairs(tbl) do
+					if id == item_id then
 						return safe_id
 					end
 				end
 			end
 		end
 	end
-	local safe_id = find_safe_name(cosmetic_id)
+	local safe_id = find_safe_name(id)
 	for content_id, safe_data in pairs(tweak_data.economy.contents) do
 		if safe_data.contains.contents and table.contains(safe_data.contains.contents, safe_id) then
 			safe_id = content_id

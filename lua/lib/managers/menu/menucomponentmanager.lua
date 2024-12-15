@@ -32,9 +32,8 @@ require("lib/managers/menu/NewHeistsGui")
 MenuComponentManager = MenuComponentManager or class()
 
 function MenuComponentManager:init()
-	self._ws = Overlay:gui():create_screen_workspace()
+	self._ws = managers.gui_data:create_saferect_workspace()
 	self._fullscreen_ws = managers.gui_data:create_fullscreen_16_9_workspace()
-	managers.gui_data:layout_workspace(self._ws)
 	self._main_panel = self._ws:panel():panel()
 	self._requested_textures = {}
 	self._block_texture_requests = false

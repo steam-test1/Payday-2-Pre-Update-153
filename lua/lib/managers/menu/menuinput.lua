@@ -17,12 +17,11 @@ function MenuInput:init(logic, ...)
 	self._item_input_action_map[MenuItemFriend.TYPE] = callback(self, self, "input_item")
 	self._item_input_action_map[MenuItemCustomizeController.TYPE] = callback(self, self, "input_customize_controller")
 	self._item_input_action_map[MenuItemExpand.TYPE] = callback(self, self, "input_expand")
-	self._item_input_action_map[MenuItemWeaponExpand.TYPE] = callback(self, self, "input_expand")
-	self._item_input_action_map[MenuItemWeaponUpgradeExpand.TYPE] = callback(self, self, "input_expand")
 	self._item_input_action_map[MenuItemDivider.TYPE] = callback(self, self, "input_item")
 	self._item_input_action_map[MenuItemColoredDivider.TYPE] = callback(self, self, "input_item")
 	self._item_input_action_map[MenuItemInput.TYPE] = callback(self, self, "input_item")
 	self._item_input_action_map[MenuItemTextBox.TYPE] = callback(self, self, "input_item")
+	self._item_input_action_map[MenuItemDummy.TYPE] = callback(self, self, "input_item")
 	self._callback_map = {}
 	self._callback_map.mouse_moved = {}
 	self._callback_map.mouse_pressed = {}
@@ -169,13 +168,13 @@ function MenuInput:mouse_moved(o, x, y, mouse_ws)
 		local inside_item_panel_parent = node_gui:item_panel_parent():inside(x, y)
 		for _, row_item in pairs(node_gui.row_items) do
 			if row_item.item:parameters().pd2_corner then
-				if row_item.gui_text:inside(x, y) and self._logic:get_item(row_item.name).TYPE ~= "divider" then
+				if row_item.gui_text:inside(x, y) and not self._logic:get_item(row_item.name).no_mouse_select then
 					select_item = row_item.name
 					select_row_item = row_item
 				end
 			elseif inside_item_panel_parent and row_item.gui_panel:inside(x, y) then
 				local item = self._logic:get_item(row_item.name)
-				if item and item.TYPE ~= "divider" then
+				if item and not item.no_mouse_select then
 					select_item = row_item.name
 					select_row_item = row_item
 				elseif not item then
@@ -352,7 +351,7 @@ function MenuInput:mouse_pressed(o, button, x, y)
 							return node_gui.mouse_pressed and node_gui:mouse_pressed(button, x, y)
 						end
 					end
-				elseif not (row_item.gui_panel:inside(x, y) and node_gui._item_panel_parent:inside(x, y)) or row_item.type == "divider" then
+				elseif not (row_item.gui_panel:inside(x, y) and node_gui._item_panel_parent:inside(x, y)) or row_item.no_mouse_select then
 				elseif row_item.type == "slider" then
 					self:post_event("slider_grab")
 					if row_item.gui_slider_marker:inside(x, y) then

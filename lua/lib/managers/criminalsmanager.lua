@@ -539,3 +539,21 @@ function CriminalsManager:get_team_ai_character(index)
 	end
 	return char_name
 end
+
+function CriminalsManager:save_current_character_names()
+	Global.team_ai = Global.team_ai or {}
+	local index = 1
+	local players = {}
+	for _, data in pairs(self._characters) do
+		if data.ai then
+			Global.team_ai[index] = data.name
+			index = index + 1
+		elseif data.taken and alive(data.unit) and not data.unit:base().is_local_player then
+			table.insert(players, data.name)
+		end
+	end
+	for _, name in pairs(players) do
+		Global.team_ai[index] = name
+		index = index + 1
+	end
+end

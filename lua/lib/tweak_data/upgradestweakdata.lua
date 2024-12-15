@@ -11665,3 +11665,21 @@ function UpgradesTweakData:_tti_weapon_definitions()
 		dlc = "spa"
 	}
 end
+
+function UpgradesTweakData:_siltstone_weapon_definitions()
+	self.definitions.siltstone = {
+		category = "weapon",
+		weapon_id = "siltstone",
+		factory_id = "wpn_fps_snp_siltstone",
+		dlc = "grv"
+	}
+end
+
+function UpgradesTweakData:_flint_weapon_definitions()
+	self.definitions.flint = {
+		category = "weapon",
+		weapon_id = "flint",
+		factory_id = "wpn_fps_ass_flint",
+		dlc = "grv"
+	}
+end

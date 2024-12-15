@@ -6598,9 +6598,41 @@ function BlackMarketManager:equip_weapon_in_game(category, slot)
 end
 
 function BlackMarketManager:get_reload_time(weapon_id)
+	local failure = function(err)
+		Application:error("[BlackMarketManager:get_reload_time] " .. tostring(err) .. [[
+
+Returning 1 to avoid crashing.]])
+		return 1, 1
+	end
+	if not weapon_id then
+		return failure("no weapon id given")
+	end
+	local tweak = tweak_data.weapon[weapon_id]
+	if not tweak then
+		return failure("invalid weapon id: " .. tostring(weapon_id))
+	end
+	if tweak.timers.reload_empty then
+		return tweak.timers.reload_empty, tweak.timers.reload_not_empty
+	elseif tweak.timers.shotgun_reload_shell then
+		local empty = 0
+		local tactical = 0
+		empty = tweak.timers.shotgun_reload_shell * tweak.CLIP_AMMO_MAX
+		empty = empty + tweak.timers.shotgun_reload_first_shell_offset + tweak.timers.shotgun_reload_enter
+		empty = empty + tweak.timers.shotgun_reload_exit_empty
+		tactical = tweak.timers.shotgun_reload_shell
+		tactical = tactical + tweak.timers.shotgun_reload_first_shell_offset + tweak.timers.shotgun_reload_enter
+		tactical = tactical + tweak.timers.shotgun_reload_exit_not_empty
+		return empty, tactical
+	else
+		return self:get_reload_animation_time(weapon_id), self:get_reload_animation_time(weapon_id)
+	end
+	return failure("no reload time found!")
+end
+
+function BlackMarketManager:get_reload_animation_time(weapon_id)
 	if not weapon_id then
 		Application:error([[
-[BlackMarketManager:get_reload_time] no weapon id given!
+[BlackMarketManager:get_reload_animation_time] no weapon id given!
 Returning 1 to avoid crashing.]])
 		return 1
 	end

@@ -2710,7 +2710,7 @@ function MenuSceneManager:_safe_result_recieved(error, items_new, items_removed)
 end
 
 function MenuSceneManager:load_safe_result_content(result, ready_clbk)
-	local item_data = tweak_data.blackmarket[result.category][result.entry]
+	local item_data = (tweak_data.economy[result.category] or tweak_data.blackmarket[result.category])[result.entry]
 	self._safe_result_content_data = {
 		result = result,
 		item_data = item_data,

@@ -90,6 +90,11 @@ function SpecialObjectiveUnitElement:post_init(...)
 	end
 end
 
+function SpecialObjectiveUnitElement:destroy(...)
+	SpecialObjectiveUnitElement.super.destroy(self, ...)
+	self:stop_test_element()
+end
+
 function SpecialObjectiveUnitElement:test_element()
 	if not managers.navigation:is_data_ready() then
 		EWS:message_box(Global.frame_panel, "Can't test spawn unit without ready navigation data (AI-graph)", "Spawn", "OK,ICON_ERROR", Vector3(-1, -1, 0))
@@ -157,8 +162,11 @@ function SpecialObjectiveUnitElement:stop_test_element()
 	for _, enemy in ipairs(self._enemies) do
 		enemy:set_slot(0)
 	end
+	if self._start_test_t then
+		print("Stop test time", Application:time() - self._start_test_t or 0)
+		self._start_test_t = nil
+	end
 	self._enemies = {}
-	print("Stop test time", self._start_test_t and Application:time() - self._start_test_t or 0)
 end
 
 function SpecialObjectiveUnitElement:draw_links(t, dt, selected_unit, all_units)

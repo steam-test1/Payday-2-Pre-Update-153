@@ -55,7 +55,8 @@ function MenuNodeEconomySafe:_safe_result_recieved(error, items_new, items_remov
 	end
 	local load_start_time = Application:time()
 	local result = items_new[1]
-	local entry_data = tweak_data.blackmarket[result.category][result.entry]
+	print("result.category: ", result.category, tweak_data.economy[result.category], tweak_data.blackmarket[result.category])
+	local entry_data = (tweak_data.economy[result.category] or tweak_data.blackmarket[result.category])[result.entry]
 	if entry_data.rarity ~= "legendary" and entry_data.rarity ~= "epic" then
 		managers.menu:set_cash_safe_scene_done(true, true)
 	end
@@ -472,7 +473,7 @@ function MenuNodeEconomySafe:_build_result_panel()
 	if self.safe_rect_panel:child("result_panel") then
 		self.safe_rect_panel:remove(self.safe_rect_panel:child("result_panel"))
 	end
-	local item_data = tweak_data.blackmarket[self._result.category][self._result.entry]
+	local item_data = (tweak_data.economy[self._result.category] or tweak_data.blackmarket[self._result.category])[self._result.entry]
 	local rarity_data = tweak_data.economy.rarities[item_data.rarity]
 	local safe_rect_pixels = managers.gui_data:scaled_size()
 	local quality_data = tweak_data.economy.qualities[self._result.quality]
@@ -507,42 +508,44 @@ function MenuNodeEconomySafe:_build_result_panel()
 	managers.menu_component:make_color_text(name, rarity_data.color)
 	if self._result.bonus then
 		local bonus_data = item_data.bonus and tweak_data.economy.bonuses[item_data.bonus]
-		local bonuses = item_data.bonus and tweak_data.economy:get_bonus_icons(item_data.bonus) or {}
-		local _, _, w, h = name:text_rect()
-		local bonus_bitmap
-		local x = w + 16
-		for i = #bonuses, 1, -1 do
-			local texture_path = bonuses[i]
-			bonus_bitmap = self._result_panel:bitmap({
-				name = "bonus",
-				texture = texture_path,
-				x = 0,
+		if bonus_data then
+			local bonuses = item_data.bonus and tweak_data.economy:get_bonus_icons(item_data.bonus) or {}
+			local _, _, w, h = name:text_rect()
+			local bonus_bitmap
+			local x = w + 16
+			for i = #bonuses, 1, -1 do
+				local texture_path = bonuses[i]
+				bonus_bitmap = self._result_panel:bitmap({
+					name = "bonus",
+					texture = texture_path,
+					x = 0,
+					y = 0,
+					h = 16,
+					w = 16,
+					layer = 1
+				})
+				bonus_bitmap:set_x(x)
+				bonus_bitmap:set_center_y(self._result_panel:h() - h / 2)
+				x = bonus_bitmap:right() + 1
+			end
+			local bonus_value = (not bonus_data.exp_multiplier or not (bonus_data.exp_multiplier * 100 - 100 .. "%")) and bonus_data.money_multiplier and bonus_data.money_multiplier * 100 - 100 .. "%"
+			local bonus_title = bonus_data and managers.localization:to_upper_text(bonus_data.name_id, {team_bonus = bonus_value}) or ""
+			local bonus_text = self._result_panel:text({
+				name = "bonus_text",
+				text = bonus_title,
+				x = 2,
 				y = 0,
-				h = 16,
-				w = 16,
-				layer = 1
+				font_size = 24,
+				align = "left",
+				halign = "left",
+				vertical = "bottom",
+				font = self.font,
+				layer = 1,
+				color = Color.white,
+				blend_mode = "add"
 			})
-			bonus_bitmap:set_x(x)
-			bonus_bitmap:set_center_y(self._result_panel:h() - h / 2)
-			x = bonus_bitmap:right() + 1
+			bonus_text:set_x(bonus_bitmap:right() + 4)
 		end
-		local bonus_value = (not bonus_data.exp_multiplier or not (bonus_data.exp_multiplier * 100 - 100 .. "%")) and bonus_data.money_multiplier and bonus_data.money_multiplier * 100 - 100 .. "%"
-		local bonus_title = bonus_data and managers.localization:to_upper_text(bonus_data.name_id, {team_bonus = bonus_value}) or ""
-		local bonus_text = self._result_panel:text({
-			name = "bonus_text",
-			text = bonus_title,
-			x = 2,
-			y = 0,
-			font_size = 24,
-			align = "left",
-			halign = "left",
-			vertical = "bottom",
-			font = self.font,
-			layer = 1,
-			color = Color.white,
-			blend_mode = "add"
-		})
-		bonus_text:set_x(bonus_bitmap:right() + 4)
 	end
 end
 

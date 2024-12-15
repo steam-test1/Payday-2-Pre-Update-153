@@ -95,6 +95,20 @@ function CustomSafehouseTweakData:_init_heisters(tweak_data)
 	self.heisters.dragan = clone(self.heisters.base)
 	self.heisters.dragan.character_material = "var_mtr_dragan"
 	self.heisters.dragan.voice = self:get_voice(tweak_data, "dragan")
+	self.heisters.dragan.anim_lines = {
+		{
+			sound_event = "Play_{voice}_idle_phone",
+			line_type = "idle",
+			anim_value = "talking_on_phone"
+		}
+	}
+	self.heisters.dragan.anim_blocks = {
+		{
+			block = "answering",
+			anim_value = "talking_on_phone"
+		}
+	}
+	self.heisters.dragan.idle_limit = 1
 	self.heisters.jacket = clone(self.heisters.base)
 	self.heisters.jacket.character_material = "var_mtr_jacket"
 	self.heisters.jacket.voice = self:get_voice(tweak_data, "jacket")
@@ -124,7 +138,9 @@ function CustomSafehouseTweakData:_init_heisters(tweak_data)
 	self.heisters.terry.voice = self:get_voice(tweak_data, "chico")
 	self.heisters.butler = clone(self.heisters.base)
 	self.heisters.butler.character_material = ""
-	self.heisters.butler.voice = self:get_voice(tweak_data, "butler")
+	self.heisters.vlad = clone(self.heisters.base)
+	self.heisters.vlad.voice = "rb1"
+	self.heisters.vlad.idle_offset = 20
 end
 
 function CustomSafehouseTweakData:get_voice(tweak_data, character_name)

@@ -2374,14 +2374,18 @@ function CivilianHeisterInteractionExt:update_character()
 	self._lines = {}
 	self._lines.answering = self:get_character_voice_line("answer_lines", character_tier)
 	self._lines.idle = self:get_character_voice_line("idle_lines", character_tier)
+	self._lines.anim = {}
+	self._lines.anim.answering = self:get_character_anim_voice_lines("answering", character_tier)
+	self._lines.anim.idle = self:get_character_anim_voice_lines("idle", character_tier)
+	self._idle_count = 0
 end
 
-function CivilianHeisterInteractionExt:get_character_voice_line(key, character_tier)
+function CivilianHeisterInteractionExt:get_character_voice_line(key, character_tier, anim)
 	local voice_lines = self.heister_data[key] or {}
 	if #voice_lines == 0 then
 		return nil
 	end
-	local current_line = voice_lines[1]
+	local current_line = not anim and voice_lines[1]
 	for idx, data in ipairs(voice_lines) do
 		local use = not data.requirements
 		if not use then
@@ -2400,11 +2404,45 @@ function CivilianHeisterInteractionExt:get_character_voice_line(key, character_t
 			end
 			use = pass_tier and pass_trophy
 		end
+		use = use and anim == (data.anim_value and true)
 		if use and current_line.priority <= data.priority then
 			current_line = data
 		end
 	end
 	return string.gsub(current_line.sound_event, "{voice}", tostring(self.heister_data.voice))
+end
+
+function CivilianHeisterInteractionExt:get_character_anim_voice_lines(key, character_tier)
+	local voice_lines = {}
+	for _, line in ipairs(self.heister_data.anim_lines or {}) do
+		if line.line_type == key then
+			table.insert(voice_lines, line)
+		end
+	end
+	local lines = {}
+	for idx, data in ipairs(voice_lines) do
+		local use = not data.requirements
+		if not use then
+			local pass_tier, pass_trophy
+			pass_tier = not data.requirements.tiers or table.contains(data.requirements.tiers, character_tier)
+			pass_trophy = not data.requirements.trophies
+			if not pass_trophy then
+				pass_trophy = true
+				for _, trophy_id in ipairs(data.requirements.trophies) do
+					local trophy = managers.custom_safehouse:get_trophy(trophy_id)
+					if not trophy or not trophy.completed then
+						pass_trophy = false
+						break
+					end
+				end
+			end
+			use = pass_tier and pass_trophy
+		end
+		if use then
+			lines[data.anim_value] = string.gsub(data.sound_event, "{voice}", tostring(self.heister_data.voice))
+		end
+	end
+	return lines
 end
 
 function CivilianHeisterInteractionExt:_interact_blocked(player)
@@ -2422,6 +2460,13 @@ function CivilianHeisterInteractionExt:interact(player)
 		end
 	end
 	self._unit:sound():set_interactor_voice(player_voice)
+	local answer_line = self._lines.answering
+	for anim_value, line in pairs(self._lines.anim.answering) do
+		if self._unit:anim_data()[anim_value] then
+			answer_line = line
+			break
+		end
+	end
 	local character_name = CriminalsManager.convert_new_to_old_character_workname(self.character)
 	local character_tier = managers.custom_safehouse:get_room_current_tier(character_name)
 	if self:is_daily_contractor() and not self:is_daily_accepted() then
@@ -2431,13 +2476,26 @@ function CivilianHeisterInteractionExt:interact(player)
 		self._accepted = true
 		self:_play_voice_line(self._lines.answering)
 	else
-		self:_play_voice_line(self._lines.answering)
+		self:_play_voice_line(answer_line)
 	end
 	return true
 end
 
 function CivilianHeisterInteractionExt:_play_idle_line()
-	self:_play_voice_line(self._lines.idle)
+	for _, anim_block in ipairs(self.heister_data.anim_blocks or {}) do
+		if anim_block.block == "idle" and self._unit:anim_data()[anim_block.anim_value] then
+			return
+		end
+	end
+	local idle_line = self._lines.idle
+	for anim_value, line in pairs(self._lines.anim.idle) do
+		if self._unit:anim_data()[anim_value] then
+			idle_line = line
+			break
+		end
+	end
+	self:_play_voice_line(idle_line)
+	self._idle_count = self._idle_count + 1
 end
 
 function CivilianHeisterInteractionExt:_play_voice_line(snd_event)
@@ -2453,6 +2511,11 @@ function CivilianHeisterInteractionExt:_reenable_ext()
 end
 
 function CivilianHeisterInteractionExt:update(unit, t, dt)
+	for _, anim_block in ipairs(self.heister_data.anim_blocks or {}) do
+		if anim_block.block == "answering" and self._active == self._unit:anim_data()[anim_block.anim_value] then
+			self:set_active(not self._active)
+		end
+	end
 	if not self._has_set_skin then
 		self:update_character()
 		if self:is_daily_contractor() and not self:is_daily_accepted() then
@@ -2481,6 +2544,9 @@ function CivilianHeisterInteractionExt:update(unit, t, dt)
 			can_play_idle_line = false
 		end
 	end
+	if self.heister_data.idle_limit then
+		can_play_idle_line = self.heister_data.idle_limit > self._idle_count
+	end
 	if can_play_idle_line and not self._is_speaking then
 		self._next_idle_time = self._next_idle_time or t + math.rand(self.heister_data.idle_line_time[1], self.heister_data.idle_line_time[2])
 		if self._next_idle_time and t >= self._next_idle_time then
@@ -2505,23 +2571,45 @@ function CivilianHeisterInteractionExt:play_minigame_vo(state)
 	self:_play_voice_line("Play_" .. tostring(self.heister_data.voice) .. "_minigame")
 end
 
-ButlerInteractionExt = ButlerInteractionExt or class(UseInteractionExt)
+SafehouseNPCInteractionExt = SafehouseNPCInteractionExt or class(UseInteractionExt)
 
-function ButlerInteractionExt:init(unit)
+function SafehouseNPCInteractionExt:init(unit)
 	self.character = self.character or "dallas"
 	self.tweak_data = string.format("%s_%s", self.tweak_data, self.character)
 	self.heister_data = tweak_data.safehouse.heisters[self.character]
-	ButlerInteractionExt.super.init(self, unit)
+	SafehouseNPCInteractionExt.super.init(self, unit)
+	self._answer_line = string.format("Play_%s_answering", self.character)
 end
 
-function ButlerInteractionExt:_interact_blocked(player)
+function SafehouseNPCInteractionExt:_interact_blocked(player)
 	return self._unit:sound():speaking(TimerManager:game():time())
 end
 
-function ButlerInteractionExt:interact(player)
-	ButlerInteractionExt.super.super.interact(self, player)
-	self._unit:sound():say("Play_btl_answering", false, true)
+function SafehouseNPCInteractionExt:interact(player)
+	SafehouseNPCInteractionExt.super.super.interact(self, player)
+	local player_character = managers.criminals:character_name_by_unit(player)
+	local player_voice = "rb1"
+	for idx, data in ipairs(tweak_data.criminals.characters) do
+		if data.name == player_character then
+			player_voice = data.static_data.voice
+			break
+		end
+	end
+	self._unit:sound():set_interactor_voice(player_voice)
+	self._unit:sound():say(self._answer_line, false, true)
+	self:set_active(false)
 	return true
+end
+
+function SafehouseNPCInteractionExt:_reenable_ext()
+	self:set_active(true)
+end
+
+ButlerInteractionExt = ButlerInteractionExt or class(SafehouseNPCInteractionExt)
+
+function ButlerInteractionExt:init(unit)
+	ButlerInteractionExt.super.init(self, unit)
+	self._answer_line = "Play_btl_answering"
 end
 
 AccessFBIFilesInteractionExt = AccessFBIFilesInteractionExt or class(UseInteractionExt)

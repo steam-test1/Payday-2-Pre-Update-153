@@ -3030,3 +3030,13 @@ function UnitNetworkHandler:run_spawn_unit_sequence(parent_unit, parent_extensio
 	end
 	parent_unit[parent_extension_name](parent_unit):_spawn_run_sequence(unit_id, sequence_name)
 end
+
+function UnitNetworkHandler:run_local_push_child_unit(parent_unit, parent_extension_name, unit_id, mass, pow, vec3_a, vec3_b)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	if not alive(parent_unit) then
+		return
+	end
+	parent_unit[parent_extension_name](parent_unit):local_push_child_unit(unit_id, mass, pow, vec3_a, vec3_b)
+end

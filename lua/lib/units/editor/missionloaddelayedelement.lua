@@ -1,15 +1,15 @@
-MissionUnloadStaticElement = MissionUnloadStaticElement or class(MissionElement)
-MissionUnloadStaticElement.SAVE_UNIT_POSITION = false
-MissionUnloadStaticElement.SAVE_UNIT_ROTATION = false
+MissionLoadDelayedElement = MissionLoadDelayedElement or class(MissionElement)
+MissionLoadDelayedElement.SAVE_UNIT_POSITION = false
+MissionLoadDelayedElement.SAVE_UNIT_ROTATION = false
 
-function MissionUnloadStaticElement:init(unit)
-	MissionUnloadStaticElement.super.init(self, unit)
+function MissionLoadDelayedElement:init(unit)
+	MissionLoadDelayedElement.super.init(self, unit)
 	self._units = {}
 	self._hed.unit_ids = {}
 	table.insert(self._save_values, "unit_ids")
 end
 
-function MissionUnloadStaticElement:layer_finished()
+function MissionLoadDelayedElement:layer_finished()
 	MissionElement.layer_finished(self)
 	for _, id in pairs(self._hed.unit_ids) do
 		local unit = managers.worlddefinition:get_unit_on_load(id, callback(self, self, "save_unit_data"))
@@ -17,13 +17,13 @@ function MissionUnloadStaticElement:layer_finished()
 	end
 end
 
-function MissionUnloadStaticElement:save_unit_data(unit)
+function MissionLoadDelayedElement:save_unit_data(unit)
 	if unit then
 		self._units[unit:unit_data().unit_id] = unit
 	end
 end
 
-function MissionUnloadStaticElement:update_selected()
+function MissionLoadDelayedElement:update_selected()
 	for _, id in pairs(self._hed.unit_ids) do
 		if not alive(self._units[id]) then
 			table.delete(self._hed.unit_ids, id)
@@ -48,7 +48,7 @@ function MissionUnloadStaticElement:update_selected()
 	end
 end
 
-function MissionUnloadStaticElement:update_unselected(t, dt, selected_unit, all_units)
+function MissionLoadDelayedElement:update_unselected(t, dt, selected_unit, all_units)
 	for _, id in pairs(self._hed.unit_ids) do
 		if not alive(self._units[id]) then
 			table.delete(self._hed.unit_ids, id)
@@ -63,8 +63,8 @@ function MissionUnloadStaticElement:update_unselected(t, dt, selected_unit, all_
 	end
 end
 
-function MissionUnloadStaticElement:draw_links_unselected(...)
-	MissionUnloadStaticElement.super.draw_links_unselected(self, ...)
+function MissionLoadDelayedElement:draw_links_unselected(...)
+	MissionLoadDelayedElement.super.draw_links_unselected(self, ...)
 	for id, unit in pairs(self._units) do
 		local params = {
 			from_unit = self._unit,
@@ -78,7 +78,7 @@ function MissionUnloadStaticElement:draw_links_unselected(...)
 	end
 end
 
-function MissionUnloadStaticElement:update_editing()
+function MissionLoadDelayedElement:update_editing()
 	local ray = managers.editor:unit_by_raycast({
 		sample = true,
 		mask = managers.slot:get_mask("all"),
@@ -89,7 +89,7 @@ function MissionUnloadStaticElement:update_editing()
 	end
 end
 
-function MissionUnloadStaticElement:select_unit()
+function MissionLoadDelayedElement:select_unit()
 	local ray = managers.editor:unit_by_raycast({
 		sample = true,
 		mask = managers.slot:get_mask("all"),
@@ -105,26 +105,29 @@ function MissionUnloadStaticElement:select_unit()
 	end
 end
 
-function MissionUnloadStaticElement:_remove_unit(unit)
+function MissionLoadDelayedElement:_remove_unit(unit)
 	self._units[unit:unit_data().unit_id] = nil
 	table.delete(self._hed.unit_ids, unit:unit_data().unit_id)
 end
 
-function MissionUnloadStaticElement:_add_unit(unit)
+function MissionLoadDelayedElement:_add_unit(unit)
 	self:save_unit_data(unit)
 	table.insert(self._hed.unit_ids, unit:unit_data().unit_id)
 end
 
-function MissionUnloadStaticElement:add_triggers(vc)
+function MissionLoadDelayedElement:add_triggers(vc)
 	vc:add_trigger(Idstring("lmb"), callback(self, self, "select_unit"))
 end
 
-function MissionUnloadStaticElement:add_unit_list_btn()
+function MissionLoadDelayedElement:add_unit_list_btn()
 	local function filter_p(unit)
 		if self._units[unit:unit_data().unit_id] then
 			return false
 		end
-		return managers.editor:layer("Statics"):category_map()[unit:type():s()]
+		if unit:unit_data().delayed_load then
+			return managers.editor:layer("Statics"):category_map()[unit:type():s()]
+		end
+		return false
 	end
 	
 	local dialog = SelectUnitByNameModal:new("Add Unit", filter_p)
@@ -135,7 +138,7 @@ function MissionUnloadStaticElement:add_unit_list_btn()
 	end
 end
 
-function MissionUnloadStaticElement:remove_unit_list_btn()
+function MissionLoadDelayedElement:remove_unit_list_btn()
 	local function filter_p(unit)
 		return self._units[unit:unit_data().unit_id]
 	end
@@ -148,7 +151,7 @@ function MissionUnloadStaticElement:remove_unit_list_btn()
 	end
 end
 
-function MissionUnloadStaticElement:_build_panel(panel, panel_sizer)
+function MissionLoadDelayedElement:_build_panel(panel, panel_sizer)
 	self:_create_panel()
 	panel = panel or self._panel
 	panel_sizer = panel_sizer or self._panel_sizer
