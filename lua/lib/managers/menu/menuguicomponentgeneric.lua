@@ -87,7 +87,7 @@ function MenuGuiComponentGeneric:_setup(is_start_page, component_data)
 		layer = self._init_layer
 	})
 	self:_setup_panel_size()
-	if self._data.close_contract_gui == nil or self._data.close_contract_gui then
+	if self._data.close_contract_gui then
 		managers.menu_component:close_contract_gui()
 	end
 	self:_add_page_title()
@@ -241,6 +241,9 @@ function MenuGuiComponentGeneric:_add_panels()
 			2
 		}
 	})
+	if self._data.outline_data and self._data.outline_data.layer then
+		self._outline_box:set_layer(self._data.outline_data.layer)
+	end
 end
 
 function MenuGuiComponentGeneric:_add_tabs()
@@ -365,6 +368,9 @@ function MenuGuiComponentGeneric:set_active_page(new_index, play_sound)
 			2
 		}
 	})
+	if self._data.outline_data and self._data.outline_data.layer then
+		self._outline_box:set_layer(self._data.outline_data.layer)
+	end
 	self._active_page = new_index
 	self:update_legend()
 	return true

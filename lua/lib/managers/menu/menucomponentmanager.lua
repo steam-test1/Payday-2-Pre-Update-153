@@ -29,6 +29,7 @@ require("lib/managers/menu/pages/CustomSafehouseGuiPageTrophies")
 require("lib/managers/menu/MutatorsListGui")
 require("lib/managers/menu/pages/MutatorsCategoryPage")
 require("lib/managers/menu/NewHeistsGui")
+require("lib/managers/menu/CommunityChallengesGui")
 MenuComponentManager = MenuComponentManager or class()
 
 function MenuComponentManager:init()
@@ -199,6 +200,10 @@ function MenuComponentManager:init()
 	self._active_components.debug_quicklaunch = {
 		create = callback(self, self, "create_debug_quicklaunch_gui"),
 		close = callback(self, self, "close_debug_quicklaunch_gui")
+	}
+	self._active_components.community_challenges = {
+		create = callback(self, self, "create_community_challenges_gui"),
+		close = callback(self, self, "close_community_challenges_gui")
 	}
 	self._alive_components = {}
 end
@@ -466,6 +471,9 @@ function MenuComponentManager:update(t, dt)
 	end
 	if self._blackmarket_gui then
 		self._blackmarket_gui:update(t, dt)
+	end
+	if self._community_challenges_gui then
+		self._community_challenges_gui:update(t, dt)
 	end
 	self:run_on_all_live_components("update", t, dt)
 end
@@ -3878,4 +3886,17 @@ function MenuComponentManager:create_debug_quicklaunch_gui(node)
 end
 
 function MenuComponentManager:close_debug_quicklaunch_gui()
+end
+
+function MenuComponentManager:create_community_challenges_gui(node)
+	self:close_community_challenges_gui()
+	self._community_challenges_gui = CommunityChallengesGui:new(self._ws:panel())
+	self._community_challenges_gui:set_leftbottom(0, 477)
+end
+
+function MenuComponentManager:close_community_challenges_gui()
+	if self._community_challenges_gui then
+		self._community_challenges_gui:close()
+		self._community_challenges_gui = nil
+	end
 end

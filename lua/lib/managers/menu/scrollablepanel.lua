@@ -111,6 +111,10 @@ function ScrollablePanel:init(parent_panel, name, data)
 	self._thread = self._panel:animate(self._update, self)
 end
 
+function ScrollablePanel:alive()
+	return alive(self:panel())
+end
+
 function ScrollablePanel:panel()
 	return self._panel
 end

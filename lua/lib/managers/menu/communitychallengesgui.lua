@@ -446,7 +446,7 @@ function CommunityChallengeProgressBar:_make_progress_text()
 end
 
 function CommunityChallengeProgressBar:_make_value_string(number)
-	local num_string = tostring(number)
+	local num_string = string.format("%.0f", number)
 	local len = #num_string
 	local i = len
 	local result = ""
@@ -589,6 +589,7 @@ function CommunityChallengesGui:init(parent)
 		self:consume_community_challenges_data(challenge_data)
 	end
 	managers.community_challenges:add_event_listener(Message.OnCommunityChallengeDataReceived, "CommunityChallengesGui:consume_community_challenges_data", callback(self, self, "consume_community_challenges_data"))
+	managers.community_challenges:fetch_community_challenge_data()
 end
 
 function CommunityChallengesGui:close()

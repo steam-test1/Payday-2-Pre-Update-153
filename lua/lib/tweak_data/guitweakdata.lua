@@ -4674,6 +4674,11 @@ function GuiTweakData:init()
 	}
 	self.new_heists = {}
 	table.insert(self.new_heists, {
+		name_id = "menu_nh_search_for_kento",
+		texture_path = "guis/textures/pd2/new_heists/search_for_kento",
+		url = "http://www.searchforkento.com/"
+	})
+	table.insert(self.new_heists, {
 		name_id = "menu_nh_gage_russian_weapon_pack",
 		texture_path = "guis/textures/pd2/new_heists/gage_russian_weapon_pack",
 		url = "http://www.overkillsoftware.com/games/russianweaponpack/"

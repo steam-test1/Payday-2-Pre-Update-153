@@ -31,6 +31,7 @@ require("lib/managers/FeedBackManager")
 require("lib/managers/TimeSpeedManager")
 require("lib/managers/ExplosionManager")
 require("lib/managers/DOTManager")
+require("lib/units/ArmorSkinExt")
 core:import("SequenceManager")
 if Application:editor() then
 	require("lib/utils/dev/tools/WorldEditor")

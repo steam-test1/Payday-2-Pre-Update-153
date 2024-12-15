@@ -624,19 +624,6 @@ function TweakData:init()
 	self.ai_carry = {}
 	self.ai_carry.throw_distance = 500
 	self.ai_carry.throw_force = 100
-	self.ammo = {}
-	self.ammo.ricochet = {}
-	self.ammo.ricochet.max_ricochets = 5
-	self.ammo.ricochet.angles = {0, 175}
-	self.ammo.ricochet.spread_angle = {10, 30}
-	self.ammo.ricochet.autohit = {
-		MIN_RATIO = 0.6,
-		MAX_RATIO = 1,
-		INIT_RATIO = 0.6,
-		far_dis = 50000,
-		far_angle = 60,
-		near_angle = 60
-	}
 	self.EFFECT_QUALITY = 0.5
 	if SystemInfo:platform() == Idstring("X360") then
 		self.EFFECT_QUALITY = 0.5
@@ -858,6 +845,36 @@ function TweakData:init()
 	self.gui.DIALOG_LAYER = 1100
 	self.gui.MOUSE_LAYER = 1200
 	self.gui.SAVEFILE_LAYER = 1400
+	self.community_challenges_stage_multiplier = 1.5
+	self.community_challenges = {
+		{
+			statistic_id = "type_kills_law",
+			text_id = "menu_community_challenges_kills",
+			base_target = 7500000
+		},
+		{
+			statistic_id = "sb17_challenge_1",
+			text_id = "menu_community_challenges_hours_played",
+			base_target = 20000,
+			display_multiplier = 2.7777778E-4
+		},
+		{
+			statistic_id = "sb17_challenge_2",
+			text_id = "menu_community_challenges_money_earned",
+			base_target = 1.8E11
+		},
+		{
+			statistic_id = "sb17_challenge_3",
+			text_id = "menu_community_challenges_hours_played_team",
+			base_target = 10000,
+			display_multiplier = 2.7777778E-4
+		},
+		{
+			statistic_id = "sb17_challenge_4",
+			text_id = "menu_community_challenges_swing_dancing",
+			base_target = 15000
+		}
+	}
 	self.overlay_effects = {}
 	self.overlay_effects.spectator = {
 		blend_mode = "normal",

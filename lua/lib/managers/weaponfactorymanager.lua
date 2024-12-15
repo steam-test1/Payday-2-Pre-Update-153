@@ -434,10 +434,6 @@ function WeaponFactoryManager:_get_override_parts(factory_id, blueprint)
 	return overridden
 end
 
-function WeaponFactoryManager:_get_forced_parts(factory_id)
-	return tweak_data.weapon.factory[factory_id].forced_parts or {}
-end
-
 function WeaponFactoryManager:_update_task(task)
 	if not alive(task.p_unit) then
 		return true
@@ -464,26 +460,6 @@ function WeaponFactoryManager:_add_parts(p_unit, factory_id, factory_weapon, blu
 	local parts = {}
 	local need_parent = {}
 	local override = self:_get_override_parts(factory_id, blueprint)
-	for _, forced_id in ipairs(self:_get_forced_parts(factory_id)) do
-		local replaced = false
-		local exists = false
-		for i, part_id in ipairs(blueprint) do
-			if part_id == forced_id then
-				exists = true
-				break
-			end
-			local part_data = self:_part_data(part_id, factory_id)
-			local forced_data = self:_part_data(forced_id, factory_id)
-			if part_data.type == forced_data.type then
-				blueprint[i] = forced_id
-				replaced = true
-				break
-			end
-		end
-		if not exists and not replaced then
-			table.insert(blueprint, forced_id)
-		end
-	end
 	if self._uses_tasks and not skip_queue then
 		table.insert(self._tasks, {
 			done_cb = done_cb,

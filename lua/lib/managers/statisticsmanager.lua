@@ -319,6 +319,11 @@ function StatisticsManager:_setup(reset)
 		killed_by_weapon = {},
 		killed_by_grenade = {}
 	}
+	self._defaults.killed_types = {
+		law = 0,
+		gangster = 0,
+		civilians = 0
+	}
 	self._defaults.shots_by_weapon = {}
 	self._defaults.used_weapons = {}
 	self._defaults.sessions = {count = 0, time = 0}
@@ -880,6 +885,11 @@ function StatisticsManager:publish_to_steam(session, success, completion)
 			}
 		end
 	end
+	for type_name, kill_count in pairs(session.killed_types) do
+		if 0 < kill_count then
+			stats["type_kills_" .. type_name] = {type = "int", value = kill_count}
+		end
+	end
 	if completion == "win_begin" then
 		if Network:is_server() then
 			if Global.game_settings.kick_option == 1 then
@@ -1357,6 +1367,9 @@ function StatisticsManager:killed(data)
 	type.head_shots = type.head_shots + (data.head_shot and 1 or 0)
 	type.melee = type.melee + (by_melee and 1 or 0)
 	type.explosion = type.explosion + (by_explosion and 1 or 0)
+	if data.type then
+		self._global.session.killed_types[data.type] = self._global.session.killed_types[data.type] + 1
+	end
 	self._global.session.killed.total.count = self._global.session.killed.total.count + 1
 	self._global.session.killed.total.head_shots = self._global.session.killed.total.head_shots + (data.head_shot and 1 or 0)
 	self._global.session.killed.total.melee = self._global.session.killed.total.melee + (by_melee and 1 or 0)

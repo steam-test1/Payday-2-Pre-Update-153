@@ -1612,6 +1612,9 @@ function InteractionTweakData:init(tweak_data)
 	self.raise_balloon.action_text_id = "hud_action_raise_balloon"
 	self.raise_balloon.start_active = false
 	self.raise_balloon.timer = 2
+	self.raise_balloon.sound_start = "bar_winch_box_start"
+	self.raise_balloon.sound_interupt = "bar_winch_box_cancel"
+	self.raise_balloon.sound_done = "bar_winch_box_finish"
 	self.stn_int_place_camera = {}
 	self.stn_int_place_camera.text_id = "hud_int_place_camera"
 	self.stn_int_place_camera.start_active = true

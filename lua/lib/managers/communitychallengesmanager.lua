@@ -1,13 +1,13 @@
 CommunityChallengesManager = CommunityChallengesManager or class()
 CommunityChallengesManager.FULL_CREW_COUNT = 4
-CommunityChallengesManager.PER_CHALLENGE_BONUS = 0.05
+CommunityChallengesManager.PER_CHALLENGE_BONUS = 0.01
 
 function CommunityChallengesManager:init()
 	self._full_crew_start = nil
 	self._full_crew_time = 0
 	self._active_bonus = 0
 	self._message_system = MessageSystem:new()
-	self:fetch_community_challenge_data()
+	self._next_stat_request_limit = 0
 end
 
 function CommunityChallengesManager:update(t, dt)
@@ -16,41 +16,50 @@ end
 
 function CommunityChallengesManager:fetch_community_challenge_data()
 	if SystemInfo:distribution() == Idstring("STEAM") then
-		local challenges_progress_url = "http://fbi.overkillsoftware.com/_jpn/jpnstats.json"
-		local response_callback = callback(self, self, "_on_challenge_progress_response")
-		Steam:http_request(challenges_progress_url, response_callback, Idstring("CommunityChallengesManager"):key())
+		local now = Application:time()
+		if now <= self._next_stat_request_limit then
+			return
+		end
+		self._next_stat_request_limit = now + 10
+		Steam:sa_handler():refresh_global_stats_cb(callback(self, self, "_on_global_stats_refresh_complete"))
+		Steam:sa_handler():refresh_global_stats()
 	end
 end
 
-function CommunityChallengesManager:_on_challenge_progress_response(success, response)
-	print("[Debug] CommunityChallengesManager:_on_challenge_progress_response, success:", success)
+function CommunityChallengesManager:_on_global_stats_refresh_complete(success)
 	if not success then
 		return
 	end
 	self._challenge_data = {}
 	self._active_bonus = 0
-	local find_challenge_tweak = function(statistic_id)
-		for _, challenge in ipairs(tweak_data.community_challenges) do
-			if challenge.statistic_id == statistic_id then
-				return challenge
-			end
+	local get_60_day_stat = function(stat_name)
+		local stat_value = 0
+		for _, value in ipairs(Steam:sa_handler():get_global_stat(stat_name, 60)) do
+			stat_value = stat_value + value
+		end
+		return stat_value
+	end
+	local better_ceil = function(number)
+		local mod = number % 1
+		if 0 < mod then
+			return number - mod + 1
+		else
+			return number
 		end
 	end
 	local ratio = tweak_data.community_challenges_stage_multiplier
-	for key, value in string.gmatch(response, "\"([%a%d_]+)\"%s*:%s*\"(%d+)\"") do
-		local challenge_tweak = find_challenge_tweak(key)
-		if challenge_tweak then
-			local base = challenge_tweak.base_target
-			local total_value = math.floor(tonumber(value * (challenge_tweak.display_multiplier or 1)))
-			local stage = math.floor(math.log(1 - total_value * ((1 - ratio) / base)) / math.log(ratio))
-			local stage_base_value = math.floor(base * ((1 - math.pow(ratio, stage)) / (1 - ratio)))
-			self._challenge_data[key] = {
-				stage = stage + 1,
-				current_value = total_value - stage_base_value,
-				target_value = math.ceil(base * math.pow(ratio, stage))
-			}
-			self._active_bonus = self._active_bonus + stage * CommunityChallengesManager.PER_CHALLENGE_BONUS
-		end
+	for _, challenge in ipairs(tweak_data.community_challenges) do
+		local base = challenge.base_target
+		local stat_value = get_60_day_stat(challenge.statistic_id)
+		local total_value = math.floor(tonumber(stat_value * (challenge.display_multiplier or 1)))
+		local stage = math.floor(math.log(1 - total_value * ((1 - ratio) / base)) / math.log(ratio))
+		local stage_base_value = math.floor(base * ((1 - math.pow(ratio, stage)) / (1 - ratio)))
+		self._challenge_data[challenge.statistic_id] = {
+			stage = stage + 1,
+			current_value = total_value - stage_base_value,
+			target_value = better_ceil(base * math.pow(ratio, stage))
+		}
+		self._active_bonus = self._active_bonus + stage * CommunityChallengesManager.PER_CHALLENGE_BONUS
 	end
 	self._message_system:notify(Message.OnCommunityChallengeDataReceived, nil, self._challenge_data)
 end
@@ -94,7 +103,7 @@ function CommunityChallengesManager:on_mission_end(success)
 end
 
 function CommunityChallengesManager:on_achievement_awarded(id)
-	if id == "gage4_3" then
+	if id == "kosugi_5" then
 		self:increment_custom_statistic("sb17_challenge_4", 1)
 	end
 end

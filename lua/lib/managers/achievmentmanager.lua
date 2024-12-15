@@ -224,6 +224,7 @@ function AchievmentManager:award(id)
 	end
 	managers.challenge:on_achievement_awarded(id)
 	managers.custom_safehouse:on_achievement_awarded(id)
+	managers.community_challenges:on_achievement_awarded(id)
 	if managers.mutators:are_achievements_disabled() then
 		return
 	end

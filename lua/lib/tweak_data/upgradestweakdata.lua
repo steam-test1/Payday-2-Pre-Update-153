@@ -1504,8 +1504,8 @@ function UpgradesTweakData:_init_pd2_values()
 			{}
 		},
 		body_expertise = {
-			{"33%"},
-			{"100%"}
+			{"20%"},
+			{"60%"}
 		},
 		kick_starter = {
 			{"20%"},

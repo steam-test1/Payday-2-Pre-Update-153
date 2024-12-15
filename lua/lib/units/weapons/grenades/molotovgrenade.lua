@@ -6,8 +6,7 @@ function MolotovGrenade:init(unit)
 end
 
 function MolotovGrenade:clbk_impact(tag, unit, body, other_unit, other_body, position, normal, collision_velocity, velocity, other_velocity)
-	self._unit:push_at(1, normal * math.random(50, 100), self._unit:position())
-	return
+	self:_detonate(normal)
 end
 
 function MolotovGrenade:_detonate(normal)

@@ -27,17 +27,18 @@ function FragGrenade:update(unit, t, dt)
 end
 
 function FragGrenade:clbk_impact(tag, unit, body, other_unit, other_body, position, normal, collision_velocity, velocity, other_velocity, new_velocity, direction, damage, ...)
-	self._unit:push_at(1, normal * math.random(100, 1000), self._unit:position())
-	do return end
+	local reflect = other_unit and other_unit:vehicle() and other_unit:vehicle():is_active()
+	if reflect then
+		return
+	end
 	self:_detonate(tag, unit, body, other_unit, other_body, position, normal, collision_velocity, velocity, other_velocity, new_velocity, direction, damage, ...)
 end
 
 function FragGrenade:_on_collision(col_ray)
-	self._unit:push_at(1, col_ray.normal * math.random(100, 1000), self._unit:position())
-	if alive(col_ray.unit) and col_ray.unit:character_damage() then
-		self:_detonate()
+	local reflect = col_ray and col_ray.unit:vehicle() and col_ray.unit:vehicle():is_active()
+	if reflect then
+		return
 	end
-	do return end
 	self:_detonate()
 end
 
