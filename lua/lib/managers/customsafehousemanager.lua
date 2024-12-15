@@ -109,14 +109,16 @@ function CustomSafehouseManager:load(data, version)
 			local trophy = self:get_trophy(saved_trophy.id)
 			if trophy then
 				local objectives_complete = true
-				for _, objective in ipairs(trophy.objectives) do
-					for _, saved_objective in ipairs(saved_trophy.objectives) do
-						if objective.achievement_id ~= nil and objective.achievement_id == saved_objective.achievement_id or objective.progress_id ~= nil and objective.progress_id == saved_objective.progress_id then
-							for _, save_value in ipairs(objective.save_values) do
-								objective[save_value] = saved_objective[save_value] or objective[save_value]
-							end
-							if not objective.completed then
-								objectives_complete = false
+				if not saved_trophy.completed then
+					for _, objective in ipairs(trophy.objectives) do
+						for _, saved_objective in ipairs(saved_trophy.objectives) do
+							if objective.achievement_id ~= nil and objective.achievement_id == saved_objective.achievement_id or objective.progress_id ~= nil and objective.progress_id == saved_objective.progress_id then
+								for _, save_value in ipairs(objective.save_values) do
+									objective[save_value] = saved_objective[save_value] or objective[save_value]
+								end
+								if not saved_objective.completed then
+									objectives_complete = false
+								end
 							end
 						end
 					end

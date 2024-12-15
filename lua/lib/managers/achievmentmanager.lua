@@ -326,14 +326,9 @@ end
 
 function AchievmentManager:award_x360(id)
 	print("[AchievmentManager:award_x360] Awarded X360 achievment", id)
-	
-	local function x360_unlock_result(result)
+	local x360_unlock_result = function(result)
 		print("result", result)
-		if result then
-			managers.achievment:_give_reward(id)
-		end
 	end
-	
 	XboxLive:award_achievement(managers.user:get_platform_id(), self:get_info(id).id, x360_unlock_result)
 end
 

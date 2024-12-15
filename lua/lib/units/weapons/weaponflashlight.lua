@@ -28,9 +28,7 @@ function WeaponFlashLight:init(unit)
 end
 
 function WeaponFlashLight:is_haunted()
-	local job_id = managers.job and managers.job:current_job_id()
-	local tweak = job_id and tweak_data.narrative.jobs[job_id]
-	return tweak and tweak.is_halloween_level
+	return false
 end
 
 function WeaponFlashLight:set_npc()

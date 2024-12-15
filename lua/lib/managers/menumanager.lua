@@ -126,6 +126,7 @@ function MenuManager:init(is_start_menu)
 	managers.user:add_setting_changed_callback("use_lightfx", callback(self, self, "lightfx_changed"), true)
 	managers.user:add_setting_changed_callback("effect_quality", callback(self, self, "effect_quality_changed"), true)
 	managers.user:add_setting_changed_callback("dof_setting", callback(self, self, "dof_setting_changed"), true)
+	managers.user:add_setting_changed_callback("chromatic_setting", callback(self, self, "chromatic_setting_changed"), true)
 	managers.user:add_setting_changed_callback("fps_cap", callback(self, self, "fps_limit_changed"), true)
 	managers.user:add_setting_changed_callback("net_packet_throttling", callback(self, self, "net_packet_throttling_changed"), true)
 	managers.user:add_setting_changed_callback("net_forwarding", callback(self, self, "net_forwarding_changed"), true)
@@ -147,6 +148,7 @@ function MenuManager:init(is_start_menu)
 	self:invert_camera_y_changed("invert_camera_y", nil, managers.user:get_setting("invert_camera_y"))
 	self:southpaw_changed("southpaw", nil, managers.user:get_setting("southpaw"))
 	self:dof_setting_changed("dof_setting", nil, managers.user:get_setting("dof_setting"))
+	self:chromatic_setting_changed("chromatic_setting", nil, managers.user:get_setting("chromatic_setting"))
 	managers.system_menu:add_active_changed_callback(callback(self, self, "system_menu_active_changed"))
 	self._sound_source = SoundDevice:create_source("MenuManager")
 	managers.user:add_setting_changed_callback("video_ao", callback(self, self, "video_ao_changed"), true)
@@ -587,6 +589,10 @@ end
 
 function MenuManager:dof_setting_changed(name, old_value, new_value)
 	managers.environment_controller:set_dof_setting(new_value)
+end
+
+function MenuManager:chromatic_setting_changed(name, old_value, new_value)
+	managers.environment_controller:set_chromatic_enabled(new_value == "standard")
 end
 
 function MenuManager:fps_limit_changed(name, old_value, new_value)
@@ -1997,6 +2003,11 @@ end
 function MenuCallbackHandler:toggle_dof_setting(item)
 	local dof_setting = item:value() == "on"
 	managers.user:set_setting("dof_setting", dof_setting and "standard" or "none")
+end
+
+function MenuCallbackHandler:toggle_chromatic_setting(item)
+	local chromatic_setting = item:value() == "on"
+	managers.user:set_setting("chromatic_setting", chromatic_setting and "standard" or "none")
 end
 
 function MenuCallbackHandler:hold_to_steelsight(item)
@@ -7846,6 +7857,14 @@ function MenuOptionInitiator:modify_adv_video(node)
 			option_value = "on"
 		end
 		dof_setting_item:set_value(option_value)
+	end
+	option_value = "off"
+	local chromatic_setting_item = node:item("toggle_chromatic")
+	if chromatic_setting_item then
+		if managers.user:get_setting("chromatic_setting") ~= "none" then
+			option_value = "on"
+		end
+		chromatic_setting_item:set_value(option_value)
 	end
 	if node:item("choose_ao") then
 		node:item("choose_ao"):set_value(managers.user:get_setting("video_ao"))

@@ -6,6 +6,7 @@ function CoreEnvironmentControllerManager:init()
 	self._DEFAULT_DOF_DISTANCE = 10
 	self._dof_distance = self._DEFAULT_DOF_DISTANCE
 	self._current_dof_distance = self._dof_distance
+	self._chromatic_enabled = true
 	self._base_chromatic_amount = 0.15
 	self._base_contrast = 0.1
 	self._hurt_value = 1
@@ -450,7 +451,11 @@ function CoreEnvironmentControllerManager:set_post_composite(t, dt)
 	end
 	self._material:set_variable(ids_radial_offset, Vector3((self._hit_left - self._hit_right) * 0.2, (self._hit_up - self._hit_down) * 0.2, self._hit_front - self._hit_back + blur_zone_flashbang * 0.1))
 	self._material:set_variable(Idstring("contrast"), self._base_contrast + self._hit_some * 0.25)
-	self._material:set_variable(Idstring("chromatic_amount"), self._base_chromatic_amount + blur_zone_val * 0.3 + flash_1 * 0.5)
+	if self._chromatic_enabled then
+		self._material:set_variable(Idstring("chromatic_amount"), self._base_chromatic_amount + blur_zone_val * 0.3 + flash_1 * 0.5)
+	else
+		self._material:set_variable(Idstring("chromatic_amount"), 0)
+	end
 	self:_update_dof(t, dt)
 	local lut_post = vp:vp():get_post_processor_effect("World", ids_LUT_post)
 	if lut_post then
@@ -842,6 +847,17 @@ end
 
 function CoreEnvironmentControllerManager:set_base_chromatic_amount(base_chromatic_amount)
 	self._base_chromatic_amount = base_chromatic_amount
+end
+
+function CoreEnvironmentControllerManager:set_chromatic_enabled(enabled)
+	self._chromatic_enabled = enabled
+	if self._material then
+		if self._chromatic_enabled then
+			self._material:set_variable(Idstring("chromatic_amount"), self._base_chromatic_amount)
+		else
+			self._material:set_variable(Idstring("chromatic_amount"), 0)
+		end
+	end
 end
 
 function CoreEnvironmentControllerManager:base_chromatic_amount()

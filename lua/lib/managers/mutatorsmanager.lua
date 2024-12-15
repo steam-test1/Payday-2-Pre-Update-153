@@ -34,8 +34,7 @@ function MutatorsManager:init()
 		MutatorEnemyReplacer:new(self),
 		MutatorMediDozer:new(self),
 		MutatorCloakerEffect:new(self),
-		MutatorShieldDozers:new(self),
-		MutatorTitandozers:new(self)
+		MutatorShieldDozers:new(self)
 	}
 	self._active_mutators = {}
 	if Global.mutators and Global.mutators.active_on_load then

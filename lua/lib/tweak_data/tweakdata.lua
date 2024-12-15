@@ -4405,7 +4405,10 @@ Play the full version soon to get your full PAYDAY!]],
 		unit = Idstring("units/pickups/pickup_chavez_key/pickup_chavez_key")
 	}
 	self.pickups.gen_fbi_usb_stick = {
-		unit = Idstring("units/pd2_dlc_short/props/gen_fbi_usb_stick/gen_fbi_usb_stick")
+		unit = Idstring("units/pd2_dlc_friend/props/sfm_fbi_usb_stick/sfm_fbi_usb_stick")
+	}
+	self.pickups.sfm_fbi_usb_stick = {
+		unit = Idstring("units/pd2_dlc_friend/props/sfm_fbi_usb_stick/sfm_fbi_usb_stick")
 	}
 	self.pickups.drill = {
 		unit = Idstring("units/pickups/pickup_drill/pickup_drill")

@@ -119,6 +119,7 @@ function GenericUserManager:setup_setting_map()
 	self:setup_setting(66, "crimenet_filter_contract", -1)
 	self:setup_setting(67, "crimenet_filter_kick", -1)
 	self:setup_setting(68, "crimenet_filter_safehouses", false)
+	self:setup_setting(75, "chromatic_setting", "standard")
 end
 
 function GenericUserManager:setup_setting(id, name, default_value)
@@ -176,6 +177,7 @@ function GenericUserManager:reset_video_setting_map()
 		"brightness",
 		"effect_quality",
 		"dof_setting",
+		"chromatic_setting",
 		"video_animation_lod",
 		"fps_cap",
 		"use_lightfx",

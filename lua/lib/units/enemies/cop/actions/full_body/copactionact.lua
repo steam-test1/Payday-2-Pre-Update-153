@@ -691,6 +691,7 @@ CopActionAct._act_redirects.SO = {
 	"cm_so_boxing_hold_enter",
 	"cm_so_ss_goto_trunk",
 	"cm_so_ss_enter_limo",
+	"so_crawl_var1",
 	"cm_so_blow_torch_take_new",
 	"cm_so_blow_torch_to_work",
 	"cm_so_blow_torch_work",

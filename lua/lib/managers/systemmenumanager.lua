@@ -88,6 +88,30 @@ function GenericSystemMenuManager:add_init_show(data)
 	Global.dialog_manager.init_show_data_list = init_show_data_list
 end
 
+function GenericSystemMenuManager:ps4_add_init_show(data)
+	local init_show_data_list = Global.dialog_manager.init_show_data_list
+	local priority = data.priority or 0
+	cat_print("dialog_manager", "[SystemMenuManager] Adding an init dialog with priority \"" .. tostring(priority) .. "\".")
+	if init_show_data_list then
+		for index = #init_show_data_list, 1, -1 do
+			local next_data = init_show_data_list[index]
+			local next_priority = next_data.priority or 0
+			if priority < next_priority then
+				cat_print("dialog_manager", "[SystemMenuManager] Ignoring request to show init dialog since it had lower priority than the existing priority \"" .. tostring(next_priority) .. "\". Index: " .. tostring(index) .. "/" .. tostring(#init_show_data_list))
+				return false
+			elseif priority > next_priority then
+				cat_print("dialog_manager", "[SystemMenuManager] Removed an already added init dialog with the lower priority of \"" .. tostring(next_priority) .. "\". Index: " .. tostring(index) .. "/" .. tostring(#init_show_data_list))
+				table.remove(init_show_data_list, index)
+			end
+		end
+		table.insert(init_show_data_list, data)
+		Global.dialog_manager.init_show_data_list = init_show_data_list
+	else
+		local success = self:_show_class(data, self.GENERIC_DIALOG_CLASS, self.DIALOG_CLASS, data.force)
+		self:_show_result(success, data)
+	end
+end
+
 function GenericSystemMenuManager:destroy()
 	if alive(self._ws) then
 		Overlay:gui():destroy_workspace(self._ws)

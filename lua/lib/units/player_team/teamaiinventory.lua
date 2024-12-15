@@ -32,6 +32,7 @@ function TeamAIInventory:add_unit_by_name(new_unit_name, equip)
 	setup_data.alert_filter = self._unit:brain():SO_access()
 	new_unit:base():setup(setup_data)
 	self:add_unit(new_unit, equip)
+	new_unit:set_enabled(false)
 end
 
 function TeamAIInventory:_unload_mask()

@@ -4175,64 +4175,6 @@ function NarrativeTweakData:init(tweak_data)
 	}
 	self.jobs.help.objective_stinger = "hlp_stinger_objectivecomplete"
 	self.jobs.help.is_halloween_level = true
-	self.jobs.haunted = {}
-	self.jobs.haunted.name_id = "heist_haunted"
-	self.jobs.haunted.briefing_id = "heist_haunted_crimenet"
-	self.jobs.haunted.contact = "events"
-	self.jobs.haunted.region = "street"
-	self.jobs.haunted.jc = 10
-	self.jobs.haunted.chain = {
-		{
-			level_id = "haunted",
-			type_id = "heist_type_assault",
-			type = "d"
-		}
-	}
-	self.jobs.haunted.briefing_event = nil
-	self.jobs.haunted.debrief_event = nil
-	self.jobs.haunted.crimenet_videos = {
-		"cn_branchbank1",
-		"cn_branchbank2",
-		"cn_branchbank3"
-	}
-	self.jobs.haunted.payout = {
-		20000,
-		30000,
-		40000,
-		70000,
-		80000,
-		90000,
-		100000
-	}
-	self.jobs.haunted.contract_cost = {
-		16000,
-		32000,
-		80000,
-		160000,
-		200000,
-		240000,
-		280000
-	}
-	self.jobs.haunted.contract_visuals = {}
-	self.jobs.haunted.contract_visuals.min_mission_xp = {
-		10000,
-		10000,
-		10000,
-		10000,
-		10000,
-		10000,
-		10000
-	}
-	self.jobs.haunted.contract_visuals.max_mission_xp = {
-		10000,
-		10000,
-		10000,
-		10000,
-		10000,
-		10000,
-		10000
-	}
-	self.jobs.haunted.is_halloween_level = true
 	self._jobs_index = {
 		"jewelry_store",
 		"four_stores",
@@ -4293,8 +4235,7 @@ function NarrativeTweakData:init(tweak_data)
 		"chill",
 		"chill_combat",
 		"flat",
-		"help",
-		"haunted"
+		"help"
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self._jobs_index, "roberts")

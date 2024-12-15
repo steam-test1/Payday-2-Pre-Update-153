@@ -460,7 +460,11 @@ function SavefileManager:_save_done(slot, cache_only, task_data, slot_data, succ
 		ok_button.text = managers.localization:text("dialog_ok")
 		dialog_data.button_list = {ok_button}
 		dialog_data.text = managers.localization:text("dialog_fail_save_game_corrupt")
-		managers.system_menu:show(dialog_data)
+		if SystemInfo:platform() == Idstring("PS4") then
+			managers.system_menu:ps4_add_init_show(dialog_data)
+		else
+			managers.system_menu:show(dialog_data)
+		end
 	end
 end
 

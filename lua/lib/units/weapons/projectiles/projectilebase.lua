@@ -81,7 +81,6 @@ function ProjectileBase:create_sweep_data()
 end
 
 function ProjectileBase:throw(params)
-	Application:stack_dump()
 	self._owner = params.owner
 	local velocity = params.dir
 	local adjust_z = 50
