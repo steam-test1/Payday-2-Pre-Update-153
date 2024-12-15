@@ -27,7 +27,7 @@ function TeamAILogicBase._get_logic_state_from_reaction(data, reaction)
 	end
 end
 
-function TeamAILogicBase.actually_revive(data, revive_unit)
+function TeamAILogicBase.actually_revive(data, revive_unit, show_hint_locally)
 	if revive_unit:interaction() then
 		if revive_unit:interaction():active() then
 			revive_unit:interaction():interact(data.unit)
@@ -36,6 +36,9 @@ function TeamAILogicBase.actually_revive(data, revive_unit)
 		local hint = revive_unit:character_damage():need_revive() and 2 or 3
 		managers.network:session():send_to_peers_synched("sync_teammate_helped_hint", hint, revive_unit, data.unit)
 		revive_unit:character_damage():revive(data.unit)
+		if show_hint_locally then
+			managers.trade:sync_teammate_helped_hint(revive_unit, data.unit, hint)
+		end
 	end
 end
 

@@ -366,6 +366,7 @@ function CommunityChallengeProgressBar:init(parent, config)
 	self._statistic_id = config.statistic_id or ""
 	self._target_value = config.target_value or 0
 	self._current_value = config.current_value or 0
+	self._additional_zeroes = config.additional_zeroes or 0
 	self._value_tween = Tween:new(self, "_current_value")
 	self._width = config.width or 300
 	self._height = 43
@@ -408,6 +409,7 @@ end
 
 function CommunityChallengeProgressBar:config(config)
 	self._target_value = config.target_value or 0
+	self._additional_zeroes = config.additional_zeroes or 0
 	self._value_tween:init(self, "_current_value", {
 		to = config.current_value or 0,
 		duration = 2,
@@ -442,11 +444,17 @@ function CommunityChallengeProgressBar:update(t, dt)
 end
 
 function CommunityChallengeProgressBar:_make_progress_text()
-	return self:_make_value_string(self._current_value) .. " / " .. self:_make_value_string(self._target_value)
+	local current = self:_make_value_string(self._current_value, self._additional_zeroes)
+	local target = self:_make_value_string(self._target_value, self._additional_zeroes)
+	return current .. " / " .. target
 end
 
-function CommunityChallengeProgressBar:_make_value_string(number)
+function CommunityChallengeProgressBar:_make_value_string(number, additional_zeroes)
+	if number == 0 then
+		return "0"
+	end
 	local num_string = string.format("%.0f", number)
+	num_string = num_string .. string.rep("0", additional_zeroes)
 	local len = #num_string
 	local i = len
 	local result = ""
@@ -638,7 +646,7 @@ function CommunityChallengesGui:consume_community_challenges_data(data)
 	end
 	local active_bonus = managers.community_challenges:get_active_experience_bonus()
 	self._total_bonus_text:set_text(managers.localization:to_upper_text("menu_community_challenges_active_bonus", {
-		bonus = active_bonus * 100
+		bonus = math.round(active_bonus * 100)
 	}))
 	self:layout()
 end

@@ -4759,11 +4759,11 @@ function BlackMarketManager:character_sequence_by_character_name(character, peer
 	return tweak_data.blackmarket.characters[character].sequence
 end
 
-function BlackMarketManager:character_mask_on_sequence_by_character_id(character_id, peer_id)
+function BlackMarketManager:character_mask_on_sequence_by_character_id(character_id, peer_id, character_name)
 	if not peer_id and character_id ~= "locked" then
 		return tweak_data.blackmarket.characters[character_id].mask_on_sequence
 	end
-	local character = self:get_preferred_character()
+	local character = character_name or self:get_preferred_character()
 	if managers.network and managers.network:session() and peer_id then
 		local peer = managers.network:session():peer(peer_id)
 		if peer then
@@ -4782,11 +4782,11 @@ function BlackMarketManager:character_mask_on_sequence_by_character_id(character
 	return tweak_data.blackmarket.characters[character].mask_on_sequence
 end
 
-function BlackMarketManager:character_mask_off_sequence_by_character_id(character_id, peer_id)
+function BlackMarketManager:character_mask_off_sequence_by_character_id(character_id, peer_id, character_name)
 	if not peer_id and character_id ~= "locked" then
 		return tweak_data.blackmarket.characters[character_id].mask_off_sequence
 	end
-	local character = self:get_preferred_character()
+	local character = character_name or self:get_preferred_character()
 	if managers.network and managers.network:session() and peer_id then
 		local peer = managers.network:session():peer(peer_id)
 		if peer then

@@ -1335,7 +1335,11 @@ function StatisticsManager:killed_by_anyone(data)
 		if throwable_id then
 			kills_table.killed_by_grenade[throwable_id] = (kills_table.killed_by_grenade[throwable_id] or 0) + 1
 		elseif is_molotov then
-			kills_table.killed_by_grenade.molotov = (kills_table.killed_by_grenade.molotov or 0) + 1
+			if type(is_molotov) == "boolean" then
+				kills_table.killed_by_grenade.molotov = (kills_table.killed_by_grenade.molotov or 0) + 1
+			else
+				kills_table.killed_by_grenade[is_molotov] = (kills_table.killed_by_grenade[is_molotov] or 0) + 1
+			end
 		else
 			self:_add_to_killed_by_weapon(kills_table, name_id, data, false)
 		end

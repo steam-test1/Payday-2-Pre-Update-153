@@ -533,12 +533,17 @@ function CustomSafehouseManager:complete_trophy(trophy_or_id)
 	if trophy and not trophy.completed then
 		trophy.completed = true
 		self:add_completed_trophy(trophy, "trophy")
-		self:add_coins(tweak_data.safehouse.rewards.challenge)
+		if trophy.gives_reward == nil or trophy.gives_reward then
+			self:add_coins(tweak_data.safehouse.rewards.challenge)
+		end
 		self:run_trophy_unlocked_callbacks(trophy.id)
 	end
 end
 
 function CustomSafehouseManager:add_completed_trophy(trophy, trophy_type)
+	if trophy.hidden_in_list then
+		return
+	end
 	local reward = 0
 	if trophy_type == "trophy" then
 		reward = tweak_data.safehouse.rewards.challenge

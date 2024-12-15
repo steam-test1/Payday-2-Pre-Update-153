@@ -101,6 +101,27 @@ require("lib/utils/dev/api/TestAPI")
 script_data = script_data or {}
 game_state_machine = game_state_machine or nil
 Setup = Setup or class(CoreSetup.CoreSetup)
+local next_update_funcs = next_update_funcs or {}
+local next_update_funcs_busy
+
+function call_on_next_update(func, optional_key)
+	local map = next_update_funcs_busy or next_update_funcs
+	if not optional_key then
+		table.insert(map, func)
+	else
+		local key = optional_key == true and func or optional_key
+		map[key] = func
+	end
+end
+
+function call_next_update_functions()
+	next_update_funcs_busy = {}
+	for _, func in pairs(next_update_funcs) do
+		func()
+	end
+	next_update_funcs = next_update_funcs_busy
+	next_update_funcs_busy = nil
+end
 
 function Setup:init_category_print()
 	CoreSetup.CoreSetup.init_category_print(self)
@@ -400,6 +421,7 @@ end
 function Setup:update(t, dt)
 	local main_t, main_dt = TimerManager:main():time(), TimerManager:main():delta_time()
 	self:_upd_unload_packages()
+	call_next_update_functions()
 	managers.weapon_factory:update(t, dt)
 	managers.platform:update(t, dt)
 	managers.user:update(t, dt)

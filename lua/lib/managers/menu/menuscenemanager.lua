@@ -1097,12 +1097,12 @@ function MenuSceneManager:set_character_deployable(deployable_id, unit, peer_id)
 	self._deployable_equipped[peer_id] = deployable_id
 end
 
-function MenuSceneManager:set_character_mask_by_id(mask_id, blueprint, unit, peer_id)
-	mask_id = managers.blackmarket:get_real_mask_id(mask_id, peer_id)
-	local unit_name = managers.blackmarket:mask_unit_name_by_mask_id(mask_id, peer_id)
+function MenuSceneManager:set_character_mask_by_id(mask_id, blueprint, unit, peer_id, character_name)
+	mask_id = managers.blackmarket:get_real_mask_id(mask_id, peer_id, character_name)
+	local unit_name = managers.blackmarket:mask_unit_name_by_mask_id(mask_id, peer_id, character_name)
 	self:set_character_mask(unit_name, unit, peer_id, mask_id, callback(self, self, "clbk_mask_loaded", blueprint))
 	local owner_unit = unit or self._character_unit
-	self:_check_character_mask_sequence(owner_unit, mask_id, peer_id)
+	self:_check_character_mask_sequence(owner_unit, mask_id, peer_id, character_name)
 end
 
 function MenuSceneManager:clbk_mask_loaded(blueprint, mask_unit)
@@ -1236,14 +1236,15 @@ function MenuSceneManager:set_character_equipped_weapon(unit, factory_id, bluepr
 	self:_chk_character_visibility(unit)
 end
 
-function MenuSceneManager:_check_character_mask_sequence(character_unit, mask_id, peer_id)
+function MenuSceneManager:_check_character_mask_sequence(character_unit, mask_id, peer_id, character_name)
+	local character_id = character_name and managers.blackmarket:get_character_id_by_character_name(character_name) or managers.blackmarket:equipped_character()
 	if tweak_data.blackmarket.masks[mask_id].skip_mask_on_sequence then
-		local mask_off_sequence = managers.blackmarket:character_mask_off_sequence_by_character_id(managers.blackmarket:equipped_character(), peer_id)
+		local mask_off_sequence = managers.blackmarket:character_mask_off_sequence_by_character_id(character_id, peer_id, character_name)
 		if mask_off_sequence and character_unit:damage():has_sequence(mask_off_sequence) then
 			character_unit:damage():run_sequence_simple(mask_off_sequence)
 		end
 	else
-		local mask_on_sequence = managers.blackmarket:character_mask_on_sequence_by_character_id(managers.blackmarket:equipped_character(), peer_id)
+		local mask_on_sequence = managers.blackmarket:character_mask_on_sequence_by_character_id(character_id, peer_id, character_name)
 		if mask_on_sequence and character_unit:damage():has_sequence(mask_on_sequence) then
 			character_unit:damage():run_sequence_simple(mask_on_sequence)
 		end

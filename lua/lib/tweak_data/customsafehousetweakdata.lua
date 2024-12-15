@@ -1160,7 +1160,8 @@ function CustomSafehouseTweakData:_init_trophies(tweak_data)
 			self:_progress("trophy_run_matt", 1)
 		},
 		image_id = "safehouse_trophies_preview_yacht",
-		hidden_in_list = true
+		hidden_in_list = true,
+		gives_reward = false
 	})
 	table.insert(self.trophies, {
 		id = "trophy_run_turtle",
