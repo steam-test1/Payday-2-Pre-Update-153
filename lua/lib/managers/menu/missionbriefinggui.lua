@@ -2279,6 +2279,7 @@ function NewLoadoutTab:init(panel, text, i, menu_component_data)
 	NewLoadoutTab.super.init(self, panel, text, i)
 	self._panel:move(0, 5)
 	self._panel:grow(0, -5)
+	self._index = i
 	local player_loadout_data = managers.blackmarket:player_loadout_data()
 	local items = {
 		player_loadout_data.primary,
@@ -3109,7 +3110,7 @@ function MissionBriefingGui:create_asset_tab()
 			texture = assets_names[i][1],
 			w = 512,
 			h = 512,
-			layer = 100
+			layer = 250
 		})
 		local aspect = asset:texture_width() / math.max(asset:texture_height(), 1)
 		local size = math.max(asset:texture_height(), self._panel:h())
@@ -3244,10 +3245,12 @@ function MissionBriefingGui:mouse_pressed(button, x, y)
 		self:close_asset()
 		return
 	end
-	if button == Idstring("mouse wheel down") then
+	local mwheel_down = button == Idstring("mouse wheel down")
+	local mwheel_up = button == Idstring("mouse wheel up")
+	if mwheel_down then
 		self:next_tab(true)
 		return
-	elseif button == Idstring("mouse wheel up") then
+	elseif mwheel_up then
 		self:prev_tab(true)
 		return
 	end
@@ -3659,11 +3662,12 @@ function MissionBriefingGui:reload_loadout()
 	end
 	loadout_data.changing_loadout = nil
 	loadout_data.current_slot = nil
+	local index = self._new_loadout_item._index
 	self._new_loadout_item:destroy()
 	self._new_loadout_item = nil
-	self._items[3] = nil
-	self._new_loadout_item = NewLoadoutTab:new(self._panel, managers.localization:to_upper_text("menu_loadout"), 3, loadout_data)
-	self._items[3] = self._new_loadout_item
+	self._items[index] = nil
+	self._new_loadout_item = NewLoadoutTab:new(self._panel, managers.localization:to_upper_text("menu_loadout"), index, loadout_data)
+	self._items[index] = self._new_loadout_item
 	self:chk_reduce_to_small_font()
 	self:set_tab(self._node:parameters().menu_component_data.selected_tab, true)
 	self._items[self._selected_item]:select(true)

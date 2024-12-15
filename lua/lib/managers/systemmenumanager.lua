@@ -50,9 +50,7 @@ function GenericSystemMenuManager:init()
 end
 
 function GenericSystemMenuManager:init_finalize()
-	local gui = Overlay:gui()
-	self._ws = Overlay:gui():create_screen_workspace()
-	managers.gui_data:layout_1280_workspace(self._ws)
+	self._ws = managers.gui_data:create_1280_workspace()
 	self._ws:hide()
 	if Global.dialog_manager.init_show_data_list then
 		local init_show_data_list = Global.dialog_manager.init_show_data_list
@@ -117,7 +115,7 @@ end
 
 function GenericSystemMenuManager:destroy()
 	if alive(self._ws) then
-		Overlay:gui():destroy_workspace(self._ws)
+		managers.gui_data:destroy_workspace(self._ws)
 		self._ws = nil
 	end
 	if self._controller then

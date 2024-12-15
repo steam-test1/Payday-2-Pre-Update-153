@@ -2754,6 +2754,7 @@ function CoreEditor:do_save(path, dir, save_continents)
 	self:_save_continents_file(dir)
 	self:_save_mission_file(dir)
 	self:_save_cover_ai_data(dir)
+	self:_save_blacklist(dir)
 	self:_save_packages(dir)
 	self:_save_unit_stats(dir)
 	self:_save_bundle_info_files(dir)
@@ -3151,6 +3152,47 @@ function CoreEditor:_save_bundle_info_files(dir)
 	file:puts("\t<include folder=\"" .. cubelights_path .. "\"/>")
 	file:puts("</bundle_info>")
 	SystemFS:close(file)
+end
+
+function CoreEditor:_save_blacklist(dir)
+	local tableSetInsert = function(t, val)
+		for _, v in ipairs(t) do
+			if v == val then
+				return
+			end
+		end
+		table.insert(t, val)
+	end
+	local tableSetContains = function(t, val)
+		for _, v in ipairs(t) do
+			if v == val then
+				return true
+			end
+		end
+		return false
+	end
+	local used_assets = {}
+	local unused_assets = {}
+	local units = World:find_units_quick("all")
+	for _, u in ipairs(units) do
+		if u:unit_data() and u:unit_data().delayed_load then
+			tableSetInsert(unused_assets, u:name())
+		else
+			tableSetInsert(used_assets, u:name())
+		end
+	end
+	local blacklist = {}
+	for _, v in pairs(unused_assets) do
+		if not tableSetContains(used_assets, v) then
+			table.insert(blacklist, v:s())
+		end
+	end
+	if 0 < #blacklist then
+		Application:debug("delayed units saved in the blacklist " .. tostring(#blacklist))
+		local blfile = self:_open_file(dir .. "\\blacklist.blacklist")
+		blfile:puts(ScriptSerializer:to_generic_xml(blacklist))
+		SystemFS:close(blfile)
+	end
 end
 
 function CoreEditor:_get_instances_paths()

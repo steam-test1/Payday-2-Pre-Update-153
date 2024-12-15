@@ -184,8 +184,8 @@ function CriminalsManager:add_character(name, unit, peer_id, ai)
 			data.unit = unit
 			data.peer_id = peer_id
 			data.data.ai = ai or false
-			data.data.mask_obj = tweak_data.blackmarket.masks[data.static_data.ai_mask_id].unit
 			data.data.mask_id = data.static_data.ai_mask_id
+			data.data.mask_obj = managers.blackmarket:mask_unit_name_by_mask_id(data.data.mask_id, nil, name)
 			data.data.mask_blueprint = nil
 			if not ai and unit then
 				local mask_id = managers.network:session():peer(peer_id):mask_id()
@@ -224,8 +224,8 @@ function CriminalsManager:set_unit(name, unit)
 			data.unit = unit
 			managers.hud:remove_mugshot_by_character_name(data.name)
 			data.data.mugshot_id = managers.hud:add_mugshot_by_unit(unit)
-			data.data.mask_obj = tweak_data.blackmarket.masks[data.static_data.ai_mask_id].unit
 			data.data.mask_id = data.static_data.ai_mask_id
+			data.data.mask_obj = managers.blackmarket:mask_unit_name_by_mask_id(data.data.mask_id, nil, name)
 			data.data.mask_blueprint = nil
 			if not data.data.ai then
 				local mask_id = managers.network:session():peer(data.peer_id):mask_id()
@@ -244,6 +244,7 @@ function CriminalsManager:set_unit(name, unit)
 end
 
 function CriminalsManager:set_data(name)
+	print("[CriminalsManager]:set_data", name)
 	for id, data in pairs(self._characters) do
 		if data.name == name then
 			if not data.taken then
@@ -551,9 +552,5 @@ function CriminalsManager:save_current_character_names()
 		elseif data.taken and alive(data.unit) and not data.unit:base().is_local_player then
 			table.insert(players, data.name)
 		end
-	end
-	for _, name in pairs(players) do
-		Global.team_ai[index] = name
-		index = index + 1
 	end
 end

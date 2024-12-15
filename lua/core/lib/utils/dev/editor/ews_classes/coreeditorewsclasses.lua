@@ -466,7 +466,7 @@ function UnitList:append_item(name, t)
 	self._list:set_item(i, 8, t.nr_materials)
 	self._list:set_item(i, 9, t.vertices_per_tris)
 	self._list:set_item(i, 10, tostring(t.instanced))
-	self._list:set_item(i, 11, t.author)
+	self._list:set_item(i, 11, utf8.to_lower(t.author))
 	self._list:set_item(i, 12, t.unit_filename)
 	self._list:set_item(i, 13, t.model_filename)
 	self._list:set_item(i, 14, t.diesel_filename)
@@ -1902,7 +1902,10 @@ function UnitDuality:init(collisions, pos)
 	local complete_sizer = EWS:StaticBoxSizer(self._scrolled_window, "VERTICAL", "Collisions with both position and rotation")
 	if 0 < #collisions.complete then
 		for _, collision in ipairs(collisions.complete) do
-			complete_sizer:add(self:build_collision(collision), 0, 0, "EXPAND")
+			local col = self:build_collision(collision)
+			if col then
+				complete_sizer:add(col, 0, 0, "EXPAND")
+			end
 		end
 	else
 		complete_sizer:add(EWS:StaticText(self._scrolled_window, "No collisions found. Great!", 0, ""), 0, 5, "ALIGN_CENTER_HORIZONTAL,TOP,BOTTOM")
@@ -1911,7 +1914,10 @@ function UnitDuality:init(collisions, pos)
 	local position_sizer = EWS:StaticBoxSizer(self._scrolled_window, "VERTICAL", "Collisions with only position")
 	if 0 < #collisions.only_positions then
 		for _, collision in ipairs(collisions.only_positions) do
-			position_sizer:add(self:build_collision(collision), 0, 0, "EXPAND")
+			local col = self:build_collision(collision)
+			if col then
+				position_sizer:add(col, 0, 0, "EXPAND")
+			end
 		end
 	else
 		position_sizer:add(EWS:StaticText(self._scrolled_window, "No collisions found. Great!", 0, ""), 0, 5, "ALIGN_CENTER_HORIZONTAL,TOP,BOTTOM")
@@ -1934,6 +1940,9 @@ function UnitDuality:build_collision(collision)
 	local u1 = collision.u1
 	local u2 = collision.u2
 	local pos = collision.pos
+	if not (u1 and u2 and u1:unit_data()) or not u2:unit_data() then
+		return
+	end
 	local panel = EWS:Panel(self._scrolled_window, "", "TAB_TRAVERSAL")
 	local sizer = EWS:BoxSizer("HORIZONTAL")
 	panel:set_sizer(sizer)

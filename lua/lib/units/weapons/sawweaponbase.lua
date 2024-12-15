@@ -199,12 +199,22 @@ function SawWeaponBase:can_reload()
 end
 
 SawHit = SawHit or class(InstantBulletBase)
-local tank_name_server = Idstring("units/payday2/characters/ene_bulldozer_1/ene_bulldozer_1")
-local tank_name_client = Idstring("units/payday2/characters/ene_bulldozer_1/ene_bulldozer_1_husk")
+local tank_server_names = {
+	Idstring("units/payday2/characters/ene_bulldozer_1/ene_bulldozer_1"),
+	Idstring("units/payday2/characters/ene_bulldozer_2/ene_bulldozer_2"),
+	Idstring("units/payday2/characters/ene_bulldozer_3/ene_bulldozer_3"),
+	Idstring("units/payday2/characters/ene_bulldozer_4/ene_bulldozer_4")
+}
+local tank_client_names = {
+	Idstring("units/payday2/characters/ene_bulldozer_1/ene_bulldozer_1_husk"),
+	Idstring("units/payday2/characters/ene_bulldozer_2/ene_bulldozer_2_husk"),
+	Idstring("units/payday2/characters/ene_bulldozer_3/ene_bulldozer_3_husk"),
+	Idstring("units/payday2/characters/ene_bulldozer_4/ene_bulldozer_4_husk")
+}
 
 function SawHit:on_collision(col_ray, weapon_unit, user_unit, damage)
 	local hit_unit = col_ray.unit
-	if hit_unit and (hit_unit:name() == tank_name_server or hit_unit:name() == tank_name_client) then
+	if hit_unit and (table.contains(tank_server_names, hit_unit:name()) or table.contains(tank_client_names, hit_unit:name())) then
 		damage = 50
 	end
 	local result = InstantBulletBase.on_collision(self, col_ray, weapon_unit, user_unit, damage)

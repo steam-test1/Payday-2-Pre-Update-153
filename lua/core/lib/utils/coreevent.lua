@@ -171,26 +171,31 @@ function CallbackEventHandler:add(func)
 end
 
 function CallbackEventHandler:remove(func)
-	if not self._callback_map or not self._callback_map[func] then
+	if not self._callback_map or self._callback_map[func] == nil then
 		return
 	end
-	if self._next_callback == func then
-		self._next_callback = next(self._callback_map, self._next_callback)
+	if 0 < (self._dispatch_depth or 0) then
+		self._callback_map[func] = false
+		return
 	end
 	self._callback_map[func] = nil
-	if not next(self._callback_map) then
-		self._callback_map = nil
-	end
 end
 
 function CallbackEventHandler:dispatch(...)
-	if self._callback_map then
-		self._next_callback = next(self._callback_map)
-		self._next_callback(...)
-		while self._next_callback do
-			self._next_callback = next(self._callback_map, self._next_callback)
-			if self._next_callback then
-				self._next_callback(...)
+	self._dispatch_depth = (self._dispatch_depth or 0) + 1
+	if not self._callback_map then
+		return
+	end
+	for func, run in pairs(self._callback_map) do
+		if run then
+			func(...)
+		end
+	end
+	self._dispatch_depth = self._dispatch_depth - 1
+	if self._dispatch_depth == 0 then
+		for func, keep in pairs(self._callback_map) do
+			if not keep then
+				self:remove(func)
 			end
 		end
 	end

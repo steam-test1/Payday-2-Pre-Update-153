@@ -152,6 +152,9 @@ end
 function NetworkMatchMaking:get_friends_lobbies()
 	local lobbies = {}
 	local num_updated_lobbies = 0
+	local is_key_valid = function(key)
+		return key ~= "value_missing" and key ~= "value_pending"
+	end
 	local empty = function()
 	end
 	
@@ -257,6 +260,9 @@ function NetworkMatchMaking:search_lobby(friends_only)
 	if not self:_has_callback("search_lobby") then
 		return
 	end
+	local is_key_valid = function(key)
+		return key ~= "value_missing" and key ~= "value_pending"
+	end
 	if friends_only then
 		self:get_friends_lobbies()
 	else
@@ -275,7 +281,8 @@ function NetworkMatchMaking:search_lobby(friends_only)
 						table.insert(info.room_list, {
 							owner_id = lobby:key_value("owner_id"),
 							owner_name = lobby:key_value("owner_name"),
-							room_id = lobby:id()
+							room_id = lobby:id(),
+							owner_level = lobby:key_value("owner_level")
 						})
 						local attributes_data = {
 							numbers = self:_lobby_to_numbers(lobby),

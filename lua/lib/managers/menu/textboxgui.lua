@@ -50,10 +50,10 @@ end
 
 function TextBoxGui:add_background()
 	if alive(self._fullscreen_ws) then
-		Overlay:gui():destroy_workspace(self._fullscreen_ws)
+		managers.gui_data:destroy_workspace(self._fullscreen_ws)
 		self._fullscreen_ws = nil
 	end
-	self._fullscreen_ws = Overlay:gui():create_screen_workspace()
+	self._fullscreen_ws = managers.gui_data:create_fullscreen_workspace()
 	self._background = self._fullscreen_ws:panel():bitmap({
 		name = "bg",
 		texture = "guis/textures/test_blur_df",
@@ -1264,7 +1264,7 @@ function TextBoxGui:close()
 		self._fullscreen_ws:panel():remove(self._background2)
 	end
 	if alive(self._fullscreen_ws) then
-		Overlay:gui():destroy_workspace(self._fullscreen_ws)
+		managers.gui_data:destroy_workspace(self._fullscreen_ws)
 		self._fullscreen_ws = nil
 	end
 end

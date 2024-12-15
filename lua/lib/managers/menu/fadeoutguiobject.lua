@@ -44,7 +44,7 @@ function FadeoutGuiObject:init(params)
 			end
 		end)
 		Application:debug("FadeoutGuiObject: Destroy")
-		Overlay:gui():destroy_workspace(self._ws)
+		managers.gui_data:destroy_workspace(self._ws)
 		table.delete(Global.FadeoutObjects, self)
 	end
 	

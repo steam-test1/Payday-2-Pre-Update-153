@@ -473,6 +473,7 @@ function CarryTweakData:init(tweak_data)
 	self.prototype = {}
 	self.prototype.type = "medium"
 	self.prototype.name_id = "hud_carry_prototype"
+	self.prototype.bag_value = "prototype"
 	self.prototype.visual_unit_name = "units/payday2/characters/npc_acc_loot_bag_1/npc_acc_loot_bag_1"
 	self.prototype.AI_carry = {SO_category = "enemies"}
 	self.master_server = {}

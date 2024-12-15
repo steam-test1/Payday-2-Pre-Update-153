@@ -224,7 +224,7 @@ end
 
 function MenuNodeCreditsGui:close(...)
 	self._credits_panel:stop(self._credits_panel_thread)
-	Overlay:gui():destroy_workspace(self._fullscreen_ws)
+	managers.gui_data:destroy_workspace(self._fullscreen_ws)
 	MenuNodeCreditsGui.super.close(self, ...)
 	managers.music:post_event(managers.music:jukebox_menu_track("mainmenu"))
 end

@@ -536,7 +536,13 @@ function StatisticsTweakData:statistics_table()
 		"spa_01",
 		"spa_02",
 		"spa_03",
-		"spa_04"
+		"spa_04",
+		"grv_01",
+		"grv_02",
+		"grv_03",
+		"grv_04",
+		"grv_01_bodhi",
+		"grv_01_bonnie"
 	}
 	local weapon_list = {
 		"ak5",
@@ -652,7 +658,10 @@ function StatisticsTweakData:statistics_table()
 		"contraband",
 		"contraband_m203",
 		"ray",
-		"tti"
+		"tti",
+		"siltstone",
+		"flint",
+		"coal"
 	}
 	local melee_list = {
 		"weapon",
@@ -734,7 +743,8 @@ function StatisticsTweakData:statistics_table()
 		"brick",
 		"cs",
 		"ostry",
-		"catch"
+		"catch",
+		"oxide"
 	}
 	local grenade_list = {
 		"frag",

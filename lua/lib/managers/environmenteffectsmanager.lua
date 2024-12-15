@@ -11,6 +11,19 @@ function EnvironmentEffectsManager:init()
 	self._camera_rotation = Rotation()
 end
 
+function EnvironmentEffectsManager:set_active_effects(effects)
+	for effect_name, effect in pairs(self._effects) do
+		if not table.contains(effects, effect_name) then
+			if table.contains(self._current_effects, effect) then
+				effect:stop()
+				table.delete(self._current_effects, effect)
+			end
+		else
+			self:use(effect_name)
+		end
+	end
+end
+
 function EnvironmentEffectsManager:update(t, dt)
 	self._camera_position = managers.viewport:get_current_camera_position()
 	self._camera_rotation = managers.viewport:get_current_camera_rotation()
@@ -183,13 +196,17 @@ function LightningEffect:_update_second(t, dt)
 end
 
 function LightningEffect:_set_original_values()
-	self._sky_material:set_variable(Idstring("color0"), self._original_color0)
+	if alive(self._sky_material) then
+		self._sky_material:set_variable(Idstring("color0"), self._original_color0)
+	end
 	Global._global_light:set_color(self._original_light_color)
 	Underlay:set_time(Idstring("sun_horizontal"), self._original_sun_horizontal)
 end
 
 function LightningEffect:_make_lightning()
-	self._sky_material:set_variable(Idstring("color0"), self._intensity_value)
+	if alive(self._sky_material) then
+		self._sky_material:set_variable(Idstring("color0"), self._intensity_value)
+	end
 	Global._global_light:set_color(self._intensity_value)
 	Underlay:set_time(Idstring("sun_horizontal"), self._flash_anim_time)
 end

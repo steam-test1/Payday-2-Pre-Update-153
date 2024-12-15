@@ -182,10 +182,13 @@ function HUDMissionBriefing:init(hud, workspace)
 	self._current_job_data = managers.job:current_job_data()
 	self._current_job_chain = managers.job:current_job_chain_data()
 	self._job_class = self._current_job_data and self._current_job_data.jc or 0
-	local contact_gui = self._background_layer_two:gui(self._current_contact_data.assets_gui, {})
-	local contact_pattern = contact_gui:has_script() and contact_gui:script().pattern
-	if contact_pattern then
-		self._backdrop:set_pattern(contact_pattern, 0.1, "add")
+	local show_contact_gui = true
+	if show_contact_gui then
+		local contact_gui = self._background_layer_two:gui(self._current_contact_data.assets_gui, {})
+		local contact_pattern = contact_gui:has_script() and contact_gui:script().pattern
+		if contact_pattern then
+			self._backdrop:set_pattern(contact_pattern, 0.1, "add")
+		end
 	end
 	local padding_y = 60
 	self._paygrade_panel = self._background_layer_one:panel({
@@ -206,6 +209,7 @@ function HUDMissionBriefing:init(hud, workspace)
 	})
 	local _, _, w, h = pg_text:text_rect()
 	pg_text:set_size(w, h)
+	self._paygrade_text = pg_text
 	local job_stars = managers.job:current_job_stars()
 	local job_and_difficulty_stars = managers.job:current_job_and_difficulty_stars()
 	local difficulty_stars = managers.job:current_difficulty_stars()
@@ -391,6 +395,7 @@ function HUDMissionBriefing:init(hud, workspace)
 	job_overview_text:set_size(w, h)
 	job_overview_text:set_leftbottom(self._job_schedule_panel:left(), pg_text:bottom())
 	job_overview_text:set_y(math.round(job_overview_text:y()))
+	self._job_overview_text = job_overview_text
 	self._paygrade_panel:set_center_y(job_overview_text:center_y())
 	pg_text:set_center_y(job_overview_text:center_y())
 	pg_text:set_y(math.round(pg_text:y()))
@@ -398,9 +403,10 @@ function HUDMissionBriefing:init(hud, workspace)
 		pg_text:move(0, -pg_text:h())
 		self._paygrade_panel:move(0, -pg_text:h())
 	end
+	local text = utf8.to_upper(managers.localization:text(self._current_contact_data.name_id) .. ": " .. managers.localization:text(self._current_job_data.name_id))
 	local job_text = self._foreground_layer_one:text({
 		name = "job_text",
-		text = utf8.to_upper(managers.localization:text(self._current_contact_data.name_id) .. ": " .. managers.localization:text(self._current_job_data.name_id)),
+		text = text,
 		align = "left",
 		vertical = "center",
 		font_size = title_font_size,
@@ -411,7 +417,7 @@ function HUDMissionBriefing:init(hud, workspace)
 	job_text:set_size(w, h)
 	local big_text = self._background_layer_three:text({
 		name = "job_text",
-		text = utf8.to_upper(managers.localization:text(self._current_contact_data.name_id) .. ": " .. managers.localization:text(self._current_job_data.name_id)),
+		text = text,
 		align = "left",
 		vertical = "top",
 		font_size = bg_font_size,

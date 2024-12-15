@@ -16,11 +16,10 @@ local is_win32 = SystemInfo:platform() == Idstring("WIN32")
 
 function MenuTitlescreenState:setup()
 	local res = RenderSettings.resolution
-	local gui = Overlay:gui()
 	self._workspace = managers.gui_data:create_saferect_workspace()
 	self._workspace:hide()
 	managers.gui_data:layout_workspace(self._workspace)
-	self._full_workspace = gui:create_screen_workspace()
+	self._full_workspace = managers.gui_data:create_fullscreen_workspace()
 	self._full_workspace:hide()
 	self._back_drop_gui = MenuBackdropGUI:new()
 	self._back_drop_gui:hide()
@@ -303,11 +302,11 @@ end
 function MenuTitlescreenState:at_exit()
 	managers.platform:remove_event_callback("media_player_control", self._clbk_game_has_music_control_callback)
 	if alive(self._workspace) then
-		Overlay:gui():destroy_workspace(self._workspace)
+		managers.gui_data:destroy_workspace(self._workspace)
 		self._workspace = nil
 	end
 	if alive(self._full_workspace) then
-		Overlay:gui():destroy_workspace(self._full_workspace)
+		managers.gui_data:destroy_workspace(self._full_workspace)
 		self._full_workspace = nil
 	end
 	self._back_drop_gui:destroy()

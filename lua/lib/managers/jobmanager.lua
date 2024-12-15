@@ -921,7 +921,7 @@ function JobManager:activate_job(job_id, current_stage)
 		job_wrapper_id = job_wrapper_id,
 		current_stage = current_stage or 1,
 		last_completed_stage = 0,
-		stages = #job.chain
+		stages = job.chain and #job.chain or math.huge - 1
 	}
 	self._global.start_time = TimerManager:wall_running():time()
 	self:start_accumulate_ghost_bonus(job_id)
@@ -1101,6 +1101,9 @@ function JobManager:current_stage_data()
 	end
 	local job_chain = tweak_data.narrative:job_chain(self._global.current_job.job_id)
 	local stage = job_chain[self._global.current_job.current_stage]
+	if not stage then
+		return {}
+	end
 	if 0 < #stage then
 		return stage[self._global.alternative_stage or 1]
 	end

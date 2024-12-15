@@ -12,7 +12,7 @@ function MutatorEnemyHealth:register_values(mutator_manager)
 end
 
 function MutatorEnemyHealth:setup()
-	self:modify_character_tweak_data(tweak_data.character)
+	self:modify_character_tweak_data(tweak_data.character, self:get_health_multiplier())
 end
 
 function MutatorEnemyHealth:name()
@@ -28,13 +28,14 @@ function MutatorEnemyHealth:get_health_multiplier()
 	return self:value("health_multiplier")
 end
 
-function MutatorEnemyHealth:modify_character_tweak_data(character_tweak)
+function MutatorEnemyHealth:modify_character_tweak_data(character_tweak, multiplier)
 	if character_tweak then
+		multiplier = multiplier or self:get_health_multiplier()
 		print("[Mutators] Mutating character tweak data: ", self:id())
 		for i, character in ipairs(character_tweak:enemy_list()) do
 			if character_tweak[character] then
-				print("[Mutators] Mutating health:", character, character_tweak[character].HEALTH_INIT, self:get_health_multiplier(), character_tweak[character].HEALTH_INIT * self:get_health_multiplier())
-				character_tweak[character].HEALTH_INIT = character_tweak[character].HEALTH_INIT * self:get_health_multiplier()
+				print("[Mutators] Mutating health:", character, character_tweak[character].HEALTH_INIT, multiplier, character_tweak[character].HEALTH_INIT * multiplier)
+				character_tweak[character].HEALTH_INIT = character_tweak[character].HEALTH_INIT * multiplier
 			end
 		end
 	end

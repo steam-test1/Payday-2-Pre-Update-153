@@ -50,7 +50,8 @@ function EnvironmentManager:init()
 		CoreEnvironmentFeeder.PostEffectBloomThresholdFeeder,
 		CoreEnvironmentFeeder.PostEffectBloomIntensityFeeder,
 		CoreEnvironmentFeeder.PostEffectBloomBlurSizeFeeder,
-		CoreEnvironmentFeeder.PostEffectLenseIntensityFeeder
+		CoreEnvironmentFeeder.PostEffectLenseIntensityFeeder,
+		CoreEnvironmentFeeder.EnvironmentEffectFeeder
 	}
 	for _, feeder_class in ipairs(feeder_class_list) do
 		self._feeder_class_map[feeder_class.DATA_PATH_KEY] = feeder_class

@@ -1344,6 +1344,32 @@ function BlackMarketTweakData:_init_materials(tweak_data)
 	self.materials.underground_neon.texture = "units/pd2_dlc_spa/masks/materials/matcap_underground_neon_df"
 	self.materials.underground_neon.value = 0
 	self.materials.underground_neon.dlc = "spa"
+	self.materials.russian_camouflage = {}
+	self.materials.russian_camouflage.name_id = "bm_mtl_russian_camouflage"
+	self.materials.russian_camouflage.pcs = {}
+	self.materials.russian_camouflage.texture = "units/pd2_dlc_grv/masks/materials/matcap_russian_camouflage_df"
+	self.materials.russian_camouflage.value = 0
+	self.materials.russian_camouflage.material_amount = 0
+	self.materials.russian_camouflage.dlc = "grv"
+	self.materials.ceramics_gzhel = {}
+	self.materials.ceramics_gzhel.name_id = "bm_mtl_ceramics_gzhel"
+	self.materials.ceramics_gzhel.pcs = {}
+	self.materials.ceramics_gzhel.texture = "units/pd2_dlc_grv/masks/materials/matcap_ceramics_gzhel_df"
+	self.materials.ceramics_gzhel.value = 0
+	self.materials.ceramics_gzhel.material_amount = 0
+	self.materials.ceramics_gzhel.dlc = "grv"
+	self.materials.propaganda_palette = {}
+	self.materials.propaganda_palette.name_id = "bm_mtl_propaganda_palette"
+	self.materials.propaganda_palette.pcs = {}
+	self.materials.propaganda_palette.texture = "units/pd2_dlc_grv/masks/materials/matcap_propaganda_palette_df"
+	self.materials.propaganda_palette.value = 0
+	self.materials.propaganda_palette.dlc = "grv"
+	self.materials.tricolor = {}
+	self.materials.tricolor.name_id = "bm_mtl_tricolor"
+	self.materials.tricolor.pcs = {}
+	self.materials.tricolor.texture = "units/pd2_dlc_grv/masks/materials/matcap_tricolor_df"
+	self.materials.tricolor.value = 0
+	self.materials.tricolor.dlc = "grv"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.materials) do
 		if free_dlcs[data.dlc] then

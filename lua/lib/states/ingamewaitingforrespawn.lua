@@ -3,9 +3,10 @@ require("lib/states/GameState")
 IngameWaitingForRespawnState = IngameWaitingForRespawnState or class(GameState)
 IngameWaitingForRespawnState.GUI_SPECTATOR_FULLSCREEN = Idstring("guis/spectator_fullscreen")
 IngameWaitingForRespawnState.GUI_SPECTATOR = Idstring("guis/spectator_mode")
+IngameWaitingForRespawnState.STATE_STRING = "ingame_waiting_for_respawn"
 
 function IngameWaitingForRespawnState:init(game_state_machine)
-	GameState.init(self, "ingame_waiting_for_respawn", game_state_machine)
+	GameState.init(self, self.STATE_STRING, game_state_machine)
 	self._slotmask = managers.slot:get_mask("world_geometry") + 39
 	self._fwd = Vector3(1, 0, 0)
 	self._up_offset = math.UP * 80

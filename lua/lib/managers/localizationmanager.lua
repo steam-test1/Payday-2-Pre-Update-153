@@ -112,12 +112,16 @@ end
 
 local is_PS3 = SystemInfo:platform() == Idstring("PS3")
 
-function LocalizationManager:btn_macro(button, to_upper)
+function LocalizationManager:btn_macro(button, to_upper, nil_if_empty)
 	if not managers.menu:is_pc_controller() then
 		return
 	end
 	local type = managers.controller:get_default_wrapper_type()
-	local key = tostring(managers.controller:get_settings(type):get_connection(button):get_input_name_list()[1])
+	local key = managers.controller:get_settings(type):get_connection(button):get_input_name_list()[1]
+	if nil_if_empty and not key then
+		return
+	end
+	key = tostring(key)
 	local text = "[" .. key .. "]"
 	return to_upper and utf8.to_upper(text) or text
 end

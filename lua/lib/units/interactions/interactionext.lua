@@ -174,8 +174,20 @@ function BaseInteractionExt:can_select(player)
 	if not self:_is_in_required_state(alive(player) and player:movement() and player:movement().current_state_name and player:movement():current_state_name()) then
 		return false
 	end
-	if self._tweak_data.special_equipment_block and managers.player:has_special_equipment(self._tweak_data.special_equipment_block) then
-		return false
+	local blockers
+	if type(self._tweak_data.special_equipment_block) == "string" then
+		blockers = {
+			self._tweak_data.special_equipment_block
+		}
+	else
+		blockers = self._tweak_data.special_equipment_block
+	end
+	if blockers then
+		for k, blocker in pairs(blockers) do
+			if managers.player:has_special_equipment(blocker) then
+				return false
+			end
+		end
 	end
 	if self._tweak_data.verify_owner and not self:is_owner() then
 		return false

@@ -12,9 +12,8 @@ end
 MainMenuGui = MainMenuGui or class(PlayerInventoryGui)
 
 function MainMenuGui:init(ws, fullscreen_ws, node)
-	self._ws = Overlay:gui():create_screen_workspace()
+	self._ws = managers.gui_data:create_saferect_workspace()
 	self._fullscreen_ws = managers.gui_data:create_fullscreen_16_9_workspace()
-	managers.gui_data:layout_workspace(self._ws)
 	self._node = node
 	self._panel = self._ws:panel():panel()
 	self._fullscreen_panel = self._fullscreen_ws:panel():panel()
@@ -991,11 +990,11 @@ function MainMenuGui:close()
 		self:unretrieve_box_textures(box)
 	end
 	if alive(self._ws) then
-		Overlay:gui():destroy_workspace(self._ws)
+		managers.gui_data:destroy_workspace(self._ws)
 		self._ws = nil
 	end
 	if alive(self._fullscreen_ws) then
-		Overlay:gui():destroy_workspace(self._fullscreen_ws)
+		managers.gui_data:destroy_workspace(self._fullscreen_ws)
 		self._fullscreen_ws = nil
 	end
 	self._boxes = {}

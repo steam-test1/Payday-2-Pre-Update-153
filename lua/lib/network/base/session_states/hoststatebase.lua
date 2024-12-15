@@ -18,7 +18,24 @@ end
 
 function HostStateBase:_send_request_denied(sender, reason, my_user_id)
 	local xuid = (SystemInfo:platform() == Idstring("X360") or SystemInfo:platform() == Idstring("XB1")) and managers.network.account:player_id() or ""
-	sender:join_request_reply(reason, 0, "", 1, 1, 0, "", my_user_id, "", 0, 0, 0, 0, xuid, 0)
+	local params = {
+		reason,
+		0,
+		"",
+		1,
+		1,
+		0,
+		"",
+		my_user_id,
+		"",
+		0,
+		0,
+		0,
+		0,
+		xuid,
+		0
+	}
+	sender:join_request_reply(unpack(params))
 end
 
 function HostStateBase:_has_peer_left_PSN(peer_name)

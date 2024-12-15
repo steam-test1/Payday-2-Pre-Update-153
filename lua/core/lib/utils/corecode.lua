@@ -76,7 +76,7 @@ function deprecation_warning(method_name, breaking_release_name)
 	CoreDebug.cat_print("debug", string.format("DEPRECATION WARNING: %s will be removed in %s", method_name, breaking_release_name or "a future release"))
 end
 
-local sort_iterator = function(t, raw)
+function sort_iterator(t, raw)
 	local sorted = {}
 	for k, v in pairs(t) do
 		sorted[#sorted + 1] = k

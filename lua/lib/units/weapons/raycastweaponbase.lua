@@ -114,6 +114,10 @@ function RaycastWeaponBase:got_silencer()
 	return false
 end
 
+function RaycastWeaponBase:run_and_shoot_allowed()
+	return managers.player:has_category_upgrade("player", "run_and_shoot")
+end
+
 function RaycastWeaponBase:_create_use_setups()
 	local sel_index = tweak_data.weapon[self._name_id].use_data.selection_index
 	local align_place = tweak_data.weapon[self._name_id].use_data.align_place or "right_hand"
@@ -606,8 +610,9 @@ function RaycastWeaponBase:get_aim_assist(from_pos, direction, max_dist, use_aim
 	return closest_ray
 end
 
-function RaycastWeaponBase:check_autoaim(from_pos, direction, max_dist, use_aim_assist)
+function RaycastWeaponBase:check_autoaim(from_pos, direction, max_dist, use_aim_assist, autohit_override_data)
 	local autohit = use_aim_assist and self._aim_assist_data or self._autohit_data
+	autohit = autohit_override_data or autohit
 	local autohit_near_angle = autohit.near_angle
 	local autohit_far_angle = autohit.far_angle
 	local far_dis = autohit.far_dis
@@ -1525,9 +1530,6 @@ function InstantBulletBase:give_impact_damage(col_ray, weapon_unit, user_unit, d
 	action_data.shield_knock = shield_knock
 	action_data.origin = user_unit:position()
 	action_data.knock_down = knock_down
-	if weapon_unit:base().get_add_head_shot_mul then
-		action_data.add_head_shot_mul = weapon_unit:base():get_add_head_shot_mul()
-	end
 	action_data.stagger = stagger
 	local defense_data = col_ray.unit:character_damage():damage_bullet(action_data)
 	return defense_data

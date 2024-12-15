@@ -244,6 +244,7 @@ function IngameWaitingForPlayersState:at_enter()
 	managers.hud:show(self.GUI_SAFERECT)
 	managers.hud:load_hud(self.GUI_FULLSCREEN, false, true, false, {}, nil, nil, true)
 	managers.hud:show(self.GUI_FULLSCREEN)
+	managers.hud._hud_mission_briefing:reload()
 	if not managers.hud:exists(self.PLAYER_HUD) then
 		managers.hud:load_hud(self.PLAYER_HUD, false, false, true, {})
 	end
@@ -296,6 +297,7 @@ function IngameWaitingForPlayersState:at_enter()
 	if Global.exe_argument_auto_enter_level then
 		game_state_machine:current_state():start_game_intro()
 	end
+	TestAPIHelper.on_event("start_job_loadout")
 end
 
 function IngameWaitingForPlayersState:clbk_file_streamer_status(workload)
@@ -419,6 +421,7 @@ function IngameWaitingForPlayersState:at_exit()
 		self._fadeout_loading_icon:fade_out(tweak_data.overlay_effects.level_fade_in.fade_out)
 		self._fadeout_loading_icon = nil
 	end
+	TestAPIHelper.on_event("start_job")
 end
 
 function IngameWaitingForPlayersState:_get_cameras()

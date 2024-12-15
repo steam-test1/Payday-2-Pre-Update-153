@@ -2068,6 +2068,30 @@ function BlackMarketTweakData:_init_textures(tweak_data)
 	self.textures.hood_stripes.texture = "units/pd2_dlc_spa/masks/patterns/pattern_hood_stripes_df"
 	self.textures.hood_stripes.value = 0
 	self.textures.hood_stripes.dlc = "spa"
+	self.textures.red_star = {}
+	self.textures.red_star.name_id = "bm_txt_red_star"
+	self.textures.red_star.pcs = {}
+	self.textures.red_star.texture = "units/pd2_dlc_grv/masks/patterns/pattern_red_star_df"
+	self.textures.red_star.value = 0
+	self.textures.red_star.dlc = "grv"
+	self.textures.bear_fight = {}
+	self.textures.bear_fight.name_id = "bm_txt_bear_fight"
+	self.textures.bear_fight.pcs = {}
+	self.textures.bear_fight.texture = "units/pd2_dlc_grv/masks/patterns/pattern_bear_fight_df"
+	self.textures.bear_fight.value = 0
+	self.textures.bear_fight.dlc = "grv"
+	self.textures.prison_statement = {}
+	self.textures.prison_statement.name_id = "bm_txt_prison_statement"
+	self.textures.prison_statement.pcs = {}
+	self.textures.prison_statement.texture = "units/pd2_dlc_grv/masks/patterns/pattern_prison_statement_df"
+	self.textures.prison_statement.value = 0
+	self.textures.prison_statement.dlc = "grv"
+	self.textures.russian_gamble = {}
+	self.textures.russian_gamble.name_id = "bm_txt_russian_gamble"
+	self.textures.russian_gamble.pcs = {}
+	self.textures.russian_gamble.texture = "units/pd2_dlc_grv/masks/patterns/pattern_russian_gamble_df"
+	self.textures.russian_gamble.value = 0
+	self.textures.russian_gamble.dlc = "grv"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.textures) do
 		if free_dlcs[data.dlc] then

@@ -74,7 +74,7 @@ end
 
 function SavefileManager:destroy()
 	if self._workspace then
-		Overlay:gui():destroy_workspace(self._workspace)
+		managers.gui_data:destroy_workspace(self._workspace)
 		self._workspace = nil
 		self._gui = nil
 		self._gui_script = nil

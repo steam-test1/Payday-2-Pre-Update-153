@@ -72,7 +72,12 @@ function HuskPlayerInventory:add_unit_by_factory_name(factory_name, equip, insta
 	if not managers.dyn_resource:is_resource_ready(Idstring("unit"), ids_unit_name, managers.dyn_resource.DYN_RESOURCES_PACKAGE) then
 		managers.dyn_resource:load(Idstring("unit"), ids_unit_name, managers.dyn_resource.DYN_RESOURCES_PACKAGE, nil)
 	end
-	local blueprint = managers.weapon_factory:unpack_blueprint_from_string(factory_name, blueprint_string)
+	local blueprint
+	if blueprint_string and blueprint_string ~= "" then
+		blueprint = managers.weapon_factory:unpack_blueprint_from_string(factory_name, blueprint_string)
+	else
+		blueprint = managers.weapon_factory:get_default_blueprint_by_factory_id(factory_name)
+	end
 	local cosmetics
 	local cosmetics_data = string.split(cosmetics_string, "-")
 	local weapon_skin_id = cosmetics_data[1] or "nil"
@@ -115,7 +120,7 @@ function HuskPlayerInventory:add_unit_by_factory_blueprint(factory_name, equip, 
 end
 
 function HuskPlayerInventory:synch_weapon_gadget_state(state)
-	if self:equipped_unit():base().set_gadget_on then
+	if self:equipped_unit():base().set_gadget_on and self._unit:movement().set_cbt_permanent then
 		self:equipped_unit():base():set_gadget_on(state, true)
 		if state and 0 < state then
 			self._unit:movement():set_cbt_permanent(true)

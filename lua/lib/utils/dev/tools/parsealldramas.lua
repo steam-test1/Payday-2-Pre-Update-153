@@ -47,9 +47,9 @@ end
 
 function ParseAllDramas:start_parsing()
 	if self._ws then
-		Overlay:gui():destroy_workspace(self._ws)
+		managers.gui_data:destroy_workspace(self._ws)
 	end
-	self._ws = Overlay:gui():create_screen_workspace()
+	self._ws = managers.gui_data:create_fullscreen_workspace()
 	self._panel = self._ws:panel():panel()
 	self._panel:set_size(self._ws:panel():w() / 2, self._ws:panel():h() / 2)
 	self._panel:set_center(self._ws:panel():w() / 2, self._ws:panel():h() / 2)

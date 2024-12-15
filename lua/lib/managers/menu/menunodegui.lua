@@ -463,7 +463,7 @@ function MenuNodeGui:_create_menu_item(row_item)
 		})
 		local row_item_panel = managers.menu:is_pc_controller() and row_item.gui_pd2_panel or row_item.gui_panel
 		row_item.gui_text = row_item_panel:text({
-			font_size = tweak_data.menu.pd2_large_font_size,
+			font_size = tweak_data.menu.pd2_large_font_size * (row_item.item:parameters().scale or 1),
 			x = 0,
 			y = 0,
 			align = "right",
@@ -478,12 +478,22 @@ function MenuNodeGui:_create_menu_item(row_item)
 		local _, _, w, h = row_item.gui_text:text_rect()
 		row_item.gui_text:set_size(math.round(w), math.round(h))
 		if managers.menu:is_pc_controller() then
-			row_item.gui_text:set_rightbottom(row_item.gui_pd2_panel:w(), row_item.gui_pd2_panel:h())
+			local x = row_item.gui_pd2_panel:w()
+			local y = row_item.gui_pd2_panel:h()
+			local item = self.corner_items[table.size(self.corner_items)]
+			if item and alive(item.gui_text) then
+				x = x - item.gui_text:w() - 30
+			end
+			row_item.gui_text:set_rightbottom(x, y)
 		else
 			row_item.gui_text:set_rotation(360)
 			row_item.gui_text:set_right(row_item.gui_pd2_panel:w())
+			local item = self.corner_items[table.size(self.corner_items)]
+			if item and alive(item.gui_text) then
+				row_item.gui_text:set_top(item.gui_text:bottom())
+			end
 		end
-		if MenuBackdropGUI and managers.menu:is_pc_controller() then
+		if MenuBackdropGUI and managers.menu:is_pc_controller() and not row_item.item:parameters().no_bg_text then
 			local bg_text = row_item.gui_pd2_panel:text({
 				text = utf8.to_upper(row_item.text),
 				h = 90,
@@ -500,6 +510,9 @@ function MenuNodeGui:_create_menu_item(row_item)
 			bg_text:set_center_y(row_item.gui_text:center_y())
 			bg_text:move(13, -9)
 			MenuBackdropGUI.animate_bg_text(self, bg_text)
+		end
+		if not table.contains(self.corner_items, row_item) then
+			table.insert(self.corner_items, row_item)
 		end
 	elseif row_item.type == "level" then
 		row_item.gui_panel = self:_text_item_part(row_item, self.item_panel, self:_right_align())
@@ -1167,6 +1180,9 @@ function MenuNodeGui:_delete_row_item(item)
 			end
 			break
 		end
+	end
+	if table.contains(self.corner_items, row_item) then
+		table.delete(self.corner_items, row_item)
 	end
 	MenuNodeGui.super._delete_row_item(self, item)
 end

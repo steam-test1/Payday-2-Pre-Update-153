@@ -23,6 +23,9 @@ function ButlerSound:init(unit)
 end
 
 function ButlerSound:_mirroring_clbk()
+	if not alive(self._unit) then
+		return
+	end
 	if managers.butler_mirroring:has_sound_event() then
 		self._snd_clbk = callback(self, self, "_mirroring_sound_callback")
 		self._snd_start_clbk = callback(self, self, "_sound_start_mirroring")

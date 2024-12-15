@@ -93,7 +93,7 @@ end
 
 BlackMarketGuiTabItem = BlackMarketGuiTabItem or class(BlackMarketGuiItem)
 
-function BlackMarketGuiTabItem:init(main_panel, data, node, size_data, hide_select_rect, scroll_tab_table)
+function BlackMarketGuiTabItem:init(main_panel, data, node, size_data, hide_select_rect, scroll_tab_table, parent)
 	BlackMarketGuiTabItem.super.init(self, main_panel, data, 0, 0, main_panel:w(), main_panel:h())
 	local grid_panel_w = size_data.grid_w
 	local grid_panel_h = size_data.grid_h
@@ -166,7 +166,7 @@ function BlackMarketGuiTabItem:init(main_panel, data, node, size_data, hide_sele
 	self._node:parameters().menu_component_tabs = self._node:parameters().menu_component_tabs or {}
 	self._node:parameters().menu_component_tabs[data.name] = self._node:parameters().menu_component_tabs[data.name] or {}
 	self._my_node_data = self._node:parameters().menu_component_tabs[data.name]
-	self._data.on_create_func(self._data)
+	self._data.on_create_func(self._data, parent)
 	if slots[2] ~= 1 then
 		self._grid_scroll_panel:set_h(grid_panel_h / slots[2] * #self._data / slots[1])
 	else
@@ -1918,7 +1918,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 		if data.unique_tab_class then
 			new_tab_class = _G[data.unique_tab_class]
 		end
-		local new_tab = new_tab_class:new(self._panel, data, self._node, size_data, not self._pages, self._tab_scroll_table)
+		local new_tab = new_tab_class:new(self._panel, data, self._node, size_data, not self._pages, self._tab_scroll_table, self)
 		table.insert(self._tabs, new_tab)
 	end
 	if self._data.open_callback_name then
@@ -2821,6 +2821,12 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				callback = callback(self, self, "preview_grenade_callback")
 			}
 		}
+		for btn, data in pairs(BTNS) do
+			data.callback = callback(self, self, "overridable_callback", {
+				button = btn,
+				callback = data.callback
+			})
+		end
 		local get_real_font_sizes = false
 		local real_small_font_size = small_font_size
 		if get_real_font_sizes then
@@ -5088,44 +5094,49 @@ function BlackMarketGui:update_info_text()
 				self:_set_rename_info_text(1)
 			end
 			if not slot_data.unlocked then
-				local skill_based = slot_data.skill_based
-				local func_based = slot_data.func_based
-				local level_based = slot_data.level and 0 < slot_data.level
-				local dlc_based = tweak_data.lootdrop.global_values[slot_data.global_value] and tweak_data.lootdrop.global_values[slot_data.global_value].dlc and not managers.dlc:is_dlc_unlocked(slot_data.global_value)
-				local part_dlc_locked = slot_data.part_dlc_lock
-				local skill_text_id = skill_based and (slot_data.skill_name or "bm_menu_skilltree_locked") or false
-				local level_text_id = level_based and "bm_menu_level_req" or false
-				local dlc_text_id = dlc_based and slot_data.dlc_locked or false
-				local part_dlc_text_id = part_dlc_locked and "bm_menu_part_dlc_locked"
-				local funclock_text_id = false
-				if func_based then
-					local unlocked, text_id = BlackMarketGui.get_func_based(func_based)
-					if not unlocked then
-						funclock_text_id = text_id
+				if slot_data.lock_text then
+					updated_texts[3].text = slot_data.lock_text
+					updated_texts[3].below_stats = true
+				else
+					local skill_based = slot_data.skill_based
+					local func_based = slot_data.func_based
+					local level_based = slot_data.level and 0 < slot_data.level
+					local dlc_based = tweak_data.lootdrop.global_values[slot_data.global_value] and tweak_data.lootdrop.global_values[slot_data.global_value].dlc and not managers.dlc:is_dlc_unlocked(slot_data.global_value)
+					local part_dlc_locked = slot_data.part_dlc_lock
+					local skill_text_id = skill_based and (slot_data.skill_name or "bm_menu_skilltree_locked") or false
+					local level_text_id = level_based and "bm_menu_level_req" or false
+					local dlc_text_id = dlc_based and slot_data.dlc_locked or false
+					local part_dlc_text_id = part_dlc_locked and "bm_menu_part_dlc_locked"
+					local funclock_text_id = false
+					if func_based then
+						local unlocked, text_id = BlackMarketGui.get_func_based(func_based)
+						if not unlocked then
+							funclock_text_id = text_id
+						end
 					end
+					local text = ""
+					if slot_data.install_lock then
+						text = text .. managers.localization:to_upper_text(slot_data.install_lock, {}) .. "\n"
+					elseif dlc_text_id then
+						text = text .. managers.localization:to_upper_text(dlc_text_id, {}) .. "\n"
+					elseif part_dlc_text_id then
+						text = text .. managers.localization:to_upper_text(part_dlc_text_id, {}) .. "\n"
+					elseif funclock_text_id then
+						text = text .. managers.localization:to_upper_text(funclock_text_id, {
+							slot_data.name_localized
+						}) .. "\n"
+					elseif skill_text_id then
+						text = text .. managers.localization:to_upper_text(skill_text_id, {
+							slot_data.name_localized
+						}) .. "\n"
+					elseif level_text_id then
+						text = text .. managers.localization:to_upper_text(level_text_id, {
+							level = slot_data.level
+						}) .. "\n"
+					end
+					updated_texts[3].text = text
+					updated_texts[3].below_stats = true
 				end
-				local text = ""
-				if slot_data.install_lock then
-					text = text .. managers.localization:to_upper_text(slot_data.install_lock, {}) .. "\n"
-				elseif dlc_text_id then
-					text = text .. managers.localization:to_upper_text(dlc_text_id, {}) .. "\n"
-				elseif part_dlc_text_id then
-					text = text .. managers.localization:to_upper_text(part_dlc_text_id, {}) .. "\n"
-				elseif funclock_text_id then
-					text = text .. managers.localization:to_upper_text(funclock_text_id, {
-						slot_data.name_localized
-					}) .. "\n"
-				elseif skill_text_id then
-					text = text .. managers.localization:to_upper_text(skill_text_id, {
-						slot_data.name_localized
-					}) .. "\n"
-				elseif level_text_id then
-					text = text .. managers.localization:to_upper_text(level_text_id, {
-						level = slot_data.level
-					}) .. "\n"
-				end
-				updated_texts[3].text = text
-				updated_texts[3].below_stats = true
 			elseif self._slot_data.can_afford == false then
 			end
 			if slot_data.last_weapon then
@@ -5771,6 +5782,10 @@ function BlackMarketGui:update_info_text()
 			elseif slot_data.desc_id then
 				updated_texts[2].text = managers.localization:text(slot_data.desc_id)
 			end
+		end
+	elseif identifier == self.identifiers.custom then
+		if self._data.custom_update_text_info then
+			self._data.custom_update_text_info(slot_data, updated_texts, self)
 		end
 	elseif Application:production_build() then
 		updated_texts[1].text = identifier:s()
@@ -6571,7 +6586,7 @@ function BlackMarketGui:update(t, dt)
 				self._preloading_list = {}
 				self._preloading_index = 0
 				if self._preload_ws then
-					Overlay:gui():destroy_workspace(self._preload_ws)
+					managers.gui_data:destroy_workspace(self._preload_ws)
 					self._preload_ws = nil
 				end
 			elseif self._preload_ws then
@@ -7061,7 +7076,7 @@ function BlackMarketGui:show_btns(slot)
 	end
 	local btns = {}
 	local btn_show_func_name, btn_show_func
-	for i, btn in ipairs(data) do
+	for i, btn in ipairs(data.buttons or data) do
 		btn_show_func_name = btn_show_funcs[btn]
 		btn_show_func = btn_show_func_name and callback(self, self, btn_show_func_name)
 		if self._btns[btn] and (not btn_show_func or btn_show_func(data)) then
@@ -7943,7 +7958,7 @@ function BlackMarketGui:populate_masks(data)
 	local start_crafted_item = data.start_crafted_item or 1
 	local hold_crafted_item = managers.blackmarket:get_hold_crafted_item()
 	local currently_holding = hold_crafted_item and hold_crafted_item.category == "masks"
-	local max_rows = tweak_data.gui.MAX_MASK_ROWS
+	local max_rows = tweak_data.gui.MAX_MASK_ROWS or 3
 	max_items = max_rows * (data.override_slots and data.override_slots[2] or 3)
 	for i = 1, max_items do
 		data[i] = nil
@@ -10558,6 +10573,15 @@ function BlackMarketGui:equip_weapon_callback(data)
 	else
 		managers.blackmarket:equip_weapon(data.category, data.slot)
 		self:reload()
+	end
+end
+
+function BlackMarketGui:overridable_callback(original, data)
+	local func = (not self._data.custom_callback or not self._data.custom_callback[original.button]) and data.custom_callback and data.custom_callback[original.button]
+	if func then
+		func(data, self)
+	else
+		original.callback(data)
 	end
 end
 

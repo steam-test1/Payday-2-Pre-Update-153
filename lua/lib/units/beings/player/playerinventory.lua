@@ -493,6 +493,9 @@ function PlayerInventory:_clbk_weapon_add(data)
 	end
 	local eq_weap_name = self._get_weapon_name_from_sync_index(data.equipped_weapon_index)
 	if type(eq_weap_name) == "string" then
+		if not managers.network:session() then
+			return
+		end
 		self:add_unit_by_factory_name(eq_weap_name, true, true, data.blueprint_string, self:cosmetics_string_from_peer(managers.network:session():peer_by_unit(self._unit), eq_weap_name) or data.cosmetics_string)
 		self:synch_weapon_gadget_state(data.gadget_on)
 	else

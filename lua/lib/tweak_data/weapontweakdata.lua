@@ -125,6 +125,9 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_contraband_npc()
 	self:_init_data_ray_npc()
 	self:_init_data_tti_npc()
+	self:_init_data_siltstone_npc()
+	self:_init_data_flint_npc()
+	self:_init_data_coal_npc()
 	self:_precalculate_values()
 end
 
@@ -1486,7 +1489,7 @@ end
 
 function WeaponTweakData:_init_data_m1928_npc()
 	self.m1928_npc.sounds.prefix = "m1928_npc"
-	self.m1928_npc.use_data.selection_index = 1
+	self.m1928_npc.use_data.selection_index = 2
 	self.m1928_npc.DAMAGE = 2
 	self.m1928_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
 	self.m1928_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
@@ -1501,7 +1504,7 @@ end
 
 function WeaponTweakData:_init_data_l85a2_npc()
 	self.l85a2_npc.sounds.prefix = "l85_npc"
-	self.l85a2_npc.use_data.selection_index = 1
+	self.l85a2_npc.use_data.selection_index = 2
 	self.l85a2_npc.DAMAGE = 2
 	self.l85a2_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
 	self.l85a2_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
@@ -1516,7 +1519,7 @@ end
 
 function WeaponTweakData:_init_data_vhs_npc()
 	self.vhs_npc.sounds.prefix = "vhs_npc"
-	self.vhs_npc.use_data.selection_index = 1
+	self.vhs_npc.use_data.selection_index = 2
 	self.vhs_npc.DAMAGE = 2
 	self.vhs_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
 	self.vhs_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
@@ -2227,7 +2230,7 @@ end
 
 function WeaponTweakData:_init_data_tti_npc()
 	self.tti_npc.sounds.prefix = "tti_npc"
-	self.tti_npc.use_data.selection_index = 1
+	self.tti_npc.use_data.selection_index = 2
 	self.tti_npc.DAMAGE = 2
 	self.tti_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
 	self.tti_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
@@ -2238,6 +2241,50 @@ function WeaponTweakData:_init_data_tti_npc()
 	self.tti_npc.hold = "rifle"
 	self.tti_npc.alert_size = 5000
 	self.tti_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_siltstone_npc()
+	self.siltstone_npc.sounds.prefix = "siltstone_npc"
+	self.siltstone_npc.use_data.selection_index = 1
+	self.siltstone_npc.DAMAGE = 2
+	self.siltstone_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.siltstone_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.siltstone_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.siltstone_npc.CLIP_AMMO_MAX = 10
+	self.siltstone_npc.NR_CLIPS_MAX = 4
+	self.siltstone_npc.auto.fire_rate = 0.5
+	self.siltstone_npc.hold = "rifle"
+	self.siltstone_npc.alert_size = 5000
+	self.siltstone_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_flint_npc()
+	self.flint_npc.sounds.prefix = "flint_npc"
+	self.flint_npc.use_data.selection_index = 2
+	self.flint_npc.DAMAGE = 2
+	self.flint_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.flint_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.flint_npc.CLIP_AMMO_MAX = 35
+	self.flint_npc.NR_CLIPS_MAX = 5
+	self.flint_npc.auto.fire_rate = 0.19
+	self.flint_npc.hold = "rifle"
+	self.flint_npc.alert_size = 5000
+	self.flint_npc.suppression = 1
+end
+
+function WeaponTweakData:_init_data_coal_npc()
+	self.coal_npc.sounds.prefix = "coal_npc"
+	self.coal_npc.use_data.selection_index = 1
+	self.coal_npc.DAMAGE = 2
+	self.coal_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.coal_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.coal_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.coal_npc.CLIP_AMMO_MAX = 64
+	self.coal_npc.NR_CLIPS_MAX = 5
+	self.coal_npc.auto.fire_rate = 0.092
+	self.coal_npc.hold = "rifle"
+	self.coal_npc.alert_size = 5000
+	self.coal_npc.suppression = 1
 end
 
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
@@ -13179,6 +13226,283 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	}
 	self.tti.armor_piercing_chance = 1
 	self.tti.stats_modifiers = {damage = 1}
+	self.siltstone = {}
+	self.siltstone.category = "snp"
+	self.siltstone.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.siltstone.damage_melee = damage_melee_default
+	self.siltstone.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.siltstone.sounds = {}
+	self.siltstone.sounds.fire = "siltstone_fire"
+	self.siltstone.sounds.dryfire = "primary_dryfire"
+	self.siltstone.sounds.enter_steelsight = "primary_steel_sight_enter"
+	self.siltstone.sounds.leave_steelsight = "primary_steel_sight_exit"
+	self.siltstone.timers = {}
+	self.siltstone.timers.reload_not_empty = 2.3
+	self.siltstone.timers.reload_empty = 3.3
+	self.siltstone.timers.unequip = 0.9
+	self.siltstone.timers.equip = 0.9
+	self.siltstone.name_id = "bm_w_siltstone"
+	self.siltstone.desc_id = "bm_w_siltstone_desc"
+	self.siltstone.description_id = "des_siltstone"
+	self.siltstone.muzzleflash = "effects/payday2/particles/weapons/big_762_auto_fps"
+	self.siltstone.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.siltstone.use_data = {}
+	self.siltstone.use_data.selection_index = 2
+	self.siltstone.DAMAGE = 1
+	self.siltstone.CLIP_AMMO_MAX = 10
+	self.siltstone.NR_CLIPS_MAX = 3
+	self.siltstone.AMMO_MAX = self.siltstone.CLIP_AMMO_MAX * self.siltstone.NR_CLIPS_MAX
+	self.siltstone.AMMO_PICKUP = self:_pickup_chance(self.siltstone.AMMO_MAX, 5)
+	self.siltstone.FIRE_MODE = "single"
+	self.siltstone.fire_mode_data = {}
+	self.siltstone.fire_mode_data.fire_rate = 1
+	self.siltstone.CAN_TOGGLE_FIREMODE = false
+	self.siltstone.single = {}
+	self.siltstone.single.fire_rate = 1
+	self.siltstone.spread = {}
+	self.siltstone.spread.standing = self.new_m4.spread.standing
+	self.siltstone.spread.crouching = self.new_m4.spread.crouching
+	self.siltstone.spread.steelsight = self.new_m4.spread.steelsight
+	self.siltstone.spread.moving_standing = self.new_m4.spread.moving_standing
+	self.siltstone.spread.moving_crouching = self.new_m4.spread.moving_crouching
+	self.siltstone.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.siltstone.kick = {}
+	self.siltstone.kick.standing = {
+		2,
+		3.8,
+		-0.3,
+		0.3
+	}
+	self.siltstone.kick.crouching = self.siltstone.kick.standing
+	self.siltstone.kick.steelsight = self.siltstone.kick.standing
+	self.siltstone.crosshair = {}
+	self.siltstone.crosshair.standing = {}
+	self.siltstone.crosshair.crouching = {}
+	self.siltstone.crosshair.steelsight = {}
+	self.siltstone.crosshair.standing.offset = 1.14
+	self.siltstone.crosshair.standing.moving_offset = 1.8
+	self.siltstone.crosshair.standing.kick_offset = 1.6
+	self.siltstone.crosshair.crouching.offset = 1.1
+	self.siltstone.crosshair.crouching.moving_offset = 1.6
+	self.siltstone.crosshair.crouching.kick_offset = 1.4
+	self.siltstone.crosshair.steelsight.hidden = true
+	self.siltstone.crosshair.steelsight.offset = 1
+	self.siltstone.crosshair.steelsight.moving_offset = 1
+	self.siltstone.crosshair.steelsight.kick_offset = 1.14
+	self.siltstone.shake = {}
+	self.siltstone.shake.fire_multiplier = 1.1
+	self.siltstone.shake.fire_steelsight_multiplier = -1.1
+	self.siltstone.autohit = autohit_snp_default
+	self.siltstone.aim_assist = aim_assist_snp_default
+	self.siltstone.weapon_hold = "siltstone"
+	self.siltstone.animations = {}
+	self.siltstone.animations.equip_id = "equip_siltstone"
+	self.siltstone.animations.recoil_steelsight = true
+	self.siltstone.panic_suppression_chance = 0.2
+	self.siltstone.global_value = "grv"
+	self.siltstone.texture_bundle_folder = "grv"
+	self.siltstone.can_shoot_through_enemy = true
+	self.siltstone.can_shoot_through_shield = true
+	self.siltstone.can_shoot_through_wall = true
+	self.siltstone.stats = {
+		damage = 150,
+		spread = 19,
+		recoil = 2,
+		spread_moving = 24,
+		zoom = 1,
+		concealment = 16,
+		suppression = 12,
+		alert_size = 8,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 9,
+		reload = 11
+	}
+	self.siltstone.armor_piercing_chance = 1
+	self.siltstone.stats_modifiers = {damage = 2}
+	self.flint = {}
+	self.flint.category = "assault_rifle"
+	self.flint.damage_melee = damage_melee_default
+	self.flint.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.flint.sounds = {}
+	self.flint.sounds.fire = "flint_fire_single"
+	self.flint.sounds.fire_single = "flint_fire_single"
+	self.flint.sounds.fire_auto = "flint_fire"
+	self.flint.sounds.stop_fire = "flint_stop"
+	self.flint.sounds.dryfire = "primary_dryfire"
+	self.flint.sounds.enter_steelsight = "primary_steel_sight_enter"
+	self.flint.sounds.leave_steelsight = "primary_steel_sight_exit"
+	self.flint.timers = {}
+	self.flint.timers.reload_not_empty = 2.26
+	self.flint.timers.reload_empty = 3.37
+	self.flint.timers.unequip = 0.5
+	self.flint.timers.equip = 0.5
+	self.flint.name_id = "bm_w_ak12"
+	self.flint.desc_id = "bm_w_ak12_desc"
+	self.flint.description_id = "des_ak47"
+	self.flint.muzzleflash = "effects/payday2/particles/weapons/556_auto_fps"
+	self.flint.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.flint.use_data = {}
+	self.flint.use_data.selection_index = 2
+	self.flint.DAMAGE = 1
+	self.flint.CLIP_AMMO_MAX = 35
+	self.flint.NR_CLIPS_MAX = 3
+	self.flint.AMMO_MAX = self.flint.CLIP_AMMO_MAX * self.flint.NR_CLIPS_MAX
+	self.flint.AMMO_PICKUP = self:_pickup_chance(self.flint.AMMO_MAX, 3)
+	self.flint.FIRE_MODE = "auto"
+	self.flint.fire_mode_data = {}
+	self.flint.fire_mode_data.fire_rate = 0.092
+	self.flint.CAN_TOGGLE_FIREMODE = true
+	self.flint.auto = {}
+	self.flint.auto.fire_rate = 0.092
+	self.flint.spread = {}
+	self.flint.spread.standing = self.new_m4.spread.standing
+	self.flint.spread.crouching = self.new_m4.spread.crouching
+	self.flint.spread.steelsight = self.new_m4.spread.steelsight
+	self.flint.spread.moving_standing = self.new_m4.spread.moving_standing
+	self.flint.spread.moving_crouching = self.new_m4.spread.moving_crouching
+	self.flint.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.flint.kick = {}
+	self.flint.kick.standing = self.new_m4.kick.standing
+	self.flint.kick.crouching = self.ak74.kick.standing
+	self.flint.kick.steelsight = self.ak74.kick.standing
+	self.flint.crosshair = {}
+	self.flint.crosshair.standing = {}
+	self.flint.crosshair.crouching = {}
+	self.flint.crosshair.steelsight = {}
+	self.flint.crosshair.standing.offset = 0.16
+	self.flint.crosshair.standing.moving_offset = 0.8
+	self.flint.crosshair.standing.kick_offset = 0.6
+	self.flint.crosshair.crouching.offset = 0.08
+	self.flint.crosshair.crouching.moving_offset = 0.7
+	self.flint.crosshair.crouching.kick_offset = 0.4
+	self.flint.crosshair.steelsight.hidden = true
+	self.flint.crosshair.steelsight.offset = 0
+	self.flint.crosshair.steelsight.moving_offset = 0
+	self.flint.crosshair.steelsight.kick_offset = 0.1
+	self.flint.shake = {}
+	self.flint.shake.fire_multiplier = 0.7
+	self.flint.shake.fire_steelsight_multiplier = -0.7
+	self.flint.autohit = autohit_rifle_default
+	self.flint.aim_assist = aim_assist_rifle_default
+	self.flint.weapon_hold = "flint"
+	self.flint.animations = {}
+	self.flint.animations.equip_id = "equip_flint"
+	self.flint.animations.recoil_steelsight = true
+	self.flint.animations.thq_align_anim = "thq"
+	self.flint.global_value = "grv"
+	self.flint.texture_bundle_folder = "grv"
+	self.flint.panic_suppression_chance = 0.2
+	self.flint.stats = {
+		damage = 80,
+		spread = 16,
+		recoil = 16,
+		spread_moving = 11,
+		zoom = 3,
+		concealment = 16,
+		suppression = 10,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1,
+		reload = 11
+	}
+	self.coal = {}
+	self.coal.category = "smg"
+	self.coal.damage_melee = damage_melee_default
+	self.coal.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.coal.sounds = {}
+	self.coal.sounds.fire = "coal_fire_single"
+	self.coal.sounds.fire_single = "coal_fire_single"
+	self.coal.sounds.fire_auto = "coal_fire"
+	self.coal.sounds.stop_fire = "coal_stop"
+	self.coal.sounds.dryfire = "secondary_dryfire"
+	self.coal.sounds.enter_steelsight = "secondary_steel_sight_enter"
+	self.coal.sounds.leave_steelsight = "secondary_steel_sight_exit"
+	self.coal.timers = {}
+	self.coal.timers.reload_not_empty = 3.25
+	self.coal.timers.reload_empty = 4.25
+	self.coal.timers.unequip = 0.6
+	self.coal.timers.equip = 0.5
+	self.coal.name_id = "bm_w_coal"
+	self.coal.desc_id = "bm_w_coal_desc"
+	self.coal.description_id = "des_ak47"
+	self.coal.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.coal.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence_fps"
+	self.coal.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.coal.use_data = {}
+	self.coal.use_data.selection_index = 1
+	self.coal.DAMAGE = 1
+	self.coal.CLIP_AMMO_MAX = 64
+	self.coal.NR_CLIPS_MAX = 2
+	self.coal.AMMO_MAX = self.coal.CLIP_AMMO_MAX * self.coal.NR_CLIPS_MAX
+	self.coal.AMMO_PICKUP = self:_pickup_chance(self.coal.AMMO_MAX, 1)
+	self.coal.FIRE_MODE = "auto"
+	self.coal.fire_mode_data = {}
+	self.coal.fire_mode_data.fire_rate = 0.092
+	self.coal.CAN_TOGGLE_FIREMODE = true
+	self.coal.auto = {}
+	self.coal.auto.fire_rate = 0.092
+	self.coal.spread = {}
+	self.coal.spread.standing = self.new_m4.spread.standing
+	self.coal.spread.crouching = self.new_m4.spread.crouching
+	self.coal.spread.steelsight = self.new_m4.spread.steelsight
+	self.coal.spread.moving_standing = self.new_m4.spread.moving_standing
+	self.coal.spread.moving_crouching = self.new_m4.spread.moving_crouching
+	self.coal.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.coal.kick = {}
+	self.coal.kick.standing = {
+		-0.2,
+		0.4,
+		-1,
+		1
+	}
+	self.coal.kick.crouching = self.coal.kick.standing
+	self.coal.kick.steelsight = self.coal.kick.standing
+	self.coal.crosshair = {}
+	self.coal.crosshair.standing = {}
+	self.coal.crosshair.crouching = {}
+	self.coal.crosshair.steelsight = {}
+	self.coal.crosshair.standing.offset = 0.4
+	self.coal.crosshair.standing.moving_offset = 0.7
+	self.coal.crosshair.standing.kick_offset = 0.6
+	self.coal.crosshair.crouching.offset = 0.3
+	self.coal.crosshair.crouching.moving_offset = 0.6
+	self.coal.crosshair.crouching.kick_offset = 0.4
+	self.coal.crosshair.steelsight.hidden = true
+	self.coal.crosshair.steelsight.offset = 0
+	self.coal.crosshair.steelsight.moving_offset = 0
+	self.coal.crosshair.steelsight.kick_offset = 0.4
+	self.coal.shake = {}
+	self.coal.shake.fire_multiplier = 0.5
+	self.coal.shake.fire_steelsight_multiplier = -0.5
+	self.coal.autohit = autohit_smg_default
+	self.coal.aim_assist = aim_assist_smg_default
+	self.coal.weapon_hold = "coal"
+	self.coal.animations = {}
+	self.coal.animations.equip_id = "equip_coal"
+	self.coal.animations.recoil_steelsight = true
+	self.coal.global_value = "grv"
+	self.coal.texture_bundle_folder = "grv"
+	self.coal.panic_suppression_chance = 0.2
+	self.coal.stats = {
+		damage = 80,
+		spread = 14,
+		recoil = 14,
+		spread_moving = 14,
+		zoom = 3,
+		concealment = 24,
+		suppression = 14,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1,
+		reload = 11
+	}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -13600,7 +13924,7 @@ function WeaponTweakData:_create_table_structure()
 		auto = {}
 	}
 	self.ksg_npc = {
-		usage = "ak47",
+		usage = "r870",
 		sounds = {},
 		use_data = {},
 		auto = {}
@@ -14007,6 +14331,24 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.siltstone_npc = {
+		usage = "rifle",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.flint_npc = {
+		usage = "rifle",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.coal_npc = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -14142,4 +14484,7 @@ function WeaponTweakData:_precalculate_values()
 	self.sg417_npc.AMMO_MAX = self.sg417_npc.CLIP_AMMO_MAX * self.sg417_npc.NR_CLIPS_MAX
 	self.tti_npc.AMMO_MAX = self.tti_npc.CLIP_AMMO_MAX * self.tti_npc.NR_CLIPS_MAX
 	self.svdsil_snp_npc.AMMO_MAX = self.svdsil_snp_npc.CLIP_AMMO_MAX * self.svdsil_snp_npc.NR_CLIPS_MAX
+	self.siltstone_npc.AMMO_MAX = self.siltstone_npc.CLIP_AMMO_MAX * self.siltstone_npc.NR_CLIPS_MAX
+	self.flint_npc.AMMO_MAX = self.flint_npc.CLIP_AMMO_MAX * self.flint_npc.NR_CLIPS_MAX
+	self.coal_npc.AMMO_MAX = self.coal_npc.CLIP_AMMO_MAX * self.coal_npc.NR_CLIPS_MAX
 end

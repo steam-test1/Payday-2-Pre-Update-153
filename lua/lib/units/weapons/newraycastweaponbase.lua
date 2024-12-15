@@ -445,14 +445,11 @@ function NewRaycastWeaponBase:_update_stats_values(disallow_replenish)
 	local user_unit = self._setup and self._setup.user_unit
 	local current_state = alive(user_unit) and user_unit:movement() and user_unit:movement()._current_state
 	self._fire_rate_multiplier = managers.blackmarket:fire_rate_multiplier(self._name_id, self:weapon_tweak_data().category, self._silencer, nil, current_state, self._blueprint)
-	if self:is_category("smg", "lmg", "assault_rifle", "minigun") and self:fire_mode() == "auto" or self:is_category("bow", "crossbow", "saw") then
-		self._add_head_shot_mul = managers.player:upgrade_value("weapon", "automatic_head_shot_add", nil)
-	end
 end
 
 function NewRaycastWeaponBase:get_add_head_shot_mul()
-	if self._add_head_shot_mul and self._fire_mode == ids_auto then
-		return self._add_head_shot_mul
+	if self:is_category("smg", "lmg", "assault_rifle", "minigun") and self._fire_mode == ids_auto or self:is_category("bow", "crossbow", "saw") then
+		return managers.player:upgrade_value("weapon", "automatic_head_shot_add", nil)
 	end
 	return nil
 end

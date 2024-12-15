@@ -373,13 +373,13 @@ function CopDamage:damage_bullet(attack_data)
 			damage = self._health * 10
 		end
 	end
-	if attack_data.weapon_unit and attack_data.weapon_unit:base().is_category and attack_data.weapon_unit:base():is_category("bow", "crossbow", "saw") and managers.player:has_category_upgrade("weapon", "automatic_head_shot_add") then
-		attack_data.add_head_shot_mul = managers.player:upgrade_value("weapon", "automatic_head_shot_add", nil)
-	end
-	if not head and attack_data.add_head_shot_mul and self._char_tweak then
-		local tweak_headshot_mul = math.max(0, self._char_tweak.headshot_dmg_mul - 1)
-		local mul = tweak_headshot_mul * attack_data.add_head_shot_mul + 1
-		damage = damage * mul
+	if attack_data.weapon_unit:base().get_add_head_shot_mul then
+		local add_head_shot_mul = attack_data.weapon_unit:base():get_add_head_shot_mul()
+		if not head and add_head_shot_mul and self._char_tweak then
+			local tweak_headshot_mul = math.max(0, self._char_tweak.headshot_dmg_mul - 1)
+			local mul = tweak_headshot_mul * add_head_shot_mul + 1
+			damage = damage * mul
+		end
 	end
 	damage = self:_apply_damage_reduction(damage)
 	attack_data.raw_damage = damage
@@ -527,7 +527,7 @@ function CopDamage:_check_damage_achievements(attack_data, head)
 		local unit_anim = self._unit.anim_data and self._unit:anim_data()
 		local achievements = tweak_data.achievement.enemy_kill_achievements or {}
 		local current_mask_id = managers.blackmarket:equipped_mask().mask_id
-		local weapons_pass, weapon_pass, fire_mode_pass, ammo_pass, enemy_pass, enemy_weapon_pass, mask_pass, hiding_pass, head_pass, steelsight_pass, distance_pass, zipline_pass, rope_pass, one_shot_pass, weapon_type_pass, level_pass, part_pass, parts_pass, timer_pass, cop_pass, gangster_pass, civilian_pass, count_no_reload_pass, count_pass, count_in_row_pass, diff_pass, all_pass, memory
+		local weapons_pass, weapon_pass, fire_mode_pass, ammo_pass, enemy_pass, enemy_weapon_pass, mask_pass, hiding_pass, head_pass, steelsight_pass, distance_pass, zipline_pass, rope_pass, one_shot_pass, weapon_type_pass, level_pass, part_pass, parts_pass, timer_pass, cop_pass, gangster_pass, civilian_pass, count_no_reload_pass, count_pass, count_in_row_pass, diff_pass, complete_count_pass, all_pass, memory
 		local kill_count_no_reload = managers.job:get_memory("kill_count_no_reload_" .. tostring(attack_weapon:base()._name_id), true)
 		kill_count_no_reload = (kill_count_no_reload or 0) + 1
 		managers.job:set_memory("kill_count_no_reload_" .. tostring(attack_weapon:base()._name_id), kill_count_no_reload, true)
@@ -556,6 +556,14 @@ function CopDamage:_check_damage_achievements(attack_data, head)
 			count_pass = not achievement_data.kill_count or achievement_data.weapon and managers.statistics:session_killed_by_weapon(achievement_data.weapon) == achievement_data.kill_count
 			diff_pass = not achievement_data.difficulty or table.contains(achievement_data.difficulty, Global.game_settings.difficulty)
 			cop_pass = not achievement_data.is_cop or is_cop
+			complete_count_pass = not achievement_data.complete_count
+			if achievement_data.complete_count and achievement_data.weapons then
+				local total = 0
+				for _, weapon in ipairs(achievement_data.weapons) do
+					total = total + managers.statistics:session_killed_by_weapon(weapon)
+				end
+				complete_count_pass = total == achievement_data.complete_count
+			end
 			local enemy_type = self._unit:base()._tweak_table
 			if achievement_data.enemies then
 				enemy_pass = false
@@ -576,7 +584,7 @@ function CopDamage:_check_damage_achievements(attack_data, head)
 					end
 				end
 			end
-			all_pass = weapon_type_pass and weapons_pass and weapon_pass and fire_mode_pass and ammo_pass and one_shot_pass and enemy_pass and enemy_weapon_pass and mask_pass and hiding_pass and head_pass and distance_pass and zipline_pass and rope_pass and level_pass and part_pass and steelsight_pass and cop_pass and count_no_reload_pass and count_pass and diff_pass
+			all_pass = weapon_type_pass and weapons_pass and weapon_pass and fire_mode_pass and ammo_pass and one_shot_pass and enemy_pass and enemy_weapon_pass and mask_pass and hiding_pass and head_pass and distance_pass and zipline_pass and rope_pass and level_pass and part_pass and steelsight_pass and cop_pass and count_no_reload_pass and count_pass and diff_pass and complete_count_pass
 			timer_pass = not achievement_data.timer
 			if all_pass and achievement_data.timer then
 				memory = managers.job:get_memory(achievement, true)

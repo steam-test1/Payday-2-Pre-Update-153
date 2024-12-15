@@ -60,7 +60,7 @@ function BoxGuiObject:_create_side(panel, side, type)
 	})
 	if type == 0 then
 		return
-	elseif type == 1 then
+	elseif type == 1 or type == 3 or type == 4 then
 		local one = side_panel:bitmap({
 			texture = "guis/textures/pd2/shared_lines",
 			halign = "grow",
@@ -110,6 +110,8 @@ function BoxGuiObject:_create_side(panel, side, type)
 			two:set_size(tw, 2)
 			two:set_right(w)
 		end
+		one:set_visible(type == 1 or type == 3)
+		two:set_visible(type == 1 or type == 4)
 	elseif type == 2 then
 		local full = side_panel:bitmap({
 			texture = "guis/textures/pd2/shared_lines",

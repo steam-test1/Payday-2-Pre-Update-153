@@ -828,71 +828,40 @@ function BlackMarketManager:_outfit_string_mask()
 	return s
 end
 
+local BM_STRING_TO_INDEX = {
+	mask = 1,
+	mask_color = 2,
+	mask_pattern = 3,
+	mask_material = 4,
+	armor = 5,
+	character = 6,
+	primary = 7,
+	primary_blueprint = 8,
+	secondary = 9,
+	secondary_blueprint = 10,
+	deployable = 11,
+	deployable_amount = 12,
+	secondary_deployable = 13,
+	secondary_deployable_amount = 14,
+	concealment_modifier = 15,
+	melee_weapon = 16,
+	grenade = 17,
+	skills = 18,
+	primary_cosmetics = 19,
+	secondary_cosmetics = 20
+}
+
 function BlackMarketManager:outfit_string_index(type)
-	if type == "mask" then
-		return 1
-	end
-	if type == "mask_color" then
-		return 2
-	end
-	if type == "mask_pattern" then
-		return 3
-	end
-	if type == "mask_material" then
-		return 4
-	end
-	if type == "armor" then
-		return 5
-	end
-	if type == "character" then
-		return 6
-	end
-	if type == "primary" then
-		return 7
-	end
-	if type == "primary_blueprint" then
-		return 8
-	end
-	if type == "secondary" then
-		return 9
-	end
-	if type == "secondary_blueprint" then
-		return 10
-	end
-	if type == "deployable" then
-		return 11
-	end
-	if type == "deployable_amount" then
-		return 12
-	end
-	if type == "secondary_deployable" then
-		return 13
-	end
-	if type == "secondary_deployable_amount" then
-		return 14
-	end
-	if type == "concealment_modifier" then
-		return 15
-	end
-	if type == "melee_weapon" then
-		return 16
-	end
-	if type == "grenade" then
-		return 17
-	end
-	if type == "skills" then
-		return 18
-	end
-	if type == "primary_cosmetics" then
-		return 19
-	end
-	if type == "secondary_cosmetics" then
-		return 20
-	end
+	return BM_STRING_TO_INDEX[type]
 end
 
 function BlackMarketManager:unpack_outfit_from_string(outfit_string)
 	local data = string.split(outfit_string or "", " ")
+	for k, v in pairs(data) do
+		if v == "nil" or v == "" then
+			data[k] = nil
+		end
+	end
 	local outfit = {}
 	outfit.character = data[self:outfit_string_index("character")] or self._defaults.character
 	outfit.mask = {}
@@ -1455,7 +1424,7 @@ function BlackMarketManager:update(t, dt)
 				self._preloading_list = {}
 				self._preloading_index = 0
 				if self._preload_ws then
-					Overlay:gui():destroy_workspace(self._preload_ws)
+					managers.gui_data:destroy_workspace(self._preload_ws)
 					self._preload_ws = nil
 				end
 			else
@@ -4695,40 +4664,41 @@ function BlackMarketManager:set_mask_blueprint(slot, blueprint)
 	self._global.crafted_items[category][slot].blueprint = blueprint
 end
 
-function BlackMarketManager:get_real_character(mask_id, peer_id)
+function BlackMarketManager:get_real_character(character_name, peer_id)
 	local character
 	if managers.network and managers.network:session() and managers.network:session():peer(peer_id) then
 		character = managers.network:session():peer(peer_id):character()
 	else
-		character = self:get_preferred_character()
+		character = character_name or self:get_preferred_character()
 	end
 	return CriminalsManager.convert_old_to_new_character_workname(character)
 end
 
-function BlackMarketManager:get_real_mask_id(mask_id, peer_id)
+function BlackMarketManager:get_real_mask_id(mask_id, peer_id, char)
 	if not tweak_data.blackmarket.masks[mask_id] then
 		Application:error("[BlackMarketManager:get_real_mask_id] Missing mask:" .. mask_id .. ". Using dallas mask!")
 		return "dallas"
 	end
 	if tweak_data.blackmarket.masks[mask_id].characters then
-		local character = self:get_real_character(mask_id, peer_id)
+		local character = self:get_real_character(char, peer_id)
 		if not tweak_data.blackmarket.masks[mask_id].characters[character] and not Application:production_build() then
 			for index, _ in pairs(tweak_data.blackmarket.masks[mask_id].characters) do
 				character = index
 				break
 			end
 		end
+		print("[BlackMarketManager].get_real_mask_id", mask_id, character, tweak_data.blackmarket.masks[mask_id].characters[character])
 		return tweak_data.blackmarket.masks[mask_id].characters[character] or "dallas"
 	end
 	if mask_id ~= "character_locked" then
 		return mask_id
 	end
-	local character = self:get_real_character(mask_id, peer_id)
+	local character = self:get_real_character(char, peer_id)
 	return tweak_data.blackmarket.masks[mask_id][character] or "dallas"
 end
 
-function BlackMarketManager:mask_unit_name_by_mask_id(mask_id, peer_id)
-	return tweak_data.blackmarket.masks[self:get_real_mask_id(mask_id, peer_id)].unit
+function BlackMarketManager:mask_unit_name_by_mask_id(mask_id, peer_id, character)
+	return tweak_data.blackmarket.masks[self:get_real_mask_id(mask_id, peer_id, character)].unit
 end
 
 function BlackMarketManager:character_sequence_by_character_id(character_id, peer_id)

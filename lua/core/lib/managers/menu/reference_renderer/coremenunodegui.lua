@@ -19,6 +19,7 @@ function NodeGui:init(node, layer, parameters)
 	self.safe_rect_panel = self.ws:panel():panel({
 		name = "safe_rect_panel"
 	})
+	self.corner_items = {}
 	self.ws:show()
 	self.layers = {}
 	self.layers.first = layer
@@ -55,6 +56,17 @@ end
 function NodeGui:_setup_item_rows(node)
 	local items = node:items()
 	local i = 0
+	if not managers.menu:is_pc_controller() then
+		for i, a in ipairs(items) do
+			for k, b in ipairs(items) do
+				if i ~= k and a:parameters().controller_order_override ~= nil and b:parameters().controller_order_override ~= nil and a:parameters().controller_order_override < b:parameters().controller_order_override and k < i then
+					local t = a
+					items[i] = b
+					items[k] = t
+				end
+			end
+		end
+	end
 	for _, item in pairs(items) do
 		if item:visible() then
 			item:parameters().gui_node = self
@@ -207,7 +219,7 @@ function NodeGui:_clear_gui()
 end
 
 function NodeGui:close()
-	Overlay:gui():destroy_workspace(self.ws)
+	managers.gui_data:destroy_workspace(self.ws)
 	self.ws = nil
 end
 

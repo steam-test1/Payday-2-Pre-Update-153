@@ -165,8 +165,7 @@ function MenuSceneManager:_init_lobby_poses()
 end
 
 function MenuSceneManager:_setup_gui()
-	self._workspace = Overlay:gui():create_screen_workspace()
-	managers.gui_data:layout_workspace(self._workspace)
+	self._workspace = managers.gui_data:create_saferect_workspace()
 	self._main_panel = self._workspace:panel():panel({layer = 0})
 	local scaled_size = managers.gui_data:scaled_size()
 	self._main_panel:set_shape(0, 0, scaled_size.width, scaled_size.height)

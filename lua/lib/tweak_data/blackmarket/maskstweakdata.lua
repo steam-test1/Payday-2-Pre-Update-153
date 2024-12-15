@@ -3311,6 +3311,216 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.yor.value = 0
 	self.masks.yor.texture_bundle_folder = "yor"
 	self.masks.yor.sort_number = 42
+	self.masks.grv_01_bodhi = {}
+	self.masks.grv_01_bodhi.unit = "units/pd2_dlc_grv/masks/grv_01/grv_01_bodhi/msk_grv_01_bodhi"
+	self.masks.grv_01_bodhi.name_id = "bm_msk_cheat_error2"
+	self.masks.grv_01_bodhi.type = "helmet"
+	self.masks.grv_01_bodhi.inaccessible = true
+	self.masks.grv_01_bodhi.offsets = {
+		dallas = {
+			Vector3(0, -0.518717, 0.673747),
+			Rotation(0, 0, 0)
+		},
+		sydney = {
+			Vector3(-0.280224, -0.518717, 1.15073),
+			Rotation(-0.300467, -0.300467, 0.558107)
+		},
+		dragon = {
+			Vector3(-0.280224, 0.196761, 0.435254),
+			Rotation(0, 0, 0)
+		},
+		female_1 = {
+			Vector3(0, 0, 0.435254),
+			Rotation(0, 2.27525, 0)
+		},
+		hoxton = {
+			Vector3(0, -0.160978, 0.912239),
+			Rotation(0, 0, 0)
+		},
+		wild = {
+			Vector3(0, -1.71118, 1.03149),
+			Rotation(0, -6.31048, 0)
+		},
+		chains = {
+			Vector3(-0.280224, -0.995702, 0.435254),
+			Rotation(0, 0.558107, 0)
+		},
+		chico = {
+			Vector3(-0.0417315, -0.518717, 0.912239),
+			Rotation(0, 0, 0)
+		},
+		old_hoxton = {
+			Vector3(0, 0.196761, 0.0775149),
+			Rotation(0, 3.9924, 0)
+		},
+		bodhi = {
+			Vector3(0.196761, -0.280224, 0.5545),
+			Rotation(0, 0, 0)
+		},
+		dragan = {
+			Vector3(0, -0.160978, 0.912239),
+			Rotation(0, 0, 0)
+		}
+	}
+	self.masks.grv_01_bonnie = {}
+	self.masks.grv_01_bonnie.unit = "units/pd2_dlc_grv/masks/grv_01/grv_01_bonnie/msk_grv_01_bonnie"
+	self.masks.grv_01_bonnie.name_id = "bm_msk_cheat_error2"
+	self.masks.grv_01_bonnie.type = "helmet"
+	self.masks.grv_01_bonnie.inaccessible = true
+	self.masks.grv_01_bonnie.offsets = {
+		jacket = {
+			Vector3(0, 0, 0.196761),
+			Rotation(0, 0, 0)
+		},
+		wolf = {
+			Vector3(0, -0.518717, 1.03149),
+			Rotation(0, -1.15904, 0)
+		},
+		jowi = {
+			Vector3(-0.160978, -0.160978, 0.792993),
+			Rotation(0, 0, 0)
+		},
+		jimmy = {
+			Vector3(-0.0417315, 0.5545, -0.160978),
+			Rotation(0, 2.27525, 0)
+		},
+		sokol = {
+			Vector3(0, 0, 0.316008),
+			Rotation(0, 0, 0)
+		},
+		bonnie = {
+			Vector3(0.0775149, 0.673747, 0.435254),
+			Rotation(0, 0, 0)
+		}
+	}
+	self.masks.grv_01 = {}
+	self.masks.grv_01.name_id = "bm_msk_grv_01"
+	self.masks.grv_01.value = 0
+	self.masks.grv_01.pcs = {}
+	self.masks.grv_01.type = "helmet"
+	self.masks.grv_01.texture_bundle_folder = "grv"
+	self.masks.grv_01.sort_number = 43
+	self.masks.grv_01.dlc = "grv"
+	self.masks.grv_01.global_value = "grv"
+	self.masks.grv_01.characters = {
+		dallas = "grv_01_bodhi",
+		wolf = "grv_01_bonnie",
+		hoxton = "grv_01_bodhi",
+		chains = "grv_01_bonnie",
+		jowi = "grv_01_bonnie",
+		old_hoxton = "grv_01_bodhi",
+		female_1 = "grv_01_bodhi",
+		dragan = "grv_01_bodhi",
+		jacket = "grv_01_bonnie",
+		sokol = "grv_01_bonnie",
+		dragon = "grv_01_bodhi",
+		jimmy = "grv_01_bonnie",
+		sydney = "grv_01_bodhi",
+		wild = "grv_01_bodhi",
+		chico = "grv_01_bodhi",
+		chains = "grv_01_bodhi",
+		bodhi = "grv_01_bodhi",
+		bonnie = "grv_01_bonnie"
+	}
+	self.masks.grv_02 = {}
+	self.masks.grv_02.unit = "units/pd2_dlc_grv/masks/grv_02/msk_grv_02"
+	self.masks.grv_02.name_id = "bm_msk_grv_02"
+	self.masks.grv_02.pcs = {}
+	self.masks.grv_02.value = 0
+	self.masks.grv_02.texture_bundle_folder = "grv"
+	self.masks.grv_02.sort_number = 43
+	self.masks.grv_02.dlc = "grv"
+	self.masks.grv_02.global_value = "grv"
+	self.masks.grv_03 = {}
+	self.masks.grv_03.unit = "units/pd2_dlc_grv/masks/grv_03/msk_grv_03"
+	self.masks.grv_03.name_id = "bm_msk_grv_03"
+	self.masks.grv_03.pcs = {}
+	self.masks.grv_03.value = 0
+	self.masks.grv_03.texture_bundle_folder = "grv"
+	self.masks.grv_03.type = "tiara"
+	self.masks.grv_03.skip_mask_on_sequence = true
+	self.masks.grv_03.sort_number = 43
+	self.masks.grv_03.dlc = "grv"
+	self.masks.grv_03.global_value = "grv"
+	self.masks.grv_04 = {}
+	self.masks.grv_04.unit = "units/pd2_dlc_grv/masks/grv_04/msk_grv_04"
+	self.masks.grv_04.name_id = "bm_msk_grv_04"
+	self.masks.grv_04.pcs = {}
+	self.masks.grv_04.value = 0
+	self.masks.grv_04.type = "helmet"
+	self.masks.grv_04.texture_bundle_folder = "grv"
+	self.masks.grv_04.sort_number = 43
+	self.masks.grv_04.dlc = "grv"
+	self.masks.grv_04.offsets = {
+		sydney = {
+			Vector3(-0.0417333, -1.59194, 1.03148),
+			Rotation(0, 0, -1.15905)
+		},
+		chains = {
+			Vector3(0, -1.59194, 0.435252),
+			Rotation(0, -3.73477, 0)
+		},
+		female_1 = {
+			Vector3(0, -1.83043, 0.673745),
+			Rotation(0, 0, 0)
+		},
+		hoxton = {
+			Vector3(0, -2.30741, 1.38922),
+			Rotation(0, -8.02764, 0)
+		},
+		wild = {
+			Vector3(0, -1.83043, 0),
+			Rotation(1.41667, -3.73477, 0)
+		},
+		wolf = {
+			Vector3(0, -1.35344, 0.673745),
+			Rotation(0, 0, 0)
+		},
+		bodhi = {
+			Vector3(-0.399472, -2.42666, 0),
+			Rotation(0, 0, 0)
+		},
+		jowi = {
+			Vector3(0, -1.35344, 0),
+			Rotation(0, 0, 0)
+		},
+		jacket = {
+			Vector3(0, -1.35344, 0.077513),
+			Rotation(0, 0, 0)
+		},
+		dallas = {
+			Vector3(0, -1.71118, 0.554498),
+			Rotation(0, 0, 0)
+		},
+		old_hoxton = {
+			Vector3(0, -1.94967, -0.995704),
+			Rotation(0, 2.27524, 0)
+		},
+		bonnie = {
+			Vector3(0.196759, -0.757211, 0.196759),
+			Rotation(1.41667, -0.30048, -8.33763E-10)
+		},
+		sokol = {
+			Vector3(0, -1.94967, 1.15073),
+			Rotation(-3.3351E-9, -6.3105, -0.30048)
+		},
+		chico = {
+			Vector3(0, -1.83043, 0.792991),
+			Rotation(0, -3.73477, 0)
+		},
+		dragon = {
+			Vector3(0, -0.995704, 1.15073),
+			Rotation(0, -7.16907, 0)
+		},
+		jimmy = {
+			Vector3(0.435252, -1.47269, 0),
+			Rotation(2.27524, 2.08444E-9, -0.30048)
+		},
+		dragan = {
+			Vector3(0, -1.35344, 0.554498),
+			Rotation(0, 0, 0)
+		}
+	}
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.masks) do
 		if free_dlcs[data.dlc] then

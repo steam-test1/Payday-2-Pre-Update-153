@@ -20,6 +20,7 @@ function CoreEnvironmentControllerManager:init()
 	self._health_effect_value_diff = 0
 	self._GAME_DEFAULT_COLOR_GRADING = "color_off"
 	self._default_color_grading = self._GAME_DEFAULT_COLOR_GRADING
+	self._ignore_user_color_grading = false
 	self._blurzones = {}
 	self._hit_right = 0
 	self._hit_left = 0
@@ -113,8 +114,9 @@ function CoreEnvironmentControllerManager:set_dof_distance(distance, in_steelsig
 	self._in_steelsight = in_steelsight
 end
 
-function CoreEnvironmentControllerManager:set_default_color_grading(color_grading)
+function CoreEnvironmentControllerManager:set_default_color_grading(color_grading, ignore_user_setting)
 	self._default_color_grading = color_grading or self._GAME_DEFAULT_COLOR_GRADING
+	self._ignore_user_color_grading = ignore_user_setting or false
 end
 
 function CoreEnvironmentControllerManager:game_default_color_grading()
@@ -365,7 +367,8 @@ function CoreEnvironmentControllerManager:refresh_render_settings(vp)
 	end
 	local lvl_tweak_data = Global.level_data and Global.level_data.level_id and tweak_data.levels[Global.level_data.level_id]
 	local cubemap_name = lvl_tweak_data and lvl_tweak_data.cube or "cube_apply_empty"
-	self._vp:vp():set_post_processor_effect("World", Idstring("color_grading_post"), Idstring(self._default_color_grading))
+	local color_grading = self._default_color_grading
+	self._vp:vp():set_post_processor_effect("World", Idstring("color_grading_post"), Idstring(color_grading))
 	self._vp:vp():set_post_processor_effect("World", ids_hdr_post_processor, Idstring(managers.user:get_setting("light_adaption") and "default" or "no_light_adaption"))
 end
 

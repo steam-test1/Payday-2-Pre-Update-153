@@ -111,7 +111,7 @@ function MenuRenderer:close(...)
 	MenuRenderer.super.close(self, ...)
 	managers.menu_component:close_newsfeed_gui()
 	if alive(self._blackborder_workspace) then
-		Overlay:gui():destroy_workspace(self._blackborder_workspace)
+		managers.gui_data:destroy_workspace(self._blackborder_workspace)
 		self._blackborder_workspace = nil
 	end
 end
@@ -127,7 +127,7 @@ end
 
 function MenuRenderer:_create_blackborders()
 	if alive(self._blackborder_workspace) then
-		Overlay:gui():destroy_workspace(self._blackborder_workspace)
+		managers.gui_data:destroy_workspace(self._blackborder_workspace)
 		self._blackborder_workspace = nil
 	end
 	Application:debug("MenuRenderer: Creating blackborders")
@@ -468,15 +468,13 @@ end
 
 function MenuRenderer:ws_test()
 	if alive(self._test_safe) then
-		Overlay:gui():destroy_workspace(self._test_safe)
+		managers.gui_data:destroy_workspace(self._test_safe)
 	end
 	if alive(self._test_full) then
-		Overlay:gui():destroy_workspace(self._test_full)
+		managers.gui_data:destroy_workspace(self._test_full)
 	end
-	self._test_safe = Overlay:gui():create_screen_workspace()
-	managers.gui_data:layout_workspace(self._test_safe)
-	self._test_full = Overlay:gui():create_screen_workspace()
-	managers.gui_data:layout_fullscreen_workspace(self._test_full)
+	self._test_safe = managers.gui_data:create_saferect_workspace()
+	self._test_full = managers.gui_data:create_fullscreen_workspace()
 	local x = 150
 	local y = 200
 	local fx, fy = managers.gui_data:safe_to_full(x, y)

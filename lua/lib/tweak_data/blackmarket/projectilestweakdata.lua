@@ -22,7 +22,6 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 	self.projectiles.concussion.unit_dummy = "units/pd2_crimefest_2016/fez1/weapons/wpn_fps_gre_pressure/wpn_fps_gre_pressure_husk"
 	self.projectiles.concussion.sprint_unit = "units/pd2_crimefest_2016/fez1/weapons/wpn_fps_gre_pressure/wpn_third_gre_pressure_sprint"
 	self.projectiles.concussion.icon = "concussion_grenade"
-	self.projectiles.concussion.dlc = "fez1"
 	self.projectiles.concussion.throwable = true
 	self.projectiles.concussion.max_amount = 6
 	self.projectiles.concussion.animation = "throw_concussion"

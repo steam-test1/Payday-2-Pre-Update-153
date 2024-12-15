@@ -1185,6 +1185,19 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.spa.track = true
 	self.global_values.spa.sort_number = 302
 	self.global_values.spa.category = "dlc"
+	self.global_values.grv = {}
+	self.global_values.grv.name_id = "bm_global_value_grv"
+	self.global_values.grv.desc_id = "menu_l_global_value_grv"
+	self.global_values.grv.unlock_id = "bm_global_value_grv_unlock"
+	self.global_values.grv.color = Color(255, 255, 212, 0) / 255
+	self.global_values.grv.dlc = true
+	self.global_values.grv.chance = 1
+	self.global_values.grv.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "grv")
+	self.global_values.grv.durability_multiplier = 1
+	self.global_values.grv.drops = true
+	self.global_values.grv.track = true
+	self.global_values.grv.sort_number = 303
+	self.global_values.grv.category = "dlc"
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.global_values.sweettooth = {}
 		self.global_values.sweettooth.name_id = "bm_global_value_sweettooth"
@@ -1248,7 +1261,8 @@ function LootDropTweakData:init(tweak_data)
 		"friend",
 		"swm",
 		"spa",
-		"sha"
+		"sha",
+		"grv"
 	}
 	self:_create_global_value_list_map()
 end

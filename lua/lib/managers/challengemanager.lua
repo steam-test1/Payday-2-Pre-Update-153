@@ -534,7 +534,7 @@ function ChallengeManager:mission_set_value(variable, activated)
 end
 
 function ChallengeManager:check_equipped_outfit(equip_data, outfit, character)
-	local pass_armor, pass_deployable, pass_mask, pass_melee_weapon, pass_primary, pass_secondary, pass_primaries, pass_secondaries, pass_primary_unmodded, pass_secondary_unmodded, pass_skills, pass_melee_weapons, pass_primary_category, pass_secondary_category, pass_masks, pass_armors, pass_characters, pass_detection, pass_perk_deck, pass_grenade, pass_single_deployable
+	local pass_armor, pass_deployable, pass_mask, pass_melee_weapon, pass_primary, pass_secondary, pass_primaries, pass_secondaries, pass_primary_unmodded, pass_secondary_unmodded, pass_skills, pass_melee_weapons, pass_primary_category, pass_secondary_category, pass_masks, pass_armors, pass_characters, pass_detection, pass_perk_deck, pass_grenade, pass_single_deployable, pass_weapons
 	local ad = equip_data
 	local num_skills
 	pass_deployable = not ad.deployable or ad.deployable == outfit.deployable
@@ -554,6 +554,7 @@ function ChallengeManager:check_equipped_outfit(equip_data, outfit, character)
 	pass_secondaries = not ad.secondaries or table.contains(ad.secondaries, outfit.secondary.factory_id)
 	pass_secondary_unmodded = not ad.secondary_unmodded or managers.weapon_factory:is_weapon_unmodded(outfit.secondary.factory_id, outfit.secondary.blueprint)
 	pass_secondary_category = not ad.secondary_category or ad.secondary_category == tweak_data:get_raw_value("weapon", managers.weapon_factory:get_weapon_id_by_factory_id(outfit.secondary.factory_id), "category")
+	pass_weapons = not ad.weapons or table.contains(ad.weapons, outfit.primary.factory_id) or table.contains(ad.weapons, outfit.secondary.factory_id)
 	pass_characters = not ad.characters or table.contains(ad.characters, character)
 	pass_skills = not ad.num_skills
 	pass_perk_deck = not ad.perk_deck or outfit.skills.specializations[1] == tostring(ad.perk_deck)
@@ -574,7 +575,7 @@ function ChallengeManager:check_equipped_outfit(equip_data, outfit, character)
 	else
 		pass_detection = true
 	end
-	return pass_armor and pass_armors and pass_deployable and pass_mask and pass_masks and pass_melee_weapon and pass_primary and pass_secondary and pass_primaries and pass_secondaries and pass_primary_unmodded and pass_secondary_unmodded and pass_skills and pass_melee_weapons and pass_characters and pass_primary_category and pass_secondary_category and pass_detection and pass_grenade and pass_perk_deck and pass_single_deployable
+	return pass_armor and pass_armors and pass_deployable and pass_mask and pass_masks and pass_melee_weapon and pass_primary and pass_secondary and pass_primaries and pass_secondaries and pass_primary_unmodded and pass_secondary_unmodded and pass_skills and pass_melee_weapons and pass_characters and pass_primary_category and pass_secondary_category and pass_detection and pass_grenade and pass_perk_deck and pass_single_deployable and pass_weapons
 end
 
 function ChallengeManager:check_equipped_team(achievement_data)

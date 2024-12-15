@@ -2181,7 +2181,7 @@ function CopActionWalk:_advance_simplified_path()
 end
 
 function CopActionWalk:_husk_needs_speedup()
-	if next(self._ext_movement._queued_actions) then
+	if self._ext_movement._queued_actions and next(self._ext_movement._queued_actions) then
 		return true
 	elseif #self._simplified_path > 2 then
 		local sz_path = #self._simplified_path

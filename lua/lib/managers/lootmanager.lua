@@ -357,6 +357,7 @@ function LootManager:get_real_value(carry_id, multiplier)
 		local has_active_job = managers.job:has_active_job()
 		local job_stars = has_active_job and managers.job:current_job_stars() or 1
 		mul_value = tweak_data:get_value("carry", "value_multiplier", job_stars)
+		mul_value = mul_value or 1
 	end
 	return managers.money:get_bag_value(carry_id, multiplier) * mul_value
 end
@@ -495,11 +496,16 @@ function LootManager:_present(carry_id, multiplier)
 end
 
 function LootManager:sync_save(data)
-	data.LootManager = self._global
+	data.LootManager = {}
+	for key, value in pairs(self._global) do
+		data.LootManager[key] = value
+	end
+	data.LootManager.distribute = {}
 end
 
 function LootManager:sync_load(data)
 	self._global = data.LootManager
+	Global.loot_manager = self._global
 	for _, data in ipairs(self._global.secured) do
 		if data.multiplier and data.multiplier > 2 then
 			data.multiplier = 2

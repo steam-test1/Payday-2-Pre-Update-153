@@ -2288,6 +2288,27 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.catch.repeat_expire_t = 0.4
 	self.melee_weapons.catch.expire_t = 0.6
 	self.melee_weapons.catch.melee_damage_delay = 0.11
+	self.melee_weapons.oxide = deep_clone(self.melee_weapons.machete)
+	self.melee_weapons.oxide.name_id = "bm_melee_oxide"
+	self.melee_weapons.oxide.unit = "units/pd2_dlc_grv/weapons/wpn_fps_mel_oxide/wpn_fps_mel_oxide"
+	self.melee_weapons.oxide.third_unit = "units/pd2_dlc_grv/weapons/wpn_fps_mel_oxide/wpn_third_mel_oxide"
+	self.melee_weapons.oxide.dlc = "grv"
+	self.melee_weapons.oxide.texture_bundle_folder = "grv"
+	self.melee_weapons.oxide.sounds = {}
+	self.melee_weapons.oxide.sounds.equip = "oxide_equip"
+	self.melee_weapons.oxide.sounds.hit_air = "oxide_hit_air"
+	self.melee_weapons.oxide.sounds.hit_gen = "oxide_hit_gen"
+	self.melee_weapons.oxide.sounds.hit_body = "oxide_hit_body"
+	self.melee_weapons.oxide.sounds.charge = "machete_charge"
+	self.melee_weapons.oxide.stats.min_damage = 3
+	self.melee_weapons.oxide.stats.max_damage = 8
+	self.melee_weapons.oxide.stats.min_damage_effect = 1
+	self.melee_weapons.oxide.stats.max_damage_effect = 1
+	self.melee_weapons.oxide.stats.charge_time = 2
+	self.melee_weapons.oxide.stats.range = 225
+	self.melee_weapons.oxide.expire_t = 0.6
+	self.melee_weapons.oxide.repeat_expire_t = 0.8
+	self.melee_weapons.oxide.stats.concealment = 29
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.melee_weapons) do
 		if free_dlcs[data.dlc] then

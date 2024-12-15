@@ -329,6 +329,7 @@ function InteractionTweakData:init(tweak_data)
 	self.pick_lock_easy.sound_start = "bar_pick_lock"
 	self.pick_lock_easy.sound_interupt = "bar_pick_lock_cancel"
 	self.pick_lock_easy.sound_done = "bar_pick_lock_finished"
+	self.pick_lock_easy.is_lockpicking = true
 	self.pick_lock_easy_no_skill = {}
 	self.pick_lock_easy_no_skill.contour = "interactable_icon"
 	self.pick_lock_easy_no_skill.icon = "equipment_bank_manager_key"
@@ -350,6 +351,7 @@ function InteractionTweakData:init(tweak_data)
 	self.pick_lock_easy_no_skill.sound_start = "bar_pick_lock"
 	self.pick_lock_easy_no_skill.sound_interupt = "bar_pick_lock_cancel"
 	self.pick_lock_easy_no_skill.sound_done = "bar_pick_lock_finished"
+	self.pick_lock_easy_no_skill.is_lockpicking = true
 	self.pick_lock_hard = {}
 	self.pick_lock_hard.contour = "interactable_icon"
 	self.pick_lock_hard.icon = "equipment_bank_manager_key"
@@ -364,6 +366,7 @@ function InteractionTweakData:init(tweak_data)
 	self.pick_lock_hard.sound_start = "bar_pick_lock"
 	self.pick_lock_hard.sound_interupt = "bar_pick_lock_cancel"
 	self.pick_lock_hard.sound_done = "bar_pick_lock_finished"
+	self.pick_lock_hard.is_lockpicking = true
 	self.pick_lock_hard_no_skill = {}
 	self.pick_lock_hard_no_skill.contour = "interactable_icon"
 	self.pick_lock_hard_no_skill.icon = "equipment_bank_manager_key"
@@ -385,10 +388,12 @@ function InteractionTweakData:init(tweak_data)
 	self.pick_lock_hard_no_skill.sound_start = "bar_pick_lock"
 	self.pick_lock_hard_no_skill.sound_interupt = "bar_pick_lock_cancel"
 	self.pick_lock_hard_no_skill.sound_done = "bar_pick_lock_finished"
+	self.pick_lock_hard_no_skill.is_lockpicking = true
 	self.pick_lock_deposit_transport = deep_clone(self.pick_lock_hard_no_skill)
 	self.pick_lock_deposit_transport.timer = 15
 	self.pick_lock_deposit_transport.axis = "y"
 	self.pick_lock_deposit_transport.interact_distance = 80
+	self.pick_lock_deposit_transport.is_lockpicking = true
 	self.open_door_with_keys = {}
 	self.open_door_with_keys.contour = "interactable_icon"
 	self.open_door_with_keys.icon = "equipment_bank_manager_key"
@@ -402,13 +407,13 @@ function InteractionTweakData:init(tweak_data)
 	self.open_door_with_keys.sound_done = "bar_pick_lock_finished"
 	self.open_door_with_keys.special_equipment = "keychain"
 	self.open_door_with_keys.equipment_text_id = "hud_action_try_keys_no_key"
+	self.open_door_with_keys.is_lockpicking = true
 	self.cant_pick_lock = {}
 	self.cant_pick_lock.icon = "equipment_bank_manager_key"
 	self.cant_pick_lock.text_id = "hud_int_pick_lock"
 	self.cant_pick_lock.start_active = false
 	self.cant_pick_lock.interact_distance = 80
 	self.lockpick_int_off = deep_clone(self.cant_pick_lock)
-	self.lockpick_int_off.interact_distance = 0
 	self.hospital_veil_container = {}
 	self.hospital_veil_container.icon = "equipment_vialOK"
 	self.hospital_veil_container.text_id = "debug_interact_hospital_veil_container"
@@ -1710,6 +1715,7 @@ function InteractionTweakData:init(tweak_data)
 	self.crate_loot.action_text_id = "hud_action_cracking_crate"
 	self.crate_loot.timer = 2
 	self.crate_loot.start_active = false
+	self.crate_loot.interact_distance = 130
 	self.crate_loot.sound_start = "bar_open_crate"
 	self.crate_loot.sound_interupt = "bar_open_crate_cancel"
 	self.crate_loot.sound_done = "bar_open_crate_finished"
@@ -1734,6 +1740,7 @@ function InteractionTweakData:init(tweak_data)
 	self.crate_loot_close.action_text_id = "hud_action_closing_crate"
 	self.crate_loot_close.timer = 2
 	self.crate_loot_close.start_active = false
+	self.crate_loot_close.interact_distance = 130
 	self.crate_loot_close.sound_start = "bar_close_crate"
 	self.crate_loot_close.sound_interupt = "bar_close_crate_cancel"
 	self.crate_loot_close.sound_done = "bar_close_crate_finished"
@@ -1802,12 +1809,14 @@ function InteractionTweakData:init(tweak_data)
 	self.votingmachine2 = {}
 	self.votingmachine2.text_id = "debug_interact_hack_ipad"
 	self.votingmachine2.timer = 5
+	self.votingmachine2.interact_distance = 130
 	self.votingmachine2.sound_start = "bar_keyboard"
 	self.votingmachine2.sound_interupt = "bar_keyboard_cancel"
 	self.votingmachine2.sound_done = "bar_keyboard_finished"
 	self.votingmachine2_jammed = {}
 	self.votingmachine2_jammed.text_id = "debug_interact_hack_ipad_jammed"
 	self.votingmachine2_jammed.timer = 5
+	self.votingmachine2.interact_distance = 130
 	self.votingmachine2_jammed.sound_start = "bar_keyboard"
 	self.votingmachine2_jammed.sound_interupt = "bar_keyboard_cancel"
 	self.votingmachine2_jammed.sound_done = "bar_keyboard_finished"
@@ -1983,16 +1992,46 @@ function InteractionTweakData:init(tweak_data)
 	self.pku_barcode_downtown = {}
 	self.pku_barcode_downtown.text_id = "hud_int_hold_barcode"
 	self.pku_barcode_downtown.action_text_id = "hud_action_barcode"
-	self.pku_barcode_downtown.special_equipment_block = "barcode_downtown"
+	self.pku_barcode_downtown.special_equipment_block = {
+		"barcode_downtown",
+		"barcode_brickell",
+		"barcode_edgewater",
+		"barcode_isles_beach",
+		"barcode_opa_locka"
+	}
 	self.pku_barcode_downtown.timer = 2
 	self.pku_barcode_brickell = deep_clone(self.pku_barcode_downtown)
-	self.pku_barcode_brickell.special_equipment_block = "barcode_brickell"
+	self.pku_barcode_brickell.special_equipment_block = {
+		"barcode_downtown",
+		"barcode_brickell",
+		"barcode_edgewater",
+		"barcode_isles_beach",
+		"barcode_opa_locka"
+	}
 	self.pku_barcode_edgewater = deep_clone(self.pku_barcode_downtown)
-	self.pku_barcode_edgewater.special_equipment_block = "barcode_edgewater"
+	self.pku_barcode_edgewater.special_equipment_block = {
+		"barcode_downtown",
+		"barcode_brickell",
+		"barcode_edgewater",
+		"barcode_isles_beach",
+		"barcode_opa_locka"
+	}
 	self.pku_barcode_isles_beach = deep_clone(self.pku_barcode_downtown)
-	self.pku_barcode_isles_beach.special_equipment_block = "barcode_isles_beach"
+	self.pku_barcode_isles_beach.special_equipment_block = {
+		"barcode_downtown",
+		"barcode_brickell",
+		"barcode_edgewater",
+		"barcode_isles_beach",
+		"barcode_opa_locka"
+	}
 	self.pku_barcode_opa_locka = deep_clone(self.pku_barcode_downtown)
-	self.pku_barcode_opa_locka.special_equipment_block = "barcode_opa_locka"
+	self.pku_barcode_opa_locka.special_equipment_block = {
+		"barcode_downtown",
+		"barcode_brickell",
+		"barcode_edgewater",
+		"barcode_isles_beach",
+		"barcode_opa_locka"
+	}
 	self.read_barcode_downtown = {}
 	self.read_barcode_downtown.text_id = "hud_int_hold_read_barcode"
 	self.read_barcode_downtown.action_text_id = "hud_action_read_barcode"
@@ -2824,6 +2863,7 @@ function InteractionTweakData:init(tweak_data)
 	self.lockpick_locker.sound_start = "bar_pick_lock"
 	self.lockpick_locker.sound_interupt = "bar_pick_lock_cancel"
 	self.lockpick_locker.sound_done = "bar_pick_lock_finished"
+	self.lockpick_locker.is_lockpicking = true
 	self.cas_copy_usb = {}
 	self.cas_copy_usb.text_id = "hud_int_copy_data_usb"
 	self.cas_copy_usb.equipment_text_id = "hint_no_usb_key"
@@ -2921,9 +2961,14 @@ function InteractionTweakData:init(tweak_data)
 	self.cas_take_sleeping_gas.text_id = "hud_take_sleeping_gas"
 	self.cas_take_sleeping_gas.action_text_id = "hud_action_taking_sleeping_gas"
 	self.cas_take_sleeping_gas.timer = 2
-	self.cas_take_sleeping_gas.interact_distance = 150
+	self.cas_take_sleeping_gas.interact_distance = 200
 	self.cas_take_sleeping_gas.special_equipment_block = "cas_sleeping_gas"
 	self.cas_take_sleeping_gas.start_active = false
+	self.cas_take_sleeping_gas.requires_mask_off_upgrade = {
+		category = "player",
+		upgrade = "mask_off_pickup"
+	}
+	self.cas_take_sleeping_gas.can_interact_in_civilian = true
 	self.cas_chips_pile = {}
 	self.cas_chips_pile.text_id = "hud_take_casino_chips"
 	self.cas_chips_pile.start_active = false
@@ -3119,6 +3164,7 @@ function InteractionTweakData:init(tweak_data)
 	self.pick_lock_30.sound_start = "bar_pick_lock"
 	self.pick_lock_30.sound_interupt = "bar_pick_lock_cancel"
 	self.pick_lock_30.sound_done = "bar_pick_lock_finished"
+	self.pick_lock_30.is_lockpicking = true
 	self.winning_slip = {}
 	self.winning_slip.text_id = "hud_int_take_win_slip"
 	self.winning_slip.start_active = false
@@ -3150,7 +3196,6 @@ function InteractionTweakData:init(tweak_data)
 	self.gen_int_saw_upgrade.sound_start = "bar_drill_apply"
 	self.gen_int_saw_upgrade.sound_interupt = "bar_drill_apply_cancel"
 	self.gen_int_saw_upgrade.sound_done = "bar_drill_apply_finished"
-	self.gen_int_saw_upgrade.action_text_id = "hud_action_upgrading_drill"
 	self.safe_carry_drop = {}
 	self.safe_carry_drop.icon = "develop"
 	self.safe_carry_drop.text_id = "hud_int_hold_take_safe"
@@ -3447,6 +3492,7 @@ function InteractionTweakData:init(tweak_data)
 	self.man_trunk_picklock.sound_start = "bar_pick_lock"
 	self.man_trunk_picklock.sound_interupt = "bar_pick_lock_cancel"
 	self.man_trunk_picklock.sound_done = "bar_pick_lock_finished"
+	self.man_trunk_picklock.is_lockpicking = true
 	self.stash_server_pickup_server = deep_clone(self.stash_server_pickup)
 	self.stash_server_pickup_server.text_id = "hud_int_grab_server"
 	self.stash_server_pickup_server.action_text_id = "hud_action_grab_server"

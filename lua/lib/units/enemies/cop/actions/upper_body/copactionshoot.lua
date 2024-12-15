@@ -68,7 +68,7 @@ function CopActionShoot:init(action_desc, common_data)
 	self._variant = action_desc.variant
 	self._body_part = action_desc.body_part
 	self._turn_allowed = Network:is_client()
-	self._automatic_weap = weap_tweak.auto and true
+	self._automatic_weap = weap_tweak.auto and weapon_usage_tweak.autofire_rounds and true
 	self._shoot_t = 0
 	self._melee_timeout_t = t + 1
 	local shoot_from_pos = self._ext_movement:m_head_pos()

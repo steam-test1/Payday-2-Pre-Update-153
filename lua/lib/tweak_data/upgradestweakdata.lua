@@ -2314,7 +2314,9 @@ function UpgradesTweakData:init(tweak_data)
 			"g36",
 			"hunter",
 			"iceaxe",
-			"zeus"
+			"zeus",
+			"flint",
+			"oxide"
 		}
 	}
 	self.level_tree[17] = {
@@ -2547,7 +2549,11 @@ function UpgradesTweakData:init(tweak_data)
 	}
 	self.level_tree[42] = {
 		name_id = "weapons",
-		upgrades = {"fal", "tomahawk"}
+		upgrades = {
+			"fal",
+			"tomahawk",
+			"coal"
+		}
 	}
 	self.level_tree[43] = {
 		name_id = "weapons",
@@ -2570,7 +2576,11 @@ function UpgradesTweakData:init(tweak_data)
 	}
 	self.level_tree[46] = {
 		name_id = "weapons",
-		upgrades = {"gre_m79", "great"}
+		upgrades = {
+			"gre_m79",
+			"great",
+			"siltstone"
+		}
 	}
 	self.level_tree[47] = {
 		name_id = "weapons",
@@ -2890,6 +2900,9 @@ function UpgradesTweakData:init(tweak_data)
 	self:_contraband_weapon_definitions()
 	self:_ray_weapon_definitions()
 	self:_tti_weapon_definitions()
+	self:_siltstone_weapon_definitions()
+	self:_flint_weapon_definitions()
+	self:_coal_weapon_definitions()
 	self:_melee_weapon_definitions()
 	self:_grenades_definitions()
 	self:_carry_definitions()
@@ -8610,6 +8623,10 @@ function UpgradesTweakData:_melee_weapon_definitions()
 		category = "melee_weapon",
 		dlc = "spa"
 	}
+	self.definitions.oxide = {
+		category = "melee_weapon",
+		dlc = "grv"
+	}
 end
 
 function UpgradesTweakData:_grenades_definitions()
@@ -8622,7 +8639,7 @@ function UpgradesTweakData:_grenades_definitions()
 	self.definitions.wpn_prj_hur = {category = "grenade", dlc = "born"}
 	self.definitions.wpn_prj_target = {category = "grenade", dlc = "pim"}
 	self.definitions.frag_com = {category = "grenade", dlc = "pd2_clan"}
-	self.definitions.concussion = {category = "grenade", dlc = "fez1"}
+	self.definitions.concussion = {category = "grenade"}
 	self.definitions.chico_injector = {category = "grenade", dlc = "chico"}
 end
 
@@ -11680,6 +11697,15 @@ function UpgradesTweakData:_flint_weapon_definitions()
 		category = "weapon",
 		weapon_id = "flint",
 		factory_id = "wpn_fps_ass_flint",
+		dlc = "grv"
+	}
+end
+
+function UpgradesTweakData:_coal_weapon_definitions()
+	self.definitions.coal = {
+		category = "weapon",
+		weapon_id = "coal",
+		factory_id = "wpn_fps_smg_coal",
 		dlc = "grv"
 	}
 end

@@ -325,7 +325,6 @@ local mvec_to = Vector3()
 function NewNPCRaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, shoot_player)
 	local result = {}
 	local hit_unit
-	debug_pause_unit(user_unit, "[NewNPCRaycastWeaponBase:_fire_raycast]", user_unit, self._unit)
 	mvector3.set(mvec_to, direction)
 	mvector3.multiply(mvec_to, 20000)
 	mvector3.add(mvec_to, from_pos)

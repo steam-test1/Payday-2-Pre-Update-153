@@ -819,9 +819,6 @@ end
 
 function ContractBoxGui:set_enabled(enabled)
 	self._enabled = enabled
-	if enabled then
-	else
-	end
 	if self._contract_panel then
 		self._contract_panel:set_visible(enabled)
 	end

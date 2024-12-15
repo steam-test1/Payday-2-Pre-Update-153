@@ -1361,13 +1361,34 @@ function HUDTeammate:add_special_equipment(data)
 		name = "bitmap",
 		texture = icon,
 		color = Color.white,
-		layer = 1,
 		texture_rect = texture_rect,
+		layer = 0,
 		w = equipment_panel:w(),
-		h = equipment_panel:w()
+		h = equipment_panel:h(),
+		rotation = 360
 	})
+	local flash_icon = equipment_panel:bitmap({
+		name = "bitmap",
+		texture = icon,
+		color = tweak_data.hud.prime_color,
+		texture_rect = texture_rect,
+		layer = 1,
+		w = equipment_panel:w() + 2,
+		h = equipment_panel:h() + 2,
+		rotation = 360
+	})
+	local w = teammate_panel:w()
+	equipment_panel:set_x(w - (equipment_panel:w() + 0) * #special_equipment)
+	table.insert(special_equipment, equipment_panel)
 	local amount, amount_bg
 	if data.amount then
+		amount_bg = equipment_panel:child("amount_bg") or equipment_panel:bitmap({
+			name = "amount_bg",
+			texture = "guis/textures/pd2/equip_count",
+			color = Color.white,
+			layer = 2,
+			rotation = 360
+		})
 		amount = equipment_panel:child("amount") or equipment_panel:text({
 			name = "amount",
 			text = tostring(data.amount),
@@ -1376,35 +1397,16 @@ function HUDTeammate:add_special_equipment(data)
 			color = Color.black,
 			align = "center",
 			vertical = "center",
-			layer = 4,
+			layer = 3,
 			w = equipment_panel:w(),
-			h = equipment_panel:h()
+			h = equipment_panel:h(),
+			rotation = 360
 		})
-		amount:set_visible(1 < data.amount)
-		amount_bg = equipment_panel:child("amount_bg") or equipment_panel:bitmap({
-			name = "amount_bg",
-			texture = "guis/textures/pd2/equip_count",
-			color = Color.white,
-			layer = 3
-		})
-		amount_bg:set_visible(1 < data.amount)
-	end
-	local flash_icon = equipment_panel:bitmap({
-		name = "bitmap",
-		texture = icon,
-		color = tweak_data.hud.prime_color,
-		layer = 2,
-		texture_rect = texture_rect,
-		w = equipment_panel:w() + 2,
-		h = equipment_panel:w() + 2
-	})
-	table.insert(special_equipment, equipment_panel)
-	local w = teammate_panel:w()
-	equipment_panel:set_x(w - (equipment_panel:w() + 0) * #special_equipment)
-	if amount then
 		amount_bg:set_center(bitmap:center())
 		amount_bg:move(7, 7)
+		amount_bg:set_visible(1 < data.amount)
 		amount:set_center(amount_bg:center())
+		amount:set_visible(1 < data.amount)
 	end
 	local hud = managers.hud:script(PlayerBase.PLAYER_INFO_HUD_PD2)
 	flash_icon:set_center(bitmap:center())
@@ -1425,6 +1427,24 @@ function HUDTeammate:remove_special_equipment(equipment)
 	end
 end
 
+function HUDTeammate:layout_special_equipments()
+	local teammate_panel = self._panel
+	local special_equipment = self._special_equipment
+	local container_width = teammate_panel:w()
+	local row_width = math.floor(container_width / 32)
+	for i, panel in ipairs(special_equipment) do
+		local zi = i - 1
+		local y_pos = -math.floor(zi / row_width) * panel:h()
+		if self._main_player then
+			panel:set_x(container_width - (panel:w() + 0) * (zi % row_width + 1))
+			panel:set_y(y_pos)
+		else
+			panel:set_x(48 + panel:w() * (zi % row_width))
+			panel:set_y(y_pos)
+		end
+	end
+end
+
 function HUDTeammate:set_special_equipment_amount(equipment_id, amount)
 	local teammate_panel = self._panel
 	local special_equipment = self._special_equipment
@@ -1441,22 +1461,6 @@ end
 function HUDTeammate:clear_special_equipment()
 	self:remove_panel()
 	self:add_panel()
-end
-
-function HUDTeammate:layout_special_equipments()
-	local teammate_panel = self._panel
-	local special_equipment = self._special_equipment
-	local name = teammate_panel:child("name")
-	local w = teammate_panel:w()
-	for i, panel in ipairs(special_equipment) do
-		if self._main_player then
-			panel:set_x(w - (panel:w() + 0) * i)
-			panel:set_y(0)
-		else
-			panel:set_x(48 + panel:w() * (i - 1))
-			panel:set_y(0)
-		end
-	end
 end
 
 function HUDTeammate:set_condition(icon_data, text)

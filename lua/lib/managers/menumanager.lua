@@ -1432,6 +1432,11 @@ function MenuCallbackHandler:dlc_buy_spa_pc()
 	Steam:overlay_activate("store", 591710)
 end
 
+function MenuCallbackHandler:dlc_buy_grv_pc()
+	print("[MenuCallbackHandler:dlc_buy_grv_pc]")
+	Steam:overlay_activate("store", 218620)
+end
+
 function MenuCallbackHandler:dlc_buy_ps3()
 	print("[MenuCallbackHandler:dlc_buy_ps3]")
 	managers.dlc:buy_product("dlc1")
@@ -1509,6 +1514,7 @@ end
 
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
+		"grv",
 		"spa",
 		"friend",
 		"chico",
@@ -1698,6 +1704,10 @@ end
 
 function MenuCallbackHandler:visible_callback_spa()
 	return self:is_dlc_latest_locked("spa")
+end
+
+function MenuCallbackHandler:visible_callback_grv()
+	return self:is_dlc_latest_locked("grv")
 end
 
 function MenuCallbackHandler:not_has_all_dlcs()
@@ -2876,6 +2886,7 @@ end
 function MenuCallbackHandler:choice_choose_color_grading(item)
 	managers.user:set_setting("video_color_grading", item:value())
 	if managers.environment_controller then
+		managers.environment_controller:set_default_color_grading(item:value())
 		managers.environment_controller:refresh_render_settings()
 	end
 end
@@ -2885,7 +2896,6 @@ function MenuCallbackHandler:choice_choose_menu_theme(item)
 end
 
 function MenuCallbackHandler:choice_corpse_limit(item)
-	print("corpse limit set to: ", item:value())
 	managers.user:set_setting("corpse_limit", item:value())
 end
 

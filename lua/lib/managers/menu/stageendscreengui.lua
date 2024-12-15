@@ -2,6 +2,7 @@ StatsTabItem = StatsTabItem or class()
 
 function StatsTabItem:init(panel, tab_panel, text, i)
 	self._main_panel = panel
+	self._tab_panel = tab_panel
 	self._panel = self._main_panel:panel({
 		h = self._main_panel:h() - 70
 	})
@@ -43,11 +44,12 @@ end
 function StatsTabItem:reduce_to_small_font()
 	self._tab_text:set_font(tweak_data.menu.pd2_small_font_id)
 	self._tab_text:set_font_size(tweak_data.menu.pd2_small_font_size)
-	local prev_item_title_text = self._main_panel:child("tab_text_" .. tostring(self._index - 1))
+	local prev_item_title_text = self._tab_panel:child("tab_text_" .. tostring(self._index - 1))
 	local offset = prev_item_title_text and prev_item_title_text:right() or 0
 	local x, y, w, h = self._tab_text:text_rect()
 	self._tab_text:set_size(w + 15, h + 10)
 	self._tab_text:set_x(offset + 5)
+	self._tab_text:set_y(self._tab_text:y() + 5)
 	self._select_rect:set_shape(self._tab_text:shape())
 	self._panel:set_top(self._tab_text:bottom() - 2)
 	self._panel:set_h(self._main_panel:h() - 70)
@@ -434,22 +436,25 @@ function StatsTabItem.animate_deselect(o)
 end
 
 StageEndScreenGui = StageEndScreenGui or class()
+local padding = 10
 
 function StageEndScreenGui:init(saferect_ws, fullrect_ws, statistics_data)
 	self._safe_workspace = saferect_ws
 	self._full_workspace = fullrect_ws
 	self._fullscreen_panel = self._full_workspace:panel():panel({layer = 1})
+	local w = self._safe_workspace:panel():w() / 2 - padding
 	self._panel = self._safe_workspace:panel():panel({
-		w = self._safe_workspace:panel():w() / 2 - 10,
-		h = self._safe_workspace:panel():h() * 0.5 - 10,
+		w = w,
+		h = self._safe_workspace:panel():h() * 0.5 - padding,
 		layer = 6
 	})
 	self._panel:set_right(self._safe_workspace:panel():w())
 	self._panel:set_bottom(self._safe_workspace:panel():h())
 	local continue_button = managers.menu:is_pc_controller() and "[ENTER]" or nil
+	local continue_text = utf8.to_upper(managers.localization:text("menu_es_calculating_experience", {CONTINUE = continue_button}))
 	self._continue_button = self._panel:text({
 		name = "ready_button",
-		text = utf8.to_upper(managers.localization:text("menu_es_calculating_experience", {CONTINUE = continue_button})),
+		text = continue_text,
 		h = 32,
 		align = "right",
 		vertical = "center",
@@ -470,7 +475,7 @@ function StageEndScreenGui:init(saferect_ws, fullrect_ws, statistics_data)
 	self._tab_panel = self._scroll_panel:panel({name = "tab_panel"})
 	local big_text = self._fullscreen_panel:text({
 		name = "continue_big_text",
-		text = utf8.to_upper(managers.localization:text("menu_es_calculating_experience", {CONTINUE = continue_button})),
+		text = continue_text,
 		h = 90,
 		align = "right",
 		vertical = "bottom",
@@ -510,12 +515,15 @@ function StageEndScreenGui:init(saferect_ws, fullrect_ws, statistics_data)
 	self._items = {}
 	local item
 	local tab_height = 0
-	item = StatsTabItem:new(self._panel, self._tab_panel, utf8.to_upper(managers.localization:text("menu_es_summary")), 1)
-	item:set_stats({
-		"stage_cash_summary"
-	})
-	table.insert(self._items, item)
-	self._items[1]._panel:set_alpha(0)
+	local show_summary = true
+	if show_summary then
+		item = StatsTabItem:new(self._panel, self._tab_panel, utf8.to_upper(managers.localization:text("menu_es_summary")), 1)
+		item:set_stats({
+			"stage_cash_summary"
+		})
+		table.insert(self._items, item)
+		self._items[1]._panel:set_alpha(0)
+	end
 	item = StatsTabItem:new(self._panel, self._tab_panel, utf8.to_upper(managers.localization:text("menu_es_stats_crew")), 2)
 	item:set_stats({
 		"time_played",
@@ -708,6 +716,11 @@ function StageEndScreenGui:update(t, dt)
 		self._console_subtitle_string_id = nil
 		self._console_subtitle_duration = nil
 	end
+	for index, tab in ipairs(self._items) do
+		if tab.update then
+			tab:update(t, dt)
+		end
+	end
 end
 
 function StageEndScreenGui:feed_statistics(data)
@@ -817,7 +830,6 @@ function StageEndScreenGui:mouse_pressed(button, x, y)
 	if alive(self._next_page) and self._next_page:visible() and self._next_page:inside(x, y) then
 		self:next_page(false)
 	end
-	return self._selected_item
 end
 
 function StageEndScreenGui:mouse_moved(x, y)

@@ -375,12 +375,12 @@ end
 
 function ExperienceManager:get_job_xp_by_stars(stars)
 	local amount = tweak_data:get_value("experience_manager", "job_completion", stars)
-	return amount
+	return amount or 0
 end
 
 function ExperienceManager:get_stage_xp_by_stars(stars)
 	local amount = tweak_data:get_value("experience_manager", "stage_completion", stars)
-	return amount
+	return amount or 0
 end
 
 function ExperienceManager:get_contract_difficulty_multiplier(stars)
@@ -390,12 +390,12 @@ end
 
 function ExperienceManager:get_current_stage_xp_by_stars(stars, diff_stars)
 	local amount = self:get_stage_xp_by_stars(stars) + self:get_stage_xp_by_stars(stars) * self:get_contract_difficulty_multiplier(diff_stars)
-	return amount
+	return amount or 0
 end
 
 function ExperienceManager:get_current_job_xp_by_stars(stars, diff_stars)
 	local amount = self:get_job_xp_by_stars(stars) + self:get_job_xp_by_stars(stars) * self:get_contract_difficulty_multiplier(diff_stars)
-	return amount
+	return amount or 0
 end
 
 function ExperienceManager:get_current_job_day_multiplier()

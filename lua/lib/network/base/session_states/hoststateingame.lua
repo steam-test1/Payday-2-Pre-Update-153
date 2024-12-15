@@ -1,4 +1,5 @@
 HostStateInGame = HostStateInGame or class(HostStateBase)
+HostStateInGame.STATE_INDEX = 3
 
 function HostStateInGame:enter(data, enter_params)
 	print("[HostStateInGame:enter]", data, inspect(enter_params))
@@ -100,7 +101,24 @@ function HostStateInGame:on_join_request_received(data, peer_name, client_prefer
 		interupt_job_stage_level_index = interupt_stage_level and tweak_data.levels:get_index_from_level_id(interupt_stage_level) or 0
 	end
 	local server_xuid = (SystemInfo:platform() == Idstring("X360") or SystemInfo:platform() == Idstring("XB1")) and managers.network.account:player_id() or ""
-	new_peer:send("join_request_reply", 1, new_peer_id, character, level_index, difficulty_index, 2, data.local_peer:character(), my_user_id, Global.game_settings.mission, job_id_index, job_stage, alternative_job_stage, interupt_job_stage_level_index, server_xuid, ticket)
+	local params = {
+		1,
+		new_peer_id,
+		character,
+		level_index,
+		difficulty_index,
+		self.STATE_INDEX,
+		data.local_peer:character(),
+		my_user_id,
+		Global.game_settings.mission,
+		job_id_index,
+		job_stage,
+		alternative_job_stage,
+		interupt_job_stage_level_index,
+		server_xuid,
+		ticket
+	}
+	new_peer:send("join_request_reply", unpack(params))
 	new_peer:send("set_loading_state", false, data.session:load_counter())
 	if SystemInfo:platform() == Idstring("X360") or SystemInfo:platform() == Idstring("XB1") then
 		new_peer:send("request_player_name_reply", managers.network:session():local_peer():name())

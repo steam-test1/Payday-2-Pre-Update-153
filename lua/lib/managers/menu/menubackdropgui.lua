@@ -99,7 +99,7 @@ function MenuBackdropGUI:create_black_borders()
 		self._gui_data_scene_gui:destroy_workspace(self._black_bg_ws)
 		self._black_bg_ws = nil
 	end
-	self._gui_data_scene_gui = Overlay:gui()
+	self._gui_data_scene_gui = managers.gui_data:get_scene_gui()
 	self._black_bg_ws = self._gui_data_scene_gui:create_screen_workspace()
 	self._black_bg_ws:panel():rect({
 		name = "bg",
@@ -547,10 +547,10 @@ end
 
 function MenuBackdropGUI:destroy()
 	if self._blackborder_workspace then
-		Overlay:gui():destroy_workspace(self._blackborder_workspace)
+		self._gui_data_scene_gui:destroy_workspace(self._blackborder_workspace)
 	end
 	if self._my_workspace then
-		Overlay:gui():destroy_workspace(self._workspace)
+		self._gui_data_scene_gui:destroy_workspace(self._workspace)
 	else
 		self._workspace:panel():remove(self._panel)
 	end

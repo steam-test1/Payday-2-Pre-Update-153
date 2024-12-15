@@ -192,9 +192,8 @@ function FreeFlight:_setup_controller(controller_manager)
 end
 
 function FreeFlight:_setup_gui()
-	local gui_scene = Overlay:gui()
 	local res = RenderSettings.resolution
-	self._workspace = gui_scene:create_screen_workspace()
+	self._workspace = Overlay:gui():create_screen_workspace()
 	self._workspace:set_timer(TimerManager:main())
 	self._panel = self._workspace:panel()
 	local SCREEN_RIGHT_OFFSET = 420

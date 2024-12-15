@@ -99,6 +99,8 @@ require("lib/units/editor/UnitDamageTriggerElement")
 require("lib/units/editor/StopwatchElement")
 require("lib/units/editor/PlayerCharacterElement")
 require("lib/units/editor/RandomInstanceElement")
+require("lib/units/editor/MissionLoadDelayedElement")
+require("lib/units/editor/MissionUnloadStaticElement")
 require("lib/units/editor/ChangeVanSkinElement")
 require("lib/units/editor/CustomSafehouseElement")
 require("lib/units/editor/LootPileUnitElement")
@@ -271,4 +273,15 @@ end
 function WorldEditor:_open_inventory_icon_creator()
 	self._inventory_icon_creator = self._inventory_icon_creator or InventoryIconCreator:new()
 	self._inventory_icon_creator:show_ews()
+end
+
+function WorldEditor:open()
+	WorldEditor.super.open(self)
+	managers.menu_component:set_rev_visible(self._enable_revision_number)
+end
+
+function WorldEditor:on_enable_revision_number(changed, value)
+	if changed then
+		managers.menu_component:set_rev_visible(value)
+	end
 end

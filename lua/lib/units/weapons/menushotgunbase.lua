@@ -1,12 +1,12 @@
-NewShotgunBase = NewShotgunBase or class(NewRaycastWeaponBase)
+ShotgunBase = ShotgunBase or class(NewRaycastWeaponBase)
 
-function NewShotgunBase:init(...)
-	NewShotgunBase.super.init(self, ...)
+function ShotgunBase:init(...)
+	ShotgunBase.super.init(self, ...)
 end
 
 NewFlamethrowerBase = NewFlamethrowerBase or class(NewRaycastWeaponBase)
 FlamethrowerEffectExtension = FlamethrowerEffectExtension or class(NewRaycastWeaponBase)
-SaigaShotgun = SaigaShotgun or class(NewShotgunBase)
+SaigaShotgun = SaigaShotgun or class(ShotgunBase)
 GrenadeLauncherBase = GrenadeLauncherBase or class(NewRaycastWeaponBase)
 GrenadeLauncherContinousReloadBase = GrenadeLauncherContinousReloadBase or class(NewRaycastWeaponBase)
 AkimboWeaponBase = AkimboWeaponBase or class(NewRaycastWeaponBase)

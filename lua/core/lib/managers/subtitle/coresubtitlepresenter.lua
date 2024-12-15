@@ -165,7 +165,7 @@ end
 
 function OverlayPresenter:_clear_workspace()
 	if CoreCode.alive(self.__ws) then
-		Overlay:gui():destroy_workspace(self.__ws)
+		managers.gui_data:destroy_workspace(self.__ws)
 	end
 	self.__ws = managers.gui_data:create_saferect_workspace()
 	self.__subtitle_panel = self.__ws:panel():panel({layer = 150})

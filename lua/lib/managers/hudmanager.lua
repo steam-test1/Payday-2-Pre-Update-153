@@ -40,8 +40,7 @@ function HUDManager:init()
 	self._fullscreen_workspace = managers.gui_data:create_fullscreen_16_9_workspace()
 	self._saferect = managers.gui_data:create_saferect_workspace()
 	managers.gui_data:layout_corner_saferect_1280_workspace(self._saferect)
-	self._workspace = Overlay:gui():create_scaled_screen_workspace(self._workspace_size.w, self._workspace_size.h, self._workspace_size.x, self._workspace_size.y, RenderSettings.resolution.x, RenderSettings.resolution.y)
-	managers.gui_data:layout_fullscreen_workspace(self._workspace)
+	self._workspace = managers.gui_data:create_fullscreen_workspace()
 	self._updators = {}
 	managers.viewport:add_resolution_changed_func(callback(self, self, "resolution_changed"))
 	self._sound_source = SoundDevice:create_source("hud")
@@ -1434,6 +1433,7 @@ function HUDManager:reset_player_hpbar()
 		return
 	end
 	local color_id = managers.network:session():local_peer():id()
+	self._teammate_panels[4]:add_panel()
 	self:set_teammate_callsign(4, color_id)
 	self:set_teammate_name(4, managers.network:session():local_peer():name())
 end

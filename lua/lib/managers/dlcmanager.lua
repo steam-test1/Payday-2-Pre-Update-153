@@ -427,6 +427,10 @@ function GenericDLCManager:has_sha()
 	return self:is_dlc_unlocked("sha")
 end
 
+function GenericDLCManager:has_grv()
+	return self:is_dlc_unlocked("grv")
+end
+
 function GenericDLCManager:has_goty_all_dlc_bundle_2014()
 	return self:has_goty_weapon_bundle_2014() and self:has_goty_heist_bundle_2014() and self:is_dlcs_unlocked({
 		"character_pack_clover"
@@ -822,7 +826,8 @@ function PS4DLCManager:init()
 				product_id = "PD2DLCBIKERCHA17",
 				verified = false,
 				verified_for_TheBigScore = false
-			}
+			},
+			rota = {verified = true, verified_for_TheBigScore = true}
 		}
 		self:_verify_dlcs()
 	end
@@ -1144,7 +1149,6 @@ function WINDLCManager:init()
 				no_install = true,
 				external = true
 			},
-			fez1 = {app_id = "218620", no_install = true},
 			pim = {app_id = "545100", no_install = true},
 			rota = {app_id = "218620", no_install = true},
 			gotti_bundle = {app_id = "218620", no_install = true},
@@ -1168,7 +1172,8 @@ function WINDLCManager:init()
 			swm = {app_id = "588130", no_install = true},
 			yor_bundle = {app_id = "218620", no_install = true},
 			sha = {app_id = "218620", no_install = true},
-			spa = {app_id = "591710", no_install = true}
+			spa = {app_id = "591710", no_install = true},
+			grv = {app_id = "612900", no_install = true}
 		}
 		self:_verify_dlcs()
 	end

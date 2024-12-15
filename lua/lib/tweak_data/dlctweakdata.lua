@@ -60,6 +60,7 @@ function DLCTweakData:init(tweak_data)
 			sha = true,
 			fish = true,
 			lxy = true,
+			grv = true,
 			rip = true,
 			pd2_goty = 1,
 			pd2_hw_boxing = true,
@@ -5197,10 +5198,6 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
-	self.fez1 = {}
-	self.fez1.dlc = "has_fez1"
-	self.fez1.content = {}
-	self.fez1.content.loot_drops = {}
 	self.howl = {}
 	self.howl.free = true
 	self.howl.content = {}
@@ -5360,6 +5357,11 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "weapon_mods",
 			item_entry = "wpn_fps_gre_arbiter_b_long",
+			amount = 1
+		},
+		{
+			type_items = "weapon_mods",
+			item_entry = "wpn_fps_upg_a_grenade_launcher_incendiary_arbiter",
 			amount = 1
 		}
 	}
@@ -5647,6 +5649,99 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "textures",
 			item_entry = "continental",
+			amount = 1
+		}
+	}
+	self.grv_bundle = {}
+	self.grv_bundle.content = {}
+	self.grv_bundle.content.loot_global_value = "grv"
+	self.grv_bundle.dlc = "has_grv"
+	self.grv_bundle.content.loot_drops = {}
+	self.ach_grv_1 = {}
+	self.ach_grv_1.dlc = "has_achievement"
+	self.ach_grv_1.achievement_id = "grv_1"
+	self.ach_grv_1.content = {}
+	self.ach_grv_1.content.loot_global_value = "grv"
+	self.ach_grv_1.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "grv_04",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "tricolor",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "russian_gamble",
+			amount = 1
+		}
+	}
+	self.ach_grv_2 = {}
+	self.ach_grv_2.dlc = "has_achievement"
+	self.ach_grv_2.achievement_id = "grv_2"
+	self.ach_grv_2.content = {}
+	self.ach_grv_2.content.loot_global_value = "grv"
+	self.ach_grv_2.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "grv_01",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "russian_camouflage",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "red_star",
+			amount = 1
+		}
+	}
+	self.ach_grv_3 = {}
+	self.ach_grv_3.dlc = "has_achievement"
+	self.ach_grv_3.achievement_id = "grv_3"
+	self.ach_grv_3.content = {}
+	self.ach_grv_3.content.loot_global_value = "grv"
+	self.ach_grv_3.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "grv_03",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "propaganda_palette",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "bear_fight",
+			amount = 1
+		}
+	}
+	self.ach_grv_4 = {}
+	self.ach_grv_4.dlc = "has_achievement"
+	self.ach_grv_4.achievement_id = "grv_4"
+	self.ach_grv_4.content = {}
+	self.ach_grv_4.content.loot_global_value = "grv"
+	self.ach_grv_4.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "grv_02",
+			amount = 1
+		},
+		{
+			type_items = "materials",
+			item_entry = "ceramics_gzhel",
+			amount = 1
+		},
+		{
+			type_items = "textures",
+			item_entry = "prison_statement",
 			amount = 1
 		}
 	}

@@ -10,7 +10,8 @@ end
 
 function MedicDamage:heal_unit(unit)
 	local t = Application:time()
-	if t < self._heal_cooldown_t + tweak_data.medic.cooldown then
+	local cooldown = tweak_data.medic.cooldown
+	if t < self._heal_cooldown_t + cooldown then
 		return false
 	end
 	if self._unit:anim_data() and self._unit:anim_data().act then

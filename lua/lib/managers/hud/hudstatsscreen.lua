@@ -1,4 +1,5 @@
 HUDStatsScreen = HUDStatsScreen or class()
+local padding = 10
 
 function HUDStatsScreen:init()
 	self._full_hud_panel = managers.hud:script(managers.hud.STATS_SCREEN_FULLSCREEN).panel
@@ -388,18 +389,20 @@ function HUDStatsScreen:init()
 		local difficulty_stars = managers.job:current_difficulty_stars()
 		local difficulty = tweak_data.difficulties[difficulty_stars + 2] or 1
 		local difficulty_string_id = tweak_data.difficulty_name_ids[difficulty]
+		local difficulty_string = managers.localization:to_upper_text(difficulty_string_id)
+		local difficulty_color = tweak_data.screen_colors.risk
 		local risk_text = day_wrapper_panel:text({
 			name = "risk_text",
 			font = tweak_data.menu.pd2_medium_font,
 			font_size = tweak_data.hud_stats.loot_size,
-			text = managers.localization:to_upper_text(difficulty_string_id),
+			text = difficulty_string,
 			color = tweak_data.screen_colors.text
 		})
 		managers.hud:make_fine_text(risk_text)
 		risk_text:set_top(math.round(paygrade_title:top()))
 		risk_text:set_left(paygrade_title:right() + 8)
 		if 0 < difficulty_stars then
-			risk_text:set_color(tweak_data.screen_colors.risk)
+			risk_text:set_color(difficulty_color)
 		end
 	end
 	local day_payout = day_wrapper_panel:text({
@@ -1133,7 +1136,7 @@ function HUDStatsScreen:_update_stats_screen_day(right_panel)
 			local ghostable_text = day_wrapper_panel:child("ghostable_text")
 			ghost_icon:set_left(days_title:right())
 			ghost_icon:set_center_y(days_title:center_y())
-			ghostable_text:set_y(day_description:bottom() + 10)
+			ghostable_text:set_y(day_description:bottom() + padding)
 			ghostable_text:set_left(day_description:left())
 			ghost_icon:set_visible(is_level_ghostable)
 			ghost_icon:set_color(is_whisper_mode and Color.white or tweak_data.screen_colors.important_1)

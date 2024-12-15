@@ -2,11 +2,13 @@ ScrollablePanel = ScrollablePanel or class()
 local PANEL_PADDING = 10
 local FADEOUT_SPEED = 5
 local SCROLL_SPEED = 28
+ScrollablePanel.SCROLL_SPEED = SCROLL_SPEED
 
 function ScrollablePanel:init(parent_panel, name, data)
 	data = data or {}
 	self._alphas = {}
 	self._padding = data.padding ~= nil and data.padding or PANEL_PADDING
+	self._force_scroll_indicators = data.force_scroll_indicators
 	local layer = data.layer ~= nil and data.layer or 50
 	self._panel = parent_panel:panel({
 		name = name .. "Base"
@@ -316,7 +318,7 @@ function ScrollablePanel:_check_scroll_indicator_states()
 	local down_alpha = self:canvas():bottom() > self:scroll_panel():h() and 1 or 0
 	self:set_element_alpha_target("scroll_up_indicator_arrow", up_alpha, FADEOUT_SPEED)
 	self:set_element_alpha_target("scroll_down_indicator_arrow", down_alpha, FADEOUT_SPEED)
-	if 0 < self:padding() then
+	if 0 < self:padding() or self._force_scroll_indicators then
 		self:set_element_alpha_target("scroll_up_indicator_shade", up_alpha, FADEOUT_SPEED)
 		self:set_element_alpha_target("scroll_down_indicator_shade", down_alpha, FADEOUT_SPEED)
 	end

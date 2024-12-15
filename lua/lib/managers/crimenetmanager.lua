@@ -2963,8 +2963,10 @@ function CrimeNetGui:update_server_job(data, i)
 			peer_icon:set_visible(i <= job.num_plrs)
 		end
 	end
-	local new_color = data.mutators and tweak_data.screen_colors.mutators_color or Color.white
-	local new_text_color = data.mutators and tweak_data.screen_colors.mutators_color_text or Color.white
+	local new_color = Color.white
+	local new_text_color = Color.white
+	new_color = data.mutators and tweak_data.screen_colors.mutators_color or new_color
+	new_text_color = data.mutators and tweak_data.screen_colors.mutators_color_text or new_text_color
 	if job.peers_panel then
 		for i, peer_icon in ipairs(job.peers_panel:children()) do
 			peer_icon:set_color(new_color)

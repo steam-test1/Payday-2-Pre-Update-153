@@ -39,6 +39,13 @@ function CoreEditor:_add_general_page(notebook)
 	reset_camera_on_new:set_value(self._reset_camera_on_new)
 	self._config._reset_camera_on_new = reset_camera_on_new
 	general_sizer:add(reset_camera_on_new, 0, 0, "EXPAND")
+	local enable_revision_number = EWS:CheckBox(page_general, "Enable Revision Number", "")
+	enable_revision_number:set_value(self._enable_revision_number)
+	self._config._enable_revision_number = {
+		ctrlr = enable_revision_number,
+		callback = self.on_enable_revision_number and callback(self, self, "on_enable_revision_number")
+	}
+	general_sizer:add(enable_revision_number, 0, 0, "EXPAND")
 	local undo_sizer = EWS:StaticBoxSizer(page_general, "VERTICAL", "Undo [Beta]:")
 	local use_beta_undo = EWS:CheckBox(page_general, "Enable Undo", "")
 	use_beta_undo:set_value(self._use_beta_undo)

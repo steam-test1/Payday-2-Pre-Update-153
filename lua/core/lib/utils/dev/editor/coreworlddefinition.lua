@@ -23,6 +23,8 @@ function WorldDefinition:init(params)
 	self._ignore_spawn_list = {}
 	self._excluded_continents = {}
 	self:_parse_world_setting(params.world_setting)
+	self._blacklist_data = {}
+	self:_load_blacklist()
 	self:parse_continents()
 	managers.sequence:preload()
 	PackageManager:set_resource_loaded_clbk(Idstring("unit"), callback(managers.sequence, managers.sequence, "clbk_pkg_manager_unit_loaded"))
@@ -125,6 +127,13 @@ function WorldDefinition:_load_continent_init_package(path)
 end
 
 function WorldDefinition:_load_continent_package(path)
+	function blacklist_filter_pred(t, name)
+		if t == Idstring("unit") then
+			return not self._blacklist_data[name:key()]
+		end
+		return true
+	end
+	
 	if Application:editor() then
 		return
 	end
@@ -134,7 +143,7 @@ function WorldDefinition:_load_continent_package(path)
 	end
 	self._continent_packages = self._continent_packages or {}
 	if not PackageManager:loaded(path) then
-		PackageManager:load(path)
+		PackageManager:load_filtered(path, blacklist_filter_pred)
 		table.insert(self._continent_packages, path)
 	end
 end
@@ -171,6 +180,18 @@ function WorldDefinition:_parse_world_setting(world_setting)
 	end
 	for name, bool in pairs(t) do
 		self._excluded_continents[name] = bool
+	end
+end
+
+function WorldDefinition:_load_blacklist()
+	if not Application:editor() then
+		local path = self:world_dir() .. "blacklist"
+		if DB:has("blacklist", path) then
+			local blacklist_data = self:_serialize_to_script("blacklist", path)
+			for _, k in ipairs(blacklist_data) do
+				self._blacklist_data[Idstring(k):key()] = true
+			end
+		end
 	end
 end
 
@@ -685,6 +706,7 @@ function WorldDefinition:create_delayed_unit(new_unit_id)
 		self:preload_unit(unit_data.name)
 		local unit = self:make_unit(unit_data, spawn_data[2])
 		if unit then
+			unit:set_spawn_delayed(true)
 			table.insert(spawn_data[3], unit)
 		end
 	end

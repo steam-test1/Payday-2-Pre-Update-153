@@ -1618,6 +1618,12 @@ Play the full version soon to get your full PAYDAY!]],
 			grenade_type = "frag_com",
 			kill = true,
 			is_civilian = false
+		},
+		daily_grenades_dynamite = {
+			trophy_stat = "daily_grenades",
+			grenade_type = "dynamite",
+			kill = true,
+			is_civilian = false
 		}
 	}
 	self.achievement.shotgun_single_shot_kills = {
@@ -1923,6 +1929,19 @@ Play the full version soon to get your full PAYDAY!]],
 				"tank",
 				"spooc",
 				"medic"
+			}
+		},
+		grv_2 = {
+			award = "grv_2",
+			weapon = "coal",
+			count_no_reload = 32
+		},
+		grv_3 = {
+			stat = "grv_3_stats",
+			weapons = {
+				"siltstone",
+				"flint",
+				"coal"
 			}
 		}
 	}
@@ -3355,6 +3374,30 @@ Play the full version soon to get your full PAYDAY!]],
 			everyone_killed_by_weapons = 0,
 			everyone_killed_by_melee = 0,
 			everyone_killed_by_grenade = 0
+		},
+		grv_1 = {
+			award = "grv_1",
+			difficulty = overkill_and_above,
+			equipped_outfit = {
+				primaries = {
+					"wpn_fps_snp_siltstone",
+					"wpn_fps_ass_flint"
+				},
+				secondary = "wpn_fps_smg_coal",
+				melee_weapon = "oxide"
+			}
+		},
+		grv_4 = {
+			award = "grv_4",
+			stealth = true,
+			equipped_outfit = {
+				primaries = {
+					"wpn_fps_snp_siltstone",
+					"wpn_fps_ass_flint"
+				},
+				secondary = "wpn_fps_smg_coal",
+				melee_weapon = "oxide"
+			}
 		},
 		bain_jobs = {
 			challenge_stat = "bain_jobs",

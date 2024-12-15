@@ -79,6 +79,7 @@ function ClientNetworkSession:on_join_request_reply(reply, my_peer_id, my_charac
 		Global.game_settings.level_id = tweak_data.levels:get_level_name_from_index(level_index)
 		Global.game_settings.difficulty = tweak_data:index_to_difficulty(difficulty_index)
 		Global.game_settings.mission = mission
+		Global.game_settings.join_state_index = state_index
 		self._server_peer:set_character(server_character)
 		self._server_peer:set_xuid(xuid)
 		if SystemInfo:platform() == Idstring("X360") or SystemInfo:platform() == Idstring("XB1") then
@@ -114,7 +115,13 @@ function ClientNetworkSession:on_join_request_reply(reply, my_peer_id, my_charac
 			Global.game_settings.world_setting = managers.job:current_world_setting()
 			self._server_peer:verify_job(job_id)
 		end
-		cb(state_index == 1 and "JOINED_LOBBY" or "JOINED_GAME", level_index, difficulty_index, state_index)
+		local params = {
+			state_index == 1 and "JOINED_LOBBY" or "JOINED_GAME",
+			level_index,
+			difficulty_index,
+			state_index
+		}
+		cb(unpack(params))
 	elseif reply == 2 then
 		self:remove_peer(self._server_peer, 1)
 		cb("KICKED")

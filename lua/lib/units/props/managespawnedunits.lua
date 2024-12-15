@@ -3,33 +3,18 @@ ManageSpawnedUnits = ManageSpawnedUnits or class()
 function ManageSpawnedUnits:init(unit)
 	self._unit = unit
 	self._spawned_units = {}
+	unit:set_extension_update_enabled(Idstring("spawn_manager"), true)
 end
 
-function ManageSpawnedUnits:_link_joints(unit_id, joint_table)
-	for index, value in ipairs(self[joint_table]) do
-		if 1 < index then
-			local parent_object = self._unit:get_object(Idstring(value))
-			local child_object = self._spawned_units[unit_id].unit:get_object(Idstring(value))
-			child_object:link(parent_object)
-			child_object:set_position(parent_object:position())
-			child_object:set_rotation(parent_object:rotation())
-		end
-	end
-	self._unit:set_moving()
-end
-
-function ManageSpawnedUnits:sync_unit_spawn(unit_id)
-	if self._sync_spawn_and_link and self._sync_spawn_and_link[unit_id] then
-		self:_link_joints(unit_id, self._sync_spawn_and_link[unit_id].joint_table)
-		self._sync_spawn_and_link[unit_id] = nil
-	end
+function ManageSpawnedUnits:update(unit, t, dt)
 end
 
 function ManageSpawnedUnits:spawn_unit(unit_id, align_obj_name, unit)
+	print("[ManageSpawnedUnits] spawn_unit", unit_id, unit)
 	local align_obj = self._unit:get_object(Idstring(align_obj_name))
 	local spawn_unit
 	if type_name(unit) == "string" then
-		if Network:is_server() then
+		if Network:is_server() or self.allow_client_spawn then
 			local spawn_pos = align_obj:position()
 			local spawn_rot = align_obj:rotation()
 			spawn_unit = safe_spawn_unit(Idstring(unit), spawn_pos, spawn_rot)
@@ -50,21 +35,34 @@ function ManageSpawnedUnits:spawn_unit(unit_id, align_obj_name, unit)
 end
 
 function ManageSpawnedUnits:spawn_and_link_unit(joint_table, unit_id, unit)
+	if not Network:is_server() and not self._loaded then
+		self._link_after_load = self._link_after_load or {}
+		table.insert(self._link_after_load, {
+			joint_table,
+			unit_id,
+			unit
+		})
+		return
+	end
 	if not self[joint_table] then
 		Application:error("No table named:", joint_table, "in unit file:", self._unit:name())
+		print("[ManageSpawnedUnits] No table named:", joint_table, "in unit file:", self._unit:name())
 		return
 	end
 	if not unit_id then
 		Application:error("param2", "nil:\n", self._unit:name())
+		print("[ManageSpawnedUnits] param2", "nil:\n", self._unit:name())
 		return
 	end
 	if not unit then
 		Application:error("param3", "nil:\n", self._unit:name())
+		print("[ManageSpawnedUnits] param3", "nil:\n", self._unit:name())
 		return
 	end
+	print("[ManageSpawnedUnits] spawn_and_link_unit", joint_table, unit_id, unit)
 	self:spawn_unit(unit_id, self[joint_table][1], unit)
 	self._sync_spawn_and_link = self._sync_spawn_and_link or {}
-	self._sync_spawn_and_link[unit_id] = {joint_table = joint_table}
+	self._sync_spawn_and_link[unit_id] = {unit = unit, joint_table = joint_table}
 	if Network:is_server() then
 		self:_link_joints(unit_id, joint_table)
 	end
@@ -82,25 +80,6 @@ function ManageSpawnedUnits:spawn_run_sequence(unit_id, sequence_name)
 		managers.network:session():send_to_peers_synched("run_spawn_unit_sequence", self._unit, "spawn_manager", unit_id, sequence_name)
 	end
 	self:_spawn_run_sequence(unit_id, sequence_name)
-end
-
-function ManageSpawnedUnits:_spawn_run_sequence(unit_id, sequence_name)
-	local entry = self._spawned_units[unit_id]
-	if not entry then
-		return
-	end
-	if not alive(entry.unit) then
-		return
-	end
-	if not sequence_name then
-		Application:error("No sequence_name param passed\n", self._unit:name(), "\n")
-		return
-	end
-	if self._spawned_units[unit_id].unit:damage():has_sequence(sequence_name) then
-		self._spawned_units[unit_id].unit:damage():run_sequence_simple(sequence_name)
-	else
-		Application:error(sequence_name, "sequence does not exist in:\n", self._spawned_units[unit_id].unit:name())
-	end
 end
 
 function ManageSpawnedUnits:local_push_child_unit(unit_id, mass, pow, vec3_a, vec3_b)
@@ -182,4 +161,53 @@ function ManageSpawnedUnits:load(data)
 		return
 	end
 	self._sync_spawn_and_link = data.managed_spawned_units.linked_joints or {}
+	self._loaded = true
+	if self._link_after_load then
+		for _, data in ipairs(self._link_after_load) do
+			self:spawn_and_link_unit(unpack(data))
+		end
+	else
+		for id, data in pairs(self._sync_spawn_and_link) do
+			self:spawn_and_link_unit(data.joint_table, id, data.unit)
+		end
+	end
+end
+
+function ManageSpawnedUnits:_spawn_run_sequence(unit_id, sequence_name)
+	local entry = self._spawned_units[unit_id]
+	if not entry then
+		return
+	end
+	if not alive(entry.unit) then
+		return
+	end
+	if not sequence_name then
+		Application:error("No sequence_name param passed\n", self._unit:name(), "\n")
+		return
+	end
+	if self._spawned_units[unit_id].unit:damage():has_sequence(sequence_name) then
+		self._spawned_units[unit_id].unit:damage():run_sequence_simple(sequence_name)
+	else
+		Application:error(sequence_name, "sequence does not exist in:\n", self._spawned_units[unit_id].unit:name())
+	end
+end
+
+function ManageSpawnedUnits:_link_joints(unit_id, joint_table)
+	for index, value in ipairs(self[joint_table]) do
+		if 1 < index then
+			local parent_object = self._unit:get_object(Idstring(value))
+			local child_object = self._spawned_units[unit_id].unit:get_object(Idstring(value))
+			child_object:link(parent_object)
+			child_object:set_position(parent_object:position())
+			child_object:set_rotation(parent_object:rotation())
+		end
+	end
+	self._unit:set_moving()
+end
+
+function ManageSpawnedUnits:sync_unit_spawn(unit_id)
+	if self._sync_spawn_and_link and self._sync_spawn_and_link[unit_id] then
+		self:_link_joints(unit_id, self._sync_spawn_and_link[unit_id].joint_table)
+		self._sync_spawn_and_link[unit_id] = nil
+	end
 end

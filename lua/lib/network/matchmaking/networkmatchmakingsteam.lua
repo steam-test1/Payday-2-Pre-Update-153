@@ -1,6 +1,6 @@
 NetworkMatchMakingSTEAM = NetworkMatchMakingSTEAM or class()
 NetworkMatchMakingSTEAM.OPEN_SLOTS = 4
-NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.65.0"
+NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.66.0"
 
 function NetworkMatchMakingSTEAM:init()
 	cat_print("lobby", "matchmake = NetworkMatchMakingSTEAM")
@@ -177,6 +177,9 @@ end
 function NetworkMatchMakingSTEAM:get_friends_lobbies()
 	local lobbies = {}
 	local num_updated_lobbies = 0
+	local is_key_valid = function(key)
+		return key ~= "value_missing" and key ~= "value_pending"
+	end
 	local empty = function()
 	end
 	
@@ -289,6 +292,9 @@ function NetworkMatchMakingSTEAM:search_lobby(friends_only, no_filters)
 	self._search_friends_only = friends_only
 	if not self:_has_callback("search_lobby") then
 		return
+	end
+	local is_key_valid = function(key)
+		return key ~= "value_missing" and key ~= "value_pending"
 	end
 	if friends_only then
 		self:get_friends_lobbies()
