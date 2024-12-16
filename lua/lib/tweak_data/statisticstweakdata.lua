@@ -571,7 +571,15 @@ function StatisticsTweakData:statistics_table()
 		"amp_03",
 		"amp_04",
 		"max",
-		"max_begins"
+		"max_begins",
+		"ant_01",
+		"ant_02",
+		"ant_03",
+		"ant_04",
+		"ant_05",
+		"ant_06",
+		"ant_07",
+		"ant_08"
 	}
 	local weapon_list = {
 		"ak5",

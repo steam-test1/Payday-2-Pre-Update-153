@@ -5873,4 +5873,54 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.ant_free = {}
+	self.ant_free.free = true
+	self.ant_free.content = {}
+	self.ant_free.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "ant_05",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "ant_07",
+			amount = 1
+		}
+	}
+	self.ant = {}
+	self.ant.dlc = "has_ant"
+	self.ant.content = {}
+	self.ant.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "ant_01",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "ant_02",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "ant_03",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "ant_04",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "ant_06",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "ant_08",
+			amount = 1
+		}
+	}
 end

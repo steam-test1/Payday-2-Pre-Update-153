@@ -1370,6 +1370,36 @@ function BlackMarketTweakData:_init_materials(tweak_data)
 	self.materials.tricolor.texture = "units/pd2_dlc_grv/masks/materials/matcap_tricolor_df"
 	self.materials.tricolor.value = 0
 	self.materials.tricolor.dlc = "grv"
+	self.materials.arena_colors = {}
+	self.materials.arena_colors.name_id = "bm_mtl_arena_colors"
+	self.materials.arena_colors.pcs = {}
+	self.materials.arena_colors.texture = "units/pd2_dlc_ant/masks/materials/matcap_arena_colors_df"
+	self.materials.arena_colors.value = 0
+	self.materials.arena_colors.dlc = "ant"
+	self.materials.arena_colors.texture_bundle_folder = "ant"
+	self.materials.hexagon_panels = {}
+	self.materials.hexagon_panels.name_id = "bm_mtl_hexagon_panels"
+	self.materials.hexagon_panels.pcs = {}
+	self.materials.hexagon_panels.texture = "units/pd2_dlc_ant/masks/materials/matcap_hexagon_panels_df"
+	self.materials.hexagon_panels.value = 0
+	self.materials.hexagon_panels.texture_bundle_folder = "ant"
+	self.materials.hexagon_panels.material_amount = 0
+	self.materials.hexagon_panels.dlc = "ant"
+	self.materials.brushed_metal = {}
+	self.materials.brushed_metal.name_id = "bm_mtl_brushed_metal"
+	self.materials.brushed_metal.pcs = {}
+	self.materials.brushed_metal.texture = "units/pd2_dlc_ant/masks/materials/matcap_brushed_metal_df"
+	self.materials.brushed_metal.value = 0
+	self.materials.brushed_metal.material_amount = 0
+	self.materials.brushed_metal.texture_bundle_folder = "ant"
+	self.materials.brushed_metal.dlc = "ant"
+	self.materials.menu = {}
+	self.materials.menu.name_id = "bm_mtl_menu"
+	self.materials.menu.pcs = {}
+	self.materials.menu.texture = "units/pd2_dlc_ant/masks/materials/matcap_menu_df"
+	self.materials.menu.texture_bundle_folder = "ant"
+	self.materials.menu.value = 0
+	self.materials.menu.dlc = "ant"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.materials) do
 		if free_dlcs[data.dlc] then

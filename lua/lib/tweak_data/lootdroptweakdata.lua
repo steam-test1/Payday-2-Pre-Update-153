@@ -1224,6 +1224,34 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.mp2.track = true
 	self.global_values.mp2.sort_number = 305
 	self.global_values.mp2.category = "dlc"
+	self.global_values.ant = {}
+	self.global_values.ant.name_id = "bm_global_value_ant"
+	self.global_values.ant.desc_id = "menu_l_global_value_ant"
+	self.global_values.ant.unlock_id = "bm_global_value_ant_unlock"
+	self.global_values.ant.color = Color(255, 255, 212, 0) / 255
+	self.global_values.ant.dlc = true
+	self.global_values.ant.chance = 1
+	self.global_values.ant.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "ant")
+	self.global_values.ant.durability_multiplier = 1
+	self.global_values.ant.drops = true
+	self.global_values.ant.track = true
+	self.global_values.ant.sort_number = 305
+	self.global_values.ant.unique_lock_icon = "guis/textures/pd2/blackmarket/money_lock"
+	self.global_values.ant.category = "collaboration"
+	self.global_values.ant_free = {}
+	self.global_values.ant_free.name_id = "bm_global_value_ant"
+	self.global_values.ant_free.desc_id = "menu_l_global_value_ant"
+	self.global_values.ant_free.unlock_id = "bm_global_value_ant_free_unlock"
+	self.global_values.ant_free.color = Color(255, 255, 212, 0) / 255
+	self.global_values.ant_free.dlc = true
+	self.global_values.ant_free.chance = 1
+	self.global_values.ant_free.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "ant_free")
+	self.global_values.ant_free.durability_multiplier = 1
+	self.global_values.ant_free.drops = true
+	self.global_values.ant_free.track = true
+	self.global_values.ant_free.sort_number = 305
+	self.global_values.ant_free.unique_lock_icon = "guis/textures/pd2/blackmarket/money_lock"
+	self.global_values.ant_free.category = "collaboration"
 	self.global_values.pn2 = {}
 	self.global_values.pn2.name_id = "bm_global_value_pn2"
 	self.global_values.pn2.desc_id = "menu_l_global_value_pn2"
@@ -1319,6 +1347,8 @@ function LootDropTweakData:init(tweak_data)
 		"amp",
 		"mp2",
 		"mom",
+		"ant",
+		"ant_free",
 		"pn2",
 		"max"
 	}

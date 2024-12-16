@@ -2092,6 +2092,30 @@ function BlackMarketTweakData:_init_textures(tweak_data)
 	self.textures.russian_gamble.texture = "units/pd2_dlc_grv/masks/patterns/pattern_russian_gamble_df"
 	self.textures.russian_gamble.value = 0
 	self.textures.russian_gamble.dlc = "grv"
+	self.textures.panel_cover = {}
+	self.textures.panel_cover.name_id = "bm_txt_panel_cover"
+	self.textures.panel_cover.pcs = {}
+	self.textures.panel_cover.texture = "units/pd2_dlc_ant/masks/patterns/pattern_panel_cover_df"
+	self.textures.panel_cover.value = 0
+	self.textures.panel_cover.dlc = "ant"
+	self.textures.hexagon_effect = {}
+	self.textures.hexagon_effect.name_id = "bm_txt_hexagon_effect"
+	self.textures.hexagon_effect.pcs = {}
+	self.textures.hexagon_effect.texture = "units/pd2_dlc_ant/masks/patterns/pattern_hexagon_effect_df"
+	self.textures.hexagon_effect.value = 0
+	self.textures.hexagon_effect.dlc = "ant"
+	self.textures.arena_cross = {}
+	self.textures.arena_cross.name_id = "bm_txt_arena_cross"
+	self.textures.arena_cross.pcs = {}
+	self.textures.arena_cross.texture = "units/pd2_dlc_ant/masks/patterns/pattern_arena_cross_df"
+	self.textures.arena_cross.value = 0
+	self.textures.arena_cross.dlc = "ant"
+	self.textures.anti_skull = {}
+	self.textures.anti_skull.name_id = "bm_txt_anti_skull"
+	self.textures.anti_skull.pcs = {}
+	self.textures.anti_skull.texture = "units/pd2_dlc_ant/masks/patterns/pattern_anti_skull_df"
+	self.textures.anti_skull.value = 0
+	self.textures.anti_skull.dlc = "ant"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.textures) do
 		if free_dlcs[data.dlc] then
