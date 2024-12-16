@@ -717,7 +717,7 @@ function ExperienceManager:load(data)
 		self._global.level = state.level or Application:digest_value(0, true)
 		self._global.rank = state.rank or Application:digest_value(0, true)
 		self:_set_current_level(math.min(self:current_level(), self:level_cap()))
-		for level = 1, self:current_level() do
+		for level = 0, self:current_level() do
 			managers.upgrades:aquire_from_level_tree(level, true)
 		end
 		if not (self._global.next_level_data and tweak_data.experience_manager.levels[self:current_level() + 1]) or self:next_level_data_points() ~= tweak_data:get_value("experience_manager", "levels", self:current_level() + 1, "points") then

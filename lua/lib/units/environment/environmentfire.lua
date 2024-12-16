@@ -29,7 +29,7 @@ function EnvironmentFire:on_spawn(data, normal, user_unit, added_time, range_mul
 		sound_muffle_effect = true,
 		sound_event_burning = data.sound_event_burning,
 		sound_event_impact_duration = data.sound_event_impact_duration,
-		sound_event_duration = data.burn_duration
+		sound_event_duration = data.burn_duration + added_time
 	}
 	self._data = data
 	self._normal = normal

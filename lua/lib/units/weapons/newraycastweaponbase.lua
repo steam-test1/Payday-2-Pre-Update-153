@@ -258,10 +258,9 @@ function NewRaycastWeaponBase:check_highlight_unit(unit)
 	if unit:character_damage() and unit:character_damage().dead and unit:character_damage():dead() then
 		return
 	end
-	if not unit:base().can_be_marked and managers.groupai:state():enemy_weapons_hot() then
-		return
+	if unit:base().can_be_marked then
+		managers.game_play_central:auto_highlight_enemy(unit, true)
 	end
-	managers.game_play_central:auto_highlight_enemy(unit, true)
 end
 
 function NewRaycastWeaponBase:change_part(part_id)

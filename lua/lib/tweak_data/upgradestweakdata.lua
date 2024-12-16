@@ -2306,7 +2306,6 @@ function UpgradesTweakData:init(tweak_data)
 	self.level_tree = {}
 	self.level_tree[0] = {
 		upgrades = {
-			"frag_com",
 			"frag",
 			"dynamite",
 			"molotov"
@@ -2317,6 +2316,7 @@ function UpgradesTweakData:init(tweak_data)
 		upgrades = {
 			"body_armor2",
 			"ak74",
+			"frag_com",
 			"nin",
 			"concussion",
 			"fir_com",

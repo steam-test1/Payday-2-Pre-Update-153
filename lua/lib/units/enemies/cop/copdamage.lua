@@ -524,7 +524,7 @@ function CopDamage:_check_damage_achievements(attack_data, head)
 	if attack_weapon:base().thrower_unit then
 		return
 	end
-	if managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.pump_action.mask and attack_weapon:base():is_category("shotgun") then
+	if managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.pump_action.mask and attack_weapon:base().is_category and attack_weapon:base():is_category("shotgun") then
 		managers.achievment:award_progress(tweak_data.achievement.pump_action.stat)
 	end
 	local unit_type = self._unit:base()._tweak_table
@@ -644,7 +644,7 @@ function CopDamage:_check_damage_achievements(attack_data, head)
 		local spooc_action = self._unit:movement()._active_actions[1]
 		if spooc_action and spooc_action:type() == "spooc" then
 			if spooc_action:is_flying_strike() then
-				if attack_weapon:base():is_category(tweak_data.achievement.in_town_you_are_law.weapon_type) then
+				if attack_weapon:base().is_category and attack_weapon:base():is_category(tweak_data.achievement.in_town_you_are_law.weapon_type) then
 					managers.achievment:award(tweak_data.achievement.in_town_you_are_law.award)
 				end
 			elseif not spooc_action:has_striken() and attack_weapon:base().name_id == tweak_data.achievement.dont_push_it.weapon then

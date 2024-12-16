@@ -137,6 +137,9 @@ end
 
 function CoreEditorGroups:load_group_file(path)
 	local name = self:group_name()
+	if not name then
+		return
+	end
 	local node = SystemFS:parse_xml(path)
 	local layer_name = "Statics"
 	if node:has_parameter("layer") then
