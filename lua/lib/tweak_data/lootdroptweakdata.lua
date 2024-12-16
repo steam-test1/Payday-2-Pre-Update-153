@@ -496,6 +496,7 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.jigg.sort_number = 82
 	self.global_values.jigg.hide_unavailable = true
 	self.global_values.jigg.category = "global_event"
+	self.global_values.jigg.ignore_ulti = true
 	self.global_values.xmas_soundtrack = {}
 	self.global_values.xmas_soundtrack.name_id = "bm_global_value_xmas_soundtrack"
 	self.global_values.xmas_soundtrack.desc_id = "menu_l_global_value_xmas_soundtrack"

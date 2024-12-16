@@ -579,7 +579,8 @@ function StatisticsTweakData:statistics_table()
 		"ant_05",
 		"ant_06",
 		"ant_07",
-		"ant_08"
+		"ant_08",
+		"dgm"
 	}
 	local weapon_list = {
 		"ak5",

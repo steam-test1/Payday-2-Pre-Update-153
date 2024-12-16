@@ -385,7 +385,6 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 	self.projectiles.smoke_screen_grenade.sprint_unit = "units/pd2_dlc_max/weapons/wpn_fps_smoke_screen_grenade/wpn_third_smoke_screen_grenade_sprint"
 	self.projectiles.smoke_screen_grenade.icon = "smoke_screen_grenade"
 	self.projectiles.smoke_screen_grenade.texture_bundle_folder = "max"
-	self.projectiles.smoke_screen_grenade.dlc = "max"
 	self.projectiles.smoke_screen_grenade.base_cooldown = 60
 	self.projectiles.smoke_screen_grenade.max_amount = 1
 	self.projectiles.smoke_screen_grenade.is_a_grenade = true

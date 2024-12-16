@@ -1249,212 +1249,212 @@ end
 
 function MenuCallbackHandler:dlc_buy_pc()
 	print("[MenuCallbackHandler:dlc_buy_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_gage_pack_pc()
 	print("[MenuCallbackHandler:dlc_buy_gage_pack_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_big_bank_pc()
 	print("[MenuCallbackHandler:dlc_buy_big_bank_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_gage_pack_historical_pc()
 	print("[MenuCallbackHandler:dlc_buy_gage_pack_historical_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_hl_miami_pc()
 	print("[MenuCallbackHandler:dlc_buy_hl_miami_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_gage_pack_assault_pc()
 	print("[MenuCallbackHandler:dlc_buy_gage_pack_assault_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_gage_pack_shotgun_pc()
 	print("[MenuCallbackHandler:dlc_buy_gage_pack_shotgun_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_gage_pack_snp_pc()
 	print("[MenuCallbackHandler:dlc_buy_gage_pack_snp_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_gage_pack_jobs_pc()
 	print("[MenuCallbackHandler:dlc_buy_gage_pack_jobs_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_gage_pack_lmg_pc()
 	print("[MenuCallbackHandler:dlc_buy_gage_pack_lmg_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_armadillo_pc()
 	print("[MenuCallbackHandler:dlc_buy_armadillo_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_character_pack_clover_pc()
 	print("[MenuCallbackHandler:dlc_buy_character_pack_clover_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_character_pack_dragan_pc()
 	print("[MenuCallbackHandler:dlc_buy_character_pack_dragan_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_hope_diamond_pc()
 	print("[MenuCallbackHandler:dlc_buy_hope_diamond_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_the_bomb_pc()
 	print("[MenuCallbackHandler:dlc_buy_the_bomb_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_akm4_pack_pc()
 	print("[MenuCallbackHandler:dlc_buy_akm4_pack_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_overkill_pack_pc()
 	print("[MenuCallbackHandler:dlc_buy_overkill_pack_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_complete_overkill_pack_pc()
 	print("[MenuCallbackHandler:dlc_buy_complete_overkill_pack_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_bbq_pc()
 	print("[MenuCallbackHandler:dlc_buy_bbq_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_west_pc()
 	print("[MenuCallbackHandler:dlc_buy_west_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_arena_pc()
 	print("[MenuCallbackHandler:dlc_buy_arena_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_character_pack_sokol_pc()
 	print("[MenuCallbackHandler:dlc_buy_character_pack_sokol_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_kenaz_pc()
 	print("[MenuCallbackHandler:dlc_buy_kenaz_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_turtles_pc()
 	print("[MenuCallbackHandler:dlc_buy_turtles_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_dragon_pc()
 	print("[MenuCallbackHandler:dlc_buy_dragon_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_steel_pc()
 	print("[MenuCallbackHandler:dlc_buy_steel_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_berry_pc()
 	print("[MenuCallbackHandler:dlc_buy_berry_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_peta_pc()
 	print("[MenuCallbackHandler:dlc_buy_peta_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_pal_pc()
 	print("[MenuCallbackHandler:dlc_buy_pal_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_coco_pc()
 	print("[MenuCallbackHandler:dlc_buy_coco_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_opera_pc()
 	print("[MenuCallbackHandler:dlc_buy_opera_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_wild_pc()
 	print("[MenuCallbackHandler:dlc_buy_wild_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_born_pc()
 	print("[MenuCallbackHandler:dlc_buy_born_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_pim_pc()
 	print("[MenuCallbackHandler:dlc_buy_pim_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_tango_pc()
 	print("[MenuCallbackHandler:dlc_buy_tango_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_friend_pc()
 	print("[MenuCallbackHandler:dlc_buy_friend_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_chico_pc()
 	print("[MenuCallbackHandler:dlc_buy_chico_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_spa_pc()
 	print("[MenuCallbackHandler:dlc_buy_spa_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_grv_pc()
 	print("[MenuCallbackHandler:dlc_buy_grv_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_amp_pc()
 	print("[MenuCallbackHandler:dlc_buy_amp_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_mp2_pc()
 	print("[MenuCallbackHandler:dlc_buy_mp2_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_max_pc()
 	print("[MenuCallbackHandler:dlc_buy_max_pc]")
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:dlc_buy_ps3()
@@ -2092,7 +2092,7 @@ function MenuCallbackHandler:on_visit_gamehub()
 end
 
 function MenuCallbackHandler:on_buy_dlc1()
-	Steam:overlay_activate("store", 218620)
+	Steam:overlay_activate("url", tweak_data.gui.store_page)
 end
 
 function MenuCallbackHandler:on_account_picker()

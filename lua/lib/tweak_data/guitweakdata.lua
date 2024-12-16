@@ -543,6 +543,7 @@ function GuiTweakData:init()
 		choice_id = "menu_content_updates_previous",
 		num_items = 6
 	}
+	self.store_page = "http://store.steampowered.com/app/218620"
 	if SystemInfo:platform() == Idstring("WIN32") then
 		self.content_updates.item_list = {
 			soundtrack,
@@ -4707,7 +4708,7 @@ function GuiTweakData:init()
 		"category",
 		"bonus"
 	}
-	self.new_heists = {}
+	self.new_heists = {limit = 3}
 	table.insert(self.new_heists, {
 		name_id = "menu_nh_ultimate_edition",
 		texture_path = "guis/textures/pd2/new_heists/ultimate_edition",
@@ -4722,76 +4723,6 @@ function GuiTweakData:init()
 		name_id = "menu_nh_dsync_beta",
 		texture_path = "guis/textures/pd2/new_heists/desync_beta",
 		url = "http://steamcommunity.com/app/218620/discussions/29/"
-	})
-	table.insert(self.new_heists, {
-		name_id = "menu_nh_sangres_safe",
-		texture_path = "guis/textures/pd2/new_heists/sangres_safe",
-		url = "http://www.overkillsoftware.com/games/sangres/#safe"
-	})
-	table.insert(self.new_heists, {
-		name_id = "menu_nh_search_for_kento",
-		texture_path = "guis/textures/pd2/new_heists/search_for_kento",
-		url = "http://www.searchforkento.com/"
-	})
-	table.insert(self.new_heists, {
-		name_id = "menu_nh_wick_safe",
-		texture_path = "guis/textures/pd2/new_heists/wick_safe",
-		url = "http://www.overkillsoftware.com/games/johnwickheists/#safe"
-	})
-	table.insert(self.new_heists, {
-		name_id = "menu_nh_sw_collab",
-		texture_path = "guis/textures/pd2/new_heists/sw_collab",
-		url = "http://steamcommunity.com/app/218620/allnews/#scrollTop=0"
-	})
-	table.insert(self.new_heists, {
-		name_id = "menu_nh_sangres",
-		texture_path = "guis/textures/pd2/new_heists/sangres",
-		url = "http://www.overkillsoftware.com/games/sangres/"
-	})
-	table.insert(self.new_heists, {
-		name_id = "menu_nh_gage_russian_weapon_pack",
-		texture_path = "guis/textures/pd2/new_heists/gage_russian_weapon_pack",
-		url = "http://www.overkillsoftware.com/games/russianweaponpack/"
-	})
-	table.insert(self.new_heists, {
-		name_id = "menu_nh_wick_heist",
-		texture_path = "guis/textures/pd2/new_heists/wick_heists",
-		url = "http://store.steampowered.com/app/591710"
-	})
-	table.insert(self.new_heists, {
-		name_id = "menu_nh_scarface_safe",
-		texture_path = "guis/textures/pd2/new_heists/scarface_safe",
-		url = "http://www.overkillsoftware.com/games/scarfacesafe/"
-	})
-	table.insert(self.new_heists, {
-		name_id = "menu_nh_scarface",
-		texture_path = "guis/textures/pd2/new_heists/scarface",
-		url = "http://www.overkillsoftware.com/games/scarfacepacks/"
-	})
-	table.insert(self.new_heists, {
-		name_id = "menu_nh_heist_2016_moon",
-		texture_path = "guis/textures/pd2/new_heists/christmas_heist_2016",
-		url = "http://www.overkillsoftware.com/games/christmas2016/"
-	})
-	table.insert(self.new_heists, {
-		name_id = "menu_nh_gage_spec_ops_2016",
-		texture_path = "guis/textures/pd2/new_heists/gage_spec_ops_2016",
-		url = "http://www.overkillsoftware.com/games/specops/"
-	})
-	table.insert(self.new_heists, {
-		name_id = "menu_nh_john_wick",
-		texture_path = "guis/textures/pd2/new_heists/john_wick",
-		url = "http://www.overkillsoftware.com/games/jwweaponpack/"
-	})
-	table.insert(self.new_heists, {
-		name_id = "menu_nh_beta_new_difficulty",
-		texture_path = "guis/textures/pd2/new_heists/beta_new_difficulty",
-		url = "http://steamcommunity.com/games/218620/announcements/detail/614007890988731544"
-	})
-	table.insert(self.new_heists, {
-		name_id = "menu_nh_winter_sale_2016",
-		texture_path = "guis/textures/pd2/new_heists/winter_sale_2016",
-		url = "http://store.steampowered.com/app/218620"
 	})
 end
 
