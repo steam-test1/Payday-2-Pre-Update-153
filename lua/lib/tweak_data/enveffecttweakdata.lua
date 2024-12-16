@@ -1,6 +1,10 @@
 EnvEffectTweakData = EnvEffectTweakData or class()
 
 function EnvEffectTweakData:init()
+	self.lightning = {}
+	self.lightning.event_name = "thunder_struck"
+	self.lightning.min_interval = 10
+	self.lightning.rnd_interval = 10
 end
 
 function EnvEffectTweakData:molotov_fire()

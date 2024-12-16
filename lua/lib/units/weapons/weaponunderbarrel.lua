@@ -61,7 +61,7 @@ end
 function WeaponUnderbarrel:_get_sound_event(weapon, event, alternative_event)
 	local str_name = self.name_id
 	if not weapon.third_person_important or not weapon:third_person_important() then
-		str_name = self.name_id:gsub("_npc", "")
+		str_name = self.name_id:gsub("_crew", "")
 	end
 	local sounds = self._tweak_data.sounds
 	local event = sounds and (sounds[event] or sounds[alternative_event])

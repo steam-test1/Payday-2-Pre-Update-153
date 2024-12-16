@@ -571,49 +571,40 @@ end
 function CopActionHurt:_start_enemy_fire_animation(action_type, t, use_animation_on_fire_damage, action_desc, common_data)
 end
 
+local tmp_used_flame_objects
+
 function CopActionHurt:_start_enemy_fire_effect_on_death(death_variant)
-	local enemy_effect_name = ""
-	local anim_duration = 3
-	if death_variant == 1 then
-		enemy_effect_name = Idstring("effects/payday2/particles/explosions/molotov_grenade_enemy_on_fire_9s")
-		anim_duration = 9
-	elseif death_variant == 2 then
-		enemy_effect_name = Idstring("effects/payday2/particles/explosions/molotov_grenade_enemy_on_fire_5s")
-		anim_duration = 5
-	elseif death_variant == 3 then
-		enemy_effect_name = Idstring("effects/payday2/particles/explosions/molotov_grenade_enemy_on_fire_5s")
-		anim_duration = 5
-	elseif death_variant == 4 then
-		enemy_effect_name = Idstring("effects/payday2/particles/explosions/molotov_grenade_enemy_on_fire_7s")
-		anim_duration = 7
-	elseif death_variant == 5 then
-		enemy_effect_name = Idstring("effects/payday2/particles/explosions/molotov_grenade_enemy_on_fire")
-	else
-		enemy_effect_name = Idstring("effects/payday2/particles/explosions/molotov_grenade_enemy_on_fire")
+	local effect_tbl = tweak_data.fire.fire_death_anims[death_variant] or tweak_data.fire.fire_death_anims[0]
+	local num_objects = #tweak_data.fire.fire_bones
+	local num_effects = math.random(3, num_objects)
+	if not tmp_used_flame_objects then
+		tmp_used_flame_objects = {}
+		for _, effect in ipairs(tweak_data.fire.fire_bones) do
+			table.insert(tmp_used_flame_objects, false)
+		end
+	end
+	local idx = 1
+	local effect_id
+	for i = 1, num_effects do
+		while tmp_used_flame_objects[idx] do
+			idx = math.random(1, num_objects)
+		end
+		local bone = self._unit:get_object(Idstring(tweak_data.fire.fire_bones[idx]))
+		if bone then
+			local effect_name = tweak_data.fire.effects[effect_tbl.effect][tweak_data.fire.effects_cost[i]]
+			effect_id = World:effect_manager():spawn({
+				effect = Idstring(effect_name),
+				parent = bone
+			})
+		end
+		tmp_used_flame_objects[idx] = true
+	end
+	for idx, _ in ipairs(tmp_used_flame_objects) do
+		tmp_used_flame_objects[idx] = false
 	end
 	managers.fire:start_burn_body_sound({
 		enemy_unit = self._unit
-	}, anim_duration)
-	local bone_spine = self._unit:get_object(Idstring("Spine"))
-	local bone_left_arm = self._unit:get_object(Idstring("LeftArm"))
-	local bone_right_arm = self._unit:get_object(Idstring("RightArm"))
-	local bone_left_leg = self._unit:get_object(Idstring("LeftLeg"))
-	local bone_right_leg = self._unit:get_object(Idstring("RightLeg"))
-	if bone_spine then
-		World:effect_manager():spawn({effect = enemy_effect_name, parent = bone_spine})
-	end
-	if bone_left_arm then
-		World:effect_manager():spawn({effect = enemy_effect_name, parent = bone_left_arm})
-	end
-	if bone_right_arm then
-		World:effect_manager():spawn({effect = enemy_effect_name, parent = bone_right_arm})
-	end
-	if bone_left_leg then
-		World:effect_manager():spawn({effect = enemy_effect_name, parent = bone_left_leg})
-	end
-	if bone_right_leg then
-		World:effect_manager():spawn({effect = enemy_effect_name, parent = bone_right_leg})
-	end
+	}, effect_tbl.duration)
 end
 
 function CopActionHurt:_dragons_breath_sparks()

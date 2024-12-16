@@ -2,6 +2,7 @@ IngameContractGuiCrimeSpree = IngameContractGuiCrimeSpree or class()
 
 function IngameContractGuiCrimeSpree:init(ws, node)
 	local padding = SystemInfo:platform() == Idstring("WIN32") and 10 or 5
+	self._ws = ws
 	self._panel = ws:panel():panel({
 		w = math.round(ws:panel():w() * 0.6),
 		h = math.round(ws:panel():h() * 1)
@@ -88,69 +89,7 @@ function IngameContractGuiCrimeSpree:init(ws, node)
 		x = padding,
 		y = modifiers_title:bottom() + padding
 	})
-	self._scroll = ScrollablePanel:new(self._modifiers_panel, "modifiers_scroll", {padding = 0, force_scroll_indicators = true})
-	local modifiers = managers.crime_spree:server_active_modifiers()
-	local count = 0
-	local line_h = tweak_data.menu.pd2_small_font_size * 1.5
-	local table_split = 0.125
-	for i = #modifiers, 1, -1 do
-		local modifier_data = modifiers[i]
-		local modifier = managers.crime_spree:get_modifier(modifier_data.id)
-		if modifier then
-			local modifier_class = _G[modifier.class] or {}
-			local panel = self._scroll:canvas():panel({
-				y = count * line_h,
-				h = line_h
-			})
-			panel:rect({
-				color = Color.black,
-				alpha = count % 2 == 1 and 0.4 or 0
-			})
-			local desc = panel:text({
-				text = modifier_class:get_description(modifier_data.id),
-				valign = "center",
-				vertical = "center",
-				align = "left",
-				halign = "left",
-				layer = 1,
-				x = padding + panel:w() * table_split,
-				y = 5,
-				font = tweak_data.menu.pd2_small_font,
-				font_size = tweak_data.menu.pd2_small_font_size,
-				w = panel:w() * (1 - table_split),
-				h = tweak_data.menu.pd2_small_font_size,
-				color = Color.white,
-				alpha = 0.8
-			})
-			local multi = 1
-			local _, _, w, h = desc:text_rect()
-			while w > (panel:w() - 24) * (1 - table_split) do
-				multi = multi - 0.05
-				desc:set_font_size(tweak_data.menu.pd2_small_font_size * multi)
-				_, _, w, h = desc:text_rect()
-			end
-			local level = panel:text({
-				text = managers.experience:cash_string(modifier_data.level, ""),
-				valign = "center",
-				vertical = "center",
-				align = "right",
-				halign = "right",
-				layer = 1,
-				x = padding,
-				y = 2,
-				color = Color.white,
-				font = tweak_data.menu.pd2_medium_font,
-				font_size = tweak_data.menu.pd2_medium_font_size,
-				w = panel:w() * table_split - padding * 0.5,
-				h = tweak_data.menu.pd2_medium_font_size
-			})
-			if modifier_class.stealth then
-				level:set_text(managers.localization:get_default_macro("BTN_SPREE_STEALTH") .. level:text())
-			end
-			count = count + 1
-		end
-	end
-	self._scroll:update_canvas_size()
+	CrimeSpreeModifierDetailsPage.add_modifiers_panel(self, self._modifiers_panel, managers.crime_spree:server_active_modifiers())
 	self._text_panel = text_panel
 	self:_rec_round_object(self._panel)
 	self._sides = BoxGuiObject:new(self._panel, {
@@ -161,6 +100,9 @@ function IngameContractGuiCrimeSpree:init(ws, node)
 			1
 		}
 	})
+	if not managers.menu:is_pc_controller() then
+		self:_setup_controller_input()
+	end
 end
 
 function IngameContractGuiCrimeSpree:_rec_round_object(object)
@@ -207,6 +149,18 @@ function IngameContractGuiCrimeSpree:special_btn_pressed(button)
 		self:_toggle_potential_rewards()
 	end
 	return false
+end
+
+function IngameContractGuiCrimeSpree:_setup_controller_input()
+	CrimeSpreeContractMenuComponent._setup_controller_input(self)
+end
+
+function IngameContractGuiCrimeSpree:_axis_move(o, axis_name, axis_vector, controller)
+	CrimeSpreeContractMenuComponent._axis_move(self, o, axis_name, axis_vector, controller)
+end
+
+function IngameContractGuiCrimeSpree:update(t, dt)
+	CrimeSpreeContractMenuComponent.update(self, t, dt)
 end
 
 function IngameContractGuiCrimeSpree:close()

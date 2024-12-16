@@ -596,4 +596,14 @@ function EquipmentsTweakData:init()
 		icon = "equipment_briefcase",
 		sync_possession = true
 	}
+	self.specials.scubagear_tank_and_flippers = {
+		text_id = "hud_equipment_scubagear_tank_and_flippers",
+		icon = "equipment_chrome_mask",
+		sync_possession = true
+	}
+	self.specials.scubagear_vest = {
+		text_id = "hud_equipment_scubagear_vest",
+		icon = "equipment_soda",
+		sync_possession = true
+	}
 end

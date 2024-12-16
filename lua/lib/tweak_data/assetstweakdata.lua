@@ -275,6 +275,7 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"moon",
 		"friend",
 		"spa",
+		"glace",
 		"run"
 	}
 	self.grenade_crate.visible_if_locked = true
@@ -317,6 +318,7 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"moon",
 		"friend",
 		"spa",
+		"glace",
 		"run"
 	}
 	self.ammo_bag.visible_if_locked = true
@@ -356,6 +358,7 @@ function AssetsTweakData:_init_assets(tweak_data)
 		"moon",
 		"friend",
 		"spa",
+		"glace",
 		"run"
 	}
 	self.health_bag.visible_if_locked = true
@@ -1111,6 +1114,11 @@ function AssetsTweakData:_init_assets(tweak_data)
 	self.location.texture = "guis/dlcs/run/textures/pd2/mission_briefing/assets/location"
 	self.location.stages = {"run"}
 	self.location.no_mystery = true
+	self.prison_transport_trucks = {}
+	self.prison_transport_trucks.name_id = "menu_asset_prison_transport_trucks"
+	self.prison_transport_trucks.texture = "guis/dlcs/glace/textures/pd2/mission_briefing/assets/prison_transport_trucks"
+	self.prison_transport_trucks.stages = {"glace"}
+	self.prison_transport_trucks.no_mystery = true
 end
 
 function AssetsTweakData:_init_debug_assets(tweak_data)

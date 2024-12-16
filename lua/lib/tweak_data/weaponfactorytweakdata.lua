@@ -20132,7 +20132,7 @@ function WeaponFactoryTweakData:_init_rpg7()
 		}
 	}
 	self.parts.wpn_fps_rpg7_sight_adapter = {
-		type = "sight",
+		type = "extra",
 		name_id = "bm_wp_rpg7_sight_adapter",
 		a_obj = "a_o",
 		unit = "units/pd2_dlc_overkill_pack/weapons/wpn_fps_rpg7_pts/wpn_fps_rpg7_sight_adapter",
@@ -29664,7 +29664,10 @@ function WeaponFactoryTweakData:_init_flint()
 		name_id = "bm_wp_flint_o_standard",
 		a_obj = "a_o",
 		unit = "units/pd2_dlc_grv/weapons/wpn_fps_ass_flint_pts/wpn_fps_ass_flint_o_standard",
-		stats = {value = 1}
+		stats = {value = 1},
+		forbids = {
+			"wpn_fps_upg_o_xpsg33_magnifier"
+		}
 	}
 	self.parts.wpn_fps_ass_flint_s_standard = {
 		type = "stock",

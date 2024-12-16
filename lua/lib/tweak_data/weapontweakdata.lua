@@ -129,6 +129,127 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_flint_npc()
 	self:_init_data_coal_npc()
 	self:_init_data_lemming_npc()
+	self:_init_data_m4_crew()
+	self:_init_data_m14_crew()
+	self:_init_data_c45_crew()
+	self:_init_data_x_c45_crew()
+	self:_init_data_beretta92_crew()
+	self:_init_data_raging_bull_crew()
+	self:_init_data_r870_crew()
+	self:_init_data_mossberg_crew()
+	self:_init_data_mp5_crew()
+	self:_init_data_mac11_crew()
+	self:_init_data_glock_18_crew()
+	self:_init_data_ak47_crew()
+	self:_init_data_g36_crew()
+	self:_init_data_g17_crew()
+	self:_init_data_mp9_crew()
+	self:_init_data_olympic_crew()
+	self:_init_data_m16_crew()
+	self:_init_data_aug_crew()
+	self:_init_data_ak74_crew()
+	self:_init_data_ak5_crew()
+	self:_init_data_p90_crew()
+	self:_init_data_amcar_crew()
+	self:_init_data_mac10_crew()
+	self:_init_data_akmsu_crew()
+	self:_init_data_akm_crew()
+	self:_init_data_akm_gold_crew()
+	self:_init_data_deagle_crew()
+	self:_init_data_serbu_crew()
+	self:_init_data_saiga_crew()
+	self:_init_data_huntsman_crew()
+	self:_init_data_saw_crew()
+	self:_init_data_sentry_gun_crew()
+	self:_init_data_usp_crew()
+	self:_init_data_g22c_crew()
+	self:_init_data_judge_crew()
+	self:_init_data_m45_crew()
+	self:_init_data_s552_crew()
+	self:_init_data_ppk_crew()
+	self:_init_data_mp7_crew()
+	self:_init_data_scar_crew()
+	self:_init_data_p226_crew()
+	self:_init_data_hk21_crew()
+	self:_init_data_m249_crew()
+	self:_init_data_rpk_crew()
+	self:_init_data_m95_crew()
+	self:_init_data_msr_crew()
+	self:_init_data_r93_crew()
+	self:_init_data_fal_crew()
+	self:_init_data_ben_crew()
+	self:_init_data_striker_crew()
+	self:_init_data_ksg_crew()
+	self:_init_data_gre_m79_crew()
+	self:_init_data_g3_crew()
+	self:_init_data_galil_crew()
+	self:_init_data_famas_crew()
+	self:_init_data_scorpion_crew()
+	self:_init_data_tec9_crew()
+	self:_init_data_uzi_crew()
+	self:_init_data_jowi_crew()
+	self:_init_data_x_1911_crew()
+	self:_init_data_x_b92fs_crew()
+	self:_init_data_x_deagle_crew()
+	self:_init_data_g26_crew()
+	self:_init_data_spas12_crew()
+	self:_init_data_mg42_crew()
+	self:_init_data_c96_crew()
+	self:_init_data_sterling_crew()
+	self:_init_data_mosin_crew()
+	self:_init_data_m1928_crew()
+	self:_init_data_l85a2_crew()
+	self:_init_data_hs2000_crew()
+	self:_init_data_vhs_crew()
+	self:_init_data_m134_crew()
+	self:_init_data_rpg7_crew()
+	self:_init_data_cobray_crew()
+	self:_init_data_b682_crew()
+	self:_init_data_x_g22c_crew()
+	self:_init_data_x_g17_crew()
+	self:_init_data_x_usp_crew()
+	self:_init_data_flamethrower_mk2_crew()
+	self:_init_data_m32_crew()
+	self:_init_data_aa12_crew()
+	self:_init_data_peacemaker_crew()
+	self:_init_data_winchester1874_crew()
+	self:_init_data_plainsrider_crew()
+	self:_init_data_mateba_crew()
+	self:_init_data_asval_crew()
+	self:_init_data_sub2000_crew()
+	self:_init_data_wa2000_crew()
+	self:_init_data_polymer_crew()
+	self:_init_data_hunter_crew()
+	self:_init_data_baka_crew()
+	self:_init_data_arblast_crew()
+	self:_init_data_frankish_crew()
+	self:_init_data_long_crew()
+	self:_init_data_par_crew()
+	self:_init_data_sparrow_crew()
+	self:_init_data_model70_crew()
+	self:_init_data_m37_crew()
+	self:_init_data_china_crew()
+	self:_init_data_sr2_crew()
+	self:_init_data_x_sr2_crew()
+	self:_init_data_pl14_crew()
+	self:_init_data_x_mp5_crew()
+	self:_init_data_x_akmsu_crew()
+	self:_init_data_tecci_crew()
+	self:_init_data_hajk_crew()
+	self:_init_data_boot_crew()
+	self:_init_data_packrat_crew()
+	self:_init_data_schakal_crew()
+	self:_init_data_desertfox_crew()
+	self:_init_data_x_packrat_crew()
+	self:_init_data_rota_crew()
+	self:_init_data_arbiter_crew()
+	self:_init_data_contraband_crew()
+	self:_init_data_ray_crew()
+	self:_init_data_tti_crew()
+	self:_init_data_siltstone_crew()
+	self:_init_data_flint_crew()
+	self:_init_data_coal_crew()
+	self:_init_data_lemming_crew()
 	self:_precalculate_values()
 end
 
@@ -2302,6 +2423,1886 @@ function WeaponTweakData:_init_data_lemming_npc()
 	self.lemming_npc.suppression = 1
 end
 
+function WeaponTweakData:_init_data_c45_crew()
+	self.c45_crew.sounds.prefix = "c45_npc"
+	self.c45_crew.use_data.selection_index = 1
+	self.c45_crew.DAMAGE = 1
+	self.c45_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.c45_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.c45_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.c45_crew.CLIP_AMMO_MAX = 10
+	self.c45_crew.NR_CLIPS_MAX = 9
+	self.c45_crew.hold = "pistol"
+	self.c45_crew.alert_size = 2500
+	self.c45_crew.suppression = 1
+	self.colt_1911_primary_crew = deep_clone(self.c45_crew)
+	self.colt_1911_primary_crew.use_data.selection_index = 2
+end
+
+function WeaponTweakData:_init_data_x_c45_crew()
+	self.x_c45_crew.sounds.prefix = "c45_npc"
+	self.x_c45_crew.use_data.selection_index = 2
+	self.x_c45_crew.DAMAGE = 1
+	self.x_c45_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.x_c45_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.x_c45_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_c45_crew.CLIP_AMMO_MAX = 20
+	self.x_c45_crew.NR_CLIPS_MAX = 5
+	self.x_c45_crew.hold = "akimbo_pistol"
+	self.x_c45_crew.alert_size = 2500
+	self.x_c45_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_beretta92_crew()
+	self.beretta92_crew.sounds.prefix = "beretta_npc"
+	self.beretta92_crew.use_data.selection_index = 1
+	self.beretta92_crew.DAMAGE = 1
+	self.beretta92_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.beretta92_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.beretta92_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.beretta92_crew.CLIP_AMMO_MAX = 14
+	self.beretta92_crew.NR_CLIPS_MAX = 11
+	self.beretta92_crew.hold = "pistol"
+	self.beretta92_crew.alert_size = 300
+	self.beretta92_crew.suppression = 0.3
+	self.beretta92_primary_crew = deep_clone(self.beretta92_crew)
+	self.beretta92_primary_crew.use_data.selection_index = 2
+end
+
+function WeaponTweakData:_init_data_glock_18_crew()
+	self.glock_18_crew.sounds.prefix = "g18c_npc"
+	self.glock_18_crew.use_data.selection_index = 1
+	self.glock_18_crew.DAMAGE = 1
+	self.glock_18_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.glock_18_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.glock_18_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.glock_18_crew.CLIP_AMMO_MAX = 20
+	self.glock_18_crew.NR_CLIPS_MAX = 8
+	self.glock_18_crew.hold = "pistol"
+	self.glock_18_crew.auto = {}
+	self.glock_18_crew.auto.fire_rate = 0.066
+	self.glock_18_crew.alert_size = 2500
+	self.glock_18_crew.suppression = 0.45
+	self.glock_18c_primary_crew = deep_clone(self.glock_18_crew)
+	self.glock_18c_primary_crew.use_data.selection_index = 2
+end
+
+function WeaponTweakData:_init_data_raging_bull_crew()
+	self.raging_bull_crew.sounds.prefix = "rbull_npc"
+	self.raging_bull_crew.use_data.selection_index = 1
+	self.raging_bull_crew.DAMAGE = 4
+	self.raging_bull_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.raging_bull_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.raging_bull_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.raging_bull_crew.CLIP_AMMO_MAX = 6
+	self.raging_bull_crew.NR_CLIPS_MAX = 8
+	self.raging_bull_crew.hold = "pistol"
+	self.raging_bull_crew.alert_size = 5000
+	self.raging_bull_crew.suppression = 1.8
+	self.raging_bull_primary_crew = deep_clone(self.raging_bull_crew)
+	self.raging_bull_primary_crew.use_data.selection_index = 2
+end
+
+function WeaponTweakData:_init_data_m4_crew()
+	self.m4_crew.sounds.prefix = "m4_npc"
+	self.m4_crew.use_data.selection_index = 2
+	self.m4_crew.DAMAGE = 1.5
+	self.m4_crew.muzzleflash = "effects/payday2/particles/weapons/556_auto"
+	self.m4_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.m4_crew.CLIP_AMMO_MAX = 30
+	self.m4_crew.NR_CLIPS_MAX = 5
+	self.m4_crew.auto.fire_rate = 0.1
+	self.m4_crew.hold = "rifle"
+	self.m4_crew.alert_size = 5000
+	self.m4_crew.suppression = 1
+	self.m4_secondary_crew = deep_clone(self.m4_crew)
+	self.m4_secondary_crew.use_data.selection_index = 1
+	self.ak47_ass_crew = deep_clone(self.m4_crew)
+	self.sg417_crew = deep_clone(self.m4_crew)
+end
+
+function WeaponTweakData:_init_data_ak47_crew()
+	self.ak47_crew.sounds.prefix = "akm_npc"
+	self.ak47_crew.use_data.selection_index = 2
+	self.ak47_crew.DAMAGE = 3
+	self.ak47_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.ak47_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.ak47_crew.CLIP_AMMO_MAX = 30
+	self.ak47_crew.NR_CLIPS_MAX = 5
+	self.ak47_crew.auto.fire_rate = 0.107
+	self.ak47_crew.hold = "rifle"
+	self.ak47_crew.alert_size = 5000
+	self.ak47_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_m14_crew()
+	self.m14_crew.sounds.prefix = "m14_npc"
+	self.m14_crew.use_data.selection_index = 2
+	self.m14_crew.DAMAGE = 1.28
+	self.m14_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.m14_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.m14_crew.CLIP_AMMO_MAX = 10
+	self.m14_crew.NR_CLIPS_MAX = 8
+	self.m14_crew.auto.fire_rate = 0.085
+	self.m14_crew.hold = "rifle"
+	self.m14_crew.alert_size = 5000
+	self.m14_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_r870_crew()
+	self.r870_crew.sounds.prefix = "remington_npc"
+	self.r870_crew.use_data.selection_index = 2
+	self.r870_crew.DAMAGE = 45
+	self.r870_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.r870_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug_semi"
+	self.r870_crew.CLIP_AMMO_MAX = 6
+	self.r870_crew.NR_CLIPS_MAX = 4
+	self.r870_crew.hold = "rifle"
+	self.r870_crew.alert_size = 4500
+	self.r870_crew.suppression = 1.8
+	self.r870_crew.is_shotgun = true
+	self.benelli_crew = deep_clone(self.r870_crew)
+end
+
+function WeaponTweakData:_init_data_mossberg_crew()
+	self.mossberg_crew.sounds.prefix = "mossberg_npc"
+	self.mossberg_crew.use_data.selection_index = 2
+	self.mossberg_crew.DAMAGE = 6
+	self.mossberg_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.mossberg_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug_semi"
+	self.mossberg_crew.CLIP_AMMO_MAX = 6
+	self.mossberg_crew.NR_CLIPS_MAX = 4
+	self.mossberg_crew.hold = "rifle"
+	self.mossberg_crew.alert_size = 3000
+	self.mossberg_crew.suppression = 2
+	self.mossberg_crew.is_shotgun = true
+end
+
+function WeaponTweakData:_init_data_mp5_crew()
+	self.mp5_crew.sounds.prefix = "mp5_npc"
+	self.mp5_crew.use_data.selection_index = 1
+	self.mp5_crew.DAMAGE = 1
+	self.mp5_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.mp5_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.mp5_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.mp5_crew.CLIP_AMMO_MAX = 30
+	self.mp5_crew.NR_CLIPS_MAX = 5
+	self.mp5_crew.auto.fire_rate = 0.08
+	self.mp5_crew.hold = "rifle"
+	self.mp5_crew.alert_size = 2500
+	self.mp5_crew.suppression = 1
+	self.mp5_tactical_crew = deep_clone(self.mp5_crew)
+	self.mp5_tactical_crew.has_suppressor = "suppressed_a"
+	self.ump_crew = deep_clone(self.mp5_crew)
+	self.akmsu_smg_crew = deep_clone(self.mp5_crew)
+	self.asval_smg_crew = deep_clone(self.mp5_crew)
+	self.asval_smg_crew.has_suppressor = "suppressed_a"
+end
+
+function WeaponTweakData:_init_data_mac11_crew()
+	self.mac11_crew.sounds.prefix = "mp5_npc"
+	self.mac11_crew.use_data.selection_index = 1
+	self.mac11_crew.DAMAGE = 1
+	self.mac11_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.mac11_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.mac11_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.mac11_crew.CLIP_AMMO_MAX = 40
+	self.mac11_crew.NR_CLIPS_MAX = 5
+	self.mac11_crew.auto.fire_rate = 0.06
+	self.mac11_crew.hold = "pistol"
+	self.mac11_crew.alert_size = 2500
+	self.mac11_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_g36_crew()
+	self.g36_crew.sounds.prefix = "g36_npc"
+	self.g36_crew.use_data.selection_index = 2
+	self.g36_crew.DAMAGE = 1.28
+	self.g36_crew.muzzleflash = "effects/payday2/particles/weapons/556_auto"
+	self.g36_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.g36_crew.CLIP_AMMO_MAX = 30
+	self.g36_crew.NR_CLIPS_MAX = 5
+	self.g36_crew.auto.fire_rate = 0.085
+	self.g36_crew.hold = "rifle"
+	self.g36_crew.alert_size = 5000
+	self.g36_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_g17_crew()
+	self.g17_crew.sounds.prefix = "g17_npc"
+	self.g17_crew.use_data.selection_index = 1
+	self.g17_crew.DAMAGE = 1
+	self.g17_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.g17_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.g17_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.g17_crew.CLIP_AMMO_MAX = 17
+	self.g17_crew.NR_CLIPS_MAX = 5
+	self.g17_crew.hold = "pistol"
+	self.g17_crew.alert_size = 2500
+	self.g17_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_mp9_crew()
+	self.mp9_crew.sounds.prefix = "mp9_npc"
+	self.mp9_crew.use_data.selection_index = 1
+	self.mp9_crew.DAMAGE = 1
+	self.mp9_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.mp9_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.mp9_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.mp9_crew.CLIP_AMMO_MAX = 30
+	self.mp9_crew.NR_CLIPS_MAX = 5
+	self.mp9_crew.auto.fire_rate = 0.063
+	self.mp9_crew.hold = "pistol"
+	self.mp9_crew.alert_size = 1000
+	self.mp9_crew.suppression = 1
+	self.sr2_smg_crew = deep_clone(self.mp9_crew)
+end
+
+function WeaponTweakData:_init_data_olympic_crew()
+	self.olympic_crew.sounds.prefix = "m4_olympic_npc"
+	self.olympic_crew.use_data.selection_index = 1
+	self.olympic_crew.DAMAGE = 1.5
+	self.olympic_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.olympic_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.olympic_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.olympic_crew.CLIP_AMMO_MAX = 25
+	self.olympic_crew.NR_CLIPS_MAX = 5
+	self.olympic_crew.auto.fire_rate = 0.088
+	self.olympic_crew.hold = "rifle"
+	self.olympic_crew.alert_size = 1000
+	self.olympic_crew.suppression = 1
+	self.olympic_primary_crew = deep_clone(self.olympic_crew)
+	self.olympic_primary_crew.use_data.selection_index = 2
+end
+
+function WeaponTweakData:_init_data_m16_crew()
+	self.m16_crew.sounds.prefix = "m16_npc"
+	self.m16_crew.use_data.selection_index = 2
+	self.m16_crew.DAMAGE = 1.05
+	self.m16_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.m16_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.m16_crew.CLIP_AMMO_MAX = 30
+	self.m16_crew.NR_CLIPS_MAX = 8
+	self.m16_crew.auto.fire_rate = 0.07
+	self.m16_crew.hold = "rifle"
+	self.m16_crew.alert_size = 5000
+	self.m16_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_aug_crew()
+	self.aug_crew.sounds.prefix = "aug_npc"
+	self.aug_crew.use_data.selection_index = 2
+	self.aug_crew.DAMAGE = 1.2
+	self.aug_crew.muzzleflash = "effects/payday2/particles/weapons/556_auto"
+	self.aug_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.aug_crew.CLIP_AMMO_MAX = 30
+	self.aug_crew.NR_CLIPS_MAX = 5
+	self.aug_crew.auto.fire_rate = 0.08
+	self.aug_crew.hold = "rifle"
+	self.aug_crew.alert_size = 5000
+	self.aug_crew.suppression = 1
+	self.aug_secondary_crew = deep_clone(self.aug_crew)
+	self.aug_secondary_crew.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_ak74_crew()
+	self.ak74_crew.sounds.prefix = "ak74_npc"
+	self.ak74_crew.use_data.selection_index = 2
+	self.ak74_crew.DAMAGE = 1.38
+	self.ak74_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.ak74_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.ak74_crew.CLIP_AMMO_MAX = 30
+	self.ak74_crew.NR_CLIPS_MAX = 5
+	self.ak74_crew.auto.fire_rate = 0.092
+	self.ak74_crew.hold = "rifle"
+	self.ak74_crew.alert_size = 5000
+	self.ak74_crew.suppression = 1
+	self.ak74_secondary_crew = deep_clone(self.ak74_crew)
+	self.ak74_secondary_crew.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_ak5_crew()
+	self.ak5_crew.sounds.prefix = "ak5_npc"
+	self.ak5_crew.use_data.selection_index = 2
+	self.ak5_crew.DAMAGE = 1.28
+	self.ak5_crew.muzzleflash = "effects/payday2/particles/weapons/556_auto"
+	self.ak5_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.ak5_crew.CLIP_AMMO_MAX = 30
+	self.ak5_crew.NR_CLIPS_MAX = 5
+	self.ak5_crew.auto.fire_rate = 0.085
+	self.ak5_crew.hold = "rifle"
+	self.ak5_crew.alert_size = 5000
+	self.ak5_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_p90_crew()
+	self.p90_crew.sounds.prefix = "p90_npc"
+	self.p90_crew.use_data.selection_index = 1
+	self.p90_crew.DAMAGE = 1
+	self.p90_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.p90_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.p90_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.p90_crew.CLIP_AMMO_MAX = 50
+	self.p90_crew.NR_CLIPS_MAX = 4
+	self.p90_crew.auto.fire_rate = 0.066
+	self.p90_crew.hold = "pistol"
+	self.p90_crew.alert_size = 1000
+	self.p90_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_amcar_crew()
+	self.amcar_crew.sounds.prefix = "amcar_npc"
+	self.amcar_crew.use_data.selection_index = 2
+	self.amcar_crew.DAMAGE = 1.65
+	self.amcar_crew.muzzleflash = "effects/payday2/particles/weapons/556_auto"
+	self.amcar_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.amcar_crew.CLIP_AMMO_MAX = 20
+	self.amcar_crew.NR_CLIPS_MAX = 5
+	self.amcar_crew.auto.fire_rate = 0.11
+	self.amcar_crew.hold = "rifle"
+	self.amcar_crew.alert_size = 5000
+	self.amcar_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_mac10_crew()
+	self.mac10_crew.sounds.prefix = "mac10_npc"
+	self.mac10_crew.use_data.selection_index = 1
+	self.mac10_crew.DAMAGE = 0.75
+	self.mac10_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.mac10_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.mac10_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.mac10_crew.CLIP_AMMO_MAX = 32
+	self.mac10_crew.NR_CLIPS_MAX = 5
+	self.mac10_crew.auto.fire_rate = 0.06
+	self.mac10_crew.hold = "pistol"
+	self.mac10_crew.alert_size = 1000
+	self.mac10_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_akmsu_crew()
+	self.akmsu_crew.sounds.prefix = "akmsu_npc"
+	self.akmsu_crew.use_data.selection_index = 1
+	self.akmsu_crew.DAMAGE = 3
+	self.akmsu_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.akmsu_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.akmsu_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.akmsu_crew.CLIP_AMMO_MAX = 30
+	self.akmsu_crew.NR_CLIPS_MAX = 5
+	self.akmsu_crew.auto.fire_rate = 0.073
+	self.akmsu_crew.hold = "rifle"
+	self.akmsu_crew.alert_size = 1000
+	self.akmsu_crew.suppression = 1
+	self.akmsu_primary_crew = deep_clone(self.akmsu_crew)
+	self.akmsu_primary_crew.use_data.selection_index = 2
+end
+
+function WeaponTweakData:_init_data_akm_crew()
+	self.akm_crew.sounds.prefix = "akm_npc"
+	self.akm_crew.use_data.selection_index = 2
+	self.akm_crew.DAMAGE = 1.61
+	self.akm_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.akm_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.akm_crew.CLIP_AMMO_MAX = 30
+	self.akm_crew.NR_CLIPS_MAX = 5
+	self.akm_crew.auto.fire_rate = 0.107
+	self.akm_crew.hold = "rifle"
+	self.akm_crew.alert_size = 5000
+	self.akm_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_akm_gold_crew()
+	self.akm_gold_crew.sounds.prefix = "akm_npc"
+	self.akm_gold_crew.use_data.selection_index = 2
+	self.akm_gold_crew.DAMAGE = 1.61
+	self.akm_gold_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.akm_gold_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.akm_gold_crew.CLIP_AMMO_MAX = 30
+	self.akm_gold_crew.NR_CLIPS_MAX = 5
+	self.akm_gold_crew.auto.fire_rate = 0.107
+	self.akm_gold_crew.hold = "rifle"
+	self.akm_gold_crew.alert_size = 5000
+	self.akm_gold_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_deagle_crew()
+	self.deagle_crew.sounds.prefix = "deagle_npc"
+	self.deagle_crew.use_data.selection_index = 1
+	self.deagle_crew.DAMAGE = 4
+	self.deagle_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.deagle_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.deagle_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.deagle_crew.CLIP_AMMO_MAX = 10
+	self.deagle_crew.NR_CLIPS_MAX = 5
+	self.deagle_crew.hold = "pistol"
+	self.deagle_crew.alert_size = 2500
+	self.deagle_crew.suppression = 1
+	self.deagle_primary_crew = deep_clone(self.deagle_crew)
+	self.deagle_primary_crew.use_data.selection_index = 2
+end
+
+function WeaponTweakData:_init_data_serbu_crew()
+	self.serbu_crew.sounds.prefix = "serbu_npc"
+	self.serbu_crew.use_data.selection_index = 1
+	self.serbu_crew.DAMAGE = 5
+	self.serbu_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.serbu_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug_semi"
+	self.serbu_crew.CLIP_AMMO_MAX = 6
+	self.serbu_crew.NR_CLIPS_MAX = 4
+	self.serbu_crew.hold = "rifle"
+	self.serbu_crew.alert_size = 4500
+	self.serbu_crew.suppression = 1.8
+	self.serbu_crew.is_shotgun = true
+end
+
+function WeaponTweakData:_init_data_saiga_crew()
+	self.saiga_crew.sounds.prefix = "saiga_npc"
+	self.saiga_crew.use_data.selection_index = 2
+	self.saiga_crew.DAMAGE = 2.7
+	self.saiga_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.saiga_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
+	self.saiga_crew.auto.fire_rate = 0.18
+	self.saiga_crew.CLIP_AMMO_MAX = 7
+	self.saiga_crew.NR_CLIPS_MAX = 10
+	self.saiga_crew.hold = "rifle"
+	self.saiga_crew.alert_size = 4500
+	self.saiga_crew.suppression = 1.8
+	self.saiga_crew.is_shotgun = true
+end
+
+function WeaponTweakData:_init_data_huntsman_crew()
+	self.huntsman_crew.sounds.prefix = "huntsman_npc"
+	self.huntsman_crew.use_data.selection_index = 2
+	self.huntsman_crew.DAMAGE = 45
+	self.huntsman_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.huntsman_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.huntsman_crew.CLIP_AMMO_MAX = 2
+	self.huntsman_crew.NR_CLIPS_MAX = 4
+	self.huntsman_crew.hold = "rifle"
+	self.huntsman_crew.alert_size = 4500
+	self.huntsman_crew.suppression = 1.8
+	self.huntsman_crew.is_shotgun = true
+end
+
+function WeaponTweakData:_init_data_saw_crew()
+	self.saw_crew.sounds.prefix = "saw_npc"
+	self.saw_crew.sounds.fire = "Play_npc_saw_handheld_start"
+	self.saw_crew.sounds.stop_fire = "Play_npc_saw_handheld_end"
+	self.saw_crew.use_data.selection_index = 2
+	self.saw_crew.DAMAGE = 1
+	self.saw_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.saw_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.saw_crew.CLIP_AMMO_MAX = 2
+	self.saw_crew.NR_CLIPS_MAX = 4
+	self.saw_crew.hold = "rifle"
+	self.saw_crew.alert_size = 4500
+	self.saw_crew.suppression = 1.8
+	self.saw_secondary_crew = deep_clone(self.saw_crew)
+	self.saw_secondary_crew.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_sentry_gun_crew()
+	self.sentry_gun.name_id = "debug_sentry_gun"
+	self.sentry_gun.DAMAGE = 3
+	self.sentry_gun.SUPPRESSION = 1
+	self.sentry_gun.SPREAD = 5
+	self.sentry_gun.FIRE_RANGE = 5000
+	self.sentry_gun.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.sentry_gun.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.sentry_gun.auto.fire_rate = 0.15
+	self.sentry_gun.alert_size = 2500
+	self.sentry_gun.BAG_DMG_MUL = 0.25
+	self.sentry_gun.SHIELD_DMG_MUL = 0
+	self.sentry_gun.DEATH_VERIFICATION = {0.4, 0.75}
+	self.sentry_gun.DETECTION_RANGE = self.sentry_gun.FIRE_RANGE
+	self.sentry_gun.KEEP_FIRE_ANGLE = 0.8
+	self.sentry_gun.DETECTION_DELAY = {
+		{600, 0.1},
+		{
+			self.sentry_gun.DETECTION_RANGE,
+			0.5
+		}
+	}
+	self.sentry_gun.MAX_VEL_SPIN = 120
+	self.sentry_gun.MIN_VEL_SPIN = self.sentry_gun.MAX_VEL_SPIN * 0.05
+	self.sentry_gun.SLOWDOWN_ANGLE_SPIN = 30
+	self.sentry_gun.ACC_SPIN = self.sentry_gun.MAX_VEL_SPIN * 5
+	self.sentry_gun.MAX_VEL_PITCH = 100
+	self.sentry_gun.MIN_VEL_PITCH = self.sentry_gun.MAX_VEL_PITCH * 0.05
+	self.sentry_gun.SLOWDOWN_ANGLE_PITCH = 20
+	self.sentry_gun.ACC_PITCH = self.sentry_gun.MAX_VEL_PITCH * 5
+	self.sentry_gun.recoil = {}
+	self.sentry_gun.recoil.horizontal = {
+		2,
+		3,
+		0,
+		3
+	}
+	self.sentry_gun.recoil.vertical = {
+		1,
+		2,
+		0,
+		4
+	}
+	self.sentry_gun.challenges = {}
+	self.sentry_gun.challenges.group = "sentry_gun"
+	self.sentry_gun.challenges.weapon = "sentry_gun"
+	self.sentry_gun.suppression = 0.8
+end
+
+function WeaponTweakData:_init_data_usp_crew()
+	self.usp_crew.sounds.prefix = "usp45_npc"
+	self.usp_crew.use_data.selection_index = 1
+	self.usp_crew.DAMAGE = 1.25
+	self.usp_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.usp_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.usp_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.usp_crew.CLIP_AMMO_MAX = 13
+	self.usp_crew.NR_CLIPS_MAX = 6
+	self.usp_crew.auto.fire_rate = 0.1
+	self.usp_crew.hold = "pistol"
+	self.usp_crew.alert_size = 1800
+	self.usp_crew.suppression = 2
+end
+
+function WeaponTweakData:_init_data_g22c_crew()
+	self.g22c_crew.sounds.prefix = "g22_npc"
+	self.g22c_crew.use_data.selection_index = 1
+	self.g22c_crew.DAMAGE = 1.25
+	self.g22c_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.g22c_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.g22c_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.g22c_crew.CLIP_AMMO_MAX = 16
+	self.g22c_crew.NR_CLIPS_MAX = 6
+	self.g22c_crew.auto.fire_rate = 0.1
+	self.g22c_crew.hold = "pistol"
+	self.g22c_crew.alert_size = 1800
+	self.g22c_crew.suppression = 2
+end
+
+function WeaponTweakData:_init_data_judge_crew()
+	self.judge_crew.sounds.prefix = "judge_npc"
+	self.judge_crew.use_data.selection_index = 1
+	self.judge_crew.DAMAGE = 4
+	self.judge_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.judge_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.judge_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.judge_crew.CLIP_AMMO_MAX = 5
+	self.judge_crew.NR_CLIPS_MAX = 5
+	self.judge_crew.hold = "pistol"
+	self.judge_crew.alert_size = 5000
+	self.judge_crew.suppression = 1.8
+end
+
+function WeaponTweakData:_init_data_m45_crew()
+	self.m45_crew.sounds.prefix = "m45_npc"
+	self.m45_crew.use_data.selection_index = 1
+	self.m45_crew.DAMAGE = 2
+	self.m45_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.m45_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.m45_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.m45_crew.CLIP_AMMO_MAX = 40
+	self.m45_crew.NR_CLIPS_MAX = 5
+	self.m45_crew.auto.fire_rate = 0.1
+	self.m45_crew.hold = "rifle"
+	self.m45_crew.alert_size = 2800
+	self.m45_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_s552_crew()
+	self.s552_crew.sounds.prefix = "sig552_npc"
+	self.s552_crew.use_data.selection_index = 2
+	self.s552_crew.DAMAGE = 1.26
+	self.s552_crew.muzzleflash = "effects/payday2/particles/weapons/556_auto"
+	self.s552_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.s552_crew.CLIP_AMMO_MAX = 30
+	self.s552_crew.NR_CLIPS_MAX = 5
+	self.s552_crew.auto.fire_rate = 0.084
+	self.s552_crew.hold = "rifle"
+	self.s552_crew.alert_size = 5000
+	self.s552_crew.suppression = 1
+	self.s552_secondary_crew = deep_clone(self.s552_crew)
+	self.s552_secondary_crew.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_ppk_crew()
+	self.ppk_crew.sounds.prefix = "w_ppk_npc"
+	self.ppk_crew.use_data.selection_index = 1
+	self.ppk_crew.DAMAGE = 1
+	self.ppk_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.ppk_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.ppk_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.ppk_crew.CLIP_AMMO_MAX = 14
+	self.ppk_crew.NR_CLIPS_MAX = 5
+	self.ppk_crew.hold = "pistol"
+	self.ppk_crew.alert_size = 2500
+	self.ppk_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_mp7_crew()
+	self.mp7_crew.sounds.prefix = "mp7_npc"
+	self.mp7_crew.use_data.selection_index = 1
+	self.mp7_crew.DAMAGE = 2
+	self.mp7_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.mp7_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.mp7_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.mp7_crew.CLIP_AMMO_MAX = 20
+	self.mp7_crew.NR_CLIPS_MAX = 5
+	self.mp7_crew.auto.fire_rate = 0.063
+	self.mp7_crew.hold = "pistol"
+	self.mp7_crew.alert_size = 2800
+	self.mp7_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_scar_crew()
+	self.scar_crew.sounds.prefix = "scar_npc"
+	self.scar_crew.use_data.selection_index = 2
+	self.scar_crew.DAMAGE = 1.47
+	self.scar_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.scar_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.scar_crew.CLIP_AMMO_MAX = 20
+	self.scar_crew.NR_CLIPS_MAX = 5
+	self.scar_crew.auto.fire_rate = 0.098
+	self.scar_crew.hold = "rifle"
+	self.scar_crew.alert_size = 5000
+	self.scar_crew.suppression = 1
+	self.scar_secondary_crew = deep_clone(self.scar_crew)
+	self.scar_secondary_crew.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_p226_crew()
+	self.p226_crew.sounds.prefix = "p226r_npc"
+	self.p226_crew.use_data.selection_index = 1
+	self.p226_crew.DAMAGE = 1
+	self.p226_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.p226_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.p226_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.p226_crew.CLIP_AMMO_MAX = 12
+	self.p226_crew.NR_CLIPS_MAX = 5
+	self.p226_crew.hold = "pistol"
+	self.p226_crew.alert_size = 2500
+	self.p226_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_hk21_crew()
+	self.hk21_crew.sounds.prefix = "hk23e_npc"
+	self.hk21_crew.use_data.selection_index = 2
+	self.hk21_crew.DAMAGE = 1.25
+	self.hk21_crew.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.hk21_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556_lmg"
+	self.hk21_crew.CLIP_AMMO_MAX = 150
+	self.hk21_crew.NR_CLIPS_MAX = 5
+	self.hk21_crew.auto.fire_rate = 0.083
+	self.hk21_crew.hold = "rifle"
+	self.hk21_crew.alert_size = 5000
+	self.hk21_crew.suppression = 1
+	self.hk21_secondary_crew = deep_clone(self.hk21_crew)
+	self.hk21_secondary_crew.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_m249_crew()
+	self.m249_crew.sounds.prefix = "m249_npc"
+	self.m249_crew.use_data.selection_index = 2
+	self.m249_crew.DAMAGE = 0.99
+	self.m249_crew.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.m249_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556_lmg"
+	self.m249_crew.CLIP_AMMO_MAX = 200
+	self.m249_crew.NR_CLIPS_MAX = 2
+	self.m249_crew.auto.fire_rate = 0.066
+	self.m249_crew.hold = "rifle"
+	self.m249_crew.alert_size = 5000
+	self.m249_crew.suppression = 1
+	self.rpk_lmg_crew = deep_clone(self.m249_crew)
+end
+
+function WeaponTweakData:_init_data_rpk_crew()
+	self.rpk_crew.sounds.prefix = "rpk_npc"
+	self.rpk_crew.use_data.selection_index = 2
+	self.rpk_crew.DAMAGE = 1.2
+	self.rpk_crew.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.rpk_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.rpk_crew.CLIP_AMMO_MAX = 100
+	self.rpk_crew.NR_CLIPS_MAX = 5
+	self.rpk_crew.auto.fire_rate = 0.08
+	self.rpk_crew.hold = "rifle"
+	self.rpk_crew.alert_size = 5000
+	self.rpk_crew.suppression = 1
+	self.rpk_secondary_crew = deep_clone(self.rpk_crew)
+	self.rpk_secondary_crew.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_m95_crew()
+	self.m95_crew.sounds.prefix = "barrett_npc"
+	self.m95_crew.use_data.selection_index = 2
+	self.m95_crew.DAMAGE = 22.5
+	self.m95_crew.muzzleflash = "effects/payday2/particles/weapons/50cal_auto"
+	self.m95_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper_m95"
+	self.m95_crew.CLIP_AMMO_MAX = 5
+	self.m95_crew.NR_CLIPS_MAX = 5
+	self.m95_crew.auto.fire_rate = 1.5
+	self.m95_crew.hold = "rifle"
+	self.m95_crew.alert_size = 5000
+	self.m95_crew.suppression = 1
+	self.m95_secondary_crew = deep_clone(self.m95_crew)
+	self.m95_secondary_crew.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_msr_crew()
+	self.msr_crew.sounds.prefix = "msr_npc"
+	self.msr_crew.use_data.selection_index = 2
+	self.msr_crew.DAMAGE = 15
+	self.msr_crew.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.msr_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
+	self.msr_crew.CLIP_AMMO_MAX = 10
+	self.msr_crew.NR_CLIPS_MAX = 5
+	self.msr_crew.auto.fire_rate = 1
+	self.msr_crew.hold = "rifle"
+	self.msr_crew.alert_size = 5000
+	self.msr_crew.suppression = 1
+	self.msr_secondary_crew = deep_clone(self.msr_crew)
+	self.msr_secondary_crew.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_r93_crew()
+	self.r93_crew.sounds.prefix = "blazer_npc"
+	self.r93_crew.use_data.selection_index = 2
+	self.r93_crew.DAMAGE = 18
+	self.r93_crew.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.r93_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
+	self.r93_crew.CLIP_AMMO_MAX = 6
+	self.r93_crew.NR_CLIPS_MAX = 5
+	self.r93_crew.auto.fire_rate = 1.2
+	self.r93_crew.hold = "rifle"
+	self.r93_crew.alert_size = 5000
+	self.r93_crew.suppression = 1
+	self.r93_secondary_crew = deep_clone(self.r93_crew)
+	self.r93_secondary_crew.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_fal_crew()
+	self.fal_crew.sounds.prefix = "fn_fal_npc"
+	self.fal_crew.use_data.selection_index = 2
+	self.fal_crew.DAMAGE = 1.29
+	self.fal_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.fal_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.fal_crew.CLIP_AMMO_MAX = 20
+	self.fal_crew.NR_CLIPS_MAX = 5
+	self.fal_crew.auto.fire_rate = 0.08
+	self.fal_crew.hold = "rifle"
+	self.fal_crew.alert_size = 5000
+	self.fal_crew.suppression = 1
+	self.fal_secondary_crew = deep_clone(self.fal_crew)
+	self.fal_secondary_crew.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_ben_crew()
+	self.ben_crew.sounds.prefix = "benelli_m4_npc"
+	self.ben_crew.use_data.selection_index = 2
+	self.ben_crew.DAMAGE = 2.1
+	self.ben_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.ben_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
+	self.ben_crew.auto.fire_rate = 0.14
+	self.ben_crew.CLIP_AMMO_MAX = 8
+	self.ben_crew.NR_CLIPS_MAX = 4
+	self.ben_crew.hold = "rifle"
+	self.ben_crew.alert_size = 4500
+	self.ben_crew.suppression = 1.8
+	self.ben_crew.is_shotgun = true
+end
+
+function WeaponTweakData:_init_data_striker_crew()
+	self.striker_crew.sounds.prefix = "striker_npc"
+	self.striker_crew.use_data.selection_index = 1
+	self.striker_crew.DAMAGE = 5
+	self.striker_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.striker_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
+	self.striker_crew.auto.fire_rate = 0.14
+	self.striker_crew.CLIP_AMMO_MAX = 12
+	self.striker_crew.NR_CLIPS_MAX = 4
+	self.striker_crew.hold = "rifle"
+	self.striker_crew.alert_size = 4500
+	self.striker_crew.suppression = 1.8
+	self.striker_crew.is_shotgun = true
+end
+
+function WeaponTweakData:_init_data_ksg_crew()
+	self.ksg_crew.sounds.prefix = "keltec_npc"
+	self.ksg_crew.use_data.selection_index = 2
+	self.ksg_crew.DAMAGE = 8.7
+	self.ksg_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.ksg_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
+	self.ksg_crew.auto.fire_rate = 0.575
+	self.ksg_crew.CLIP_AMMO_MAX = 14
+	self.ksg_crew.NR_CLIPS_MAX = 4
+	self.ksg_crew.hold = "rifle"
+	self.ksg_crew.alert_size = 4500
+	self.ksg_crew.suppression = 1.8
+	self.ksg_crew.is_shotgun = true
+end
+
+function WeaponTweakData:_init_data_gre_m79_crew()
+	self.gre_m79_crew.sounds.prefix = "gl40_npc"
+	self.gre_m79_crew.use_data.selection_index = 2
+	self.gre_m79_crew.DAMAGE = 2
+	self.gre_m79_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.gre_m79_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.gre_m79_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.gre_m79_crew.no_trail = true
+	self.gre_m79_crew.CLIP_AMMO_MAX = 1
+	self.gre_m79_crew.NR_CLIPS_MAX = 4
+	self.gre_m79_crew.auto.fire_rate = 0.1
+	self.gre_m79_crew.hold = "rifle"
+	self.gre_m79_crew.alert_size = 2800
+	self.gre_m79_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_g3_crew()
+	self.g3_crew.sounds.prefix = "g3_npc"
+	self.g3_crew.use_data.selection_index = 2
+	self.g3_crew.DAMAGE = 1.43
+	self.g3_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.g3_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.g3_crew.CLIP_AMMO_MAX = 20
+	self.g3_crew.NR_CLIPS_MAX = 5
+	self.g3_crew.auto.fire_rate = 0.092
+	self.g3_crew.hold = "rifle"
+	self.g3_crew.alert_size = 5000
+	self.g3_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_galil_crew()
+	self.galil_crew.sounds.prefix = "galil_npc"
+	self.galil_crew.use_data.selection_index = 2
+	self.galil_crew.DAMAGE = 1.07
+	self.galil_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.galil_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.galil_crew.CLIP_AMMO_MAX = 30
+	self.galil_crew.NR_CLIPS_MAX = 5
+	self.galil_crew.auto.fire_rate = 0.071
+	self.galil_crew.hold = "rifle"
+	self.galil_crew.alert_size = 5000
+	self.galil_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_famas_crew()
+	self.famas_crew.sounds.prefix = "famas_npc"
+	self.famas_crew.use_data.selection_index = 2
+	self.famas_crew.DAMAGE = 0.9
+	self.famas_crew.muzzleflash = "effects/payday2/particles/weapons/556_auto"
+	self.famas_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.famas_crew.CLIP_AMMO_MAX = 30
+	self.famas_crew.NR_CLIPS_MAX = 5
+	self.famas_crew.auto.fire_rate = 0.06
+	self.famas_crew.hold = "rifle"
+	self.famas_crew.alert_size = 5000
+	self.famas_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_scorpion_crew()
+	self.scorpion_crew.sounds.prefix = "skorpion_npc"
+	self.scorpion_crew.use_data.selection_index = 1
+	self.scorpion_crew.DAMAGE = 2
+	self.scorpion_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.scorpion_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.scorpion_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.scorpion_crew.CLIP_AMMO_MAX = 20
+	self.scorpion_crew.NR_CLIPS_MAX = 5
+	self.scorpion_crew.auto.fire_rate = 0.06
+	self.scorpion_crew.hold = "pistol"
+	self.scorpion_crew.alert_size = 2800
+	self.scorpion_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_tec9_crew()
+	self.tec9_crew.sounds.prefix = "tec9_npc"
+	self.tec9_crew.use_data.selection_index = 1
+	self.tec9_crew.DAMAGE = 2
+	self.tec9_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.tec9_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.tec9_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.tec9_crew.CLIP_AMMO_MAX = 20
+	self.tec9_crew.NR_CLIPS_MAX = 5
+	self.tec9_crew.auto.fire_rate = 0.067
+	self.tec9_crew.hold = "pistol"
+	self.tec9_crew.alert_size = 2800
+	self.tec9_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_uzi_crew()
+	self.uzi_crew.sounds.prefix = "uzi_npc"
+	self.uzi_crew.use_data.selection_index = 1
+	self.uzi_crew.DAMAGE = 2
+	self.uzi_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.uzi_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.uzi_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.uzi_crew.CLIP_AMMO_MAX = 40
+	self.uzi_crew.NR_CLIPS_MAX = 5
+	self.uzi_crew.auto.fire_rate = 0.086
+	self.uzi_crew.hold = "pistol"
+	self.uzi_crew.alert_size = 2800
+	self.uzi_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_jowi_crew()
+	self.jowi_crew.sounds.prefix = "g17_npc"
+	self.jowi_crew.use_data.selection_index = 2
+	self.jowi_crew.DAMAGE = 1
+	self.jowi_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.jowi_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.jowi_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.jowi_crew.CLIP_AMMO_MAX = 20
+	self.jowi_crew.NR_CLIPS_MAX = 5
+	self.jowi_crew.hold = "akimbo_pistol"
+	self.jowi_crew.alert_size = 2500
+	self.jowi_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_x_1911_crew()
+	self.x_1911_crew.sounds.prefix = "c45_npc"
+	self.x_1911_crew.use_data.selection_index = 2
+	self.x_1911_crew.DAMAGE = 1
+	self.x_1911_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.x_1911_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.x_1911_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_1911_crew.CLIP_AMMO_MAX = 20
+	self.x_1911_crew.NR_CLIPS_MAX = 5
+	self.x_1911_crew.hold = "akimbo_pistol"
+	self.x_1911_crew.alert_size = 2500
+	self.x_1911_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_x_b92fs_crew()
+	self.x_b92fs_crew.sounds.prefix = "beretta_npc"
+	self.x_b92fs_crew.use_data.selection_index = 2
+	self.x_b92fs_crew.DAMAGE = 1
+	self.x_b92fs_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.x_b92fs_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.x_b92fs_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_b92fs_crew.CLIP_AMMO_MAX = 28
+	self.x_b92fs_crew.NR_CLIPS_MAX = 5
+	self.x_b92fs_crew.hold = "akimbo_pistol"
+	self.x_b92fs_crew.alert_size = 2500
+	self.x_b92fs_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_x_deagle_crew()
+	self.x_deagle_crew.sounds.prefix = "deagle_npc"
+	self.x_deagle_crew.use_data.selection_index = 2
+	self.x_deagle_crew.DAMAGE = 1
+	self.x_deagle_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.x_deagle_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.x_deagle_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_deagle_crew.CLIP_AMMO_MAX = 20
+	self.x_deagle_crew.NR_CLIPS_MAX = 5
+	self.x_deagle_crew.hold = "akimbo_pistol"
+	self.x_deagle_crew.alert_size = 2500
+	self.x_deagle_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_g26_crew()
+	self.g26_crew.sounds.prefix = "g17_npc"
+	self.g26_crew.use_data.selection_index = 1
+	self.g26_crew.DAMAGE = 1
+	self.g26_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.g26_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.g26_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.g26_crew.CLIP_AMMO_MAX = 10
+	self.g26_crew.NR_CLIPS_MAX = 5
+	self.g26_crew.hold = "pistol"
+	self.g26_crew.alert_size = 2500
+	self.g26_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_spas12_crew()
+	self.spas12_crew.sounds.prefix = "spas_npc"
+	self.spas12_crew.use_data.selection_index = 2
+	self.spas12_crew.DAMAGE = 3
+	self.spas12_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.spas12_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
+	self.spas12_crew.auto.fire_rate = 0.2
+	self.spas12_crew.CLIP_AMMO_MAX = 6
+	self.spas12_crew.NR_CLIPS_MAX = 4
+	self.spas12_crew.hold = "rifle"
+	self.spas12_crew.alert_size = 4500
+	self.spas12_crew.suppression = 1.8
+	self.spas12_crew.is_shotgun = true
+end
+
+function WeaponTweakData:_init_data_mg42_crew()
+	self.mg42_crew.sounds.prefix = "mg42_npc"
+	self.mg42_crew.use_data.selection_index = 2
+	self.mg42_crew.DAMAGE = 0.75
+	self.mg42_crew.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.mg42_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556_lmg"
+	self.mg42_crew.CLIP_AMMO_MAX = 150
+	self.mg42_crew.NR_CLIPS_MAX = 3
+	self.mg42_crew.auto.fire_rate = 0.05
+	self.mg42_crew.hold = "rifle"
+	self.mg42_crew.alert_size = 5000
+	self.mg42_crew.suppression = 1
+	self.mg42_secondary_crew = deep_clone(self.mg42_crew)
+	self.mg42_secondary_crew.use_data.selection_index = 1
+	self.mg42_secondary_crew.armor_piercing = true
+end
+
+function WeaponTweakData:_init_data_c96_crew()
+	self.c96_crew.sounds.prefix = "c96_npc"
+	self.c96_crew.use_data.selection_index = 1
+	self.c96_crew.DAMAGE = 1
+	self.c96_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.c96_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.c96_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.c96_crew.CLIP_AMMO_MAX = 10
+	self.c96_crew.NR_CLIPS_MAX = 5
+	self.c96_crew.hold = "pistol"
+	self.c96_crew.alert_size = 2500
+	self.c96_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_sterling_crew()
+	self.sterling_crew.sounds.prefix = "sterling_npc"
+	self.sterling_crew.use_data.selection_index = 1
+	self.sterling_crew.DAMAGE = 2
+	self.sterling_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.sterling_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.sterling_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.sterling_crew.CLIP_AMMO_MAX = 20
+	self.sterling_crew.NR_CLIPS_MAX = 5
+	self.sterling_crew.auto.fire_rate = 0.11
+	self.sterling_crew.hold = "pistol"
+	self.sterling_crew.alert_size = 2800
+	self.sterling_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_mosin_crew()
+	self.mosin_crew.sounds.prefix = "nagant_npc"
+	self.mosin_crew.use_data.selection_index = 2
+	self.mosin_crew.DAMAGE = 15
+	self.mosin_crew.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.mosin_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
+	self.mosin_crew.CLIP_AMMO_MAX = 5
+	self.mosin_crew.NR_CLIPS_MAX = 8
+	self.mosin_crew.auto.fire_rate = 1
+	self.mosin_crew.hold = "rifle"
+	self.mosin_crew.alert_size = 5000
+	self.mosin_crew.suppression = 1
+	self.mosin_secondary_crew = deep_clone(self.mosin_crew)
+	self.mosin_secondary_crew.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_m1928_crew()
+	self.m1928_crew.sounds.prefix = "m1928_npc"
+	self.m1928_crew.use_data.selection_index = 2
+	self.m1928_crew.DAMAGE = 2
+	self.m1928_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.m1928_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.m1928_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.m1928_crew.CLIP_AMMO_MAX = 50
+	self.m1928_crew.NR_CLIPS_MAX = 3
+	self.m1928_crew.auto.fire_rate = 0.083
+	self.m1928_crew.hold = "rifle"
+	self.m1928_crew.alert_size = 5000
+	self.m1928_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_l85a2_crew()
+	self.l85a2_crew.sounds.prefix = "l85_npc"
+	self.l85a2_crew.use_data.selection_index = 2
+	self.l85a2_crew.DAMAGE = 2
+	self.l85a2_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.l85a2_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.l85a2_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.l85a2_crew.CLIP_AMMO_MAX = 30
+	self.l85a2_crew.NR_CLIPS_MAX = 5
+	self.l85a2_crew.auto.fire_rate = 0.083
+	self.l85a2_crew.hold = "rifle"
+	self.l85a2_crew.alert_size = 5000
+	self.l85a2_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_vhs_crew()
+	self.vhs_crew.sounds.prefix = "vhs_npc"
+	self.vhs_crew.use_data.selection_index = 2
+	self.vhs_crew.DAMAGE = 1.05
+	self.vhs_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.vhs_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.vhs_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.vhs_crew.CLIP_AMMO_MAX = 30
+	self.vhs_crew.NR_CLIPS_MAX = 5
+	self.vhs_crew.auto.fire_rate = 0.07
+	self.vhs_crew.hold = "rifle"
+	self.vhs_crew.alert_size = 5000
+	self.vhs_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_m134_crew()
+	self.m134_crew.sounds.prefix = "minigun_npc"
+	self.m134_crew.use_data.selection_index = 2
+	self.m134_crew.DAMAGE = 2
+	self.m134_crew.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.m134_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556_lmg"
+	self.m134_crew.CLIP_AMMO_MAX = 750
+	self.m134_crew.NR_CLIPS_MAX = 1
+	self.m134_crew.auto.fire_rate = 0.05
+	self.m134_crew.hold = "rifle"
+	self.m134_crew.alert_size = 5000
+	self.m134_crew.suppression = 1
+	self.m134_crew.has_fire_animation = true
+	self.m134_crew.animations = {}
+	self.m134_crew.animations.thq_align_anim = "thq"
+	self.m134_secondary_crew = deep_clone(self.m134_crew)
+	self.m134_secondary_crew.use_data.selection_index = 1
+	self.m134_secondary_crew.armor_piercing = true
+end
+
+function WeaponTweakData:_init_data_rpg7_crew()
+	self.rpg7_crew.sounds.prefix = "rpg_npc"
+	self.rpg7_crew.use_data.selection_index = 2
+	self.rpg7_crew.DAMAGE = 2
+	self.rpg7_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.rpg7_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.rpg7_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.rpg7_crew.no_trail = true
+	self.rpg7_crew.CLIP_AMMO_MAX = 1
+	self.rpg7_crew.NR_CLIPS_MAX = 4
+	self.rpg7_crew.auto.fire_rate = 0.1
+	self.rpg7_crew.hold = "rifle"
+	self.rpg7_crew.alert_size = 2800
+	self.rpg7_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_hs2000_crew()
+	self.hs2000_crew.sounds.prefix = "p226r_npc"
+	self.hs2000_crew.use_data.selection_index = 1
+	self.hs2000_crew.DAMAGE = 1
+	self.hs2000_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.hs2000_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.hs2000_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.hs2000_crew.CLIP_AMMO_MAX = 19
+	self.hs2000_crew.NR_CLIPS_MAX = 5
+	self.hs2000_crew.hold = "pistol"
+	self.hs2000_crew.alert_size = 2500
+	self.hs2000_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_cobray_crew()
+	self.cobray_crew.sounds.prefix = "cobray_npc"
+	self.cobray_crew.use_data.selection_index = 1
+	self.cobray_crew.DAMAGE = 2
+	self.cobray_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.cobray_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.cobray_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.cobray_crew.CLIP_AMMO_MAX = 32
+	self.cobray_crew.NR_CLIPS_MAX = 5
+	self.cobray_crew.auto.fire_rate = 0.05
+	self.cobray_crew.hold = "pistol"
+	self.cobray_crew.alert_size = 5000
+	self.cobray_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_b682_crew()
+	self.b682_crew.sounds.prefix = "b682_npc"
+	self.b682_crew.use_data.selection_index = 2
+	self.b682_crew.DAMAGE = 45
+	self.b682_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.b682_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.b682_crew.CLIP_AMMO_MAX = 2
+	self.b682_crew.NR_CLIPS_MAX = 4
+	self.b682_crew.hold = "rifle"
+	self.b682_crew.alert_size = 4500
+	self.b682_crew.suppression = 1.8
+	self.b682_crew.is_shotgun = true
+end
+
+function WeaponTweakData:_init_data_x_g22c_crew()
+	self.x_g22c_crew.sounds.prefix = "g22_npc"
+	self.x_g22c_crew.use_data.selection_index = 2
+	self.x_g22c_crew.DAMAGE = 1.25
+	self.x_g22c_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.x_g22c_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.x_g22c_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_g22c_crew.CLIP_AMMO_MAX = 32
+	self.x_g22c_crew.NR_CLIPS_MAX = 5
+	self.x_g22c_crew.hold = "akimbo_pistol"
+	self.x_g22c_crew.alert_size = 1800
+	self.x_g22c_crew.suppression = 2
+end
+
+function WeaponTweakData:_init_data_x_g17_crew()
+	self.x_g17_crew.sounds.prefix = "g22_npc"
+	self.x_g17_crew.use_data.selection_index = 2
+	self.x_g17_crew.DAMAGE = 1.25
+	self.x_g17_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.x_g17_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.x_g17_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_g17_crew.CLIP_AMMO_MAX = 34
+	self.x_g17_crew.NR_CLIPS_MAX = 5
+	self.x_g17_crew.hold = "akimbo_pistol"
+	self.x_g17_crew.alert_size = 1800
+	self.x_g17_crew.suppression = 2
+end
+
+function WeaponTweakData:_init_data_x_usp_crew()
+	self.x_usp_crew.sounds.prefix = "g22_npc"
+	self.x_usp_crew.use_data.selection_index = 2
+	self.x_usp_crew.DAMAGE = 1.25
+	self.x_usp_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.x_usp_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.x_usp_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_usp_crew.CLIP_AMMO_MAX = 26
+	self.x_usp_crew.NR_CLIPS_MAX = 5
+	self.x_usp_crew.hold = "akimbo_pistol"
+	self.x_usp_crew.alert_size = 1800
+	self.x_usp_crew.suppression = 2
+end
+
+function WeaponTweakData:_init_data_flamethrower_mk2_crew()
+	self.flamethrower_mk2_crew.sounds.prefix = "flamethrower_npc"
+	self.flamethrower_mk2_crew.sounds.fire = "flamethrower_npc_fire"
+	self.flamethrower_mk2_crew.sounds.stop_fire = "flamethrower_npc_fire_stop"
+	self.flamethrower_mk2_crew.use_data.selection_index = 2
+	self.flamethrower_mk2_crew.DAMAGE = 1
+	self.flamethrower_mk2_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.flamethrower_mk2_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.flamethrower_mk2_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.flamethrower_mk2_crew.CLIP_AMMO_MAX = 300
+	self.flamethrower_mk2_crew.NR_CLIPS_MAX = 4
+	self.flamethrower_mk2_crew.hold = "rifle"
+	self.flamethrower_mk2_crew.auto.fire_rate = 0.05
+	self.flamethrower_mk2_crew.hud_icon = "rifle"
+	self.flamethrower_mk2_crew.alert_size = 2500
+	self.flamethrower_mk2_crew.suppression = 0.45
+end
+
+function WeaponTweakData:_init_data_m32_crew()
+	self.m32_crew.sounds.prefix = "mgl_npc"
+	self.m32_crew.use_data.selection_index = 2
+	self.m32_crew.DAMAGE = 2
+	self.m32_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.m32_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.m32_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.m32_crew.no_trail = true
+	self.m32_crew.CLIP_AMMO_MAX = 6
+	self.m32_crew.NR_CLIPS_MAX = 4
+	self.m32_crew.auto.fire_rate = 0.1
+	self.m32_crew.hold = "rifle"
+	self.m32_crew.alert_size = 2800
+	self.m32_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_aa12_crew()
+	self.aa12_crew.sounds.prefix = "aa12_npc"
+	self.aa12_crew.use_data.selection_index = 2
+	self.aa12_crew.DAMAGE = 3
+	self.aa12_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.aa12_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
+	self.aa12_crew.auto.fire_rate = 0.2
+	self.aa12_crew.CLIP_AMMO_MAX = 8
+	self.aa12_crew.NR_CLIPS_MAX = 4
+	self.aa12_crew.hold = "rifle"
+	self.aa12_crew.alert_size = 4500
+	self.aa12_crew.suppression = 1.8
+	self.aa12_crew.is_shotgun = true
+end
+
+function WeaponTweakData:_init_data_peacemaker_crew()
+	self.peacemaker_crew.sounds.prefix = "pmkr45_npc"
+	self.peacemaker_crew.use_data.selection_index = 1
+	self.peacemaker_crew.DAMAGE = 4
+	self.peacemaker_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.peacemaker_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.peacemaker_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.peacemaker_crew.CLIP_AMMO_MAX = 6
+	self.peacemaker_crew.NR_CLIPS_MAX = 8
+	self.peacemaker_crew.hold = "pistol"
+	self.peacemaker_crew.alert_size = 5000
+	self.peacemaker_crew.suppression = 1.8
+end
+
+function WeaponTweakData:_init_data_winchester1874_crew()
+	self.winchester1874_crew.sounds.prefix = "m1873_npc"
+	self.winchester1874_crew.use_data.selection_index = 2
+	self.winchester1874_crew.DAMAGE = 10.5
+	self.winchester1874_crew.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.winchester1874_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
+	self.winchester1874_crew.CLIP_AMMO_MAX = 15
+	self.winchester1874_crew.NR_CLIPS_MAX = 8
+	self.winchester1874_crew.auto.fire_rate = 0.7
+	self.winchester1874_crew.hold = "rifle"
+	self.winchester1874_crew.alert_size = 5000
+	self.winchester1874_crew.suppression = 1
+	self.winchester1874_secondary_crew = deep_clone(self.winchester1874_crew)
+	self.winchester1874_secondary_crew.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_plainsrider_crew()
+	self.plainsrider_crew.sounds.prefix = "bow_npc"
+	self.plainsrider_crew.use_data.selection_index = 2
+	self.plainsrider_crew.use_data.align_place = "left_hand"
+	self.plainsrider_crew.DAMAGE = 2
+	self.plainsrider_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.plainsrider_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.plainsrider_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.plainsrider_crew.no_trail = true
+	self.plainsrider_crew.CLIP_AMMO_MAX = 1
+	self.plainsrider_crew.NR_CLIPS_MAX = 4
+	self.plainsrider_crew.auto.fire_rate = 0.1
+	self.plainsrider_crew.hold = "bow"
+	self.plainsrider_crew.has_fire_animation = true
+	self.plainsrider_crew.alert_size = 2800
+	self.plainsrider_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_mateba_crew()
+	self.mateba_crew.sounds.prefix = "mateba_npc"
+	self.mateba_crew.use_data.selection_index = 1
+	self.mateba_crew.DAMAGE = 4
+	self.mateba_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.mateba_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.mateba_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.mateba_crew.CLIP_AMMO_MAX = 6
+	self.mateba_crew.NR_CLIPS_MAX = 8
+	self.mateba_crew.hold = "pistol"
+	self.mateba_crew.alert_size = 5000
+	self.mateba_crew.suppression = 1.8
+end
+
+function WeaponTweakData:_init_data_asval_crew()
+	self.asval_crew.sounds.prefix = "val_npc"
+	self.asval_crew.use_data.selection_index = 2
+	self.asval_crew.DAMAGE = 1.01
+	self.asval_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.asval_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.asval_crew.CLIP_AMMO_MAX = 20
+	self.asval_crew.NR_CLIPS_MAX = 5
+	self.asval_crew.auto.fire_rate = 0.067
+	self.asval_crew.hold = "rifle"
+	self.asval_crew.alert_size = 5000
+	self.asval_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_sub2000_crew()
+	self.sub2000_crew.sounds.prefix = "sub2k_npc"
+	self.sub2000_crew.use_data.selection_index = 2
+	self.sub2000_crew.DAMAGE = 1.28
+	self.sub2000_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.sub2000_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.sub2000_crew.CLIP_AMMO_MAX = 33
+	self.sub2000_crew.NR_CLIPS_MAX = 8
+	self.sub2000_crew.auto.fire_rate = 0.085
+	self.sub2000_crew.hold = "rifle"
+	self.sub2000_crew.alert_size = 5000
+	self.sub2000_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_wa2000_crew()
+	self.wa2000_crew.sounds.prefix = "lakner_npc"
+	self.wa2000_crew.use_data.selection_index = 2
+	self.wa2000_crew.DAMAGE = 7.5
+	self.wa2000_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.wa2000_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.wa2000_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.wa2000_crew.CLIP_AMMO_MAX = 10
+	self.wa2000_crew.NR_CLIPS_MAX = 5
+	self.wa2000_crew.auto.fire_rate = 0.5
+	self.wa2000_crew.hold = "rifle"
+	self.wa2000_crew.alert_size = 5000
+	self.wa2000_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_polymer_crew()
+	self.polymer_crew.sounds.prefix = "polymer_npc"
+	self.polymer_crew.use_data.selection_index = 1
+	self.polymer_crew.DAMAGE = 2
+	self.polymer_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.polymer_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.polymer_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.polymer_crew.CLIP_AMMO_MAX = 30
+	self.polymer_crew.NR_CLIPS_MAX = 5
+	self.polymer_crew.auto.fire_rate = 0.05
+	self.polymer_crew.hold = "pistol"
+	self.polymer_crew.alert_size = 5000
+	self.polymer_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_hunter_crew()
+	self.hunter_crew.sounds.prefix = "hunter_npc"
+	self.hunter_crew.use_data.selection_index = 1
+	self.hunter_crew.DAMAGE = 2
+	self.hunter_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.hunter_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.hunter_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.hunter_crew.CLIP_AMMO_MAX = 1
+	self.hunter_crew.NR_CLIPS_MAX = 5
+	self.hunter_crew.auto.fire_rate = 20
+	self.hunter_crew.hold = "pistol"
+	self.hunter_crew.alert_size = 5000
+	self.hunter_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_baka_crew()
+	self.baka_crew.sounds.prefix = "baka_npc"
+	self.baka_crew.use_data.selection_index = 1
+	self.baka_crew.DAMAGE = 2
+	self.baka_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.baka_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.baka_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.baka_crew.CLIP_AMMO_MAX = 32
+	self.baka_crew.NR_CLIPS_MAX = 5
+	self.baka_crew.auto.fire_rate = 0.05
+	self.baka_crew.hold = "pistol"
+	self.baka_crew.alert_size = 5000
+	self.baka_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_arblast_crew()
+	self.arblast_crew.sounds.prefix = "arblast_npc"
+	self.arblast_crew.use_data.selection_index = 2
+	self.arblast_crew.DAMAGE = 2
+	self.arblast_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.arblast_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.arblast_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.arblast_crew.CLIP_AMMO_MAX = 1
+	self.arblast_crew.NR_CLIPS_MAX = 5
+	self.arblast_crew.auto.fire_rate = 20
+	self.arblast_crew.hold = "rifle"
+	self.arblast_crew.alert_size = 5000
+	self.arblast_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_frankish_crew()
+	self.frankish_crew.sounds.prefix = "frankish_npc"
+	self.frankish_crew.use_data.selection_index = 2
+	self.frankish_crew.DAMAGE = 2
+	self.frankish_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.frankish_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.frankish_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.frankish_crew.CLIP_AMMO_MAX = 1
+	self.frankish_crew.NR_CLIPS_MAX = 5
+	self.frankish_crew.auto.fire_rate = 20
+	self.frankish_crew.hold = "rifle"
+	self.frankish_crew.alert_size = 5000
+	self.frankish_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_long_crew()
+	self.long_crew.sounds.prefix = "bow_npc"
+	self.long_crew.use_data.selection_index = 2
+	self.long_crew.use_data.align_place = "left_hand"
+	self.long_crew.DAMAGE = 2
+	self.long_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.long_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.long_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.long_crew.no_trail = true
+	self.long_crew.CLIP_AMMO_MAX = 1
+	self.long_crew.NR_CLIPS_MAX = 4
+	self.long_crew.auto.fire_rate = 0.1
+	self.long_crew.hold = "bow"
+	self.long_crew.has_fire_animation = true
+	self.long_crew.alert_size = 2800
+	self.long_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_par_crew()
+	self.par_crew.sounds.prefix = "svinet_npc"
+	self.par_crew.use_data.selection_index = 2
+	self.par_crew.DAMAGE = 0.99
+	self.par_crew.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.par_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556_lmg"
+	self.par_crew.CLIP_AMMO_MAX = 200
+	self.par_crew.NR_CLIPS_MAX = 2
+	self.par_crew.auto.fire_rate = 0.066
+	self.par_crew.hold = "rifle"
+	self.par_crew.alert_size = 5000
+	self.par_crew.suppression = 1
+	self.par_secondary_crew = deep_clone(self.par_crew)
+	self.par_secondary_crew.use_data.selection_index = 1
+	self.par_secondary_crew.armor_piercing = true
+end
+
+function WeaponTweakData:_init_data_sparrow_crew()
+	self.sparrow_crew.sounds.prefix = "sparrow_npc"
+	self.sparrow_crew.use_data.selection_index = 1
+	self.sparrow_crew.DAMAGE = 1
+	self.sparrow_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.sparrow_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.sparrow_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.sparrow_crew.CLIP_AMMO_MAX = 12
+	self.sparrow_crew.NR_CLIPS_MAX = 5
+	self.sparrow_crew.hold = "pistol"
+	self.sparrow_crew.alert_size = 2500
+	self.sparrow_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_model70_crew()
+	self.model70_crew.sounds.prefix = "model70_npc"
+	self.model70_crew.use_data.selection_index = 2
+	self.model70_crew.DAMAGE = 15
+	self.model70_crew.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.model70_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
+	self.model70_crew.CLIP_AMMO_MAX = 5
+	self.model70_crew.NR_CLIPS_MAX = 8
+	self.model70_crew.auto.fire_rate = 1
+	self.model70_crew.hold = "rifle"
+	self.model70_crew.alert_size = 5000
+	self.model70_crew.suppression = 1
+	self.model70_secondary_crew = deep_clone(self.model70_crew)
+	self.model70_secondary_crew.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_m37_crew()
+	self.m37_crew.sounds.prefix = "m37_npc"
+	self.m37_crew.use_data.selection_index = 1
+	self.m37_crew.DAMAGE = 5
+	self.m37_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.m37_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
+	self.m37_crew.auto.fire_rate = 0.14
+	self.m37_crew.CLIP_AMMO_MAX = 7
+	self.m37_crew.NR_CLIPS_MAX = 6
+	self.m37_crew.hold = "rifle"
+	self.m37_crew.alert_size = 4500
+	self.m37_crew.suppression = 1.8
+	self.m37_crew.is_shotgun = true
+end
+
+function WeaponTweakData:_init_data_china_crew()
+	self.china_crew.sounds.prefix = "china_npc"
+	self.china_crew.use_data.selection_index = 1
+	self.china_crew.DAMAGE = 2
+	self.china_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.china_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.china_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.china_crew.no_trail = true
+	self.china_crew.CLIP_AMMO_MAX = 3
+	self.china_crew.NR_CLIPS_MAX = 2
+	self.china_crew.auto.fire_rate = 0.1
+	self.china_crew.hold = "rifle"
+	self.china_crew.alert_size = 2800
+	self.china_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_sr2_crew()
+	self.sr2_crew.sounds.prefix = "sr2_npc"
+	self.sr2_crew.use_data.selection_index = 1
+	self.sr2_crew.DAMAGE = 2
+	self.sr2_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.sr2_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.sr2_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.sr2_crew.CLIP_AMMO_MAX = 32
+	self.sr2_crew.NR_CLIPS_MAX = 5
+	self.sr2_crew.auto.fire_rate = 0.08
+	self.sr2_crew.hold = "pistol"
+	self.sr2_crew.alert_size = 5000
+	self.sr2_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_x_sr2_crew()
+	self.x_sr2_crew.sounds.prefix = "sr2_x_npc"
+	self.x_sr2_crew.use_data.selection_index = 2
+	self.x_sr2_crew.DAMAGE = 1.25
+	self.x_sr2_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.x_sr2_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.x_sr2_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_sr2_crew.CLIP_AMMO_MAX = 64
+	self.x_sr2_crew.NR_CLIPS_MAX = 5
+	self.x_sr2_crew.hold = "akimbo_pistol"
+	self.x_sr2_crew.alert_size = 1800
+	self.x_sr2_crew.suppression = 2
+end
+
+function WeaponTweakData:_init_data_pl14_crew()
+	self.pl14_crew.sounds.prefix = "pl14_npc"
+	self.pl14_crew.use_data.selection_index = 1
+	self.pl14_crew.DAMAGE = 1
+	self.pl14_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.pl14_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.pl14_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.pl14_crew.CLIP_AMMO_MAX = 12
+	self.pl14_crew.NR_CLIPS_MAX = 5
+	self.pl14_crew.hold = "pistol"
+	self.pl14_crew.alert_size = 2500
+	self.pl14_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_x_mp5_crew()
+	self.x_mp5_crew.sounds.prefix = "mp5_x_npc"
+	self.x_mp5_crew.use_data.selection_index = 2
+	self.x_mp5_crew.DAMAGE = 1.25
+	self.x_mp5_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.x_mp5_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.x_mp5_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_mp5_crew.CLIP_AMMO_MAX = 60
+	self.x_mp5_crew.NR_CLIPS_MAX = 5
+	self.x_mp5_crew.hold = "akimbo_pistol"
+	self.x_mp5_crew.alert_size = 1800
+	self.x_mp5_crew.suppression = 2
+end
+
+function WeaponTweakData:_init_data_x_akmsu_crew()
+	self.x_akmsu_crew.sounds.prefix = "akmsu_x_npc"
+	self.x_akmsu_crew.use_data.selection_index = 2
+	self.x_akmsu_crew.DAMAGE = 1.25
+	self.x_akmsu_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.x_akmsu_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.x_akmsu_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.x_akmsu_crew.CLIP_AMMO_MAX = 60
+	self.x_akmsu_crew.NR_CLIPS_MAX = 5
+	self.x_akmsu_crew.hold = "akimbo_pistol"
+	self.x_akmsu_crew.alert_size = 1800
+	self.x_akmsu_crew.suppression = 2
+end
+
+function WeaponTweakData:_init_data_tecci_crew()
+	self.tecci_crew.sounds.prefix = "tecci_npc"
+	self.tecci_crew.use_data.selection_index = 2
+	self.tecci_crew.DAMAGE = 1.35
+	self.tecci_crew.muzzleflash = "effects/payday2/particles/weapons/556_auto"
+	self.tecci_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.tecci_crew.CLIP_AMMO_MAX = 100
+	self.tecci_crew.NR_CLIPS_MAX = 5
+	self.tecci_crew.auto.fire_rate = 0.9
+	self.tecci_crew.hold = "rifle"
+	self.tecci_crew.alert_size = 5000
+	self.tecci_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_hajk_crew()
+	self.hajk_crew.sounds.prefix = "hajk_npc"
+	self.hajk_crew.use_data.selection_index = 1
+	self.hajk_crew.DAMAGE = 1.5
+	self.hajk_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.hajk_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.hajk_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.hajk_crew.CLIP_AMMO_MAX = 30
+	self.hajk_crew.NR_CLIPS_MAX = 5
+	self.hajk_crew.auto.fire_rate = 0.08
+	self.hajk_crew.hold = "rifle"
+	self.hajk_crew.alert_size = 1000
+	self.hajk_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_boot_crew()
+	self.boot_crew.sounds.prefix = "boot_npc"
+	self.boot_crew.use_data.selection_index = 2
+	self.boot_crew.DAMAGE = 11.25
+	self.boot_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.boot_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.boot_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.boot_crew.CLIP_AMMO_MAX = 7
+	self.boot_crew.NR_CLIPS_MAX = 5
+	self.boot_crew.auto.fire_rate = 0.75
+	self.boot_crew.hold = "rifle"
+	self.boot_crew.alert_size = 1000
+	self.boot_crew.suppression = 1
+	self.boot_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_packrat_crew()
+	self.packrat_crew.sounds.prefix = "packrat_npc"
+	self.packrat_crew.use_data.selection_index = 1
+	self.packrat_crew.DAMAGE = 1
+	self.packrat_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.packrat_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.packrat_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.packrat_crew.CLIP_AMMO_MAX = 15
+	self.packrat_crew.NR_CLIPS_MAX = 5
+	self.packrat_crew.hold = "pistol"
+	self.packrat_crew.alert_size = 2500
+	self.packrat_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_schakal_crew()
+	self.schakal_crew.sounds.prefix = "schakal_npc"
+	self.schakal_crew.use_data.selection_index = 1
+	self.schakal_crew.DAMAGE = 2
+	self.schakal_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.schakal_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.schakal_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.schakal_crew.CLIP_AMMO_MAX = 30
+	self.schakal_crew.NR_CLIPS_MAX = 5
+	self.schakal_crew.auto.fire_rate = 0.092
+	self.schakal_crew.hold = "rifle"
+	self.schakal_crew.alert_size = 5000
+	self.schakal_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_desertfox_crew()
+	self.desertfox_crew.sounds.prefix = "desertfox_npc"
+	self.desertfox_crew.use_data.selection_index = 2
+	self.desertfox_crew.DAMAGE = 15
+	self.desertfox_crew.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
+	self.desertfox_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
+	self.desertfox_crew.CLIP_AMMO_MAX = 5
+	self.desertfox_crew.NR_CLIPS_MAX = 8
+	self.desertfox_crew.auto.fire_rate = 20
+	self.desertfox_crew.hold = "rifle"
+	self.desertfox_crew.alert_size = 5000
+	self.desertfox_crew.suppression = 1
+	self.desertfox_secondary_crew = deep_clone(self.desertfox_crew)
+	self.desertfox_secondary_crew.use_data.selection_index = 1
+end
+
+function WeaponTweakData:_init_data_x_packrat_crew()
+	self.x_packrat_crew.sounds.prefix = "packrat_npc"
+	self.x_packrat_crew.use_data.selection_index = 2
+	self.x_packrat_crew.DAMAGE = 1
+	self.x_packrat_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.x_packrat_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.x_packrat_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.x_packrat_crew.CLIP_AMMO_MAX = 30
+	self.x_packrat_crew.NR_CLIPS_MAX = 5
+	self.x_packrat_crew.hold = "akimbo_pistol"
+	self.x_packrat_crew.alert_size = 2500
+	self.x_packrat_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_rota_crew()
+	self.rota_crew.sounds.prefix = "rota_npc"
+	self.rota_crew.use_data.selection_index = 1
+	self.rota_crew.DAMAGE = 5
+	self.rota_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.rota_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.rota_crew.auto.fire_rate = 0.14
+	self.rota_crew.CLIP_AMMO_MAX = 6
+	self.rota_crew.NR_CLIPS_MAX = 6
+	self.rota_crew.hold = "rifle"
+	self.rota_crew.alert_size = 4500
+	self.rota_crew.suppression = 1.8
+	self.rota_crew.is_shotgun = true
+end
+
+function WeaponTweakData:_init_data_arbiter_crew()
+	self.arbiter_crew.sounds.prefix = "mgl_npc"
+	self.arbiter_crew.use_data.selection_index = 1
+	self.arbiter_crew.DAMAGE = 2
+	self.arbiter_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.arbiter_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.arbiter_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.arbiter_crew.no_trail = true
+	self.arbiter_crew.CLIP_AMMO_MAX = 5
+	self.arbiter_crew.NR_CLIPS_MAX = 4
+	self.arbiter_crew.auto.fire_rate = 0.1
+	self.arbiter_crew.hold = "rifle"
+	self.arbiter_crew.alert_size = 2800
+	self.arbiter_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_contraband_crew()
+	self.contraband_crew.sounds.prefix = "contraband_npc"
+	self.contraband_crew.use_data.selection_index = 2
+	self.contraband_crew.DAMAGE = 1.47
+	self.contraband_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.contraband_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.contraband_crew.CLIP_AMMO_MAX = 20
+	self.contraband_crew.NR_CLIPS_MAX = 5
+	self.contraband_crew.auto.fire_rate = 0.098
+	self.contraband_crew.hold = "rifle"
+	self.contraband_crew.alert_size = 5000
+	self.contraband_crew.suppression = 1
+	self.contraband_m203_crew.sounds.prefix = "contrabandm203_npc"
+	self.contraband_m203_crew.use_data.selection_index = 2
+	self.contraband_m203_crew.DAMAGE = 2
+	self.contraband_m203_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.contraband_m203_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.contraband_m203_crew.no_trail = true
+	self.contraband_m203_crew.CLIP_AMMO_MAX = 1
+	self.contraband_m203_crew.NR_CLIPS_MAX = 4
+	self.contraband_m203_crew.auto.fire_rate = 0.1
+	self.contraband_m203_crew.hold = "rifle"
+	self.contraband_m203_crew.alert_size = 2800
+	self.contraband_m203_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_ray_crew()
+	self.ray_crew.sounds.prefix = "ray_npc"
+	self.ray_crew.use_data.selection_index = 1
+	self.ray_crew.DAMAGE = 2
+	self.ray_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.ray_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.ray_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.ray_crew.no_trail = true
+	self.ray_crew.CLIP_AMMO_MAX = 4
+	self.ray_crew.NR_CLIPS_MAX = 1
+	self.ray_crew.auto.fire_rate = 0.1
+	self.ray_crew.hold = "rifle"
+	self.ray_crew.animations = {}
+	self.ray_crew.animations.thq_align_anim = "thq"
+	self.ray_crew.alert_size = 2800
+	self.ray_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_tti_crew()
+	self.tti_crew.sounds.prefix = "tti_npc"
+	self.tti_crew.use_data.selection_index = 2
+	self.tti_crew.DAMAGE = 6
+	self.tti_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.tti_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.tti_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.tti_crew.CLIP_AMMO_MAX = 20
+	self.tti_crew.NR_CLIPS_MAX = 5
+	self.tti_crew.auto.fire_rate = 0.4
+	self.tti_crew.hold = "rifle"
+	self.tti_crew.alert_size = 5000
+	self.tti_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_siltstone_crew()
+	self.siltstone_crew.sounds.prefix = "siltstone_npc"
+	self.siltstone_crew.use_data.selection_index = 2
+	self.siltstone_crew.DAMAGE = 2
+	self.siltstone_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.siltstone_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.siltstone_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.siltstone_crew.CLIP_AMMO_MAX = 10
+	self.siltstone_crew.NR_CLIPS_MAX = 4
+	self.siltstone_crew.auto.fire_rate = 0.5
+	self.siltstone_crew.hold = "rifle"
+	self.siltstone_crew.alert_size = 5000
+	self.siltstone_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_flint_crew()
+	self.flint_crew.sounds.prefix = "flint_npc"
+	self.flint_crew.use_data.selection_index = 2
+	self.flint_crew.DAMAGE = 2
+	self.flint_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.flint_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
+	self.flint_crew.CLIP_AMMO_MAX = 35
+	self.flint_crew.NR_CLIPS_MAX = 5
+	self.flint_crew.auto.fire_rate = 0.092
+	self.flint_crew.hold = "rifle"
+	self.flint_crew.alert_size = 5000
+	self.flint_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_coal_crew()
+	self.coal_crew.sounds.prefix = "coal_npc"
+	self.coal_crew.use_data.selection_index = 1
+	self.coal_crew.DAMAGE = 2
+	self.coal_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.coal_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.coal_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.coal_crew.CLIP_AMMO_MAX = 64
+	self.coal_crew.NR_CLIPS_MAX = 5
+	self.coal_crew.auto.fire_rate = 0.092
+	self.coal_crew.hold = "rifle"
+	self.coal_crew.alert_size = 5000
+	self.coal_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_lemming_crew()
+	self.lemming_crew.sounds.prefix = "lemming_npc"
+	self.lemming_crew.use_data.selection_index = 1
+	self.lemming_crew.DAMAGE = 1
+	self.lemming_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.lemming_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.lemming_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
+	self.lemming_crew.CLIP_AMMO_MAX = 10
+	self.lemming_crew.NR_CLIPS_MAX = 5
+	self.lemming_crew.hold = "pistol"
+	self.lemming_crew.alert_size = 2500
+	self.lemming_crew.suppression = 1
+end
+
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
 	local autohit_rifle_default, autohit_pistol_default, autohit_shotgun_default, autohit_lmg_default, autohit_snp_default, autohit_smg_default, autohit_minigun_default, aim_assist_rifle_default, aim_assist_pistol_default, aim_assist_shotgun_default, aim_assist_lmg_default, aim_assist_snp_default, aim_assist_smg_default, aim_assist_minigun_default
 	if SystemInfo:platform() == Idstring("WIN32") then
@@ -2892,6 +4893,9 @@ function WeaponTweakData:_pickup_chance(max_ammo, selection_index)
 	elseif selection_index == 5 then
 		low = 0.05
 		high = 0.075
+	elseif selection_index == 6 then
+		low = 0.005
+		high = 0.015
 	else
 		low = 0.01
 		high = 0.035
@@ -13542,9 +15546,9 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 	self.lemming.use_data.selection_index = 1
 	self.lemming.DAMAGE = 1
 	self.lemming.CLIP_AMMO_MAX = 15
-	self.lemming.NR_CLIPS_MAX = 2
+	self.lemming.NR_CLIPS_MAX = 3
 	self.lemming.AMMO_MAX = self.lemming.CLIP_AMMO_MAX * self.lemming.NR_CLIPS_MAX
-	self.lemming.AMMO_PICKUP = {0.3, 0.4}
+	self.lemming.AMMO_PICKUP = self:_pickup_chance(self.lemming.AMMO_MAX, 6)
 	self.lemming.FIRE_MODE = "single"
 	self.lemming.fire_mode_data = {}
 	self.lemming.fire_mode_data.fire_rate = 0.1
@@ -14457,6 +16461,748 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
+	self.c45_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {}
+	}
+	self.x_c45_crew = {
+		usage = "akimbo_pistol",
+		sounds = {},
+		use_data = {}
+	}
+	self.colt_1911_primary_crew = deep_clone(self.c45_crew)
+	self.beretta92_crew = {
+		usage = "beretta92",
+		sounds = {},
+		use_data = {}
+	}
+	self.beretta92_primary_crew = deep_clone(self.beretta92_crew)
+	self.raging_bull_crew = {
+		usage = "raging_bull",
+		sounds = {},
+		use_data = {}
+	}
+	self.raging_bull_primary_crew = deep_clone(self.raging_bull_crew)
+	self.m4_crew = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.m4_secondary_crew = deep_clone(self.m4_crew)
+	self.m14_crew = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.r870_crew = {
+		usage = "r870",
+		sounds = {},
+		use_data = {}
+	}
+	self.benelli_crew = {
+		usage = "r870",
+		sounds = {},
+		use_data = {}
+	}
+	self.mossberg_crew = {
+		usage = "mossberg",
+		sounds = {},
+		use_data = {}
+	}
+	self.mp5_crew = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.mac11_crew = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.m79_crew = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.glock_18_crew = {
+		usage = "glock18",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.glock_18c_primary_crew = deep_clone(self.glock_18_crew)
+	self.ak47_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.g36_crew = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.g17_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {}
+	}
+	self.mp9_crew = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.olympic_crew = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.olympic_primary_crew = deep_clone(self.olympic_crew)
+	self.m16_crew = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.aug_crew = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.aug_secondary_crew = deep_clone(self.aug_crew)
+	self.ak74_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.ak74_secondary_crew = deep_clone(self.ak74_crew)
+	self.ak5_crew = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.p90_crew = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.amcar_crew = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.mac10_crew = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.akmsu_crew = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.akmsu_primary_crew = deep_clone(self.akmsu_crew)
+	self.akm_crew = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.akm_gold_crew = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.deagle_crew = {
+		usage = "raging_bull",
+		sounds = {},
+		use_data = {}
+	}
+	self.deagle_primary_crew = deep_clone(self.deagle_crew)
+	self.serbu_crew = {
+		usage = "r870",
+		sounds = {},
+		use_data = {}
+	}
+	self.saiga_crew = {
+		usage = "saiga",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.huntsman_crew = {
+		usage = "r870",
+		sounds = {},
+		use_data = {}
+	}
+	self.saw_crew = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {}
+	}
+	self.saw_secondary_crew = deep_clone(self.saw_crew)
+	self.sentry_gun = {
+		sounds = {},
+		auto = {}
+	}
+	self.usp_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.g22c_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.judge_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.m45_crew = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.s552_crew = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.s552_secondary_crew = deep_clone(self.s552_crew)
+	self.ppk_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.mp7_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.scar_crew = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.p226_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.hk21_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.m249_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.rpk_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.m95_crew = {
+		usage = "rifle",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.msr_crew = {
+		usage = "rifle",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.r93_crew = {
+		usage = "rifle",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.fal_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.ben_crew = {
+		usage = "r870",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.striker_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.ksg_crew = {
+		usage = "r870",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.gre_m79_crew = {
+		usage = "r870",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.g3_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.galil_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.famas_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.scorpion_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.tec9_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.uzi_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.jowi_crew = {
+		usage = "akimbo_pistol",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.x_1911_crew = {
+		usage = "akimbo_pistol",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.x_b92fs_crew = {
+		usage = "akimbo_pistol",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.x_deagle_crew = {
+		usage = "akimbo_pistol",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.g26_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.spas12_crew = {
+		usage = "r870",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.mg42_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.c96_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.sterling_crew = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.mosin_crew = {
+		usage = "rifle",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.m1928_crew = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.l85a2_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.hs2000_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.vhs_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.m134_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.rpg7_crew = {
+		usage = "rifle",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.cobray_crew = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.b682_crew = {
+		usage = "r870",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.x_g22c_crew = {
+		usage = "akimbo_pistol",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.x_g17_crew = {
+		usage = "akimbo_pistol",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.x_usp_crew = {
+		usage = "akimbo_pistol",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.flamethrower_mk2_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.m32_crew = {
+		usage = "rifle",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.aa12_crew = {
+		usage = "saiga",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.peacemaker_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.winchester1874_crew = {
+		usage = "rifle",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.plainsrider_crew = {
+		usage = "bow",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.mateba_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.asval_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.sub2000_crew = {
+		usage = "rifle",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.wa2000_crew = {
+		usage = "rifle",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.polymer_crew = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.hunter_crew = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.baka_crew = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.arblast_crew = {
+		usage = "rifle",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.frankish_crew = {
+		usage = "rifle",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.long_crew = {
+		usage = "bow",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.par_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.sparrow_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.model70_crew = {
+		usage = "rifle",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.m37_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.china_crew = {
+		usage = "r870",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.sr2_crew = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.x_sr2_crew = {
+		usage = "akimbo_pistol",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.pl14_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.x_mp5_crew = {
+		usage = "akimbo_pistol",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.x_akmsu_crew = {
+		usage = "akimbo_pistol",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.tecci_crew = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.hajk_crew = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.boot_crew = {
+		usage = "r870",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.packrat_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.schakal_crew = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.desertfox_crew = {
+		usage = "rifle",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.x_packrat_crew = {
+		usage = "akimbo_pistol",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.rota_crew = {
+		usage = "saiga",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.arbiter_crew = {
+		usage = "r870",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.contraband_crew = {
+		usage = "m4",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.contraband_m203_crew = {
+		usage = "r870",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.ray_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.tti_crew = {
+		usage = "rifle",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.siltstone_crew = {
+		usage = "rifle",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.flint_crew = {
+		usage = "ak47",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.coal_crew = {
+		usage = "mp5",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.lemming_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
 end
 
 function WeaponTweakData:_precalculate_values_wip()
@@ -14595,4 +17341,135 @@ function WeaponTweakData:_precalculate_values()
 	self.siltstone_npc.AMMO_MAX = self.siltstone_npc.CLIP_AMMO_MAX * self.siltstone_npc.NR_CLIPS_MAX
 	self.flint_npc.AMMO_MAX = self.flint_npc.CLIP_AMMO_MAX * self.flint_npc.NR_CLIPS_MAX
 	self.coal_npc.AMMO_MAX = self.coal_npc.CLIP_AMMO_MAX * self.coal_npc.NR_CLIPS_MAX
+	self.lemming_npc.AMMO_MAX = self.lemming_npc.CLIP_AMMO_MAX * self.lemming_npc.NR_CLIPS_MAX
+	self.m4_crew.AMMO_MAX = self.m4_crew.CLIP_AMMO_MAX * self.m4_crew.NR_CLIPS_MAX
+	self.m14_crew.AMMO_MAX = self.m14_crew.CLIP_AMMO_MAX * self.m14_crew.NR_CLIPS_MAX
+	self.c45_crew.AMMO_MAX = self.c45_crew.CLIP_AMMO_MAX * self.c45_crew.NR_CLIPS_MAX
+	self.x_c45_crew.AMMO_MAX = self.x_c45_crew.CLIP_AMMO_MAX * self.x_c45_crew.NR_CLIPS_MAX
+	self.beretta92_crew.AMMO_MAX = self.beretta92_crew.CLIP_AMMO_MAX * self.beretta92_crew.NR_CLIPS_MAX
+	self.raging_bull_crew.AMMO_MAX = self.raging_bull_crew.CLIP_AMMO_MAX * self.raging_bull_crew.NR_CLIPS_MAX
+	self.r870_crew.AMMO_MAX = self.r870_crew.CLIP_AMMO_MAX * self.r870_crew.NR_CLIPS_MAX
+	self.benelli_crew.AMMO_MAX = self.benelli_crew.CLIP_AMMO_MAX * self.benelli_crew.NR_CLIPS_MAX
+	self.mossberg_crew.AMMO_MAX = self.mossberg_crew.CLIP_AMMO_MAX * self.mossberg_crew.NR_CLIPS_MAX
+	self.mp5_crew.AMMO_MAX = self.mp5_crew.CLIP_AMMO_MAX * self.mp5_crew.NR_CLIPS_MAX
+	self.mp5_tactical_crew.AMMO_MAX = self.mp5_tactical_crew.CLIP_AMMO_MAX * self.mp5_tactical_crew.NR_CLIPS_MAX
+	self.ump_crew.AMMO_MAX = self.ump_crew.CLIP_AMMO_MAX * self.ump_crew.NR_CLIPS_MAX
+	self.mac11_crew.AMMO_MAX = self.mac11_crew.CLIP_AMMO_MAX * self.mac11_crew.NR_CLIPS_MAX
+	self.glock_18_crew.AMMO_MAX = self.glock_18_crew.CLIP_AMMO_MAX * self.glock_18_crew.NR_CLIPS_MAX
+	self.ak47_crew.AMMO_MAX = self.ak47_crew.CLIP_AMMO_MAX * self.ak47_crew.NR_CLIPS_MAX
+	self.g36_crew.AMMO_MAX = self.g36_crew.CLIP_AMMO_MAX * self.g36_crew.NR_CLIPS_MAX
+	self.g17_crew.AMMO_MAX = self.g17_crew.CLIP_AMMO_MAX * self.g17_crew.NR_CLIPS_MAX
+	self.mp9_crew.AMMO_MAX = self.mp9_crew.CLIP_AMMO_MAX * self.mp9_crew.NR_CLIPS_MAX
+	self.olympic_crew.AMMO_MAX = self.olympic_crew.CLIP_AMMO_MAX * self.olympic_crew.NR_CLIPS_MAX
+	self.m16_crew.AMMO_MAX = self.m16_crew.CLIP_AMMO_MAX * self.m16_crew.NR_CLIPS_MAX
+	self.aug_crew.AMMO_MAX = self.aug_crew.CLIP_AMMO_MAX * self.aug_crew.NR_CLIPS_MAX
+	self.ak74_crew.AMMO_MAX = self.ak74_crew.CLIP_AMMO_MAX * self.ak74_crew.NR_CLIPS_MAX
+	self.ak5_crew.AMMO_MAX = self.ak5_crew.CLIP_AMMO_MAX * self.ak5_crew.NR_CLIPS_MAX
+	self.p90_crew.AMMO_MAX = self.p90_crew.CLIP_AMMO_MAX * self.p90_crew.NR_CLIPS_MAX
+	self.amcar_crew.AMMO_MAX = self.amcar_crew.CLIP_AMMO_MAX * self.amcar_crew.NR_CLIPS_MAX
+	self.mac10_crew.AMMO_MAX = self.mac10_crew.CLIP_AMMO_MAX * self.mac10_crew.NR_CLIPS_MAX
+	self.akmsu_crew.AMMO_MAX = self.akmsu_crew.CLIP_AMMO_MAX * self.akmsu_crew.NR_CLIPS_MAX
+	self.akm_crew.AMMO_MAX = self.akm_crew.CLIP_AMMO_MAX * self.akm_crew.NR_CLIPS_MAX
+	self.akm_gold_crew.AMMO_MAX = self.akm_gold_crew.CLIP_AMMO_MAX * self.akm_gold_crew.NR_CLIPS_MAX
+	self.deagle_crew.AMMO_MAX = self.deagle_crew.CLIP_AMMO_MAX * self.deagle_crew.NR_CLIPS_MAX
+	self.serbu_crew.AMMO_MAX = self.serbu_crew.CLIP_AMMO_MAX * self.serbu_crew.NR_CLIPS_MAX
+	self.saiga_crew.AMMO_MAX = self.saiga_crew.CLIP_AMMO_MAX * self.saiga_crew.NR_CLIPS_MAX
+	self.huntsman_crew.AMMO_MAX = self.huntsman_crew.CLIP_AMMO_MAX * self.huntsman_crew.NR_CLIPS_MAX
+	self.saw_crew.AMMO_MAX = self.saw_crew.CLIP_AMMO_MAX * self.saw_crew.NR_CLIPS_MAX
+	self.usp_crew.AMMO_MAX = self.usp_crew.CLIP_AMMO_MAX * self.usp_crew.NR_CLIPS_MAX
+	self.g22c_crew.AMMO_MAX = self.g22c_crew.CLIP_AMMO_MAX * self.p226_crew.NR_CLIPS_MAX
+	self.judge_crew.AMMO_MAX = self.judge_crew.CLIP_AMMO_MAX * self.judge_crew.NR_CLIPS_MAX
+	self.m45_crew.AMMO_MAX = self.m45_crew.CLIP_AMMO_MAX * self.m45_crew.NR_CLIPS_MAX
+	self.s552_crew.AMMO_MAX = self.s552_crew.CLIP_AMMO_MAX * self.s552_crew.NR_CLIPS_MAX
+	self.ppk_crew.AMMO_MAX = self.ppk_crew.CLIP_AMMO_MAX * self.ppk_crew.NR_CLIPS_MAX
+	self.mp7_crew.AMMO_MAX = self.mp7_crew.CLIP_AMMO_MAX * self.mp7_crew.NR_CLIPS_MAX
+	self.scar_crew.AMMO_MAX = self.scar_crew.CLIP_AMMO_MAX * self.scar_crew.NR_CLIPS_MAX
+	self.p226_crew.AMMO_MAX = self.p226_crew.CLIP_AMMO_MAX * self.p226_crew.NR_CLIPS_MAX
+	self.hk21_crew.AMMO_MAX = self.hk21_crew.CLIP_AMMO_MAX * self.hk21_crew.NR_CLIPS_MAX
+	self.m249_crew.AMMO_MAX = self.m249_crew.CLIP_AMMO_MAX * self.m249_crew.NR_CLIPS_MAX
+	self.rpk_crew.AMMO_MAX = self.rpk_crew.CLIP_AMMO_MAX * self.rpk_crew.NR_CLIPS_MAX
+	self.m95_crew.AMMO_MAX = self.m95_crew.CLIP_AMMO_MAX * self.m95_crew.NR_CLIPS_MAX
+	self.msr_crew.AMMO_MAX = self.msr_crew.CLIP_AMMO_MAX * self.msr_crew.NR_CLIPS_MAX
+	self.r93_crew.AMMO_MAX = self.r93_crew.CLIP_AMMO_MAX * self.r93_crew.NR_CLIPS_MAX
+	self.fal_crew.AMMO_MAX = self.fal_crew.CLIP_AMMO_MAX * self.fal_crew.NR_CLIPS_MAX
+	self.ben_crew.AMMO_MAX = self.ben_crew.CLIP_AMMO_MAX * self.ben_crew.NR_CLIPS_MAX
+	self.striker_crew.AMMO_MAX = self.striker_crew.CLIP_AMMO_MAX * self.striker_crew.NR_CLIPS_MAX
+	self.ksg_crew.AMMO_MAX = self.ksg_crew.CLIP_AMMO_MAX * self.ksg_crew.NR_CLIPS_MAX
+	self.gre_m79_crew.AMMO_MAX = self.gre_m79_crew.CLIP_AMMO_MAX * self.gre_m79_crew.NR_CLIPS_MAX
+	self.g3_crew.AMMO_MAX = self.g3_crew.CLIP_AMMO_MAX * self.g3_crew.NR_CLIPS_MAX
+	self.galil_crew.AMMO_MAX = self.galil_crew.CLIP_AMMO_MAX * self.galil_crew.NR_CLIPS_MAX
+	self.famas_crew.AMMO_MAX = self.famas_crew.CLIP_AMMO_MAX * self.famas_crew.NR_CLIPS_MAX
+	self.scorpion_crew.AMMO_MAX = self.scorpion_crew.CLIP_AMMO_MAX * self.scorpion_crew.NR_CLIPS_MAX
+	self.tec9_crew.AMMO_MAX = self.tec9_crew.CLIP_AMMO_MAX * self.tec9_crew.NR_CLIPS_MAX
+	self.uzi_crew.AMMO_MAX = self.uzi_crew.CLIP_AMMO_MAX * self.uzi_crew.NR_CLIPS_MAX
+	self.jowi_crew.AMMO_MAX = self.jowi_crew.CLIP_AMMO_MAX * self.jowi_crew.NR_CLIPS_MAX
+	self.x_1911_crew.AMMO_MAX = self.x_1911_crew.CLIP_AMMO_MAX * self.x_1911_crew.NR_CLIPS_MAX
+	self.x_b92fs_crew.AMMO_MAX = self.x_b92fs_crew.CLIP_AMMO_MAX * self.x_b92fs_crew.NR_CLIPS_MAX
+	self.x_deagle_crew.AMMO_MAX = self.x_deagle_crew.CLIP_AMMO_MAX * self.x_deagle_crew.NR_CLIPS_MAX
+	self.g26_crew.AMMO_MAX = 150
+	self.spas12_crew.AMMO_MAX = self.spas12_crew.CLIP_AMMO_MAX * self.spas12_crew.NR_CLIPS_MAX
+	self.mg42_crew.AMMO_MAX = self.mg42_crew.CLIP_AMMO_MAX * self.mg42_crew.NR_CLIPS_MAX
+	self.c96_crew.AMMO_MAX = self.c96_crew.CLIP_AMMO_MAX * self.c96_crew.NR_CLIPS_MAX
+	self.sterling_crew.AMMO_MAX = self.sterling_crew.CLIP_AMMO_MAX * self.sterling_crew.NR_CLIPS_MAX
+	self.mosin_crew.AMMO_MAX = self.mosin_crew.CLIP_AMMO_MAX * self.mosin_crew.NR_CLIPS_MAX
+	self.m1928_crew.AMMO_MAX = self.m1928_crew.CLIP_AMMO_MAX * self.m1928_crew.NR_CLIPS_MAX
+	self.l85a2_crew.AMMO_MAX = self.l85a2_crew.CLIP_AMMO_MAX * self.l85a2_crew.NR_CLIPS_MAX
+	self.hs2000_crew.AMMO_MAX = self.hs2000_crew.CLIP_AMMO_MAX * self.hs2000_crew.NR_CLIPS_MAX
+	self.vhs_crew.AMMO_MAX = self.vhs_crew.CLIP_AMMO_MAX * self.vhs_crew.NR_CLIPS_MAX
+	self.m134_crew.AMMO_MAX = self.m134_crew.CLIP_AMMO_MAX * self.m134_crew.NR_CLIPS_MAX
+	self.rpg7_crew.AMMO_MAX = self.rpg7_crew.CLIP_AMMO_MAX * self.rpg7_crew.NR_CLIPS_MAX
+	self.cobray_crew.AMMO_MAX = self.cobray_crew.CLIP_AMMO_MAX * self.cobray_crew.NR_CLIPS_MAX
+	self.b682_crew.AMMO_MAX = self.b682_crew.CLIP_AMMO_MAX * self.b682_crew.NR_CLIPS_MAX
+	self.x_g22c_crew.AMMO_MAX = self.x_g22c_crew.CLIP_AMMO_MAX * self.x_g22c_crew.NR_CLIPS_MAX
+	self.x_g17_crew.AMMO_MAX = self.x_g17_crew.CLIP_AMMO_MAX * self.x_g17_crew.NR_CLIPS_MAX
+	self.x_usp_crew.AMMO_MAX = self.x_usp_crew.CLIP_AMMO_MAX * self.x_usp_crew.NR_CLIPS_MAX
+	self.flamethrower_mk2_crew.AMMO_MAX = self.flamethrower_mk2_crew.CLIP_AMMO_MAX * self.flamethrower_mk2_crew.NR_CLIPS_MAX
+	self.m32_crew.AMMO_MAX = self.m32_crew.CLIP_AMMO_MAX * self.m32_crew.NR_CLIPS_MAX
+	self.aa12_crew.AMMO_MAX = self.aa12_crew.CLIP_AMMO_MAX * self.aa12_crew.NR_CLIPS_MAX
+	self.peacemaker_crew.AMMO_MAX = self.peacemaker_crew.CLIP_AMMO_MAX * self.peacemaker_crew.NR_CLIPS_MAX
+	self.winchester1874_crew.AMMO_MAX = self.winchester1874_crew.CLIP_AMMO_MAX * self.winchester1874_crew.NR_CLIPS_MAX
+	self.plainsrider_crew.AMMO_MAX = self.plainsrider_crew.CLIP_AMMO_MAX * self.plainsrider_crew.NR_CLIPS_MAX
+	self.mateba_crew.AMMO_MAX = self.mateba_crew.CLIP_AMMO_MAX * self.mateba_crew.NR_CLIPS_MAX
+	self.asval_crew.AMMO_MAX = self.asval_crew.CLIP_AMMO_MAX * self.asval_crew.NR_CLIPS_MAX
+	self.sub2000_crew.AMMO_MAX = self.sub2000_crew.CLIP_AMMO_MAX * self.sub2000_crew.NR_CLIPS_MAX
+	self.wa2000_crew.AMMO_MAX = self.wa2000_crew.CLIP_AMMO_MAX * self.wa2000_crew.NR_CLIPS_MAX
+	self.polymer_crew.AMMO_MAX = self.polymer_crew.CLIP_AMMO_MAX * self.polymer_crew.NR_CLIPS_MAX
+	self.hunter_crew.AMMO_MAX = self.hunter_crew.CLIP_AMMO_MAX * self.hunter_crew.NR_CLIPS_MAX
+	self.baka_crew.AMMO_MAX = self.baka_crew.CLIP_AMMO_MAX * self.baka_crew.NR_CLIPS_MAX
+	self.arblast_crew.AMMO_MAX = self.arblast_crew.CLIP_AMMO_MAX * self.arblast_crew.NR_CLIPS_MAX
+	self.frankish_crew.AMMO_MAX = self.frankish_crew.CLIP_AMMO_MAX * self.frankish_crew.NR_CLIPS_MAX
+	self.long_crew.AMMO_MAX = self.long_crew.CLIP_AMMO_MAX * self.long_crew.NR_CLIPS_MAX
+	self.par_crew.AMMO_MAX = self.par_crew.CLIP_AMMO_MAX * self.par_crew.NR_CLIPS_MAX
+	self.sparrow_crew.AMMO_MAX = self.sparrow_crew.CLIP_AMMO_MAX * self.sparrow_crew.NR_CLIPS_MAX
+	self.model70_crew.AMMO_MAX = self.model70_crew.CLIP_AMMO_MAX * self.model70_crew.NR_CLIPS_MAX
+	self.m37_crew.AMMO_MAX = self.m37_crew.CLIP_AMMO_MAX * self.m37_crew.NR_CLIPS_MAX
+	self.china_crew.AMMO_MAX = self.china_crew.CLIP_AMMO_MAX * self.china_crew.NR_CLIPS_MAX
+	self.sr2_crew.AMMO_MAX = self.sr2_crew.CLIP_AMMO_MAX * self.sr2_crew.NR_CLIPS_MAX
+	self.x_sr2_crew.AMMO_MAX = self.x_sr2_crew.CLIP_AMMO_MAX * self.x_sr2_crew.NR_CLIPS_MAX
+	self.pl14_crew.AMMO_MAX = self.pl14_crew.CLIP_AMMO_MAX * self.pl14_crew.NR_CLIPS_MAX
+	self.rpk_lmg_crew.AMMO_MAX = self.rpk_lmg_crew.CLIP_AMMO_MAX * self.rpk_lmg_crew.NR_CLIPS_MAX
+	self.akmsu_smg_crew.AMMO_MAX = self.akmsu_smg_crew.CLIP_AMMO_MAX * self.akmsu_smg_crew.NR_CLIPS_MAX
+	self.asval_smg_crew.AMMO_MAX = self.asval_smg_crew.CLIP_AMMO_MAX * self.asval_smg_crew.NR_CLIPS_MAX
+	self.sr2_smg_crew.AMMO_MAX = self.sr2_smg_crew.CLIP_AMMO_MAX * self.sr2_smg_crew.NR_CLIPS_MAX
+	self.ak47_ass_crew.AMMO_MAX = self.ak47_ass_crew.CLIP_AMMO_MAX * self.ak47_ass_crew.NR_CLIPS_MAX
+	self.x_mp5_crew.AMMO_MAX = self.x_mp5_crew.CLIP_AMMO_MAX * self.x_mp5_crew.NR_CLIPS_MAX
+	self.x_akmsu_crew.AMMO_MAX = self.x_akmsu_crew.CLIP_AMMO_MAX * self.x_akmsu_crew.NR_CLIPS_MAX
+	self.tecci_crew.AMMO_MAX = self.tecci_crew.CLIP_AMMO_MAX * self.tecci_crew.NR_CLIPS_MAX
+	self.hajk_crew.AMMO_MAX = self.hajk_crew.CLIP_AMMO_MAX * self.hajk_crew.NR_CLIPS_MAX
+	self.boot_crew.AMMO_MAX = self.boot_crew.CLIP_AMMO_MAX * self.boot_crew.NR_CLIPS_MAX
+	self.packrat_crew.AMMO_MAX = self.packrat_crew.CLIP_AMMO_MAX * self.packrat_crew.NR_CLIPS_MAX
+	self.schakal_crew.AMMO_MAX = self.schakal_crew.CLIP_AMMO_MAX * self.schakal_crew.NR_CLIPS_MAX
+	self.desertfox_crew.AMMO_MAX = self.desertfox_crew.CLIP_AMMO_MAX * self.desertfox_crew.NR_CLIPS_MAX
+	self.x_packrat_crew.AMMO_MAX = self.x_packrat_crew.CLIP_AMMO_MAX * self.x_packrat_crew.NR_CLIPS_MAX
+	self.rota_crew.AMMO_MAX = self.rota_crew.CLIP_AMMO_MAX * self.rota_crew.NR_CLIPS_MAX
+	self.arbiter_crew.AMMO_MAX = self.arbiter_crew.CLIP_AMMO_MAX * self.arbiter_crew.NR_CLIPS_MAX
+	self.contraband_crew.AMMO_MAX = self.contraband_crew.CLIP_AMMO_MAX * self.contraband_crew.NR_CLIPS_MAX
+	self.contraband_m203_crew.AMMO_MAX = self.contraband_m203_crew.CLIP_AMMO_MAX * self.contraband_m203_crew.NR_CLIPS_MAX
+	self.ray_crew.AMMO_MAX = self.ray_crew.CLIP_AMMO_MAX * self.ray_crew.NR_CLIPS_MAX
+	self.sg417_crew.AMMO_MAX = self.sg417_crew.CLIP_AMMO_MAX * self.sg417_crew.NR_CLIPS_MAX
+	self.tti_crew.AMMO_MAX = self.tti_crew.CLIP_AMMO_MAX * self.tti_crew.NR_CLIPS_MAX
+	self.siltstone_crew.AMMO_MAX = self.siltstone_crew.CLIP_AMMO_MAX * self.siltstone_crew.NR_CLIPS_MAX
+	self.flint_crew.AMMO_MAX = self.flint_crew.CLIP_AMMO_MAX * self.flint_crew.NR_CLIPS_MAX
+	self.coal_crew.AMMO_MAX = self.coal_crew.CLIP_AMMO_MAX * self.coal_crew.NR_CLIPS_MAX
+	self.lemming_crew.AMMO_MAX = self.lemming_crew.CLIP_AMMO_MAX * self.lemming_crew.NR_CLIPS_MAX
 end

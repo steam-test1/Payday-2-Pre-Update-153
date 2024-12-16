@@ -237,6 +237,7 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_multipliers.spa = 1
 	self.global_value_multipliers.sha = 1
 	self.global_value_multipliers.grv = 1
+	self.global_value_multipliers.amp = 1
 	self.global_value_multipliers.mp2 = 1
 	self.global_value_multipliers.pn2 = 0
 	self.global_value_bonus_multiplier = {}
@@ -319,6 +320,7 @@ function MoneyTweakData:init(tweak_data)
 	self.global_value_bonus_multiplier.spa = 1
 	self.global_value_bonus_multiplier.sha = 1
 	self.global_value_bonus_multiplier.grv = 1
+	self.global_value_bonus_multiplier.amp = 1
 	self.global_value_bonus_multiplier.mp2 = 1
 	self.global_value_bonus_multiplier.pn2 = 0
 	local smallest_cashout = (self.stage_completion[1] + self.job_completion[1]) * self.offshore_rate

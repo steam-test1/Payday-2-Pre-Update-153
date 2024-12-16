@@ -569,7 +569,7 @@ function PlayerInventory:update_mask_offset(mask_data)
 	if mask_data.peer_id then
 		char = managers.blackmarket:get_real_character(nil, mask_data.peer_id)
 	else
-		char = mask_data.character_name
+		char = managers.blackmarket:get_real_character(mask_data.character_name, nil)
 	end
 	local mask_tweak = tweak_data.blackmarket.masks[mask_data.mask_id]
 	if mask_tweak and mask_tweak.offsets and mask_tweak.offsets[char] then

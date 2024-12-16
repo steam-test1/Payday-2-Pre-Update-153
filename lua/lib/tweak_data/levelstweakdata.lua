@@ -1442,6 +1442,23 @@ function LevelsTweakData:init()
 	self.run.music = "heist"
 	self.run.package = "packages/narr_run"
 	self.run.cube = "cube_apply_heist_bank"
+	self.glace = {}
+	self.glace.name_id = "heist_glace_hl"
+	self.glace.briefing_id = "heist_glace_briefing"
+	self.glace.briefing_dialog = "Play_pln_glace_brf"
+	self.glace.world_name = "narratives/classics/glace"
+	self.glace.intro_event = "Play_pln_glace_intro"
+	self.glace.outro_event = "Play_pln_glace_end"
+	self.glace.music = "heist"
+	self.glace.package = "packages/narr_glace"
+	self.glace.cube = "cube_apply_heist_bank"
+	self.glace.environment_effects = {
+		"rain",
+		"raindrop_screen",
+		"lightning"
+	}
+	self.glace.equipment = {"saw"}
+	self.glace.player_sequence = "spawn_prop_raincoat"
 	self._level_index = {
 		"welcome_to_the_jungle_1",
 		"welcome_to_the_jungle_1_night",
@@ -1535,7 +1552,8 @@ function LevelsTweakData:init()
 		"moon",
 		"spa",
 		"fish",
-		"run"
+		"run",
+		"glace"
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		table.insert(self._level_index, "roberts")

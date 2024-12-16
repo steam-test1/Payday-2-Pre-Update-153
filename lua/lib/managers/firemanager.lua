@@ -142,48 +142,51 @@ function FireManager:start_burn_body_sound(dot_info, delay)
 	sound_loop_burn_body:post_event("burn_loop_body")
 	dot_info.sound_source = sound_loop_burn_body
 	if delay then
-		managers.enemy:add_delayed_clbk("FireBurnBody", callback(self, self, "_release_sound_source", {sound_source = sound_loop_burn_body}), TimerManager:game():time() + delay)
+		managers.enemy:add_delayed_clbk("FireBurnBody", callback(self, self, "_stop_burn_body_sound", sound_loop_burn_body), TimerManager:game():time() + delay - 0.5)
 	end
 end
 
 function FireManager:_stop_burn_body_sound(sound_source)
-	self:_release_sound_source(sound_source)
+	sound_source:post_event("burn_loop_body_stop")
+	managers.enemy:add_delayed_clbk("FireBurnBodyFade", callback(self, self, "_release_sound_source", {sound_source = sound_source}), TimerManager:game():time() + 0.5)
 end
 
 function FireManager:_release_sound_source(...)
 end
 
+local tmp_used_flame_objects
+
 function FireManager:_start_enemy_fire_effect(dot_info)
-	local enemy_effect_name = Idstring("effects/payday2/particles/explosions/molotov_grenade_enemy_on_fire_endless")
-	local bone_spine = dot_info.enemy_unit:get_object(Idstring("Spine"))
-	local bone_left_arm = dot_info.enemy_unit:get_object(Idstring("LeftArm"))
-	local bone_right_arm = dot_info.enemy_unit:get_object(Idstring("RightArm"))
-	local bone_left_leg = dot_info.enemy_unit:get_object(Idstring("LeftLeg"))
-	local bone_right_leg = dot_info.enemy_unit:get_object(Idstring("RightLeg"))
-	local bone_spine_effect_id, bone_left_arm_effect_id, bone_right_arm_effect_id, bone_left_leg_effect_id, bone_right_leg_effect_id
-	if bone_spine then
-		bone_spine_effect_id = World:effect_manager():spawn({effect = enemy_effect_name, parent = bone_spine})
+	local num_objects = #tweak_data.fire.fire_bones
+	local num_effects = math.random(3, num_objects)
+	if not tmp_used_flame_objects then
+		tmp_used_flame_objects = {}
+		for _, effect in ipairs(tweak_data.fire.fire_bones) do
+			table.insert(tmp_used_flame_objects, false)
+		end
 	end
-	if bone_left_arm then
-		bone_left_arm_effect_id = World:effect_manager():spawn({effect = enemy_effect_name, parent = bone_left_arm})
+	local idx = 1
+	local effect_id
+	local effects_table = {}
+	for i = 1, num_effects do
+		while tmp_used_flame_objects[idx] do
+			idx = math.random(1, num_objects)
+		end
+		local effect = tweak_data.fire.effects.endless[tweak_data.fire.effects_cost[i]]
+		local bone = dot_info.enemy_unit:get_object(Idstring(tweak_data.fire.fire_bones[idx]))
+		if bone then
+			effect_id = World:effect_manager():spawn({
+				effect = Idstring(effect),
+				parent = bone
+			})
+			table.insert(effects_table, effect_id)
+		end
+		tmp_used_flame_objects[idx] = true
 	end
-	if bone_right_arm then
-		bone_right_arm_effect_id = World:effect_manager():spawn({effect = enemy_effect_name, parent = bone_right_arm})
-	end
-	if bone_left_leg then
-		bone_left_leg_effect_id = World:effect_manager():spawn({effect = enemy_effect_name, parent = bone_left_leg})
-	end
-	if bone_right_leg then
-		bone_right_leg_effect_id = World:effect_manager():spawn({effect = enemy_effect_name, parent = bone_right_leg})
-	end
-	local effects_table = {
-		bone_spine_effect_id,
-		bone_left_arm_effect_id,
-		bone_right_arm_effect_id,
-		bone_left_leg_effect_id,
-		bone_right_leg_effect_id
-	}
 	dot_info.fire_effects = effects_table
+	for idx, _ in ipairs(tmp_used_flame_objects) do
+		tmp_used_flame_objects[idx] = false
+	end
 end
 
 function FireManager:_damage_fire_dot(dot_info)
@@ -526,8 +529,17 @@ function FireManager:_dispose_of_impact_sound(custom_params)
 	local sound_source_burning_loop = SoundDevice:create_source("MolotovBurning")
 	sound_source_burning_loop:set_position(custom_params.position)
 	sound_source_burning_loop:post_event("burn_loop_gen")
-	local molotov_tweak = tweak_data.projectiles.molotov
-	managers.enemy:add_delayed_clbk("MolotovBurning", callback(GrenadeBase, GrenadeBase, "_dispose_of_sound", {sound_source = sound_source_burning_loop}), TimerManager:game():time() + tonumber(molotov_tweak.burn_duration) - custom_params.sound_event_impact_duration)
+	local molotov_tweak = tweak_data.env_effect:molotov_fire()
+	managers.enemy:add_delayed_clbk("MolotovBurning", callback(FireManager, FireManager, "_fade_out_burn_loop_sound", {
+		position = custom_params.position,
+		sound_source = sound_source_burning_loop
+	}), TimerManager:game():time() + tonumber(molotov_tweak.burn_duration) - custom_params.sound_event_impact_duration)
+end
+
+function FireManager:_fade_out_burn_loop_sound(custom_params)
+	local fade_duration = 2
+	custom_params.sound_source:post_event("burn_loop_gen_stop_fade")
+	managers.enemy:add_delayed_clbk("MolotovFading", callback(GrenadeBase, GrenadeBase, "_dispose_of_sound", custom_params), TimerManager:game():time() + fade_duration)
 end
 
 function FireManager:on_simulation_ended()

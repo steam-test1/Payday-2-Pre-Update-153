@@ -322,6 +322,7 @@ function MenuCallbackHandler:_dialog_crime_spree_continue_yes()
 	managers.menu:active_menu().logic:refresh_node("main")
 	managers.menu_component:create_crime_spree_missions_gui(managers.menu:active_menu().logic:selected_node())
 	managers.menu_component:refresh_crime_spree_details_gui()
+	WalletGuiObject.refresh()
 end
 
 function MenuCallbackHandler:_dialog_crime_spree_continue_no()

@@ -822,6 +822,7 @@ function StatisticsTweakData:statistics_table()
 		"cop_female",
 		"security_undominatable",
 		"medic",
+		"escort_chinese_prisoner",
 		"bolivian",
 		"bolivian_indoors",
 		"drug_lord_boss",

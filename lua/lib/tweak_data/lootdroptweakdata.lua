@@ -1198,6 +1198,19 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.grv.track = true
 	self.global_values.grv.sort_number = 303
 	self.global_values.grv.category = "dlc"
+	self.global_values.amp = {}
+	self.global_values.amp.name_id = "bm_global_value_amp"
+	self.global_values.amp.desc_id = "menu_l_global_value_amp"
+	self.global_values.amp.unlock_id = "bm_global_value_amp_unlock"
+	self.global_values.amp.color = Color(255, 255, 212, 0) / 255
+	self.global_values.amp.dlc = true
+	self.global_values.amp.chance = 1
+	self.global_values.amp.value_multiplier = tweak_data:get_value("money_manager", "global_value_multipliers", "amp")
+	self.global_values.amp.durability_multiplier = 1
+	self.global_values.amp.drops = true
+	self.global_values.amp.track = true
+	self.global_values.amp.sort_number = 304
+	self.global_values.amp.category = "dlc"
 	self.global_values.mp2 = {}
 	self.global_values.mp2.name_id = "bm_global_value_mp2"
 	self.global_values.mp2.desc_id = "menu_l_global_value_mp2"
@@ -1290,6 +1303,7 @@ function LootDropTweakData:init(tweak_data)
 		"spa",
 		"sha",
 		"grv",
+		"amp",
 		"mp2",
 		"pn2"
 	}

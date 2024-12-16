@@ -1301,7 +1301,7 @@ end
 function StatisticsManager:killed_by_anyone(data)
 	local name_id = alive(data.weapon_unit) and data.weapon_unit:base():get_name_id()
 	managers.achievment:set_script_data("pacifist_fail", true)
-	if name_id ~= "m79" and name_id ~= "m79_npc" then
+	if name_id ~= "m79" and name_id ~= "m79_crew" then
 		managers.achievment:set_script_data("blow_out_fail", true)
 	end
 	local kills_table = self._global.session.killed_by_anyone
@@ -1935,7 +1935,7 @@ function StatisticsManager:session_killed_by_weapon_category(category)
 end
 
 function StatisticsManager:create_unified_weapon_name(weapon_id)
-	return string.gsub(weapon_id, "_npc", "")
+	return string.gsub(string.gsub(weapon_id, "_npc", ""), "_crew", "")
 end
 
 function StatisticsManager:session_anyone_killed_by_weapon_category(category)

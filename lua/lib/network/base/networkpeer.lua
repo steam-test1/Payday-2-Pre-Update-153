@@ -1654,6 +1654,9 @@ function NetworkPeer:_update_equipped_armor()
 	if self._equipped_armor_id ~= new_armor_id then
 		self._equipped_armor_id = new_armor_id
 		local armor_sequence = tweak_data.blackmarket.armors[new_armor_id].sequence
+		if managers.job and managers.job:current_level_id() == "glace" then
+			armor_sequence = nil
+		end
 		if armor_sequence and self._unit:damage() and self._unit:damage():has_sequence(armor_sequence) then
 			self._unit:damage():run_sequence_simple(armor_sequence)
 		end

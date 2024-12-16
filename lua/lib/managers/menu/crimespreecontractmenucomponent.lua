@@ -12,6 +12,9 @@ function CrimeSpreeContractMenuComponent:init(ws, fullscreen_ws, node)
 end
 
 function CrimeSpreeContractMenuComponent:close()
+	if not managers.menu:is_pc_controller() then
+		managers.menu:active_menu().input:activate_controller_mouse()
+	end
 	self._ws:panel():remove(self._panel)
 	self._fullscreen_ws:panel():remove(self._fullscreen_panel)
 end
@@ -33,6 +36,7 @@ function CrimeSpreeContractMenuComponent:_setup()
 	self._fullscreen_panel = self._fullscreen_ws:panel():panel({layer = 50})
 	if not managers.menu:is_pc_controller() then
 		managers.menu:active_menu().input:deactivate_controller_mouse()
+		self:_setup_controller_input()
 	end
 	local is_win_32 = SystemInfo:platform() == Idstring("WIN32")
 	local is_nextgen = SystemInfo:platform() == Idstring("PS4") or SystemInfo:platform() == Idstring("XB1")
@@ -250,6 +254,21 @@ function CrimeSpreeContractMenuComponent:_setup_new_crime_spree(text_w, text_h)
 		warning_desc:set_bottom(starting_text:top() - padding)
 		warning_text:set_bottom(warning_desc:top())
 	end
+	if not managers.menu:is_pc_controller() then
+		local controls_text = self._contract_panel:text({
+			text = managers.localization:get_default_macro("BTN_X") .. " / " .. managers.localization:get_default_macro("BTN_Y"),
+			align = "left",
+			vertical = "top",
+			font_size = tweak_data.menu.pd2_medium_font_size,
+			font = tweak_data.menu.pd2_medium_font,
+			color = tweak_data.screen_colors.text,
+			wrap = true,
+			wrap_word = true
+		})
+		BlackMarketGui.make_fine_text(self, controls_text)
+		controls_text:set_bottom(self._levels_panel:top())
+		controls_text:set_right(self._levels_panel:right())
+	end
 end
 
 function CrimeSpreeContractMenuComponent:_setup_continue_crime_spree(text_w, text_h)
@@ -262,7 +281,6 @@ end
 
 function CrimeSpreeContractMenuComponent:_setup_continue_host(text_w, text_h)
 	local modifiers = managers.crime_spree:active_modifiers()
-	local clip_modifiers = #modifiers >= tweak_data.crime_spree.gui.modifiers_before_scroll
 	local next_modifiers_h = tweak_data.menu.pd2_small_font_size * 2
 	local line_h = tweak_data.menu.pd2_small_font_size * 1.5
 	local table_split = 0.125
@@ -272,6 +290,7 @@ function CrimeSpreeContractMenuComponent:_setup_continue_host(text_w, text_h)
 		w = text_w,
 		h = self._contract_panel:h() - text_h - padding * 3 - tweak_data.menu.pd2_medium_font_size
 	})
+	CrimeSpreeModifierDetailsPage.add_modifiers_panel(self, self._modifiers_panel, managers.crime_spree:active_modifiers())
 	local text = self._contract_panel:text({
 		text = managers.localization:to_upper_text("cn_crime_spree_modifiers"),
 		align = "left",
@@ -285,74 +304,8 @@ function CrimeSpreeContractMenuComponent:_setup_continue_host(text_w, text_h)
 	BlackMarketGui.make_fine_text(self, text)
 	text:set_bottom(self._modifiers_panel:top())
 	text:set_left(self._modifiers_panel:left())
-	self._scroll = ScrollablePanel:new(self._modifiers_panel, "modifiers_scroll", {padding = 0, force_scroll_indicators = true})
-	local count = 0
-	for i = #modifiers, 1, -1 do
-		local modifier_data = modifiers[i]
-		local modifier = managers.crime_spree:get_modifier(modifier_data.id)
-		if modifier then
-			local modifier_class = _G[modifier.class] or {}
-			local panel = self._scroll:canvas():panel({
-				y = count * line_h,
-				h = line_h
-			})
-			panel:rect({
-				color = Color.black,
-				alpha = count % 2 == 1 and 0.4 or 0
-			})
-			local desc = panel:text({
-				text = modifier_class:get_description(modifier_data.id),
-				valign = "center",
-				vertical = "center",
-				align = "left",
-				halign = "left",
-				layer = 1,
-				x = padding + panel:w() * table_split,
-				y = 5,
-				font = tweak_data.menu.pd2_small_font,
-				font_size = tweak_data.menu.pd2_small_font_size,
-				w = panel:w() * (1 - table_split),
-				h = tweak_data.menu.pd2_small_font_size,
-				color = Color.white,
-				alpha = 0.8
-			})
-			local multi = 1
-			local _, _, w, h = desc:text_rect()
-			while w > (panel:w() - 24) * (1 - table_split) do
-				multi = multi - 0.05
-				desc:set_font_size(tweak_data.menu.pd2_small_font_size * multi)
-				_, _, w, h = desc:text_rect()
-			end
-			local level = panel:text({
-				text = managers.experience:cash_string(modifier_data.level, ""),
-				valign = "center",
-				vertical = "center",
-				align = "right",
-				halign = "right",
-				layer = 1,
-				x = padding,
-				y = 2,
-				color = Color.white,
-				font = tweak_data.menu.pd2_medium_font,
-				font_size = tweak_data.menu.pd2_medium_font_size,
-				w = panel:w() * table_split - padding * 0.5,
-				h = tweak_data.menu.pd2_medium_font_size
-			})
-			if modifier_class.stealth then
-				level:set_text(managers.localization:get_default_macro("BTN_SPREE_STEALTH") .. level:text())
-			end
-			count = count + 1
-		end
-	end
 	if #modifiers == 0 then
-		local panel = self._scroll:canvas():panel({
-			y = count * line_h,
-			h = line_h
-		})
-		panel:rect({
-			color = Color.black,
-			alpha = count % 2 == 1 and 0.4 or 0
-		})
+		local panel = self._scroll:canvas():panel({y = line_h, h = line_h})
 		panel:text({
 			text = managers.localization:text("cn_crime_spree_no_modifiers"),
 			valign = "center",
@@ -438,6 +391,15 @@ function CrimeSpreeContractMenuComponent:_setup_continue_client(text_w, text_h)
 	end
 end
 
+function CrimeSpreeContractMenuComponent:_get_button_index(button)
+	for idx, btn in ipairs(self._buttons) do
+		if button == btn then
+			return idx
+		end
+	end
+	return 1
+end
+
 function CrimeSpreeContractMenuComponent:set_active_starting_level(btn)
 	if btn:can_activate() then
 		for idx, btn in ipairs(self._buttons) do
@@ -445,6 +407,7 @@ function CrimeSpreeContractMenuComponent:set_active_starting_level(btn)
 		end
 		btn:set_active(true)
 		managers.crime_spree:set_starting_level(btn:level())
+		self._selected_index = self:_get_button_index(btn)
 	else
 		managers.menu_component:post_event("menu_error")
 	end
@@ -482,11 +445,47 @@ function CrimeSpreeContractMenuComponent:mouse_wheel_down(x, y)
 	end
 end
 
+function CrimeSpreeContractMenuComponent:special_btn_pressed(button)
+	local change = 0
+	if button == Idstring("menu_modify_item") then
+		change = 1
+	end
+	if button == Idstring("voice_message") then
+		change = -1
+	end
+	if change ~= 0 then
+		local new_index = (self._selected_index or 0) + change
+		if new_index > #self._buttons then
+			new_index = 1
+		end
+		if new_index < 1 then
+			new_index = #self._buttons
+		end
+		self:set_active_starting_level(self._buttons[new_index])
+	end
+end
+
+function CrimeSpreeContractMenuComponent:_setup_controller_input()
+	self._gui = {}
+	self._gui._left_axis_vector = Vector3()
+	self._gui._right_axis_vector = Vector3()
+	self._ws:connect_controller(managers.menu:active_menu().input:get_controller(), true)
+	self._panel:axis_move(callback(self, self, "_axis_move"))
+end
+
+function CrimeSpreeContractMenuComponent:_axis_move(o, axis_name, axis_vector, controller)
+	if axis_name == Idstring("left") then
+		mvector3.set(self._gui._left_axis_vector, axis_vector)
+	elseif axis_name == Idstring("right") then
+		mvector3.set(self._gui._right_axis_vector, axis_vector)
+	end
+end
+
 function CrimeSpreeContractMenuComponent:update(t, dt)
 	if not managers.menu:is_pc_controller() and self._gui and self._gui._right_axis_vector and alive(self._scroll) and not mvector3.is_zero(self._gui._right_axis_vector) then
 		local x = mvector3.x(self._gui._right_axis_vector)
 		local y = mvector3.y(self._gui._right_axis_vector)
-		self._scroll:perform_scroll(ScrollablePanel.SCROLL_SPEED * dt * 200, y)
+		self._scroll:perform_scroll(ScrollablePanel.SCROLL_SPEED * dt * 24, y)
 	end
 end
 
@@ -528,7 +527,7 @@ function CrimeSpreeStartingLevelItem:init(parent, data)
 	})
 	self._active_bg = self._panel:rect({
 		color = tweak_data.screen_colors.button_stage_3,
-		alpha = 0.4,
+		alpha = 0.8,
 		blend_mode = "add",
 		layer = -1
 	})

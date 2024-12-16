@@ -54,106 +54,35 @@ function NewFlamethrowerBase:_fire_raycast(user_unit, from_pos, direction, dmg_m
 		return result
 	end
 	local result = {}
-	local hit_enemies = {}
-	local hit_something, col_rays
-	if self._alert_events then
-		col_rays = {}
-	end
+	local hit_enemies = 0
 	local damage = self:_get_current_damage(dmg_mul)
 	local autoaim, dodge_enemies = self:check_autoaim(from_pos, direction, self._range)
-	local weight = 0.1
-	local enemy_died = false
-	
-	local function hit_enemy(col_ray)
-		if col_ray.unit:character_damage() and col_ray.unit:character_damage().is_head then
-			local enemy_key = col_ray.unit:key()
-			if not hit_enemies[enemy_key] or col_ray.unit:character_damage():is_head(col_ray.body) then
-				hit_enemies[enemy_key] = col_ray
-			end
-		else
-			self._bullet_class:on_collision(col_ray, self._unit, user_unit, damage)
-		end
-	end
-	
+	local damage_range = self._flame_max_range
 	local spread_x, spread_y = self:_get_spread(user_unit)
-	local right = direction:cross(Vector3(0, 0, 1)):normalized()
-	local up = direction:cross(right):normalized()
-	mvector3.set(mvec_direction, direction)
-	for i = 1, self._rays do
-		local theta = math.random() * 360
-		local ax = math.sin(theta) * (math.random() * spread_x) * (spread_mul or 1)
-		local ay = math.cos(theta) * (math.random() * spread_y) * (spread_mul or 1)
-		mvector3.set(mvec_spread_direction, mvec_direction)
-		mvector3.add(mvec_spread_direction, right * math.rad(ax))
-		mvector3.add(mvec_spread_direction, up * math.rad(ay))
-		mvector3.set(mvec_to, mvec_spread_direction)
-		mvector3.multiply(mvec_to, 20000)
-		mvector3.add(mvec_to, from_pos)
-		local search_for_targets = true
-		local raycast_from = from_pos
-		local raycast_to = mvec_to
-		local raycast_ignore_units = clone(self._setup.ignore_units)
-		local test_color = 1
-		local col_ray, test_last_raycast_hit_position
-		while search_for_targets do
-			col_ray = World:raycast("ray", raycast_from, raycast_to, "slot_mask", self._bullet_slotmask, "ignore_unit", raycast_ignore_units)
-			if test_last_raycast_hit_position == nil then
-				test_last_raycast_hit_position = raycast_from
-			end
-			if col_rays then
-				if col_ray then
-					if col_ray then
-						test_last_raycast_hit_position = col_ray.hit_position
-					end
-					if col_ray.distance > self._flame_max_range then
-						search_for_targets = false
-						break
-					elseif col_ray.unit:in_slot(managers.slot:get_mask("world_geometry")) then
-						table.insert(col_rays, col_ray)
-						search_for_targets = false
-					else
-						table.insert(raycast_ignore_units, col_ray.unit)
-					end
-				else
-					local ray_to = mvector3.copy(raycast_to)
-					local spread_direction = mvector3.copy(mvec_spread_direction)
-					table.insert(col_rays, {position = ray_to, ray = spread_direction})
-					search_for_targets = false
-				end
-			end
-			if self._autoaim and autoaim then
-				if col_ray and col_ray.unit:in_slot(managers.slot:get_mask("enemies")) then
-					self._autohit_current = (self._autohit_current + weight) / (1 + weight)
-					hit_enemy(col_ray)
-					autoaim = false
-				else
-					autoaim = false
-					local autohit = self:check_autoaim(from_pos, direction, self._range)
-					if autohit then
-						local autohit_chance = 1 - math.clamp((self._autohit_current - self._autohit_data.MIN_RATIO) / (self._autohit_data.MAX_RATIO - self._autohit_data.MIN_RATIO), 0, 1)
-						if autohit_chance > math.random() then
-							self._autohit_current = (self._autohit_current + weight) / (1 + weight)
-							hit_something = true
-							hit_enemy(autohit)
-						else
-							self._autohit_current = self._autohit_current / (1 + weight)
-						end
-					elseif col_ray then
-						hit_something = true
-						hit_enemy(col_ray)
-					end
-				end
-			elseif col_ray then
-				hit_something = true
-				hit_enemy(col_ray)
-			end
-		end
+	mvector3.set(mvec_to, direction)
+	mvector3.multiply(mvec_to, damage_range)
+	mvector3.add(mvec_to, from_pos)
+	local col_ray = World:raycast("ray", from_pos, mvec_to, "slot_mask", self._bullet_slotmask, "ignore_unit", self._setup.ignore_units)
+	if col_ray then
+		damage_range = math.min(damage_range, col_ray.distance)
 	end
-	for _, col_ray in pairs(hit_enemies) do
-		if 0 < damage then
-			local result = self._bullet_class:on_collision(col_ray, self._unit, user_unit, damage)
-			if not result or result.type == "death" then
-			end
+	local cone_spread = math.rad(spread_x) * damage_range
+	mvector3.set(mvec_to, direction)
+	mvector3.multiply(mvec_to, damage_range)
+	mvector3.add(mvec_to, from_pos)
+	local hit_bodies = World:find_bodies(user_unit, "intersect", "cone", from_pos, mvec_to, cone_spread, self._bullet_slotmask)
+	for idx, body in ipairs(hit_bodies) do
+		local unit = body:unit()
+		local fake_ray = {
+			body = body,
+			unit = body:unit(),
+			ray = direction,
+			normal = direction,
+			position = from_pos
+		}
+		self._bullet_class:on_collision(fake_ray, self._unit, user_unit, damage)
+		if unit:character_damage() and unit:character_damage().is_head then
+			hit_enemies = hit_enemies + 1
 		end
 	end
 	if dodge_enemies and self._suppression then
@@ -161,15 +90,12 @@ function NewFlamethrowerBase:_fire_raycast(user_unit, from_pos, direction, dmg_m
 			enemy_data.unit:character_damage():build_suppression(suppr_mul * dis_error * self._suppression, self._panic_suppression_chance)
 		end
 	end
-	result.hit_enemy = next(hit_enemies) and true or false
-	if self._alert_events then
-		result.rays = 0 < #col_rays and col_rays
-	end
+	result.hit_enemy = 0 < hit_enemies and true or false
 	managers.statistics:shot_fired({
 		hit = false,
 		weapon_unit = self._unit
 	})
-	for _, _ in pairs(hit_enemies) do
+	for i = 1, hit_enemies do
 		managers.statistics:shot_fired({
 			hit = true,
 			weapon_unit = self._unit,

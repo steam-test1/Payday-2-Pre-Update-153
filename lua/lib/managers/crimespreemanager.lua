@@ -172,7 +172,7 @@ function CrimeSpreeManager:sync_load(data)
 end
 
 function CrimeSpreeManager:update(t, dt)
-	if game_state_machine:current_state_name() == "menu_main" and self._global.start_data and self._global.start_data.mission_id then
+	if tweak_data.crime_spree.crash_causes_loss and game_state_machine:current_state_name() == "menu_main" and self._global.start_data and self._global.start_data.mission_id then
 		self:_on_mission_failed(self._global.start_data.mission_id)
 		self._show_crash_dialog = true
 	end
@@ -526,7 +526,7 @@ function CrimeSpreeManager:select_modifier(modifier_id)
 	}
 	table.insert(self._global.modifiers, data)
 	if self:_is_host() then
-		self:send_crime_spree_modifier(data, true)
+		self:send_crime_spree_modifier(nil, data, true)
 	end
 	return true
 end
@@ -919,6 +919,7 @@ end
 function CrimeSpreeManager:set_temporary_mission(mission_id)
 	self._global.current_mission = mission_id
 	self:_setup_global_from_mission_id(mission_id)
+	self:_setup_temporary_job()
 end
 
 function CrimeSpreeManager:_setup_temporary_job()
@@ -1020,6 +1021,9 @@ function CrimeSpreeManager:_on_mission_failed(mission_id)
 		reward_level = self:reward_level()
 	}
 	self._global.start_data = nil
+	if tweak_data.crime_spree.winning_streak_reset_on_failure then
+		self._global.winning_streak = nil
+	end
 	self._global.current_mission = nil
 	MenuCallbackHandler:save_progress()
 end
@@ -1114,8 +1118,9 @@ function CrimeSpreeManager:on_peer_finished_loading(peer)
 	end
 	if self:_is_host() then
 		for _, modifier_data in ipairs(self:active_modifiers()) do
-			self:send_crime_spree_modifier(modifier_data, false)
+			self:send_crime_spree_modifier(peer, modifier_data, false)
 		end
+		managers.network:session():send_to_peer(peer, "sync_crime_spree_modifiers_finalize")
 	end
 end
 
@@ -1144,7 +1149,7 @@ function CrimeSpreeManager:send_crime_spree_mission_data(mission_slot, mission_i
 	managers.network:session():send_to_peers("sync_crime_spree_mission", unpack(params))
 end
 
-function CrimeSpreeManager:send_crime_spree_modifier(modifier_data, announce)
+function CrimeSpreeManager:send_crime_spree_modifier(peer, modifier_data, announce)
 	if not self:_is_active() or not modifier_data then
 		return
 	end
@@ -1153,7 +1158,11 @@ function CrimeSpreeManager:send_crime_spree_modifier(modifier_data, announce)
 		modifier_data.level,
 		announce or false
 	}
-	managers.network:session():send_to_peers("sync_crime_spree_modifier", unpack(params))
+	if peer then
+		managers.network:session():send_to_peer(peer, "sync_crime_spree_modifier", unpack(params))
+	else
+		managers.network:session():send_to_peers("sync_crime_spree_modifier", unpack(params))
+	end
 end
 
 function CrimeSpreeManager:get_peer_spree_level(peer_id)
@@ -1221,6 +1230,12 @@ function CrimeSpreeManager:_announce_modifier(modifier_id)
 		managers.menu_component:crime_spree_details_gui():show_new_modifier(modifier_id)
 	else
 		managers.menu:post_event(tweak_data.crime_spree.announce_modifier_stinger)
+	end
+end
+
+function CrimeSpreeManager:on_finalize_modifiers()
+	if not self:_is_host() then
+		self:_setup_modifiers()
 	end
 end
 

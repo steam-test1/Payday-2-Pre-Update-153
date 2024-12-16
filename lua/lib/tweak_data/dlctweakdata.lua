@@ -62,6 +62,7 @@ function DLCTweakData:init(tweak_data)
 			lxy = true,
 			grv = true,
 			mrm = 1,
+			mdm = 1,
 			fir = true,
 			pn2 = true,
 			rip = true,
@@ -5817,6 +5818,32 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.amp_bundle = {}
+	self.amp_bundle.free = true
+	self.amp_bundle.content = {}
+	self.amp_bundle.content.loot_global_value = "normal"
+	self.amp_bundle.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "amp_01",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "amp_02",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "amp_03",
+			amount = 1
+		},
+		{
+			type_items = "masks",
+			item_entry = "amp_04",
+			amount = 1
+		}
+	}
 	self.flip_bundle = {}
 	self.flip_bundle.free = true
 	self.flip_bundle.content = {}
@@ -5830,6 +5857,17 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "weapon_mods",
 			item_entry = "wpn_fps_upg_o_45rds_v2",
+			amount = 1
+		}
+	}
+	self.bny_bundle = {}
+	self.bny_bundle.free = true
+	self.bny_bundle.content = {}
+	self.bny_bundle.content.loot_global_value = "infamous"
+	self.bny_bundle.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "mdm",
 			amount = 1
 		}
 	}

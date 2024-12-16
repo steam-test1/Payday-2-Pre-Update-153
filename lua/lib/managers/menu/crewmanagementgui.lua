@@ -812,7 +812,12 @@ function CrewManagementGui:populate_custom(category, henchman_index, tweak, list
 		new_data.equipped = loadout[category] == name
 		new_data.equipped_by = map[name] ~= henchman_index and map[name] or nil
 		if not new_data.unlocked then
-			new_data.lock_texture = "guis/textures/pd2/lock_ccoin"
+			if managers.blackmarket:can_afford_crew_item(name) then
+				new_data.lock_texture = "guis/textures/pd2/ccoin"
+				new_data.lock_color = Color.white
+			else
+				new_data.lock_texture = "guis/textures/pd2/lock_ccoin"
+			end
 			new_data.lock_text = managers.localization:text("menu_data_crew_item_unlock_cost", {
 				cost = managers.blackmarket:crew_item_cost(name)
 			})

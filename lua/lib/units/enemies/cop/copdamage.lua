@@ -2508,9 +2508,12 @@ function CopDamage:_update_debug_ws(damage_info)
 end
 
 function CopDamage:save(data)
-	if self._health ~= self._HEALTH_INIT then
+	local save_health = self._health ~= self._HEALTH_INIT
+	save_health = managers.crime_spree:_is_active() and ModifierEnemyHealthAndDamage:is_active() or save_health
+	if save_health then
 		data.char_dmg = data.char_dmg or {}
 		data.char_dmg.health = self._health
+		data.char_dmg.health_init = self._HEALTH_INIT
 	end
 	if self._invulnerable then
 		data.char_dmg = data.char_dmg or {}
@@ -2536,6 +2539,7 @@ function CopDamage:load(data)
 	end
 	if data.char_dmg.health then
 		self._health = data.char_dmg.health
+		self._HEALTH_INIT = data.char_dmg.health_init or self._HEALTH_INIT
 		self._health_ratio = self._health / self._HEALTH_INIT
 	end
 	if data.char_dmg.invulnerable then

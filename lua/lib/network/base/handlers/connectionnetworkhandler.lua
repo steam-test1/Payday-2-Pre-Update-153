@@ -873,6 +873,14 @@ function ConnectionNetworkHandler:sync_crime_spree_modifier(modifier_id, modifie
 	managers.crime_spree:set_server_modifier(modifier_id, modifier_level, announce)
 end
 
+function ConnectionNetworkHandler:sync_crime_spree_modifiers_finalize(sender)
+	local peer = self._verify_sender(sender)
+	if not peer then
+		return
+	end
+	managers.crime_spree:on_finalize_modifiers()
+end
+
 function ConnectionNetworkHandler:sync_crime_spree_gage_asset_event(event_id, asset_id, sender)
 	local peer = self._verify_sender(sender)
 	if not peer then

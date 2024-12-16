@@ -1440,6 +1440,11 @@ function MenuCallbackHandler:dlc_buy_grv_pc()
 	Steam:overlay_activate("store", 218620)
 end
 
+function MenuCallbackHandler:dlc_buy_amp_pc()
+	print("[MenuCallbackHandler:dlc_buy_amp_pc]")
+	Steam:overlay_activate("store", 218620)
+end
+
 function MenuCallbackHandler:dlc_buy_mp2_pc()
 	print("[MenuCallbackHandler:dlc_buy_mp2_pc]")
 	Steam:overlay_activate("store", 218620)
@@ -1523,6 +1528,7 @@ end
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
 		"mp2",
+		"amp",
 		"grv",
 		"spa",
 		"friend",
@@ -1717,6 +1723,10 @@ end
 
 function MenuCallbackHandler:visible_callback_grv()
 	return self:is_dlc_latest_locked("grv")
+end
+
+function MenuCallbackHandler:visible_callback_amp()
+	return self:is_dlc_latest_locked("amp")
 end
 
 function MenuCallbackHandler:visible_callback_mp2()
@@ -7676,7 +7686,10 @@ function MenuCrimeNetFiltersInitiator:add_filters(node)
 		}
 	}
 	for index, job_id in ipairs(tweak_data.narrative:get_jobs_index()) do
-		if not tweak_data.narrative.jobs[job_id].wrapped_to_job and tweak_data.narrative.jobs[job_id].contact ~= "tests" then
+		local contact = tweak_data.narrative.jobs[job_id].contact
+		local contact_tweak = tweak_data.narrative.contacts[contact]
+		local allow = not tweak_data.narrative.jobs[job_id].wrapped_to_job and contact ~= "tests" and (not contact_tweak or not contact_tweak.hidden)
+		if allow then
 			local text_id, color_data = tweak_data.narrative:create_job_name(job_id)
 			local params = {
 				_meta = "option",

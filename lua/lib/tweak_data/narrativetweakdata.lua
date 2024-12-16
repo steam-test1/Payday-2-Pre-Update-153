@@ -4584,6 +4584,67 @@ function NarrativeTweakData:init(tweak_data)
 		26000,
 		26000
 	}
+	self.stages.glace = {
+		level_id = "glace",
+		type_id = "heist_type_survive",
+		type = "d"
+	}
+	self.jobs.glace = {}
+	self.jobs.glace.name_id = "heist_glace"
+	self.jobs.glace.briefing_id = "heist_glace_crimenet"
+	self.jobs.glace.package = "packages/job_rats"
+	self.jobs.glace.contact = "classic"
+	self.jobs.glace.jc = 50
+	self.jobs.glace.chain = {
+		self.stages.glace
+	}
+	self.jobs.glace.briefing_event = "Play_pln_glc_cbf_01"
+	self.jobs.glace.debrief_event = "hct_rats_debrief"
+	self.jobs.glace.crimenet_callouts = {
+		"Play_pln_glc_cnc_01"
+	}
+	self.jobs.glace.crimenet_videos = {
+		"cn_branchbank1",
+		"cn_branchbank2",
+		"cn_branchbank3"
+	}
+	self.jobs.glace.payout = {
+		115000,
+		225000,
+		555000,
+		1150000,
+		1266000,
+		1435000,
+		1545000
+	}
+	self.jobs.glace.contract_cost = {
+		70000,
+		150000,
+		350307,
+		700000,
+		900000,
+		900000,
+		900000
+	}
+	self.jobs.glace.contract_visuals = {}
+	self.jobs.glace.contract_visuals.min_mission_xp = {
+		24000,
+		24000,
+		24000,
+		24000,
+		24000,
+		24000,
+		24000
+	}
+	self.jobs.glace.contract_visuals.max_mission_xp = {
+		28000,
+		28000,
+		28000,
+		28000,
+		28000,
+		28000,
+		28000
+	}
 	self.jobs.crime_spree = {}
 	self.jobs.crime_spree.name_id = "heist_crime_spree"
 	self.jobs.crime_spree.briefing_id = "heist_crime_spree_brief"
@@ -4710,6 +4771,7 @@ function NarrativeTweakData:init(tweak_data)
 		"fish",
 		"moon",
 		"run",
+		"glace",
 		"crime_spree"
 	}
 	if SystemInfo:distribution() == Idstring("STEAM") then

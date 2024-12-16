@@ -37,6 +37,7 @@ require("lib/tweak_data/SubtitleTweakData")
 require("lib/tweak_data/InputTweakData")
 require("lib/tweak_data/ArmorSkinsTweakData")
 require("lib/tweak_data/CrimeSpreeTweakData")
+require("lib/tweak_data/FireTweakData")
 TweakData = TweakData or class()
 
 function TweakData:_init_wip_tweak_data()
@@ -624,6 +625,7 @@ function TweakData:init()
 	self.subtitles = SubtitleTweakData:new(self)
 	self.input = InputTweakData:new(self)
 	self.crime_spree = CrimeSpreeTweakData:new(self)
+	self.fire = FireTweakData:new(self)
 	self.ai_carry = {}
 	self.ai_carry.throw_distance = 500
 	self.ai_carry.throw_force = 100
@@ -2491,6 +2493,11 @@ Play the full version soon to get your full PAYDAY!]],
 			difficulty = easywish_and_above,
 			job = "fish"
 		},
+		easywish_glace = {
+			award = "glace_5",
+			difficulty = easywish_and_above,
+			job = "glace"
+		},
 		easywish_run = {
 			award = "run_5",
 			difficulty = easywish_and_above,
@@ -2798,6 +2805,11 @@ Play the full version soon to get your full PAYDAY!]],
 			difficulty = deathwish_and_above,
 			job = "fish"
 		},
+		death_glace = {
+			award = "glace_6",
+			difficulty = deathwish_and_above,
+			job = "glace"
+		},
 		death_run = {
 			award = "run_6",
 			difficulty = deathwish_and_above,
@@ -3099,6 +3111,11 @@ Play the full version soon to get your full PAYDAY!]],
 			award = "fish_3",
 			difficulty = sm_wish_and_above,
 			job = "fish"
+		},
+		sm_wish_glace = {
+			award = "glace_7",
+			difficulty = sm_wish_and_above,
+			job = "glace"
 		},
 		sm_wish_run = {
 			award = "run_7",
@@ -3503,6 +3520,26 @@ Play the full version soon to get your full PAYDAY!]],
 				melee_weapon = "oxide"
 			}
 		},
+		glace_1 = {
+			award = "glace_1",
+			difficulty = normal_and_above,
+			job = "glace"
+		},
+		glace_2 = {
+			award = "glace_2",
+			difficulty = hard_and_above,
+			job = "glace"
+		},
+		glace_3 = {
+			award = "glace_3",
+			difficulty = veryhard_and_above,
+			job = "glace"
+		},
+		glace_4 = {
+			award = "glace_4",
+			difficulty = overkill_and_above,
+			job = "glace"
+		},
 		run_1 = {
 			award = "run_1",
 			difficulty = normal_and_above,
@@ -3858,6 +3895,11 @@ Play the full version soon to get your full PAYDAY!]],
 				detection = {min = 75, max = 100}
 			}
 		},
+		trophy_glace_completion = {
+			trophy_stat = "trophy_glace_completion",
+			difficulty = normal_and_above,
+			job = "glace"
+		},
 		daily_classics = {
 			trophy_stat = "daily_classics",
 			jobs = {
@@ -3865,7 +3907,9 @@ Play the full version soon to get your full PAYDAY!]],
 				"flat",
 				"dinner",
 				"pal",
-				"man"
+				"man",
+				"run",
+				"glace"
 			}
 		},
 		daily_discord = {
@@ -4158,7 +4202,8 @@ Play the full version soon to get your full PAYDAY!]],
 		"pal",
 		"man",
 		"flat",
-		"run"
+		"run",
+		"glace"
 	}
 	self.achievement.job_list.locke = {"pbr", "pbr2"}
 	self.achievement.job_list.jimmy = {"mad", "dark"}
@@ -4910,6 +4955,7 @@ Play the full version soon to get your full PAYDAY!]],
 		{track = "track_50", lock = "friend"},
 		{track = "track_51", lock = "spa"},
 		{track = "track_52"},
+		{track = "track_53"},
 		{
 			track = "track_32_lcv"
 		},

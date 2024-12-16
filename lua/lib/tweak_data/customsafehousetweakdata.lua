@@ -121,6 +121,36 @@ function CustomSafehouseTweakData:_init_heisters(tweak_data)
 	self.heisters.dragon = clone(self.heisters.base)
 	self.heisters.dragon.character_material = "var_mtr_jiro"
 	self.heisters.dragon.voice = self:get_voice(tweak_data, "dragon")
+	self.heisters.dragon.answer_lines = {
+		{
+			sound_event = "Play_{voice}_answering",
+			priority = 0
+		},
+		{
+			sound_event = "Play_{voice}_answering_glace",
+			priority = 100,
+			requirements = {
+				trophies = {
+					"trophy_glace_completion"
+				}
+			}
+		}
+	}
+	self.heisters.dragon.idle_lines = {
+		{
+			sound_event = "Play_{voice}_idle",
+			priority = 0
+		},
+		{
+			sound_event = "Play_{voice}_idle_glace",
+			priority = 100,
+			requirements = {
+				trophies = {
+					"trophy_glace_completion"
+				}
+			}
+		}
+	}
 	self.heisters.bodhi = clone(self.heisters.base)
 	self.heisters.bodhi.character_material = "var_mtr_bodhi"
 	self.heisters.bodhi.voice = self:get_voice(tweak_data, "bodhi")
@@ -1172,6 +1202,28 @@ function CustomSafehouseTweakData:_init_trophies(tweak_data)
 			self:_progress("trophy_run_turtle", 1)
 		},
 		image_id = "safehouse_trophies_preview_turtle"
+	})
+	table.insert(self.trophies, {
+		id = "trophy_glace_cuffs",
+		name_id = "trophy_glace_cuffs",
+		desc_id = "trophy_glace_cuffs_desc",
+		objective_id = "trophy_glace_cuffs_objective",
+		objectives = {
+			self:_progress("trophy_glace_cuffs", 1)
+		},
+		image_id = "safehouse_trophies_preview_glace_cuffs"
+	})
+	table.insert(self.trophies, {
+		id = "trophy_glace_completion",
+		name_id = "trophy_glace_completion",
+		desc_id = "trophy_glace_completion_desc",
+		objective_id = "trophy_glace_completion_objective",
+		objectives = {
+			self:_progress("trophy_glace_completion", 1)
+		},
+		image_id = "safehouse_trophies_preview_yacht",
+		hidden_in_list = true,
+		gives_reward = false
 	})
 end
 

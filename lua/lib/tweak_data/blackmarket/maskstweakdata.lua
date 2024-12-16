@@ -3521,6 +3521,34 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 			Rotation(0, 0, 0)
 		}
 	}
+	self.masks.amp_01 = {}
+	self.masks.amp_01.unit = "units/pd2_dlc_amp/masks/amp_01/msk_amp_01"
+	self.masks.amp_01.name_id = "bm_msk_amp_01"
+	self.masks.amp_01.pcs = {}
+	self.masks.amp_01.value = 0
+	self.masks.amp_01.texture_bundle_folder = "amp"
+	self.masks.amp_01.sort_number = 43
+	self.masks.amp_02 = {}
+	self.masks.amp_02.unit = "units/pd2_dlc_amp/masks/amp_02/msk_amp_02"
+	self.masks.amp_02.name_id = "bm_msk_amp_02"
+	self.masks.amp_02.pcs = {}
+	self.masks.amp_02.value = 0
+	self.masks.amp_02.texture_bundle_folder = "amp"
+	self.masks.amp_02.sort_number = 43
+	self.masks.amp_03 = {}
+	self.masks.amp_03.unit = "units/pd2_dlc_amp/masks/amp_03/msk_amp_03"
+	self.masks.amp_03.name_id = "bm_msk_amp_03"
+	self.masks.amp_03.pcs = {}
+	self.masks.amp_03.value = 0
+	self.masks.amp_03.texture_bundle_folder = "amp"
+	self.masks.amp_03.sort_number = 43
+	self.masks.amp_04 = {}
+	self.masks.amp_04.unit = "units/pd2_dlc_amp/masks/amp_04/msk_amp_04"
+	self.masks.amp_04.name_id = "bm_msk_amp_04"
+	self.masks.amp_04.pcs = {}
+	self.masks.amp_04.value = 0
+	self.masks.amp_04.texture_bundle_folder = "amp"
+	self.masks.amp_04.sort_number = 43
 	self.masks.mp2_01 = {}
 	self.masks.mp2_01.unit = "units/pd2_dlc_mp2/masks/mp2_01/msk_mp2_01"
 	self.masks.mp2_01.name_id = "bm_msk_mp2_01"
@@ -3924,6 +3952,20 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.bny_04.texture_bundle_folder = "bny"
 	self.masks.bny_04.sort_number = 46
 	self.masks.bny_04.type = "helmet"
+	self.masks.mdm = {}
+	self.masks.mdm.unit = "units/pd2_dlc_mdm/masks/msk_mdm/msk_mdm"
+	self.masks.mdm.name_id = "bm_msk_mdm"
+	self.masks.mdm.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
+	self.masks.mdm.value = 0
+	self.masks.mdm.texture_bundle_folder = "mdm"
+	self.masks.mdm.sort_number = 47
+	self.masks.mdm.infamous = true
+	self.masks.mdm.global_value = "infamous"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.masks) do
 		if free_dlcs[data.dlc] then

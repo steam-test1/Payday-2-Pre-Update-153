@@ -91,31 +91,20 @@ function CrimeSpreeDetailsMenuComponent:_start_page_data()
 	}
 	data.no_back_button = true
 	data.no_blur_background = true
-	if not clip then
-		data.outline_data = {
-			sides = {
-				3,
-				3,
-				2,
-				0
-			},
-			layer = 100
-		}
-	else
-		data.outline_data = {
-			sides = {
-				1,
-				1,
-				2,
-				1
-			},
-			layer = 100
-		}
-	end
+	data.outline_data = {
+		sides = {
+			3,
+			3,
+			2,
+			0
+		},
+		layer = 100
+	}
 	return data
 end
 
 function CrimeSpreeDetailsMenuComponent:update(t, dt)
+	CrimeSpreeDetailsMenuComponent.super.update(self, t, dt)
 	if alive(self._right_title_text) then
 		self._right_title_text:set_visible(true)
 	end

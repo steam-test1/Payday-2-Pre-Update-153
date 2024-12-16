@@ -1,6 +1,6 @@
 NetworkMatchMakingSTEAM = NetworkMatchMakingSTEAM or class()
 NetworkMatchMakingSTEAM.OPEN_SLOTS = 4
-NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.68.201"
+NetworkMatchMakingSTEAM._BUILD_SEARCH_INTEREST_KEY = "payday2_v1.68.207"
 
 function NetworkMatchMakingSTEAM:init()
 	cat_print("lobby", "matchmake = NetworkMatchMakingSTEAM")
@@ -363,13 +363,19 @@ function NetworkMatchMakingSTEAM:search_lobby(friends_only, no_filters)
 		end
 		self.browser:set_interest_keys(interest_keys)
 		self.browser:set_distance_filter(self._distance_filter)
-		self.browser:set_lobby_filter("min_level", managers.experience:current_level(), "equalto_less_than")
+		local use_filters = not no_filters
+		if Global.game_settings.gamemode_filter == GamemodeCrimeSpree.id then
+			use_filters = false
+		end
 		self.browser:set_lobby_filter(self._BUILD_SEARCH_INTEREST_KEY, "true", "equal")
-		if Global.game_settings.search_appropriate_jobs then
-			local min_ply_jc = managers.job:get_min_jc_for_player()
-			local max_ply_jc = managers.job:get_max_jc_for_player()
-			self.browser:set_lobby_filter("job_class_min", min_ply_jc, "equalto_or_greater_than")
-			self.browser:set_lobby_filter("job_class_max", max_ply_jc, "equalto_less_than")
+		if use_filters then
+			self.browser:set_lobby_filter("min_level", managers.experience:current_level(), "equalto_less_than")
+			if Global.game_settings.search_appropriate_jobs then
+				local min_ply_jc = managers.job:get_min_jc_for_player()
+				local max_ply_jc = managers.job:get_max_jc_for_player()
+				self.browser:set_lobby_filter("job_class_min", min_ply_jc, "equalto_or_greater_than")
+				self.browser:set_lobby_filter("job_class_max", max_ply_jc, "equalto_less_than")
+			end
 		end
 		if not no_filters then
 			if Global.game_settings.gamemode_filter == GamemodeCrimeSpree.id then
@@ -383,7 +389,7 @@ function NetworkMatchMakingSTEAM:search_lobby(friends_only, no_filters)
 				self.browser:set_lobby_filter("crime_spree", -1, "equalto_less_than")
 			end
 		end
-		if not no_filters then
+		if use_filters then
 			for key, data in pairs(self._lobby_filters) do
 				if data.value and data.value ~= -1 then
 					self.browser:set_lobby_filter(data.key, data.value, data.comparision_type)

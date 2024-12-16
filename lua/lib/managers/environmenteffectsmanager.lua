@@ -166,8 +166,8 @@ function LightningEffect:start()
 	self._original_color0 = self._sky_material:get_variable(Idstring("color0"))
 	self._original_light_color = Global._global_light:color()
 	self._original_sun_horizontal = Underlay:time(Idstring("sun_horizontal"))
-	self._min_interval = 2
-	self._rnd_interval = 10
+	self._min_interval = tweak_data.env_effect.lightning.min_interval
+	self._rnd_interval = tweak_data.env_effect.lightning.rnd_interval
 	self._sound_source = SoundDevice:create_source("thunder")
 	self:_set_next_timer()
 end
@@ -221,6 +221,7 @@ function LightningEffect:_make_lightning()
 	end
 	Global._global_light:set_color(self._intensity_value)
 	Underlay:set_time(Idstring("sun_horizontal"), self._flash_anim_time)
+	self._sound_source:post_event(tweak_data.env_effect.lightning.event_name)
 end
 
 function LightningEffect:_set_lightning_values()

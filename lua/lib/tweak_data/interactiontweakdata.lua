@@ -3809,6 +3809,30 @@ function InteractionTweakData:init(tweak_data)
 			self[id].text_id = "hud_int_talk_" .. name
 		end
 	end
+	self.pku_scubagear_tank = {}
+	self.pku_scubagear_tank.text_id = "hud_int_hold_take_scubagear_tank_and_flippers"
+	self.pku_scubagear_tank.action_text_id = "hud_action_taking_scubagear_tank_and_flippers"
+	self.pku_scubagear_tank.timer = 1
+	self.pku_scubagear_tank.interact_distance = 130
+	self.pku_scubagear_tank.start_active = false
+	self.pku_scubagear_tank.blocked_hint = "carry_block"
+	self.pku_scubagear_vest = {}
+	self.pku_scubagear_vest.text_id = "hud_int_hold_take_scubagear_vest"
+	self.pku_scubagear_vest.action_text_id = "hud_action_taking_scubagear_vest"
+	self.pku_scubagear_vest.timer = 1
+	self.pku_scubagear_vest.interact_distance = 130
+	self.pku_scubagear_vest.start_active = false
+	self.pku_scubagear_vest.blocked_hint = "carry_block"
+	self.glc_open_door = {}
+	self.glc_open_door.text_id = "hud_cas_open_door"
+	self.glc_open_door.start_active = true
+	self.glc_open_door.interact_distance = 300
+	self.glc_open_door.can_interact_in_civilian = true
+	self.glc_hold_take_handcuffs = {}
+	self.glc_hold_take_handcuffs.text_id = "hud_int_hold_take_handcuffs"
+	self.glc_hold_take_handcuffs.action_text_id = "hud_int_hold_action_take_handcuffs"
+	self.glc_hold_take_handcuffs.timer = 1
+	self.glc_hold_take_handcuffs.start_active = false
 	self.pku_toothbrush = {}
 	self.pku_toothbrush.text_id = "hud_int_hold_take_toothbrush"
 	self.pku_toothbrush.action_text_id = "hud_action_taking_toothbrush"

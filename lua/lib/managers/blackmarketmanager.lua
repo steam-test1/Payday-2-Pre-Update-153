@@ -5240,6 +5240,7 @@ function BlackMarketManager:tradable_update(tradable_list, remove_missing)
 				end
 			end
 		end
+		need_to_update_character = self:_remove_unowned_armor_skin() or need_to_update_character
 	end
 	if need_to_update_character then
 		if managers.menu_scene then
@@ -5251,9 +5252,32 @@ function BlackMarketManager:tradable_update(tradable_list, remove_missing)
 			if primary then
 				managers.menu_scene:set_character_equipped_weapon(nil, primary.factory_id, primary.blueprint, "primary", primary.cosmetics)
 			end
+			local armor = self:equipped_armor()
+			if armor then
+				managers.menu_scene:set_character_armor(armor)
+			end
 		end
 		MenuCallbackHandler:_update_outfit_information()
 	end
+end
+
+function BlackMarketManager:_remove_unowned_armor_skin()
+	local remove_armor = true
+	local skin_id = self:equipped_armor_skin()
+	local a_td = tweak_data.economy.armor_skins[skin_id]
+	if a_td.steam_economy ~= false then
+		for instance_id, item in pairs(self._global.inventory_tradable) do
+			if item.entry == skin_id then
+				remove_armor = false
+				break
+			end
+		end
+		if remove_armor then
+			self:set_equipped_armor_skin(self:_get_default_armor_skin())
+			return true
+		end
+	end
+	return false
 end
 
 function BlackMarketManager:tradable_verify(category, entry, quality, bonus, tradable_list)
@@ -5485,14 +5509,15 @@ function BlackMarketManager:load(data)
 			self._global.characters[self._defaults.character].equipped = true
 		end
 		self._global.equipped_van_skin = self._global.equipped_van_skin or tweak_data.van.default_skin_id
-		self._global.armor_skins = self._global.armor_skins or default_global.armor_skins or {}
-		self._global.equipped_armor_skin = self._global.equipped_armor_skin or self._defaults.armor_skin
 		self._global.inventory = self._global.inventory or {}
 		self._global.new_tradable_items = self._global.new_tradable_items or {}
 		self._global.inventory_tradable = self._global.inventory_tradable or {}
 		self._global.tradable_items_received = self._global.tradable_items_received or {}
 		self._global.tradable_inventory_sort = self._global.tradable_inventory_sort or 1
 		self._global.tradable_dlcs = self._global.tradable_dlcs or {}
+		self._global.armor_skins = self._global.armor_skins or default_global.armor_skins or {}
+		self._global.equipped_armor_skin = self._global.equipped_armor_skin or self._defaults.armor_skin
+		self:_remove_unowned_armor_skin()
 		self._global.crafted_items = self._global.crafted_items or {}
 		if not self._global.unlocked_mask_slots then
 			self:_setup_unlocked_mask_slots()

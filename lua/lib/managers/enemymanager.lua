@@ -85,7 +85,7 @@ function EnemyManager:_update_gfx_lod()
 				end
 				local start_i = i
 				repeat
-					if states[i] then
+					if states[i] and alive(units[i]) then
 						if not occ_skip_units[units[i]:key()] and (not (not pl_tracker or chk_vis_func(pl_tracker, trackers[i])) or unit_occluded(units[i])) then
 							states[i] = false
 							units[i]:base():set_visibility_state(false)

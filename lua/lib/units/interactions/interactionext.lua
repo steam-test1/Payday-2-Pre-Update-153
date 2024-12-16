@@ -2410,7 +2410,13 @@ function CivilianHeisterInteractionExt:get_character_voice_line(key, character_t
 				pass_trophy = true
 				for _, trophy_id in ipairs(data.requirements.trophies) do
 					local trophy = managers.custom_safehouse:get_trophy(trophy_id)
-					if not trophy or not trophy.completed then
+					local fail = not trophy
+					if data.requirements.invert then
+						fail = trophy.completed
+					else
+						fail = not trophy.completed
+					end
+					if fail then
 						pass_trophy = false
 						break
 					end
