@@ -655,7 +655,7 @@ function ConnectionNetworkHandler:sync_explosion_results(count_cops, count_gangs
 		local weapon_pass, weapon_type_pass, count_pass, all_pass
 		for achievement, achievement_data in pairs(tweak_data.achievement.explosion_achievements) do
 			weapon_pass = not achievement_data.weapon or true
-			weapon_type_pass = not achievement_data.weapon_type or weapon_unit:base() and weapon_unit:base().weapon_tweak_data and weapon_unit:base():weapon_tweak_data().category == achievement_data.weapon_type
+			weapon_type_pass = not achievement_data.weapon_type or weapon_unit:base() and weapon_unit:base().weapon_tweak_data and weapon_unit:base():is_category(achievement_data.weapon_type)
 			count_pass = not achievement_data.count or (achievement_data.kill and enemies_killed or enemies_hit) >= achievement_data.count
 			all_pass = weapon_pass and weapon_type_pass and count_pass
 			if all_pass and achievement_data.award then

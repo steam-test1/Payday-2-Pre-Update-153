@@ -2919,7 +2919,8 @@ function CharacterTweakData:_presets(tweak_data)
 		mp5 = {},
 		mac11 = {},
 		raging_bull = {},
-		akimbo_pistol = {}
+		akimbo_pistol = {},
+		mini = {}
 	}
 	presets.weapon.normal.beretta92.aim_delay = {0.1, 0.1}
 	presets.weapon.normal.beretta92.focus_delay = 10
@@ -3544,7 +3545,8 @@ function CharacterTweakData:_presets(tweak_data)
 		mossberg = {},
 		mp5 = {},
 		mac11 = {},
-		akimbo_pistol = {}
+		akimbo_pistol = {},
+		mini = {}
 	}
 	presets.weapon.good.beretta92.aim_delay = {0.1, 0.1}
 	presets.weapon.good.beretta92.focus_delay = 2
@@ -4149,7 +4151,8 @@ function CharacterTweakData:_presets(tweak_data)
 		mossberg = {},
 		mp5 = {},
 		mac11 = {},
-		akimbo_pistol = {}
+		akimbo_pistol = {},
+		mini = {}
 	}
 	presets.weapon.expert.beretta92.aim_delay = {0.1, 0.1}
 	presets.weapon.expert.beretta92.focus_delay = 1
@@ -4798,7 +4801,8 @@ function CharacterTweakData:_presets(tweak_data)
 		r870 = {},
 		mossberg = {},
 		mp5 = {},
-		mac11 = {}
+		mac11 = {},
+		mini = {}
 	}
 	presets.weapon.deathwish.raging_bull.aim_delay = {0, 0}
 	presets.weapon.deathwish.raging_bull.focus_delay = 10
@@ -5378,7 +5382,8 @@ function CharacterTweakData:_presets(tweak_data)
 		r870 = {},
 		mossberg = {},
 		mp5 = {},
-		mac11 = {}
+		mac11 = {},
+		mini = {}
 	}
 	presets.weapon.easywish.raging_bull.aim_delay = {0, 0}
 	presets.weapon.easywish.raging_bull.focus_delay = 10

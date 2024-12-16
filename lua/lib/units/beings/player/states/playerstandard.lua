@@ -1461,7 +1461,7 @@ function PlayerStandard:_start_action_interact(t, input, timer, interact_object)
 	self:_interupt_action_charging_weapon(t)
 	local final_timer = timer
 	final_timer = managers.crime_spree:modify_value("PlayerStandard:OnStartInteraction", final_timer, interact_object)
-	self._interact_expire_t = t + final_timer
+	self._interact_expire_t = final_timer
 	self._interact_params = {
 		object = interact_object,
 		timer = final_timer,
@@ -1512,11 +1512,13 @@ end
 
 function PlayerStandard:_update_interaction_timers(t)
 	if self._interact_expire_t then
+		local dt = managers.player:player_timer():delta_time()
+		self._interact_expire_t = self._interact_expire_t - dt
 		if not alive(self._interact_params.object) or self._interact_params.object ~= self._interaction:active_unit() or self._interact_params.tweak_data ~= self._interact_params.object:interaction().tweak_data or self._interact_params.object:interaction():check_interupt() then
 			self:_interupt_action_interact(t)
 		else
-			managers.hud:set_interaction_bar_width(self._interact_params.timer - (self._interact_expire_t - t), self._interact_params.timer)
-			if t >= self._interact_expire_t then
+			managers.hud:set_interaction_bar_width(self._interact_params.timer - self._interact_expire_t, self._interact_params.timer)
+			if self._interact_expire_t <= 0 then
 				self:_end_action_interact(t)
 				self._interact_expire_t = nil
 			end
@@ -1732,7 +1734,7 @@ function PlayerStandard:_do_melee_damage(t, bayonet_melee, melee_hit_ray)
 	end
 	if col_ray and alive(col_ray.unit) then
 		local damage, damage_effect = managers.blackmarket:equipped_melee_weapon_damage_info(charge_lerp_value)
-		local damage_effect_mul = math.max(managers.player:upgrade_value("player", "melee_knockdown_mul", 1), managers.player:upgrade_value(self._equipped_unit:base():weapon_tweak_data().category, "melee_knockdown_mul", 1))
+		local damage_effect_mul = math.max(managers.player:upgrade_value("player", "melee_knockdown_mul", 1), managers.player:upgrade_value(self._equipped_unit:base():weapon_tweak_data().categories and self._equipped_unit:base():weapon_tweak_data().categories[1], "melee_knockdown_mul", 1))
 		damage = damage * managers.player:get_melee_dmg_multiplier()
 		damage_effect = damage_effect * damage_effect_mul
 		col_ray.sphere_cast_radius = sphere_cast_radius
@@ -3281,14 +3283,14 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 					local autohit_mul = math.lerp(1, tweak_data.player.suppression.autohit_chance_mul, suppression_ratio)
 					local suppression_mul = managers.blackmarket:threat_multiplier()
 					local dmg_mul = managers.player:temporary_upgrade_value("temporary", "dmg_multiplier_outnumbered", 1)
-					local weapon_category = weap_base:weapon_tweak_data().category
-					if managers.player:has_category_upgrade("player", "overkill_all_weapons") or weapon_category == "shotgun" or weapon_category == "saw" then
+					if managers.player:has_category_upgrade("player", "overkill_all_weapons") or weap_base:is_category("shotgun", "saw") then
 						dmg_mul = dmg_mul * managers.player:temporary_upgrade_value("temporary", "overkill_damage_multiplier", 1)
 					end
 					local health_ratio = self._ext_damage:health_ratio()
-					local damage_health_ratio = managers.player:get_damage_health_ratio(health_ratio, weapon_category)
+					local primary_category = weap_base:weapon_tweak_data().categories[1]
+					local damage_health_ratio = managers.player:get_damage_health_ratio(health_ratio, primary_category)
 					if 0 < damage_health_ratio then
-						local upgrade_name = weapon_category == "saw" and "melee_damage_health_ratio_multiplier" or "damage_health_ratio_multiplier"
+						local upgrade_name = weap_base:is_category("saw") and "melee_damage_health_ratio_multiplier" or "damage_health_ratio_multiplier"
 						local damage_ratio = damage_health_ratio
 						dmg_mul = dmg_mul * (1 + managers.player:upgrade_value("player", upgrade_name, 0) * damage_ratio)
 					end
@@ -3352,12 +3354,12 @@ function PlayerStandard:_check_action_primary_attack(t, input)
 								self._shooting_t = nil
 							end
 						end
-						if managers.player:has_category_upgrade(weapon_category, "stacking_hit_damage_multiplier") then
+						if managers.player:has_category_upgrade(primary_category, "stacking_hit_damage_multiplier") then
 							self._state_data.stacking_dmg_mul = self._state_data.stacking_dmg_mul or {}
-							self._state_data.stacking_dmg_mul[weapon_category] = self._state_data.stacking_dmg_mul[weapon_category] or {nil, 0}
-							local stack = self._state_data.stacking_dmg_mul[weapon_category]
+							self._state_data.stacking_dmg_mul[primary_category] = self._state_data.stacking_dmg_mul[primary_category] or {nil, 0}
+							local stack = self._state_data.stacking_dmg_mul[primary_category]
 							if fired.hit_enemy then
-								stack[1] = t + managers.player:upgrade_value(weapon_category, "stacking_hit_expire_t", 1)
+								stack[1] = t + managers.player:upgrade_value(primary_category, "stacking_hit_expire_t", 1)
 								stack[2] = math.min(stack[2] + 1, tweak_data.upgrades.max_weapon_dmg_mul_stacks or 5)
 							else
 								stack[1] = nil
@@ -3532,8 +3534,9 @@ function PlayerStandard:_get_swap_speed_multiplier()
 	local weapon_tweak_data = self._equipped_unit:base():weapon_tweak_data()
 	multiplier = multiplier * managers.player:upgrade_value("weapon", "swap_speed_multiplier", 1)
 	multiplier = multiplier * managers.player:upgrade_value("weapon", "passive_swap_speed_multiplier", 1)
-	multiplier = multiplier * managers.player:upgrade_value(weapon_tweak_data.category, "swap_speed_multiplier", 1)
-	multiplier = multiplier * managers.player:upgrade_value(weapon_tweak_data.sub_category, "swap_speed_multiplier", 1)
+	for _, category in ipairs(weapon_tweak_data.categories) do
+		multiplier = multiplier * managers.player:upgrade_value(category, "swap_speed_multiplier", 1)
+	end
 	if managers.player:has_activate_temporary_upgrade("temporary", "swap_weapon_faster") then
 		multiplier = multiplier * managers.player:temporary_upgrade_value("temporary", "swap_weapon_faster", 1)
 	end

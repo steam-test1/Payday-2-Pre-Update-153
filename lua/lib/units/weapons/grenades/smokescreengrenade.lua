@@ -1,5 +1,12 @@
 SmokeScreenGrenade = SmokeScreenGrenade or class(FragGrenade)
 
+function SmokeScreenGrenade:_setup_server_data(...)
+	SmokeScreenGrenade.super._setup_server_data(self, ...)
+	if self._timer then
+		self._timer = math.max(self._timer, 0.1)
+	end
+end
+
 function SmokeScreenGrenade:_detonate(tag, unit, body, other_unit, other_body, position, normal, collision_velocity, velocity, other_velocity, new_velocity, direction, damage, ...)
 	local pos = self._unit:position()
 	local normal = math.UP
@@ -28,7 +35,7 @@ end
 function SmokeScreenGrenade:update(unit, t, dt)
 	if self._timer then
 		self._timer = self._timer - dt
-		if self._timer <= 0 and not self._unit:body("static_body"):active() then
+		if self._timer <= 0 and mvector3.length(self._unit:body("static_body"):velocity()) < 1 then
 			self._timer = nil
 			self:_detonate()
 		end

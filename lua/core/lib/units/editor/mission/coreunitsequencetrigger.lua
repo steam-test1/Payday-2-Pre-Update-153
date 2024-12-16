@@ -26,9 +26,11 @@ function CoreUnitSequenceTriggerUnitElement:layer_finished()
 		})
 	end
 	for _, data in pairs(self._hed.sequence_list) do
-		local unit = managers.worlddefinition:get_unit_on_load(data.unit_id, callback(self, self, "load_unit"))
-		if unit then
-			self._sequence_units[unit:unit_data().unit_id] = unit
+		if type(data) == "table" then
+			local unit = managers.worlddefinition:get_unit_on_load(data.unit_id, callback(self, self, "load_unit"))
+			if unit then
+				self._sequence_units[unit:unit_data().unit_id] = unit
+			end
 		end
 	end
 end
@@ -162,9 +164,10 @@ function CoreUnitSequenceTriggerUnitElement:_build_panel(panel, panel_sizer)
 	self._btn_toolbar:realize()
 	panel_sizer:add(self._btn_toolbar, 0, 1, "EXPAND,LEFT")
 	for _, data in pairs(clone(self._hed.sequence_list)) do
-		local unit = self._sequence_units[data.unit_id]
+		local unit_id = type(data) == "table" and data.unit_id or data
+		local unit = self._sequence_units[unit_id]
 		if not alive(unit) then
-			self:_remove_by_unit_id(data.unit_id)
+			self:_remove_by_unit_id(unit_id)
 		else
 			local sequences = managers.sequence:get_sequence_list(unit:name())
 			self:_add_unit(unit, sequences, data)
@@ -199,7 +202,7 @@ function CoreUnitSequenceTriggerUnitElement:remove_entry(id)
 	self._guis[id] = nil
 	self._panel:layout()
 	for i, entry in pairs(clone(self._hed.sequence_list)) do
-		if type(entry) == "table" and entry.guis_id == id or entry.guis_id == id then
+		if type(entry) == "table" and entry.guis_id == id or entry == id then
 			table.remove(self._hed.sequence_list, i)
 		end
 	end
@@ -213,8 +216,8 @@ end
 
 function CoreUnitSequenceTriggerUnitElement:_remove_from_sequence_list(unit_id)
 	for i, entry in pairs(clone(self._hed.sequence_list)) do
-		if entry.unit_id == unit_id then
-			table.insert(self._hed.sequence_list, i)
+		if type(entry) == "table" and entry.unit_id == unit_id or entry == unit_id then
+			table.remove(self._hed.sequence_list, i)
 		end
 	end
 end

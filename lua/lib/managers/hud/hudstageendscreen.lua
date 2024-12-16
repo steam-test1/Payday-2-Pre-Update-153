@@ -45,7 +45,7 @@ function HUDPackageUnlockedItem:init(panel, row, params, hud_stage_end_screen)
 			if category == Idstring("weapon") then
 				local weapon_id = upgrade_def.weapon_id
 				local weapon_name = managers.weapon_factory:get_weapon_name_by_factory_id(upgrade_def.factory_id)
-				local weapon_class = managers.localization:text("menu_" .. tweak_data.weapon[upgrade_def.weapon_id].category)
+				local weapon_class = managers.localization:text("menu_" .. tweak_data.weapon[upgrade_def.weapon_id].categories[1])
 				local weapon_category = managers.localization:text("bm_menu_" .. (tweak_data.weapon[upgrade_def.weapon_id].use_data.selection_index == 2 and "primaries" or "secondaries"))
 				bitmap_texture = managers.blackmarket:get_weapon_icon_path(weapon_id, nil)
 				text_string = managers.localization:text("menu_es_package_weapon", {

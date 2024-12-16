@@ -245,12 +245,6 @@ function NewHeistsGui:dummy_set_highlight(highlight, node, row_item, mouse_over)
 	self._highlighted = highlight
 	self:set_bar_width(highlight and BAR_W or 0)
 	self._block_change = highlight
-	if highlight then
-		self._was_force_input = managers.menu:active_menu().input:force_input()
-		managers.menu:active_menu().input:set_force_input(true)
-	else
-		managers.menu:active_menu().input:set_force_input(self._was_force_input or false)
-	end
 end
 
 function NewHeistsGui:dummy_trigger()

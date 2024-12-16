@@ -519,12 +519,7 @@ function GroupAIStateBesiege:_upd_assault_task()
 		if t > task_data.use_smoke_timer then
 			task_data.use_smoke = true
 		end
-		if self._smoke_grenade_queued and task_data.use_smoke and not self:is_smoke_grenade_active() then
-			self:detonate_smoke_grenade(self._smoke_grenade_queued[1], self._smoke_grenade_queued[1], self._smoke_grenade_queued[2], self._smoke_grenade_queued[4])
-			if self._smoke_grenade_queued[3] then
-				self._smoke_grenade_ignore_control = true
-			end
-		end
+		self:detonate_queued_smoke_grenades()
 	end
 	self:_assign_enemy_groups_to_assault(task_data.phase)
 end

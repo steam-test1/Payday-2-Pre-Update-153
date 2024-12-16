@@ -1060,6 +1060,9 @@ function WeaponFactoryTweakData:_init_sights()
 				translation = Vector3(0, 0, -0.25),
 				rotation = Rotation(0, -0.1, 0)
 			}
+		},
+		forbids = {
+			"wpn_fps_upg_o_xpsg33_magnifier"
 		}
 	}
 	self.parts.wpn_upg_o_marksmansight_front = {
@@ -1272,6 +1275,9 @@ function WeaponFactoryTweakData:_init_sights()
 	self.parts.wpn_fps_upg_o_45iron.third_unit = "units/pd2_dlc_gage_snp/weapons/wpn_fps_upg_o_45iron/wpn_third_upg_o_45iron"
 	self.parts.wpn_fps_upg_o_shortdot.third_unit = "units/pd2_dlc_gage_snp/weapons/wpn_fps_upg_o_shortdot/wpn_third_upg_o_shortdot"
 	self.parts.wpn_fps_upg_o_leupold.third_unit = "units/pd2_dlc_gage_snp/weapons/wpn_fps_upg_o_leupold/wpn_third_upg_o_leupold"
+	self.parts.wpn_fps_upg_o_shortdot_vanilla = deep_clone(self.parts.wpn_fps_upg_o_shortdot)
+	self.parts.wpn_fps_upg_o_shortdot_vanilla.stats = nil
+	self.parts.wpn_fps_upg_o_shortdot_vanilla.pcs = nil
 end
 
 function WeaponFactoryTweakData:_init_content_dlc1()
@@ -15176,12 +15182,14 @@ function WeaponFactoryTweakData:create_bonuses(tweak_data, weapon_skins)
 		}
 		local all_pass, weapon_pass, exclude_weapon_pass, category_pass, exclude_category_pass
 		for id, data in pairs(tweak_data.upgrades.definitions) do
-			if data.weapon_id and tweak_data.weapon[data.weapon_id] and data.factory_id and self[data.factory_id] then
+			local weapon_tweak = tweak_data.weapon[data.weapon_id]
+			local primary_category = weapon_tweak and weapon_tweak.categories and weapon_tweak.categories[1]
+			if data.weapon_id and weapon_tweak and data.factory_id and self[data.factory_id] then
 				for part_id, params in pairs(uses_parts) do
 					weapon_pass = not params.weapon or table.contains(params.weapon, data.weapon_id)
 					exclude_weapon_pass = not params.exclude_weapon or not table.contains(params.exclude_weapon, data.weapon_id)
-					category_pass = not params.category or table.contains(params.category, tweak_data.weapon[data.weapon_id].category)
-					exclude_category_pass = not params.exclude_category or not table.contains(params.exclude_category, tweak_data.weapon[data.weapon_id].category)
+					category_pass = not params.category or table.contains(params.category, primary_category)
+					exclude_category_pass = not params.exclude_category or not table.contains(params.exclude_category, primary_category)
 					all_pass = weapon_pass and exclude_weapon_pass and category_pass and exclude_category_pass
 					if all_pass then
 						table.insert(self[data.factory_id].uses_parts, part_id)
@@ -25009,6 +25017,9 @@ function WeaponFactoryTweakData:_init_model70()
 		wpn_fps_upg_o_leupold = {
 			"wpn_fps_snp_model70_o_rail"
 		},
+		wpn_fps_upg_o_shortdot_vanilla = {
+			"wpn_fps_snp_model70_o_rail"
+		},
 		wpn_fps_upg_o_spot = {
 			"wpn_fps_snp_model70_o_rail"
 		},
@@ -25036,7 +25047,7 @@ function WeaponFactoryTweakData:_init_model70()
 		"wpn_fps_snp_model70_body_standard",
 		"wpn_fps_snp_model70_s_standard",
 		"wpn_fps_snp_model70_m_standard",
-		"wpn_fps_upg_o_shortdot"
+		"wpn_fps_upg_o_shortdot_vanilla"
 	}
 	self.wpn_fps_snp_model70.uses_parts = {
 		"wpn_fps_snp_model70_b_standard",
@@ -25059,7 +25070,7 @@ function WeaponFactoryTweakData:_init_model70()
 		"wpn_fps_upg_o_aimpoint_2",
 		"wpn_fps_upg_o_acog",
 		"wpn_fps_upg_o_cs",
-		"wpn_fps_upg_o_shortdot",
+		"wpn_fps_upg_o_shortdot_vanilla",
 		"wpn_fps_upg_o_leupold",
 		"wpn_fps_upg_o_45iron",
 		"wpn_fps_upg_fl_ass_smg_sho_peqbox",

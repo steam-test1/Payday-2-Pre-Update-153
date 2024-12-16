@@ -1,6 +1,10 @@
 SoundTweakData = SoundTweakData or class()
 
 function SoundTweakData:init()
+	self:_init_acoustics()
+end
+
+function SoundTweakData:_init_acoustics()
 	self.acoustics = {}
 	self.acoustics.pd2_acoustics_forest = {}
 	self.acoustics.pd2_acoustics_forest.states = {

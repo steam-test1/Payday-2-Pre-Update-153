@@ -21,9 +21,8 @@ end
 
 function WeaponAmmo:replenish()
 	local ammo_max_multiplier = managers.player:upgrade_value("player", "extra_ammo_multiplier", 1)
-	ammo_max_multiplier = ammo_max_multiplier * managers.player:upgrade_value(self:weapon_tweak_data().category, "extra_ammo_multiplier", 1)
-	if self:weapon_tweak_data().sub_category then
-		ammo_max_multiplier = ammo_max_multiplier * managers.player:upgrade_value(self:weapon_tweak_data().sub_category, "extra_ammo_multiplier", 1)
+	for _, category in ipairs(self:weapon_tweak_data().categories) do
+		ammo_max_multiplier = ammo_max_multiplier * managers.player:upgrade_value(category, "extra_ammo_multiplier", 1)
 	end
 	ammo_max_multiplier = managers.crime_spree:modify_value("WeaponBase:GetMaxAmmoMultiplier", ammo_max_multiplier)
 	local ammo_max_per_clip = self:calculate_ammo_max_per_clip()
@@ -42,11 +41,10 @@ function WeaponAmmo:calculate_ammo_max_per_clip()
 	if not self:upgrade_blocked("weapon", "clip_ammo_increase") then
 		ammo = ammo + managers.player:upgrade_value("weapon", "clip_ammo_increase", 0)
 	end
-	if not self:upgrade_blocked(tweak_data.weapon[self._name_id].category, "clip_ammo_increase") then
-		ammo = ammo + managers.player:upgrade_value(self:weapon_tweak_data().category, "clip_ammo_increase", 0)
-	end
-	if not self:upgrade_blocked(tweak_data.weapon[self._name_id].sub_category, "clip_ammo_increase") then
-		ammo = ammo + managers.player:upgrade_value(self:weapon_tweak_data().sub_category, "clip_ammo_increase", 0)
+	for _, category in ipairs(tweak_data.weapon[self._name_id].categories) do
+		if not self:upgrade_blocked(category, "clip_ammo_increase") then
+			ammo = ammo + managers.player:upgrade_value(category, "clip_ammo_increase", 0)
+		end
 	end
 	return ammo
 end

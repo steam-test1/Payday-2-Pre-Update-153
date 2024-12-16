@@ -549,11 +549,11 @@ function ChallengeManager:check_equipped_outfit(equip_data, outfit, character)
 	pass_primary = not ad.primary or ad.primary == outfit.primary.factory_id
 	pass_primaries = not ad.primaries or table.contains(ad.primaries, outfit.primary.factory_id)
 	pass_primary_unmodded = not ad.primary_unmodded or managers.weapon_factory:is_weapon_unmodded(outfit.primary.factory_id, outfit.primary.blueprint)
-	pass_primary_category = not ad.primary_category or ad.primary_category == tweak_data:get_raw_value("weapon", managers.weapon_factory:get_weapon_id_by_factory_id(outfit.primary.factory_id), "category")
+	pass_primary_category = not ad.primary_category or ad.primary_category == tweak_data:get_raw_value("weapon", managers.weapon_factory:get_weapon_id_by_factory_id(outfit.primary.factory_id), "categories", 1)
 	pass_secondary = not ad.secondary or ad.secondary == outfit.secondary.factory_id
 	pass_secondaries = not ad.secondaries or table.contains(ad.secondaries, outfit.secondary.factory_id)
 	pass_secondary_unmodded = not ad.secondary_unmodded or managers.weapon_factory:is_weapon_unmodded(outfit.secondary.factory_id, outfit.secondary.blueprint)
-	pass_secondary_category = not ad.secondary_category or ad.secondary_category == tweak_data:get_raw_value("weapon", managers.weapon_factory:get_weapon_id_by_factory_id(outfit.secondary.factory_id), "category")
+	pass_secondary_category = not ad.secondary_category or ad.secondary_category == tweak_data:get_raw_value("weapon", managers.weapon_factory:get_weapon_id_by_factory_id(outfit.secondary.factory_id), "categories", 1)
 	pass_weapons = not ad.weapons or table.contains(ad.weapons, outfit.primary.factory_id) or table.contains(ad.weapons, outfit.secondary.factory_id)
 	pass_characters = not ad.characters or table.contains(ad.characters, character)
 	pass_skills = not ad.num_skills

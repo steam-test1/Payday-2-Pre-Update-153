@@ -761,6 +761,38 @@ function EconomyTweakData:init()
 		},
 		contents = {}
 	}
+	self.contents.mxs_01 = {}
+	self.contents.mxs_01.def_id = 10040
+	self.contents.mxs_01.contains = {
+		weapon_skins = {
+			"x_usp_mxs",
+			"x_deagle_mxs",
+			"amcar_mxs",
+			"tec9_mxs",
+			"striker_mxs",
+			"siltstone_mxs",
+			"scar_mxs",
+			"rota_mxs",
+			"par_mxs",
+			"lemming_mxs",
+			"jowi_mxs",
+			"contraband_mxs",
+			"chinchilla_mxs",
+			"china_mxs",
+			"akm_mxs"
+		},
+		contents = {
+			"mxs_01_legendary"
+		}
+	}
+	self.contents.mxs_01_legendary = {}
+	self.contents.mxs_01_legendary.def_id = 10041
+	self.contents.mxs_01_legendary.contains = {
+		weapon_skins = {
+			"x_chinchilla_mxs"
+		}
+	}
+	self.contents.mxs_01_legendary.rarity = "legendary"
 	self.safes.overkill_01 = {}
 	self.safes.overkill_01.def_id = 50000
 	self.safes.overkill_01.promo = true
@@ -934,6 +966,14 @@ function EconomyTweakData:init()
 	self.safes.cvc_01.unit_name = "units/payday2_cash/safes/cvc/safe/eco_safe_cvc"
 	self.safes.cvc_01.texture_bundle_folder = "cash/safes/cvc"
 	self.safes.cvc_01.market_link = "https://steamcommunity.com/market/listings/218620/Armor%20Safe"
+	self.safes.mxs_01 = {}
+	self.safes.mxs_01.free = true
+	self.safes.mxs_01.drill = "mxs_01"
+	self.safes.mxs_01.content = "mxs_01"
+	self.safes.mxs_01.name_id = "bm_menu_safe_mxs_01"
+	self.safes.mxs_01.unit_name = "units/payday2_cash/safes/mxs/safe/eco_safe_mxs"
+	self.safes.mxs_01.texture_bundle_folder = "cash/safes/mxs"
+	self.safes.mxs_01.market_link = "https://steamcommunity.com/market/listings/218620/Sangres%20Safe"
 	self.drills.overkill_01 = {}
 	self.drills.overkill_01.safe = "overkill_01"
 	self.drills.overkill_01.def_id = 70000
@@ -1062,6 +1102,9 @@ function EconomyTweakData:init()
 	self.drills.cvc_01 = {}
 	self.drills.cvc_01.safe = "cvc_01"
 	self.drills.cvc_01.unit_name = "units/payday2_cash/safes/cvc/drill/eco_drill_cvc"
+	self.drills.mxs_01 = {}
+	self.drills.mxs_01.safe = "mxs_01"
+	self.drills.mxs_01.unit_name = "units/payday2_cash/safes/mxs/drill/eco_drill_mxs"
 	self.bonuses = {}
 	self.bonuses.concealment_p1 = {}
 	self.bonuses.concealment_p1.name_id = "bm_menu_bonus_concealment"

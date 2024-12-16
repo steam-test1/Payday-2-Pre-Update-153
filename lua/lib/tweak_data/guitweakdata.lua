@@ -4709,6 +4709,11 @@ function GuiTweakData:init()
 	}
 	self.new_heists = {}
 	table.insert(self.new_heists, {
+		name_id = "menu_nh_sangres_safe",
+		texture_path = "guis/textures/pd2/new_heists/sangres_safe",
+		url = "http://www.overkillsoftware.com/games/sangres/#safe"
+	})
+	table.insert(self.new_heists, {
 		name_id = "menu_nh_sangres",
 		texture_path = "guis/textures/pd2/new_heists/sangres",
 		url = "http://www.overkillsoftware.com/games/sangres/"

@@ -572,14 +572,14 @@ function UnitNetworkHandler:sync_interacted(unit, unit_id, tweak_setting, status
 		return
 	end
 	if Network:is_server() and unit_id ~= -2 then
-		if alive(unit) and unit:interaction().tweak_data == tweak_setting and unit:interaction():active() then
+		if alive(unit) and unit:interaction() and unit:interaction().tweak_data == tweak_setting and unit:interaction():active() then
 			sender:sync_interaction_reply(true)
 		else
 			sender:sync_interaction_reply(false)
 			return
 		end
 	end
-	if alive(unit) then
+	if alive(unit) and unit:interaction() then
 		if unit:interaction()._special_equipment and unit:interaction().apply_item_pickup then
 			managers.network:session():send_to_peer(peer, "special_eq_response", unit)
 			if unit:interaction():can_remove_item() then

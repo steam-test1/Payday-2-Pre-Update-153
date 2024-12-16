@@ -309,8 +309,7 @@ function CopDamage:damage_bullet(attack_data)
 			if attack_data.weapon_unit:base():got_silencer() then
 				armor_pierce_value = armor_pierce_value + managers.player:upgrade_value("weapon", "armor_piercing_chance_silencer", 0)
 			end
-			local weapon_category = attack_data.weapon_unit:base():weapon_tweak_data().category
-			if weapon_category == "saw" then
+			if attack_data.weapon_unit:base():is_category("saw") then
 				armor_pierce_value = armor_pierce_value + managers.player:upgrade_value("saw", "armor_piercing_chance", 0)
 			end
 		elseif attack_data.attacker_unit:base() and attack_data.attacker_unit:base().sentry_gun then
@@ -444,11 +443,8 @@ function CopDamage:damage_bullet(attack_data)
 			data.attacker_state = attacker_state
 			managers.statistics:killed(data)
 			self:_check_damage_achievements(attack_data, head)
-			if not is_civilian and managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") and not attack_data.weapon_unit:base().thrower_unit then
-				local weapon_category = attack_data.weapon_unit:base():weapon_tweak_data().category
-				if weapon_category == "shotgun" or weapon_category == "saw" then
-					managers.player:activate_temporary_upgrade("temporary", "overkill_damage_multiplier")
-				end
+			if not is_civilian and managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") and not attack_data.weapon_unit:base().thrower_unit and attack_data.weapon_unit:base():is_category("shotgun", "saw") then
+				managers.player:activate_temporary_upgrade("temporary", "overkill_damage_multiplier")
 			end
 			if is_civilian then
 				managers.money:civilian_killed()
@@ -519,7 +515,7 @@ end
 function CopDamage:_check_damage_achievements(attack_data, head)
 	local attack_weapon = attack_data.weapon_unit
 	if alive(attack_weapon) and attack_weapon:base() and attack_weapon:base().weapon_tweak_data and not CopDamage.is_civilian(self._unit:base()._tweak_table) then
-		if managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.pump_action.mask and attack_weapon:base():weapon_tweak_data().category == "shotgun" then
+		if managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.pump_action.mask and attack_weapon:base():is_category("shotgun") then
 			managers.achievment:award_progress(tweak_data.achievement.pump_action.stat)
 		end
 		local unit_type = self._unit:base()._tweak_table
@@ -536,7 +532,7 @@ function CopDamage:_check_damage_achievements(attack_data, head)
 		managers.job:set_memory("kill_count_" .. (managers.player:is_carrying() and "carry" or "no_carry"), kill_count_carry_or_not, true)
 		local is_cop = CopDamage.is_cop(self._unit:base()._tweak_table)
 		for achievement, achievement_data in pairs(achievements) do
-			weapon_type_pass = not achievement_data.weapon_type or attack_weapon:base():weapon_tweak_data().category == achievement_data.weapon_type or attack_weapon:base():weapon_tweak_data().sub_category == achievement_data.weapon_type
+			weapon_type_pass = not achievement_data.weapon_type or table.contains(attack_weapon:base():weapon_tweak_data().categories, achievement_data.weapon_type)
 			weapons_pass = not achievement_data.weapons or table.contains(achievement_data.weapons, attack_weapon:base()._name_id)
 			weapon_pass = not achievement_data.weapon or attack_weapon:base().name_id == achievement_data.weapon
 			fire_mode_pass = not achievement_data.fire_mode or attack_weapon:base():fire_mode() == achievement_data.fire_mode
@@ -635,7 +631,7 @@ function CopDamage:_check_damage_achievements(attack_data, head)
 			local spooc_action = self._unit:movement()._active_actions[1]
 			if spooc_action and spooc_action:type() == "spooc" then
 				if spooc_action:is_flying_strike() then
-					if attack_weapon:base():weapon_tweak_data().category == tweak_data.achievement.in_town_you_are_law.weapon_type then
+					if attack_weapon:base():is_category(tweak_data.achievement.in_town_you_are_law.weapon_type) then
 						managers.achievment:award(tweak_data.achievement.in_town_you_are_law.award)
 					end
 				elseif not spooc_action:has_striken() and attack_weapon:base().name_id == tweak_data.achievement.dont_push_it.weapon then
@@ -796,11 +792,8 @@ function CopDamage:damage_fire(attack_data)
 		if not attack_data.is_fire_dot_damage or data.is_molotov then
 			managers.statistics:killed_by_anyone(data)
 		end
-		if not is_civilian and managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") and attacker_unit == managers.player:player_unit() and alive(attack_data.weapon_unit) and not attack_data.weapon_unit:base().thrower_unit then
-			local weapon_category = attack_data.weapon_unit:base():weapon_tweak_data().category
-			if weapon_category == "shotgun" or weapon_category == "saw" then
-				managers.player:activate_temporary_upgrade("temporary", "overkill_damage_multiplier")
-			end
+		if not is_civilian and managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") and attacker_unit == managers.player:player_unit() and alive(attack_data.weapon_unit) and not attack_data.weapon_unit:base().thrower_unit and attack_data.weapon_unit:base():is_category("shotgun", "saw") then
+			managers.player:activate_temporary_upgrade("temporary", "overkill_damage_multiplier")
 		end
 		if attacker_unit and alive(attacker_unit) and attacker_unit:base() and attacker_unit:base().thrower_unit then
 			attacker_unit = attacker_unit:base():thrower_unit()
@@ -1026,11 +1019,8 @@ function CopDamage:damage_explosion(attack_data)
 			attacker_unit = attacker_unit:base():thrower_unit()
 			data.weapon_unit = attack_data.attacker_unit
 		end
-		if not is_civilian and managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") and attacker_unit == managers.player:player_unit() and attack_data.weapon_unit and attack_data.weapon_unit:base().weapon_tweak_data and not attack_data.weapon_unit:base().thrower_unit then
-			local weapon_category = attack_data.weapon_unit:base():weapon_tweak_data().category
-			if weapon_category == "shotgun" or weapon_category == "saw" then
-				managers.player:activate_temporary_upgrade("temporary", "overkill_damage_multiplier")
-			end
+		if not is_civilian and managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") and attacker_unit == managers.player:player_unit() and attack_data.weapon_unit and attack_data.weapon_unit:base().weapon_tweak_data and not attack_data.weapon_unit:base().thrower_unit and attack_data.weapon_unit:base():is_category("shotgun", "saw") then
+			managers.player:activate_temporary_upgrade("temporary", "overkill_damage_multiplier")
 		end
 		self:chk_killshot(attacker_unit, "explosion")
 		if attacker_unit == managers.player:player_unit() then

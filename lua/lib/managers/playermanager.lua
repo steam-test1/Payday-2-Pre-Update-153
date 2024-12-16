@@ -1829,7 +1829,18 @@ end
 
 function PlayerManager:skill_dodge_chance(running, crouching, on_zipline, override_armor, detection_risk)
 	local chance = self:upgrade_value("player", "passive_dodge_chance", 0)
-	chance = chance * self:upgrade_value("player", "sicario_multiplier", 1)
+	local dodge_shot_gain = self:_dodge_shot_gain()
+	for _, smoke_screen in ipairs(self._smoke_screen_effects or {}) do
+		if smoke_screen:is_in_smoke(self:player_unit()) then
+			if smoke_screen:mine() then
+				chance = chance * self:upgrade_value("player", "sicario_multiplier", 1)
+				dodge_shot_gain = dodge_shot_gain * self:upgrade_value("player", "sicario_multiplier", 1)
+			else
+				chance = chance + smoke_screen:dodge_bonus()
+			end
+		end
+	end
+	chance = chance + dodge_shot_gain
 	chance = chance + self:upgrade_value("player", "tier_dodge_chance", 0)
 	if running then
 		chance = chance + self:upgrade_value("player", "run_dodge_chance", 0)
@@ -1843,12 +1854,6 @@ function PlayerManager:skill_dodge_chance(running, crouching, on_zipline, overri
 	local detection_risk_add_dodge_chance = managers.player:upgrade_value("player", "detection_risk_add_dodge_chance")
 	chance = chance + self:get_value_from_risk_upgrade(detection_risk_add_dodge_chance, detection_risk)
 	chance = chance + self:upgrade_value("player", tostring(override_armor or managers.blackmarket:equipped_armor(true, true)) .. "_dodge_addend", 0)
-	for _, smoke_screen in ipairs(self._smoke_screen_effects or {}) do
-		if smoke_screen:is_in_smoke(self:player_unit()) then
-			chance = chance + smoke_screen:dodge_bonus()
-		end
-	end
-	chance = chance + self:_dodge_shot_gain() * self:upgrade_value("player", "sicario_multiplier", 1)
 	return chance
 end
 
@@ -3309,7 +3314,7 @@ function PlayerManager:get_equipped_weapon_category()
 	if current_state then
 		local equipped_unit = current_state._equipped_unit
 		if equipped_unit then
-			return equipped_unit:base():weapon_tweak_data().category
+			return equipped_unit:base():weapon_tweak_data().categories[1]
 		end
 	end
 	return nil
@@ -4225,12 +4230,10 @@ function PlayerManager:on_hallowSPOOCed()
 end
 
 function PlayerManager:activate_ability(ability)
-	if not self:player_unit() then
+	if not self:player_unit() or not self:has_inactivate_temporary_upgrade("temporary", ability) then
 		return
 	end
-	if self:has_inactivate_temporary_upgrade("temporary", ability) then
-		self:activate_temporary_upgrade("temporary", ability)
-	end
+	self:activate_temporary_upgrade("temporary", ability)
 	local t = TimerManager:game():time()
 	local tweak = tweak_data.blackmarket.projectiles[ability]
 	self["_cooldown_" .. ability] = t + tweak.base_cooldown
@@ -4240,9 +4243,7 @@ function PlayerManager:activate_ability(ability)
 	if tweak.sounds and tweak.sounds.activate then
 		self:player_unit():sound():play(tweak.sounds.activate)
 	end
-	if self:has_inactivate_temporary_upgrade("temporary", ability) then
-		managers.network:session():send_to_peers("sync_ability_hud", self:temporary_upgrade_index("temporary", ability), self:upgrade_value("temporary", ability)[2])
-	end
+	managers.network:session():send_to_peers("sync_ability_hud", self:temporary_upgrade_index("temporary", ability), self:upgrade_value("temporary", ability)[2])
 end
 
 function PlayerManager:_on_activate_chico_injector()

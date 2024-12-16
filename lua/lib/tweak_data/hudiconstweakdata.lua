@@ -2695,6 +2695,41 @@ function HudIconsTweakData:init()
 	}
 end
 
+local atlas_data
+
+function HudIconsTweakData:create_grid_atlas(image_name, tex_w, tex_h, grid_w, grid_h)
+	atlas_data = atlas_data or {}
+	atlas_data[image_name] = {
+		tex_w = tex_w,
+		tex_h = tex_h,
+		grid_w = grid_w,
+		grid_h = grid_h,
+		x = 0,
+		y = 0
+	}
+end
+
+function HudIconsTweakData:create_next_icon(image_name)
+	local data = atlas_data[image_name]
+	assert(data, "No atlas definition found. Use create_grid_atlas(or potentially some other create atlas function) first!")
+	assert(data.y < data.tex_h, "Atlas already full!")
+	local rtn = {
+		texture = image_name,
+		texture_rect = {
+			data.x,
+			data.y,
+			data.grid_w,
+			data.grid_h
+		}
+	}
+	data.x = data.x + data.grid_w
+	if data.x >= data.tex_w then
+		data.x = 0
+		data.y = data.y + data.grid_h
+	end
+	return rtn
+end
+
 function HudIconsTweakData:get_icon_data(icon_id, default_rect)
 	local icon = tweak_data.hud_icons[icon_id] and tweak_data.hud_icons[icon_id].texture or icon_id
 	local texture_rect = tweak_data.hud_icons[icon_id] and tweak_data.hud_icons[icon_id].texture_rect or default_rect or {

@@ -663,7 +663,7 @@ function SkinEditor:get_current_weapon_tags()
 	if not weapon_data then
 		return tags
 	end
-	local sub_category = weapon_data.category
+	local sub_category = weapon_data.categories[1]
 	if sub_category == "assault_rifle" then
 		table.insert(tags, "Assault Rifle")
 	elseif sub_category == "akimbo" then

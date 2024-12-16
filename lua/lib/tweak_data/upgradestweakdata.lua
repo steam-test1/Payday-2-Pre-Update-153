@@ -345,6 +345,11 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.sentry_gun.armor_multiplier = {2.5}
 	self.values.weapon.single_spread_multiplier = {0.8}
 	self.values.assault_rifle.recoil_multiplier = {0.75}
+	self.sharpshooter_categories = {
+		"assault_rifle",
+		"smg",
+		"snp"
+	}
 	self.values.player.taser_malfunction = {
 		{interval = 1, chance_to_trigger = 0.3}
 	}
@@ -2200,7 +2205,7 @@ function UpgradesTweakData:_init_pd2_values()
 		},
 		{
 			{
-				"8",
+				"6",
 				"50%",
 				"30",
 				"50%",

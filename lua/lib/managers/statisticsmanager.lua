@@ -1373,7 +1373,7 @@ function StatisticsManager:killed(data)
 		else
 			self:_add_to_killed_by_weapon(self._global.session, name_id, data, true)
 			if self._global.session.killed_by_weapon[name_id] and self._global.session.killed_by_weapon[name_id].count == tweak_data.achievement.first_blood.count then
-				local category = data.weapon_unit:base():weapon_tweak_data().category
+				local category = data.weapon_unit:base():weapon_tweak_data().categories[1]
 				if category == tweak_data.achievement.first_blood.weapon_type then
 					managers.achievment:award(tweak_data.achievement.first_blood.award)
 				end
@@ -1914,7 +1914,7 @@ end
 function StatisticsManager:session_killed_by_weapon_category(category)
 	local count = 0
 	for weapon_id, data in pairs(self._global.session.killed_by_weapon) do
-		if tweak_data:get_raw_value("weapon", weapon_id, "category") == category then
+		if tweak_data:get_raw_value("weapon", weapon_id, "categories", 1) == category then
 			count = count + data.count
 		end
 	end
@@ -1928,7 +1928,7 @@ end
 function StatisticsManager:session_anyone_killed_by_weapon_category(category)
 	local count = 0
 	for weapon_id, data in pairs(self._global.session.killed_by_anyone.killed_by_weapon) do
-		if tweak_data:get_raw_value("weapon", self:create_unified_weapon_name(weapon_id), "category") == category then
+		if tweak_data:get_raw_value("weapon", self:create_unified_weapon_name(weapon_id), "categories", 1) == category then
 			count = count + data.count
 		end
 	end
@@ -1938,7 +1938,7 @@ end
 function StatisticsManager:session_killed_by_weapon_category_except(category_table)
 	local count = 0
 	for weapon_id, data in pairs(self._global.session.killed_by_weapon) do
-		local category = tweak_data:get_raw_value("weapon", self:create_unified_weapon_name(weapon_id), "category")
+		local category = tweak_data:get_raw_value("weapon", self:create_unified_weapon_name(weapon_id), "categories", 1)
 		if not table.contains(category_table, category) then
 			count = count + data.count
 		end
@@ -1949,7 +1949,7 @@ end
 function StatisticsManager:session_anyone_killed_by_weapon_category_except(category_table)
 	local count = 0
 	for weapon_id, data in pairs(self._global.session.killed_by_anyone.killed_by_weapon) do
-		local category = tweak_data:get_raw_value("weapon", self:create_unified_weapon_name(weapon_id), "category")
+		local category = tweak_data:get_raw_value("weapon", self:create_unified_weapon_name(weapon_id), "categories", 1)
 		if not table.contains(category_table, category) then
 			count = count + data.count
 		end
@@ -1992,7 +1992,7 @@ end
 
 function StatisticsManager:session_anyone_used_weapon_category(category)
 	for weapon_id in pairs(self._global.session.used_weapons) do
-		if tweak_data:get_raw_value("weapon", self:create_unified_weapon_name(weapon_id), "category") == category then
+		if tweak_data:get_raw_value("weapon", self:create_unified_weapon_name(weapon_id), "categories", 1) == category then
 			return true
 		end
 	end
@@ -2000,7 +2000,7 @@ end
 
 function StatisticsManager:session_anyone_used_weapon_category_except(category)
 	for weapon_id in pairs(self._global.session.used_weapons) do
-		if tweak_data:get_raw_value("weapon", self:create_unified_weapon_name(weapon_id), "category") ~= category then
+		if tweak_data:get_raw_value("weapon", self:create_unified_weapon_name(weapon_id), "categories", 1) ~= category then
 			return true
 		end
 	end

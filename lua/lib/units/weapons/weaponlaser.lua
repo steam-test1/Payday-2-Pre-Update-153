@@ -141,6 +141,9 @@ function WeaponLaser:theme_type()
 end
 
 function WeaponLaser:set_color(color)
+	if not color then
+		return
+	end
 	self._light_color = Vector3(color.r * 10, color.g * 10, color.b * 10)
 	self._light:set_color(self._light_color)
 	self._light_glow_color = Vector3(color.r * 0.2, color.g * 0.2, color.b * 0.2)

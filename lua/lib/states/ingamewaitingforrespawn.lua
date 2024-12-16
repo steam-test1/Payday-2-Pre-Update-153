@@ -353,7 +353,7 @@ function IngameWaitingForRespawnState:at_enter()
 		managers.hud:load_hud(PlayerBase.PLAYER_HUD, false, false, true, {})
 	end
 	self:_create_spectator_data()
-	self._next_player_cb()
+	self:watch_priority_character()
 	if Network:is_server() then
 		local respawn_delay = managers.trade:respawn_delay_by_name(managers.criminals:local_character_name())
 		local hostages_killed = managers.trade:hostages_killed_by_name(managers.criminals:local_character_name())
@@ -432,6 +432,33 @@ function IngameWaitingForRespawnState:_get_teammate_index_by_unit_key(u_key)
 			return i_key
 		end
 	end
+end
+
+function IngameWaitingForRespawnState:watch_priority_character()
+	self:_refresh_teammate_list()
+	
+	local function try_watch_unit(unit_key)
+		if table.contains(self._spectator_data.teammate_list, unit_key) then
+			self._spectator_data.watch_u_key = unit_key
+			self._dis_curr = nil
+			return true
+		end
+	end
+	
+	if Network:is_client() then
+		local peer = managers.network:session():server_peer()
+		local unit = peer and peer:unit()
+		if unit and try_watch_unit(unit:key()) then
+			return
+		end
+	end
+	for u_key, _ in pairs(managers.groupai:state():all_player_criminals()) do
+		if try_watch_unit(u_key) then
+			return
+		end
+	end
+	self._spectator_data.watch_u_key = self._spectator_data.teammate_list[1]
+	self._dis_curr = nil
 end
 
 function IngameWaitingForRespawnState:cb_next_player()

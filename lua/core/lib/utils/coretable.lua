@@ -147,6 +147,17 @@ function table.contains(v, e)
 	return false
 end
 
+function table.contains_any(v, e)
+	for _, value in pairs(v) do
+		for _, element in ipairs(e) do
+			if value == element then
+				return true
+			end
+		end
+	end
+	return false
+end
+
 function table.index_of(v, e)
 	for index, value in ipairs(v) do
 		if value == e then

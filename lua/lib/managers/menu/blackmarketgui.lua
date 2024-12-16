@@ -5228,7 +5228,7 @@ function BlackMarketGui:update_info_text()
 			if slot_data.not_moddable then
 				local weapon_id = slot_data.name
 				local weapon_tweak = weapon_id and tweak_data.weapon[weapon_id]
-				local movement_penalty = weapon_tweak and tweak_data.upgrades.weapon_movement_penalty[weapon_tweak.category] or 1
+				local movement_penalty = weapon_tweak and tweak_data.upgrades.weapon_movement_penalty[weapon_tweak.categories[1]] or 1
 				if movement_penalty < 1 then
 					local penalty_as_string = string.format("%d%%", math.round((1 - movement_penalty) * 100))
 					updated_texts[5].text = updated_texts[5].text .. managers.localization:to_upper_text("bm_menu_weapon_movement_penalty_info", {penalty = penalty_as_string})
@@ -9576,8 +9576,9 @@ function BlackMarketGui:populate_mods(data)
 				new_data.removes = removes or {}
 				local weapon = managers.blackmarket:get_crafted_category_slot(data.prev_node_data.category, data.prev_node_data.slot) or {}
 				local gadget
-				local mod_type = tweak_data.weapon.factory.parts[new_data.name].type
-				local sub_type = tweak_data.weapon.factory.parts[new_data.name].sub_type
+				local mod_td = tweak_data.weapon.factory.parts[new_data.name]
+				local mod_type = mod_td.type
+				local sub_type = mod_td.sub_type
 				local is_auto = weapon and tweak_data.weapon[weapon.weapon_id] and tweak_data.weapon[weapon.weapon_id].FIRE_MODE == "auto"
 				if mod_type == "gadget" then
 					gadget = sub_type
@@ -11303,7 +11304,7 @@ function BlackMarketGui:open_weapon_buy_menu(data, check_allowed_item_func)
 	local item_categories = {}
 	for _, item in ipairs(blackmarket_items) do
 		local weapon_data = tweak_data.weapon[item.weapon_id]
-		local category = tweak_data.gui.buy_weapon_category_groups[weapon_data.category] or weapon_data.category
+		local category = tweak_data.gui.buy_weapon_category_groups[weapon_data.categories[1]] or weapon_data.categories[1]
 		if not check_allowed_item_func or check_allowed_item_func(weapon_data) then
 			item_categories[category] = item_categories[category] or {}
 			table.insert(item_categories[category], item)

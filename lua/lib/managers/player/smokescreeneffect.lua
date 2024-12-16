@@ -15,6 +15,7 @@ function SmokeScreenEffect:init(position, normal, time, has_dodge_bonus, grenade
 		normal = normal
 	})
 	self._variant = grenade_unit and grenade_unit:base() and grenade_unit:base()._projectile_entry
+	self._mine = grenade_unit and grenade_unit:base():thrower_unit() == managers.player:player_unit()
 end
 
 function SmokeScreenEffect:variant()
@@ -37,16 +38,25 @@ function SmokeScreenEffect:is_in_smoke(unit)
 	return self._unit_list[unit:key()], self._variant
 end
 
+function SmokeScreenEffect:mine()
+	return self._mine
+end
+
 function SmokeScreenEffect:update(t, dt)
 	if self._timer then
 		self._timer = self._timer - dt
+		if self._timer <= 2 then
+			World:effect_manager():fade_kill(self._effect)
+			if not self._sound_killed then
+				self._sound_source:post_event("lung_loop_end")
+				managers.enemy:add_delayed_clbk("SmokeScreenEffect", callback(ProjectileBase, ProjectileBase, "_dispose_of_sound", {
+					sound_source = self._sound_source
+				}), TimerManager:game():time() + 4)
+				self._sound_killed = true
+			end
+		end
 		if self._timer <= 0 then
 			self._timer = nil
-			World:effect_manager():fade_kill(self._effect)
-			self._sound_source:post_event("lung_loop_end")
-			managers.enemy:add_delayed_clbk("SmokeScreenEffect", callback(ProjectileBase, ProjectileBase, "_dispose_of_sound", {
-				sound_source = self._sound_source
-			}), TimerManager:game():time() + 4)
 		end
 	end
 	self._unit_list = {}

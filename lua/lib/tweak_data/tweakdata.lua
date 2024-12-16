@@ -1119,6 +1119,7 @@ Play the full version soon to get your full PAYDAY!]],
 	self.materials[Idstring("heavy_swat_steel_no_decal"):key()] = "shield"
 	self.materials[Idstring("snow"):key()] = "snow"
 	self.materials[Idstring("ice"):key()] = "ice_thick"
+	self.materials[Idstring("aim_debug"):key()] = "aim_debug"
 	self.screen = {}
 	self.screen.fadein_delay = 1
 	self.experience_manager = {}
@@ -3930,7 +3931,8 @@ Play the full version soon to get your full PAYDAY!]],
 					"wpn_prj_jav",
 					"wpn_prj_hur",
 					"wpn_prj_target",
-					"chico_injector"
+					"chico_injector",
+					"smoke_screen_grenade"
 				}
 			}
 		},

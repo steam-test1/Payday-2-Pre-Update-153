@@ -206,14 +206,14 @@ function PlayerTased:_check_action_primary_attack(t, input)
 					local autohit_mul = math.lerp(1, tweak_data.player.suppression.autohit_chance_mul, suppression_ratio)
 					local suppression_mul = managers.blackmarket:threat_multiplier()
 					local dmg_mul = managers.player:temporary_upgrade_value("temporary", "dmg_multiplier_outnumbered", 1)
-					local weapon_category = weap_base:weapon_tweak_data().category
-					if managers.player:has_category_upgrade("player", "overkill_all_weapons") or weapon_category == "shotgun" or weapon_category == "saw" then
+					if managers.player:has_category_upgrade("player", "overkill_all_weapons") or weap_base:is_category("shotgun", "saw") then
 						dmg_mul = dmg_mul * managers.player:temporary_upgrade_value("temporary", "overkill_damage_multiplier", 1)
 					end
 					local health_ratio = self._ext_damage:health_ratio()
-					local damage_health_ratio = managers.player:get_damage_health_ratio(health_ratio, weapon_category)
+					local primary_category = weap_base:weapon_tweak_data().categories[1]
+					local damage_health_ratio = managers.player:get_damage_health_ratio(health_ratio, primary_category)
 					if 0 < damage_health_ratio then
-						local upgrade_name = weapon_category == "saw" and "melee_damage_health_ratio_multiplier" or "damage_health_ratio_multiplier"
+						local upgrade_name = primary_category == "saw" and "melee_damage_health_ratio_multiplier" or "damage_health_ratio_multiplier"
 						local damage_ratio = damage_health_ratio
 						dmg_mul = dmg_mul * (1 + managers.player:upgrade_value("player", upgrade_name, 0) * damage_ratio)
 					end
@@ -245,12 +245,12 @@ function PlayerTased:_check_action_primary_attack(t, input)
 						local spread_multiplier = weap_base:spread_multiplier()
 						self._equipped_unit:base():tweak_data_anim_stop("unequip")
 						self._equipped_unit:base():tweak_data_anim_stop("equip")
-						if managers.player:has_category_upgrade(weapon_category, "stacking_hit_damage_multiplier") then
+						if managers.player:has_category_upgrade(primary_category, "stacking_hit_damage_multiplier") then
 							self._state_data.stacking_dmg_mul = self._state_data.stacking_dmg_mul or {}
-							self._state_data.stacking_dmg_mul[weapon_category] = self._state_data.stacking_dmg_mul[weapon_category] or {nil, 0}
-							local stack = self._state_data.stacking_dmg_mul[weapon_category]
+							self._state_data.stacking_dmg_mul[primary_category] = self._state_data.stacking_dmg_mul[primary_category] or {nil, 0}
+							local stack = self._state_data.stacking_dmg_mul[primary_category]
 							if fired.hit_enemy then
-								stack[1] = t + managers.player:upgrade_value(weapon_category, "stacking_hit_expire_t", 1)
+								stack[1] = t + managers.player:upgrade_value(primary_category, "stacking_hit_expire_t", 1)
 								stack[2] = math.min(stack[2] + 1, tweak_data.upgrades.max_weapon_dmg_mul_stacks or 5)
 							else
 								stack[1] = nil

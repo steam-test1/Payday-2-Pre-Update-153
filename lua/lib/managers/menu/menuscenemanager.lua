@@ -810,9 +810,9 @@ function MenuSceneManager:_select_character_pose(unit)
 			if weapon_id_poses then
 				pose = weapon_id_poses[math.random(#weapon_id_poses)]
 			else
-				local category = tweak_data.weapon[primary.weapon_id].category
-				if poses[category] then
-					pose = poses[category][math.random(#poses[category])]
+				local primary_category = tweak_data.weapon[primary.weapon_id].categories[1]
+				if poses[primary_category] then
+					pose = poses[primary_category][math.random(#poses[primary_category])]
 				end
 			end
 			if pose then
@@ -826,9 +826,9 @@ function MenuSceneManager:_select_character_pose(unit)
 			if weapon_id_poses then
 				pose = weapon_id_poses[math.random(#weapon_id_poses)]
 			else
-				local category = tweak_data.weapon[secondary.weapon_id].category
-				if poses[category] then
-					pose = poses[category][math.random(#poses[category])]
+				local primary_category = tweak_data.weapon[secondary.weapon_id].categories[1]
+				if poses[primary_category] then
+					pose = poses[primary_category][math.random(#poses[primary_category])]
 				end
 			end
 			if pose then
@@ -845,8 +845,8 @@ function MenuSceneManager:_select_character_pose(unit)
 	local pose
 	local secondary = managers.blackmarket:equipped_secondary()
 	if secondary and (math.rand(1) < 0.12 or table.contains(self._forced_secondaries, secondary.weapon_id)) then
-		local category = tweak_data.weapon[secondary.weapon_id].category
-		if category == "pistol" then
+		local primary_category = tweak_data.weapon[secondary.weapon_id].categories[1]
+		if primary_category == "pistol" then
 			pose = self._global_poses.pistol[math.random(#self._global_poses.pistol)]
 		elseif self._global_poses[secondary.weapon_id] then
 			local wep_poses = self._global_poses[secondary.weapon_id]
@@ -868,18 +868,18 @@ function MenuSceneManager:_select_character_pose(unit)
 		if weapon_id_poses then
 			pose = weapon_id_poses[math.random(#weapon_id_poses)]
 		else
-			local category = tweak_data.weapon[primary.weapon_id].category
-			if category == "shotgun" then
+			local primary_category = tweak_data.weapon[primary.weapon_id].categories[1]
+			if primary_category == "shotgun" then
 				pose = self._global_poses.shotgun[math.random(#self._global_poses.shotgun)]
-			elseif category == "assault_rifle" then
+			elseif primary_category == "assault_rifle" then
 				pose = self._global_poses.assault_rifle[math.random(#self._global_poses.assault_rifle)]
-			elseif category == "saw" then
+			elseif primary_category == "saw" then
 				pose = self._global_poses.saw[math.random(#self._global_poses.saw)]
-			elseif category == "lmg" then
+			elseif primary_category == "lmg" then
 				pose = self._global_poses.lmg[math.random(#self._global_poses.lmg)]
-			elseif category == "snp" then
+			elseif primary_category == "snp" then
 				pose = self._global_poses.snp[math.random(#self._global_poses.snp)]
-			elseif category == "bow" then
+			elseif primary_category == "bow" then
 				pose = self._global_poses.bow[math.random(#self._global_poses.bow)]
 			end
 		end

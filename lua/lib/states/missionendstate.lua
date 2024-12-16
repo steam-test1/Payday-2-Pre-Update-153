@@ -717,7 +717,7 @@ function MissionEndState:chk_complete_heist_achievements()
 				local session_used_weapons = managers.statistics:session_used_weapons()
 				local passed = true
 				for _, weapon_id in ipairs(session_used_weapons) do
-					if not tweak_data.weapon[weapon_id] or tweak_data.weapon[weapon_id].category ~= "shotgun" then
+					if not (tweak_data.weapon[weapon_id] and tweak_data.weapon[weapon_id].categories) or not table.contains(tweak_data.weapon[weapon_id].categories, "shotgun") then
 						passed = false
 						break
 					end
@@ -734,7 +734,7 @@ function MissionEndState:chk_complete_heist_achievements()
 			if managers.statistics:started_session_from_beginning() and managers.job:on_last_stage() and managers.job:current_real_job_id() == man_5.job and table.contains(man_5.difficulty, Global.game_settings.difficulty) and killed_by_melee == 0 and killed_by_grenade == 0 then
 				local passed = true
 				for i, weapon_id in ipairs(managers.statistics:session_used_weapons()) do
-					if man_5.weapon_category ~= tweak_data:get_raw_value("weapon", weapon_id, "category") then
+					if man_5.weapon_category ~= tweak_data:get_raw_value("weapon", weapon_id, "categories", 1) then
 						passed = false
 						break
 					end
@@ -818,7 +818,7 @@ function MissionEndState:chk_complete_heist_achievements()
 						local weapon_tweak
 						for _, weapon_id in ipairs(used_weapons) do
 							weapon_tweak = tweak_data.weapon[weapon_id]
-							if not weapon_tweak or weapon_tweak.category ~= category and (category ~= "pistol" or weapon_tweak.sub_category ~= "pistol") then
+							if not weapon_tweak or not table.contains(weapon_tweak.categories, category) then
 								used_weapon_category_pass = false
 								break
 							end
@@ -885,7 +885,7 @@ function MissionEndState:chk_complete_heist_achievements()
 					end
 				end
 				everyone_killed_by_projectile_pass = not achievement_data.everyone_killed_by_projectile
-				if achievement_data.everyone_killed_by_projectile and #achievement_data.everyone_killed_by_projectile > 1 then
+				if achievement_data.everyone_killed_by_projectile and 1 < #achievement_data.everyone_killed_by_projectile then
 					local everyone_killed_by_projectile = managers.statistics:session_anyone_killed_by_projectile(achievement_data.everyone_killed_by_projectile[1])
 					if achievement_data.everyone_killed_by_projectile[2] == 0 then
 						everyone_killed_by_projectile_pass = everyone_killed_by_projectile == 0
@@ -945,7 +945,7 @@ function MissionEndState:chk_complete_heist_achievements()
 						weapon_data = managers.blackmarket:equipped_item(category)
 						if (category == "grenades" or category == "armors") and data == weapon_data then
 							equipped_pass = true
-						elseif weapon_data and weapon_data.weapon_id and (data.weapon_id and data.weapon_id == weapon_data.weapon_id or data.category and data.category == tweak_data:get_raw_value("weapon", weapon_data.weapon_id, "category")) then
+						elseif weapon_data and weapon_data.weapon_id and (data.weapon_id and data.weapon_id == weapon_data.weapon_id or data.category and data.category == tweak_data:get_raw_value("weapon", weapon_data.weapon_id, "categories", 1)) then
 							equipped_pass = true
 							if data.blueprint and weapon_data.blueprint then
 								for _, part_or_parts in ipairs(data.blueprint) do

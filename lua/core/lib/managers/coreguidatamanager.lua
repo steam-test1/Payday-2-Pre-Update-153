@@ -209,7 +209,7 @@ function GuiDataManager:layout_corner_saferect_1280_workspace(ws)
 end
 
 function GuiDataManager:_set_layout(ws, screen_data)
-	self._ws_size_data[ws] = screen_data
+	self._ws_size_data[ws:key()] = screen_data
 	ws:set_screen(screen_data.w, screen_data.h, screen_data.x, screen_data.y, screen_data.on_screen_width)
 end
 
@@ -250,8 +250,8 @@ function GuiDataManager:convert_pos(...)
 end
 
 function GuiDataManager:convert_pos_float(from_ws, to_ws, in_x, in_y)
-	local from = self._ws_size_data[from_ws]
-	local to = self._ws_size_data[to_ws]
+	local from = self._ws_size_data[from_ws:key()]
+	local to = self._ws_size_data[to_ws:key()]
 	if not from or not to then
 		return
 	end

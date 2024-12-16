@@ -1,8 +1,10 @@
 core:import("CoreLuaDump")
 CoreLuaProfiler = CoreLuaProfiler or class()
 core_lua_profiler_reload = true
+local SETTINGS_PATH = "lib\\utils\\dev\\editor\\xml\\lua_profiler.xml"
 
 function CoreLuaProfiler:init()
+	self._settings_path = managers.database:base_path() .. SETTINGS_PATH
 	self:create_main_frame()
 	self._profilers = {}
 	self._profiler_sorting = "DO_NOT_SORT"
@@ -26,7 +28,7 @@ function CoreLuaProfiler:create_main_frame()
 	self._main_frame = EWS:Frame("LUA Profiler", Vector3(-1, -1, 0), Vector3(1000, 800, 0), "FRAME_FLOAT_ON_PARENT,DEFAULT_FRAME_STYLE", Global.frame)
 	
 	function self._resource_sort_func(a, b)
-		return a._name < b._name
+		return a._name:s() < b._name:s()
 	end
 	
 	local sort_by_name = self._resource_sort_func
@@ -284,10 +286,10 @@ function CoreLuaProfiler:fill_dump_tree_ctrl(node, id)
 end
 
 function CoreLuaProfiler:load_profilers()
-	if SystemFS:exists("/data/settings/lua_profiler.xml") then
+	if SystemFS:exists(self._settings_path) then
 		local prev_class_name = self._class_name
 		local prev_class_table = self._class_table
-		local file = SystemFS:open("/data/settings/lua_profiler.xml", "r")
+		local file = SystemFS:open(self._settings_path, "r")
 		local node = Node.from_xml(file:read())
 		file:close()
 		self:remove_all_profilers()
@@ -328,7 +330,7 @@ function CoreLuaProfiler:save_profilers()
 		end
 		n:make_child("function"):set_parameter("name", v._function_name)
 	end
-	local file = SystemFS:open("/data/settings/lua_profiler.xml", "w")
+	local file = SystemFS:open(self._settings_path, "w")
 	file:write(node:to_xml())
 	file:close()
 end
@@ -593,7 +595,7 @@ function CoreLuaProfiler:on_update_resources()
 	end
 	table.sort(self._unit_report, self._resource_sort_func)
 	for _, v in ipairs(self._unit_report) do
-		self._unit_report._unit_id = self._resources_frame_table._tree_ctrl:append(root_id, v._name)
+		self._unit_report._unit_id = self._resources_frame_table._tree_ctrl:append(root_id, v._name:s())
 		self._resources_frame_table._tree_ctrl:set_item_bold(self._unit_report._unit_id, true)
 		self._resources_frame_table._tree_ctrl:append(self._unit_report._unit_id, "Author: " .. tostring(v._unit:author()))
 		self._resources_frame_table._tree_ctrl:append(self._unit_report._unit_id, "Enabled: " .. tostring(v._unit:enabled()))
@@ -601,7 +603,7 @@ function CoreLuaProfiler:on_update_resources()
 		self._resources_frame_table._tree_ctrl:append(self._unit_report._unit_id, "Slot: " .. tostring(v._unit:slot()))
 		self._resources_frame_table._tree_ctrl:append(self._unit_report._unit_id, "Num Bodies: " .. tostring(v._unit:num_bodies()))
 		self._resources_frame_table._tree_ctrl:append(self._unit_report._unit_id, "Diesel: " .. v._unit:diesel_filename())
-		self._resources_frame_table._tree_ctrl:append(self._unit_report._unit_id, "Material Config: " .. v._unit:material_config())
+		self._resources_frame_table._tree_ctrl:append(self._unit_report._unit_id, "Material Config: " .. v._unit:material_config():s())
 		self._resources_frame_table._tree_ctrl:append(self._unit_report._unit_id, "Geometry Mem: " .. tostring(math.round(v._used / 1024)) .. "Kb")
 		if #v._textures > 0 then
 			self._unit_report._textures_id = self._resources_frame_table._tree_ctrl:append(self._unit_report._unit_id, "Used Textures")

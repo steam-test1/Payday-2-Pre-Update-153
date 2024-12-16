@@ -19,6 +19,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.character_locked.sokol = "sokol"
 	self.masks.character_locked.dragon = "jiro"
 	self.masks.character_locked.bodhi = "bodhi"
+	self.masks.character_locked.bodhi = "max"
 	self.masks.character_locked.jimmy = "jimmy_duct"
 	self.masks.character_locked.sydney = "sydney"
 	self.masks.character_locked.wild = "rust"
@@ -3996,19 +3997,31 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.max = {}
 	self.masks.max.unit = "units/pd2_dlc_max/masks/msk_max"
 	self.masks.max.name_id = "bm_msk_max"
-	self.masks.max.pcs = {}
+	self.masks.max.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
 	self.masks.max.value = 0
-	self.masks.max.infamous = true
 	self.masks.max.texture_bundle_folder = "max"
 	self.masks.max.sort_number = 48
+	self.masks.max.infamous = true
+	self.masks.max.global_value = "infamous"
 	self.masks.max_begins = {}
 	self.masks.max_begins.unit = "units/pd2_dlc_max/masks/msk_max_begins"
 	self.masks.max_begins.name_id = "bm_msk_max_begins"
-	self.masks.max_begins.pcs = {}
+	self.masks.max_begins.pcs = {
+		10,
+		20,
+		30,
+		40
+	}
 	self.masks.max_begins.value = 0
-	self.masks.max_begins.infamous = true
 	self.masks.max_begins.texture_bundle_folder = "max"
-	self.masks.max_begins.sort_number = 48
+	self.masks.max_begins.sort_number = 49
+	self.masks.max_begins.infamous = true
+	self.masks.max_begins.global_value = "infamous"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.masks) do
 		if free_dlcs[data.dlc] then

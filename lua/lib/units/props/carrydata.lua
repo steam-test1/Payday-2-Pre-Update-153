@@ -44,7 +44,7 @@ function CarryData:update(unit, t, dt)
 			local unit
 			for key, data in pairs(managers.groupai:state():all_AI_criminals()) do
 				if alive(data.unit) then
-					local body = data.unit:get_object(Idstring("g_body")) or data.unit:get_object(Idstring("g_body_terry"))
+					local body = data.unit:get_object(Idstring("g_body")) or data.unit:get_object(Idstring("g_body_terry")) or data.unit:get_object(Idstring("g_body_max"))
 					if body then
 						local bag_center = bag_object:oobb():center()
 						if body:inside_oobb(bag_center) then
