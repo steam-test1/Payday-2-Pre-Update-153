@@ -1736,6 +1736,7 @@ function GuiTweakData:init()
 			name_id = "cn_crime_spree",
 			desc_id = "cn_crime_spree_help_start",
 			menu_node = "crimenet_crime_spree_contract_host",
+			no_session_only = true,
 			mp_only = true,
 			x = 675,
 			y = 810,
@@ -4699,7 +4700,10 @@ function GuiTweakData:init()
 			name_id = "menu_reticle_23"
 		}
 	}
+	wts.types.gadget = wts.types.sight
 	self.weapon_texture_switches = wts
+	self.default_part_texture_switch = "1 3"
+	self.part_texture_switches = {wpn_fps_upg_o_45rds = "1 3", wpn_fps_upg_o_45rds_v2 = "1 3"}
 	self.tradable_inventory_sort_list = {
 		"aquired",
 		"alphabetic",
@@ -4709,6 +4713,11 @@ function GuiTweakData:init()
 		"bonus"
 	}
 	self.new_heists = {limit = 4}
+	table.insert(self.new_heists, {
+		name_id = "menu_nh_dsync_beta_is_live",
+		texture_path = "guis/textures/pd2/new_heists/desync_beta_is_live",
+		url = "http://steamcommunity.com/games/218620/announcements/detail/1342486185513464930"
+	})
 	table.insert(self.new_heists, {
 		name_id = "menu_nh_crime_spree_update",
 		texture_path = "guis/textures/pd2/new_heists/crime_spree_update",
@@ -4723,11 +4732,6 @@ function GuiTweakData:init()
 		name_id = "menu_nh_russian_national_day",
 		texture_path = "guis/textures/pd2/new_heists/russian_national_day",
 		url = "http://store.steampowered.com/news/?appids=218620"
-	})
-	table.insert(self.new_heists, {
-		name_id = "menu_nh_dsync_beta",
-		texture_path = "guis/textures/pd2/new_heists/desync_beta",
-		url = "http://steamcommunity.com/app/218620/discussions/29/"
 	})
 end
 

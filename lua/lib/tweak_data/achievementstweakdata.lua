@@ -600,7 +600,8 @@ function AchievementsTweakData:init(tweak_data)
 				"new_m4",
 				"m16",
 				"akmsu",
-				"olympic"
+				"olympic",
+				"flint"
 			}
 		},
 		scorpion_4 = {

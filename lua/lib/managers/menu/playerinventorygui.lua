@@ -81,7 +81,6 @@ function PlayerInventoryGui:init(ws, fullscreen_ws, node)
 	self._boxes_by_layer = {}
 	self._mod_boxes = {}
 	self._max_layer = 1
-	managers.menu_component:close_contract_gui()
 	self._data = node:parameters().menu_component_data or {selected_box = "character"}
 	self._node:parameters().menu_component_data = self._data
 	self._input_focus = 1
@@ -501,6 +500,11 @@ function PlayerInventoryGui:init(ws, fullscreen_ws, node)
 		h = 290
 	})
 	self._player_panel = player_panel
+	self._player_panel:rect({
+		color = Color.black,
+		alpha = 0.4,
+		layer = -100
+	})
 	self._player_box_panel = self._panel:panel()
 	self._player_box_panel:set_shape(player_panel:shape())
 	self._player_box = BoxGuiObject:new(self._player_box_panel, {
@@ -700,6 +704,11 @@ function PlayerInventoryGui:init(ws, fullscreen_ws, node)
 			1,
 			1
 		}
+	})
+	info_panel:rect({
+		color = Color.black,
+		alpha = 0.4,
+		layer = -100
 	})
 	local info_content_panel = info_panel:panel({layer = 1})
 	info_content_panel:grow(-20, -20)

@@ -389,6 +389,8 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 	self.projectiles.smoke_screen_grenade.max_amount = 1
 	self.projectiles.smoke_screen_grenade.is_a_grenade = true
 	self.projectiles.smoke_screen_grenade.throwable = true
+	self.projectiles.smoke_screen_grenade.animation = "throw_grenade_com"
+	self.projectiles.smoke_screen_grenade.anim_global_param = "projectile_frag_com"
 	self.projectiles.smoke_screen_grenade.no_shouting = true
 	self.projectiles.dada_com = {}
 	self.projectiles.dada_com.name_id = "bm_grenade_dada_com"

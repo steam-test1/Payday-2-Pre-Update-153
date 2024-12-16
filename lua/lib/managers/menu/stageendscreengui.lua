@@ -443,7 +443,7 @@ function StageEndScreenGui:init(saferect_ws, fullrect_ws, statistics_data)
 	self._full_workspace = fullrect_ws
 	self._fullscreen_panel = self._full_workspace:panel():panel({layer = 1})
 	local w = self._safe_workspace:panel():w() / 2 - padding
-	if managers.crime_spree:_is_active() then
+	if managers.crime_spree:is_active() then
 		w = w - padding + 1
 	end
 	self._panel = self._safe_workspace:panel():panel({
@@ -452,14 +452,14 @@ function StageEndScreenGui:init(saferect_ws, fullrect_ws, statistics_data)
 		layer = 6
 	})
 	self._panel:set_right(self._safe_workspace:panel():w())
-	if managers.crime_spree:_is_active() then
+	if managers.crime_spree:is_active() then
 		self._panel:set_bottom(self._safe_workspace:panel():h() - (CrimeSpreeMissionsMenuComponent.get_height() + padding))
 	else
 		self._panel:set_bottom(self._safe_workspace:panel():h())
 	end
 	local continue_button = managers.menu:is_pc_controller() and "[ENTER]" or nil
 	local continue_text = utf8.to_upper(managers.localization:text("menu_es_calculating_experience", {CONTINUE = continue_button}))
-	if managers.crime_spree:_is_active() then
+	if managers.crime_spree:is_active() then
 		continue_text = ""
 	end
 	self._continue_button = self._panel:text({
@@ -526,7 +526,7 @@ function StageEndScreenGui:init(saferect_ws, fullrect_ws, statistics_data)
 	local item
 	local tab_height = 0
 	local show_summary = true
-	if managers.crime_spree:_is_active() then
+	if managers.crime_spree:is_active() then
 		show_summary = false
 		item = CrimeSpreeResultTabItem:new(self._panel, self._tab_panel, utf8.to_upper(managers.localization:text("menu_es_crime_spree_summary")), 1)
 		table.insert(self._items, item)
@@ -623,7 +623,7 @@ function StageEndScreenGui:init(saferect_ws, fullrect_ws, statistics_data)
 	if managers.job:stage_success() then
 		self._bain_debrief_t = TimerManager:main():time() + 2.5
 	end
-	self._reduced_to_small_font = managers.crime_spree:_is_active()
+	self._reduced_to_small_font = managers.crime_spree:is_active()
 	self:chk_reduce_to_small_font()
 end
 
@@ -778,7 +778,7 @@ function StageEndScreenGui:show_cash_summary()
 end
 
 function StageEndScreenGui:set_continue_button_text(text, not_clickable)
-	if managers.crime_spree:_is_active() then
+	if managers.crime_spree:is_active() then
 		return
 	end
 	self._continue_button:set_text(text)

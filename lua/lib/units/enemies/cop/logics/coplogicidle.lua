@@ -77,7 +77,8 @@ function CopLogicIdle.enter(data, new_logic_name, enter_params)
 	else
 		data.unit:brain():set_attention_settings({cbt = true})
 	end
-	my_data.weapon_range = data.char_tweak.weapon[data.unit:inventory():equipped_unit():base():weapon_tweak_data().usage].range
+	local usage = data.unit:inventory():equipped_unit():base():weapon_tweak_data().usage
+	my_data.weapon_range = (data.char_tweak.weapon[usage] or {}).range
 	data.unit:brain():set_update_enabled_state(false)
 	CopLogicIdle._perform_objective_action(data, my_data, objective)
 	if my_data ~= data.internal_data then

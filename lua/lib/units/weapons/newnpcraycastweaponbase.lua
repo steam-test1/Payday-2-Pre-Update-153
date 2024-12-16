@@ -90,6 +90,15 @@ function NewNPCRaycastWeaponBase:_on_peer_removed(peer_id)
 	end
 end
 
+function NewNPCRaycastWeaponBase:non_npc_name_id()
+	if not self._non_npc_name_id then
+		self._non_npc_name_id = self._name_id
+		self._non_npc_name_id = string.gsub(self._non_npc_name_id, "_npc", "")
+		self._non_npc_name_id = string.gsub(self._non_npc_name_id, "_crew", "")
+	end
+	return self._non_npc_name_id
+end
+
 function NewNPCRaycastWeaponBase:setup(setup_data)
 	self._autoaim = setup_data.autoaim
 	self._alert_events = setup_data.alert_AI and {} or nil
@@ -168,7 +177,9 @@ function NewNPCRaycastWeaponBase:trigger_held(...)
 	if self._next_fire_allowed <= Application:time() then
 		fired = self:fire(...)
 		if fired then
-			self._next_fire_allowed = self._next_fire_allowed + (tweak_data.weapon[self._name_id].auto and tweak_data.weapon[self._name_id].auto.fire_rate or 0.1)
+			local fire_rate = tweak_data.weapon[self._name_id] and tweak_data.weapon[self._name_id].auto and tweak_data.weapon[self._name_id].auto.fire_rate
+			fire_rate = fire_rate or 0.1
+			self._next_fire_allowed = self._next_fire_allowed + fire_rate
 		end
 	end
 	return fired
@@ -179,7 +190,9 @@ function NewNPCRaycastWeaponBase:auto_trigger_held(direction, impact)
 	if self._next_fire_allowed <= Application:time() then
 		fired = self:auto_fire_blank(direction, impact)
 		if fired then
-			self._next_fire_allowed = self._next_fire_allowed + (tweak_data.weapon[self._name_id].auto and tweak_data.weapon[self._name_id].auto.fire_rate or 0.1)
+			local fire_rate = tweak_data.weapon[self._name_id] and tweak_data.weapon[self._name_id].auto and tweak_data.weapon[self._name_id].auto.fire_rate
+			fire_rate = fire_rate or 0.1
+			self._next_fire_allowed = self._next_fire_allowed + fire_rate
 		end
 	end
 	return fired
@@ -193,14 +206,18 @@ function NewNPCRaycastWeaponBase:auto_fire_blank(direction, impact)
 	local user_unit = self._setup.user_unit
 	self._unit:m_position(mfrom)
 	local rays = {}
-	if impact then
-		mvector3.set(mspread, direction)
-		mvector3.spread(mspread, 5)
-		mvector3.set(mto, mspread)
-		mvector3.multiply(mto, 20000)
-		mvector3.add(mto, mfrom)
-		local col_ray = World:raycast("ray", mfrom, mto, "slot_mask", self._blank_slotmask, "ignore_unit", self._setup.ignore_units)
-		if self._use_trails == nil or self._use_trails == true then
+	if impact and (self._use_trails == nil or self._use_trails == true) then
+		local num_rays = (tweak_data.weapon[self:non_npc_name_id()] or {}).rays or 1
+		if self._ammo_data and self._ammo_data.rays then
+			num_rays = self._ammo_data.rays
+		end
+		for i = 1, num_rays do
+			mvector3.set(mspread, direction)
+			mvector3.spread(mspread, self:_get_spread())
+			mvector3.set(mto, mspread)
+			mvector3.multiply(mto, 20000)
+			mvector3.add(mto, mfrom)
+			local col_ray = World:raycast("ray", mfrom, mto, "slot_mask", self._blank_slotmask, "ignore_unit", self._setup.ignore_units)
 			if alive(self._obj_fire) then
 				self._obj_fire:m_position(self._trail_effect_table.position)
 				mvector3.set(self._trail_effect_table.normal, mspread)
@@ -227,6 +244,9 @@ function NewNPCRaycastWeaponBase:auto_fire_blank(direction, impact)
 	if self:weapon_tweak_data().has_fire_animation then
 		self:tweak_data_anim_play("fire")
 	end
+	if user_unit:movement() then
+		user_unit:movement():play_redirect("recoil_single")
+	end
 	return true
 end
 
@@ -234,14 +254,18 @@ function NewNPCRaycastWeaponBase:fire_blank(direction, impact)
 	local user_unit = self._setup.user_unit
 	self._unit:m_position(mfrom)
 	local rays = {}
-	if impact then
-		mvector3.set(mspread, direction)
-		mvector3.spread(mspread, 5)
-		mvector3.set(mto, mspread)
-		mvector3.multiply(mto, 20000)
-		mvector3.add(mto, mfrom)
-		local col_ray = World:raycast("ray", mfrom, mto, "slot_mask", self._blank_slotmask, "ignore_unit", self._setup.ignore_units)
-		if self._use_trails == nil or self._use_trails == true then
+	if impact and (self._use_trails == nil or self._use_trails == true) then
+		local num_rays = (tweak_data.weapon[self:non_npc_name_id()] or {}).rays or 1
+		if self._ammo_data and self._ammo_data.rays then
+			num_rays = self._ammo_data.rays
+		end
+		for i = 1, num_rays do
+			mvector3.set(mspread, direction)
+			mvector3.spread(mspread, self:_get_spread())
+			mvector3.set(mto, mspread)
+			mvector3.multiply(mto, 20000)
+			mvector3.add(mto, mfrom)
+			local col_ray = World:raycast("ray", mfrom, mto, "slot_mask", self._blank_slotmask, "ignore_unit", self._setup.ignore_units)
 			if alive(self._obj_fire) then
 				self._obj_fire:m_position(self._trail_effect_table.position)
 				mvector3.set(self._trail_effect_table.normal, mspread)
@@ -285,6 +309,22 @@ function NewNPCRaycastWeaponBase:destroy(unit)
 end
 
 function NewNPCRaycastWeaponBase:_get_spread(user_unit)
+	local weapon_tweak = tweak_data.weapon[self:non_npc_name_id()]
+	if not weapon_tweak then
+		return 3
+	end
+	local spread_values = weapon_tweak.spread
+	if not spread_values then
+		Application:error("No spread values for weapon: ", self:non_npc_name_id())
+		return 3
+	end
+	local pose = "standing"
+	local spread_index = spread_values[pose]
+	if type(spread_index) == "table" then
+		return tweak_data.weapon.stats.spread[spread_index[1]]
+	else
+		return tweak_data.weapon.stats.spread[spread_index]
+	end
 end
 
 function NewNPCRaycastWeaponBase:_sound_autofire_start(nr_shots)
@@ -329,6 +369,7 @@ function NewNPCRaycastWeaponBase:set_user_is_team_ai(enabled)
 end
 
 local mvec_to = Vector3()
+local mvec_spread = Vector3()
 local mvec1 = Vector3()
 
 function NewNPCRaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, shoot_player, shoot_through_data)
@@ -368,7 +409,15 @@ function NewNPCRaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, d
 		end
 	end
 	if not col_ray or col_ray.distance > 600 then
-		self:_spawn_trail_effect(direction, col_ray)
+		local name_id = self.non_npc_name_id and self:non_npc_name_id() or self._name_id
+		local num_rays = (tweak_data.weapon[name_id] or {}).rays or 1
+		for i = 1, num_rays do
+			mvector3.set(mvec_spread, direction)
+			if 1 < i then
+				mvector3.spread(mvec_spread, self:_get_spread())
+			end
+			self:_spawn_trail_effect(mvec_spread, col_ray)
+		end
 	end
 	result.hit_enemy = hit_unit
 	if self._alert_events then

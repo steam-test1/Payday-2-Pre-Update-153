@@ -388,7 +388,7 @@ function CoreEnvironmentControllerManager:set_post_composite(t, dt)
 		self:_refresh_fov_ratio_params(vp)
 		self._fov_ratio_dirty = false
 	end
-	if self._vp ~= vp then
+	if self._vp ~= vp or not alive(self._material) then
 		local hdr_post_processor = vp:vp():get_post_processor_effect("World", ids_hdr_post_processor)
 		if hdr_post_processor then
 			local post_composite = hdr_post_processor:modifier(ids_hdr_post_composite)

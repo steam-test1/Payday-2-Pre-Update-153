@@ -28120,6 +28120,10 @@ function WeaponFactoryTweakData:_init_tng()
 		texture_bundle_folder = "tng",
 		dlc = "tango",
 		is_a_unlockable = true,
+		texture_switch = {
+			material = "gfx_reddot1",
+			channel = "diffuse_texture"
+		},
 		stance_mod = {
 			wpn_fps_ass_m4 = {
 				translation = Vector3(-2.75, 0, -11.15),
@@ -30258,7 +30262,11 @@ function WeaponFactoryTweakData:_init_varmods()
 		},
 		texture_bundle_folder = "flip",
 		perks = {"gadget"},
-		stance_mod = deep_clone(self.parts.wpn_fps_upg_o_45rds.stance_mod)
+		stance_mod = deep_clone(self.parts.wpn_fps_upg_o_45rds.stance_mod),
+		texture_switch = {
+			material = "gfx_reddot1",
+			channel = "diffuse_texture"
+		}
 	}
 	self.parts.wpn_fps_upg_o_xpsg33_magnifier.third_unit = "units/pd2_dlc_flip/weapons/wpn_fps_upg_o_xpsg33/wpn_third_upg_o_xpsg33_magnifier"
 	self.parts.wpn_fps_upg_o_45rds_v2.third_unit = "units/pd2_dlc_flip/weapons/wpn_fps_upg_o_45rds_v2/wpn_third_upg_o_45rds_v2"

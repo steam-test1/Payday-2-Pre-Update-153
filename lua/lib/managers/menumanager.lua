@@ -2006,22 +2006,6 @@ function MenuCallbackHandler:abort_mission_visible()
 	return true
 end
 
-function MenuCallbackHandler:level_is_not_stealth_only(item)
-	if self._temp_job_data then
-		local stealth_only_days = 0
-		for _, lc_data in pairs(self._temp_job_data.chain) do
-			local level = tweak_data.levels[lc_data.level_id]
-			if level and level.ghost_required then
-				stealth_only_days = stealth_only_days + 1
-			end
-		end
-		if stealth_only_days == table.size(self._temp_job_data.chain) then
-			return false
-		end
-	end
-	return true
-end
-
 function MenuCallbackHandler:is_custom_safehouse_unlocked()
 	return managers.custom_safehouse:unlocked()
 end
@@ -2072,6 +2056,14 @@ end
 
 function MenuCallbackHandler:is_not_multiplayer()
 	return not Network:multiplayer()
+end
+
+function MenuCallbackHandler:is_not_crime_spree()
+	return not self:is_crime_spree()
+end
+
+function MenuCallbackHandler:is_crime_spree()
+	return managers.crime_spree:is_active()
 end
 
 function MenuCallbackHandler:debug_menu_enabled()
@@ -6362,7 +6354,7 @@ function MenuPrePlanningInitiator:modifiy_node_preplanning_type(node, item_name,
 					params.enabled = true
 					params.tooltip.texture = tweak_data.preplanning.gui.type_icons_path
 					params.tooltip.texture_rect = tweak_data.preplanning:get_type_texture_rect(type_data.icon)
-					params.tooltip.menu_color = tweak_data.chat_colors[reserved.peer_id]
+					params.tooltip.menu_color = tweak_data.chat_colors[reserved.peer_id] or tweak_data.chat_colors[#tweak_data.chat_colors]
 					if enabled and (reserved.peer_id == peer_id or Network:is_server() and managers.preplanning.server_master_planner) then
 						params.tooltip.name = managers.localization:text("menu_pp_unreserve_type", {
 							type = managers.preplanning:get_type_name(reserved_type)

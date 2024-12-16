@@ -33,6 +33,13 @@ function UnitNetworkHandler:set_unit(unit, character_name, outfit_string, outfit
 	self:_chk_flush_unit_too_early_packets(unit)
 end
 
+function UnitNetworkHandler:switch_weapon(unit, unequip_multiplier, equip_multiplier, sender)
+	if not self._verify_character_and_sender(unit, sender) then
+		return
+	end
+	unit:movement():sync_switch_weapon(unequip_multiplier, equip_multiplier)
+end
+
 function UnitNetworkHandler:set_equipped_weapon(unit, item_index, blueprint_string, cosmetics_string, sender)
 	if not self._verify_character(unit) then
 		return
@@ -69,7 +76,7 @@ function UnitNetworkHandler:set_look_dir(unit, yaw_in, pitch_in, sender)
 	unit:movement():sync_look_dir(dir)
 end
 
-function UnitNetworkHandler:action_walk_start(unit, first_nav_point, nav_link_yaw, nav_link_act_index, from_idle, haste_code, end_yaw, no_walk, no_strafe, end_pose_code)
+function UnitNetworkHandler:action_walk_start(unit, first_nav_point, nav_link_yaw, nav_link_act_index, from_idle, haste_code, end_yaw, no_walk, no_strafe, pose_code, end_pose_code)
 	if not self._verify_character(unit) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
 		return
 	end
@@ -94,6 +101,12 @@ function UnitNetworkHandler:action_walk_start(unit, first_nav_point, nav_link_ya
 	else
 		table.insert(nav_path, first_nav_point)
 	end
+	local pose
+	if pose_code == 1 then
+		pose = "stand"
+	elseif pose_code == 2 then
+		pose = "crouch"
+	end
 	local end_pose
 	if end_pose_code == 1 then
 		end_pose = "stand"
@@ -110,6 +123,7 @@ function UnitNetworkHandler:action_walk_start(unit, first_nav_point, nav_link_ya
 		persistent = true,
 		no_walk = no_walk,
 		no_strafe = no_strafe,
+		pose = pose,
 		end_pose = end_pose,
 		blocks = {
 			walk = -1,
@@ -126,6 +140,20 @@ function UnitNetworkHandler:action_walk_nav_point(unit, nav_point, sender)
 		return
 	end
 	unit:movement():sync_action_walk_nav_point(nav_point)
+end
+
+function UnitNetworkHandler:action_change_run(unit, is_running, sender)
+	if not self._verify_character_and_sender(unit, sender) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	unit:movement():sync_action_change_run(is_running)
+end
+
+function UnitNetworkHandler:action_change_speed(unit, speed, sender)
+	if not self._verify_character_and_sender(unit, sender) or not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	unit:movement():sync_action_change_speed(speed)
 end
 
 function UnitNetworkHandler:action_walk_stop(unit)
@@ -388,11 +416,25 @@ function UnitNetworkHandler:shot_blank_reliable(shooting_unit, impact, sender)
 	shooting_unit:movement():sync_shot_blank(impact)
 end
 
-function UnitNetworkHandler:reload_weapon(unit, sender)
+function UnitNetworkHandler:reload_weapon(unit, empty_reload, reload_speed_multiplier, sender)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character_and_sender(unit, sender) then
 		return
 	end
-	unit:movement():sync_reload_weapon()
+	unit:movement():sync_reload_weapon(empty_reload, reload_speed_multiplier)
+end
+
+function UnitNetworkHandler:reload_weapon_cop(unit, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character_and_sender(unit, sender) then
+		return
+	end
+	unit:inventory():equipped_unit():base():ammo_base():set_ammo_remaining_in_clip(0)
+end
+
+function UnitNetworkHandler:reload_weapon_interupt(unit, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character_and_sender(unit, sender) then
+		return
+	end
+	unit:movement():sync_reload_weapon_interupt()
 end
 
 function UnitNetworkHandler:run_mission_element(id, unit, orientation_element_index)
@@ -673,6 +715,33 @@ function UnitNetworkHandler:action_aim_end(cop)
 		return
 	end
 	cop:movement():sync_action_aim_end()
+end
+
+function UnitNetworkHandler:action_hurt_start(unit, hurt_type, body_part, death_type, type, variant, direction_vec, hit_pos)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_character(unit) then
+		return
+	end
+	if unit:movement():can_request_actions() then
+		local hurt_action = {
+			block_type = CopActionHurt.idx_to_hurt_type(hurt_type),
+			blocks = {
+				act = -1,
+				action = -1,
+				aim = -1,
+				tase = -1,
+				walk = -1
+			},
+			body_part = body_part,
+			death_type = CopActionHurt.idx_to_death_type(death_type),
+			hurt_type = CopActionHurt.idx_to_hurt_type(hurt_type),
+			type = CopActionHurt.idx_to_type(type),
+			variant = CopActionHurt.idx_to_variant(variant),
+			direction_vec = direction_vec,
+			hit_pos = hit_pos,
+			allow_network = false
+		}
+		unit:movement():action_request(hurt_action)
+	end
 end
 
 function UnitNetworkHandler:action_hurt_end(unit)
@@ -1541,6 +1610,19 @@ function UnitNetworkHandler:play_distance_interact_redirect(unit, redirect, send
 		return
 	end
 	unit:movement():play_redirect(redirect)
+end
+
+function UnitNetworkHandler:play_distance_interact_redirect_delay(unit, redirect, delay, sender)
+	local sender_peer = self._verify_sender(sender)
+	if not (alive(unit) and self._verify_gamestate(self._gamestate_filter.any_ingame)) or not sender_peer then
+		return
+	end
+	delay = delay - sender_peer:qos().ping / 1000
+	if unit:movement().play_redirect_delayed then
+		unit:movement():play_redirect_delayed(redirect, nil, delay)
+	else
+		unit:movement():play_redirect(redirect)
+	end
 end
 
 function UnitNetworkHandler:start_timer_gui(unit, timer, sender)
@@ -3084,4 +3166,58 @@ end
 
 function UnitNetworkHandler:sync_tear_gas_grenade_detonate(grenade)
 	grenade:base():detonate()
+end
+
+function UnitNetworkHandler:sync_spawn_smoke_screen(unit, dodge_bonus)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) then
+		return
+	end
+	if not alive(unit) then
+		return
+	end
+	managers.player:_sync_activate_smoke_screen(unit, dodge_bonus)
+end
+
+function UnitNetworkHandler:sync_melee_start(unit, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
+		return
+	end
+	if not alive(unit) then
+		return
+	end
+	unit:movement():sync_melee_start()
+end
+
+function UnitNetworkHandler:sync_melee_discharge(unit, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
+		return
+	end
+	if not alive(unit) then
+		return
+	end
+	unit:movement():sync_melee_discharge()
+end
+
+function UnitNetworkHandler:sync_interaction_anim(unit, is_start, tweak_data, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
+		return
+	end
+	if not alive(unit) then
+		return
+	end
+	if is_start then
+		unit:movement():sync_interaction_anim_start(tweak_data)
+	else
+		unit:movement():sync_interaction_anim_end()
+	end
+end
+
+function UnitNetworkHandler:sync_shotgun_push(unit, hit_pos, dir, distance, attacker, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
+		return
+	end
+	if not alive(unit) then
+		return
+	end
+	managers.game_play_central:_do_shotgun_push(unit, hit_pos, dir, distance, attacker, sender)
 end

@@ -1065,7 +1065,7 @@ function MenuNodeGui:_say(message, row_item, id)
 	end
 	local s = row_item.chat_output:script()
 	local i = utf8.find_char(message, ":")
-	s.box_print(message, tweak_data.chat_colors[id], i)
+	s.box_print(message, tweak_data.chat_colors[id] or tweak_data.chat_colors[#tweak_data.chat_colors], i)
 end
 
 function MenuNodeGui:_cb_unlock()

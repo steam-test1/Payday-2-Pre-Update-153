@@ -247,6 +247,10 @@ function ZipLine:sync_set_user(unit)
 	if self._user_unit then
 		self:run_sequence("on_person_enter_zipline", self._user_unit)
 		self._user_unit:movement():on_enter_zipline(self._unit)
+	elseif old_unit then
+		old_unit:movement():on_exit_zipline()
+		self:run_sequence("on_person_exit_zipline", old_unit)
+		self:_send_net_event(self.NET_EVENTS.remove_user)
 	end
 	self:_check_interaction_active_state()
 end
@@ -254,6 +258,7 @@ end
 function ZipLine:sync_remove_user()
 	if alive(self._user_unit) then
 		self:run_sequence("on_person_exit_zipline", self._user_unit)
+		self._user_unit:movement():on_exit_zipline()
 	end
 	self._user_unit = nil
 	self._synced_user = nil
@@ -389,15 +394,23 @@ function ZipLine:pos_at_current_time()
 	return self:pos_at_time(self._current_time)
 end
 
-function ZipLine:update_and_get_pos_at_time(time)
+function ZipLine:_update_and_get_pos_at_time(time, func)
 	self._current_time = time
 	self._dirty = true
-	local pos = self:pos_at_time(time)
+	local pos = func(self, time)
 	mvector3.set(self._sled_data.pos, pos)
 	mvector3.add(self._sled_data.pos, self._line_data.offset)
 	mvector3.set(self._line_data.pos, self._sled_data.pos)
 	self:_check_dirty()
 	return pos
+end
+
+function ZipLine:update_and_get_pos_at_time(time)
+	return self:_update_and_get_pos_at_time(time, self.pos_at_time)
+end
+
+function ZipLine:update_and_get_pos_at_time_linear(time)
+	return self:_update_and_get_pos_at_time(time, self.pos_at_time_linear)
 end
 
 local ease_bezier_points = {
@@ -420,6 +433,22 @@ function ZipLine:pos_at_time(time)
 	local slack = math.lerp(0, self._slack, slack_bezier)
 	mvector3.set_z(pos, mvector3.z(pos) - slack)
 	return pos
+end
+
+function ZipLine:pos_at_time_linear(time)
+	local pos = math.lerp(self._start_pos, self._end_pos, time)
+	local slack_bezier = math.bezier(slack_bezier_points, time)
+	local slack = math.lerp(0, self._slack, slack_bezier)
+	mvector3.set_z(pos, mvector3.z(pos) - slack)
+	return pos
+end
+
+function ZipLine:speed_at_time(time, step)
+	step = step or 0.01
+	local pos1 = self:pos_at_time(time)
+	local pos2 = self:pos_at_time(math.clamp(time + step, 0, 1))
+	local dist = mvector3.distance(pos1, pos2)
+	return dist
 end
 
 function ZipLine:current_direction()

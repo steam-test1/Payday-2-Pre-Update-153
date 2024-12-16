@@ -71,11 +71,7 @@ function PlayerParachuting:_update_movement(t, dt)
 		self._unit:set_position(old_pos + self._move_dir:normalized() * self._tweak_data.movement.forward_speed * dt)
 		self._ext_movement:set_m_pos(self._unit:position())
 	end
-	local pos = self._unit:position()
-	if t - self._last_sent_pos_t > 0.2 then
-		self._ext_network:send("sync_fall_position", pos, self._camera_unit:rotation())
-		self._last_sent_pos_t = t
-	end
+	self:_update_network_position(t, dt, self._unit:position())
 end
 
 function PlayerParachuting:_update_check_actions(t, dt)

@@ -78,8 +78,8 @@ function CrimeSpreeForcedModifiersMenuComponent:_setup()
 			btn:set_y((CrimeSpreeModifierButton.size.h + padding) * row)
 		end
 		table.insert(self._modifiers, btn)
-		managers.crime_spree:select_modifier(modifier.id)
 	end
+	self:add_modifiers_to_spree(modifiers)
 	self._modifiers_scroll:update_canvas_size()
 	self._back_btn = CrimeSpreeButton:new(self._button_panel)
 	self._back_btn:set_text(managers.localization:to_upper_text("menu_back"))
@@ -128,6 +128,18 @@ function CrimeSpreeForcedModifiersMenuComponent:get_modifers()
 	else
 		Application:error("Showing Crime Spree modifiers menu when there are no modifiers to select!")
 		return {}, "forced"
+	end
+end
+
+function CrimeSpreeForcedModifiersMenuComponent:add_modifiers_to_spree(modifiers)
+	if Network:is_server() then
+		for _, modifier in ipairs(modifiers) do
+			managers.crime_spree:select_modifier(modifier.id)
+		end
+	else
+		for _, modifier in ipairs(modifiers) do
+			managers.crime_spree:set_server_modifier(modifier.id, managers.crime_spree:server_spree_level())
+		end
 	end
 end
 

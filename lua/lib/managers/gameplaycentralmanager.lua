@@ -616,14 +616,20 @@ function GamePlayCentralManager:get_shotgun_push_range()
 end
 
 function GamePlayCentralManager:do_shotgun_push(unit, hit_pos, dir, distance, attacker)
-	local max_range = self:get_shotgun_push_range()
-	if distance > max_range then
+	if distance > self:get_shotgun_push_range() then
 		return
 	end
+	if unit:id() > 0 then
+		managers.network:session():send_to_peers("sync_shotgun_push", unit, hit_pos, dir, distance, attacker)
+	end
+	self:_do_shotgun_push(unit, hit_pos, dir, distance, attacker)
+end
+
+function GamePlayCentralManager:_do_shotgun_push(unit, hit_pos, dir, distance, attacker)
 	if unit:movement()._active_actions[1] and unit:movement()._active_actions[1]:type() == "hurt" then
 		unit:movement()._active_actions[1]:force_ragdoll()
 	end
-	local scale = math.clamp(1 - distance / max_range, 0.5, 1)
+	local scale = math.clamp(1 - distance / self:get_shotgun_push_range(), 0.5, 1)
 	local height = mvector3.distance(hit_pos, unit:position()) - 100
 	local twist_dir = math.random(2) == 1 and 1 or -1
 	local rot_acc = (dir:cross(math.UP) + math.UP * (0.5 * twist_dir)) * (-1000 * math.sign(height))

@@ -32,9 +32,9 @@ function HUDMissionBriefing:init(hud, workspace)
 	if not self._singleplayer then
 		local voice_icon, voice_texture_rect = tweak_data.hud_icons:get_icon_data("mugshot_talk")
 		local infamy_icon, infamy_rect = tweak_data.hud_icons:get_icon_data("infamy_icon")
-		for i = 1, 4 do
+		for i = 1, tweak_data.max_players do
 			local color_id = i
-			local color = tweak_data.chat_colors[color_id]
+			local color = tweak_data.chat_colors[color_id] or tweak_data.chat_colors[#tweak_data.chat_colors]
 			local slot_panel = self._ready_slot_panel:panel({
 				name = "slot_" .. tostring(i),
 				h = text_font_size,
@@ -183,7 +183,7 @@ function HUDMissionBriefing:init(hud, workspace)
 	self._current_job_chain = managers.job:current_job_chain_data()
 	self._job_class = self._current_job_data and self._current_job_data.jc or 0
 	local show_contact_gui = true
-	if managers.crime_spree:_is_active() then
+	if managers.crime_spree:is_active() then
 		self._backdrop:set_pattern("guis/textures/pd2/mission_briefing/bain/bd_pattern", 0.1, "add")
 		show_contact_gui = false
 	end
@@ -409,7 +409,7 @@ function HUDMissionBriefing:init(hud, workspace)
 	end
 	local text = utf8.to_upper(managers.localization:text(self._current_contact_data.name_id) .. ": " .. managers.localization:text(self._current_job_data.name_id))
 	local text_align, text_len
-	if managers.crime_spree:_is_active() then
+	if managers.crime_spree:is_active() then
 		local level_id = Global.game_settings.level_id
 		local name_id = level_id and tweak_data.levels[level_id] and tweak_data.levels[level_id].name_id
 		local mission = managers.crime_spree:get_mission()
@@ -429,7 +429,7 @@ function HUDMissionBriefing:init(hud, workspace)
 		font = title_font,
 		color = tweak_data.screen_colors.text
 	})
-	if managers.crime_spree:_is_active() then
+	if managers.crime_spree:is_active() then
 		job_text:set_range_color(text_len, utf8.len(text), tweak_data.screen_colors.crime_spree_risk)
 	end
 	if not text_align then
@@ -448,7 +448,7 @@ function HUDMissionBriefing:init(hud, workspace)
 		big_text:move(-13, 9)
 		self._backdrop:animate_bg_text(big_text)
 	end
-	if managers.crime_spree:_is_active() then
+	if managers.crime_spree:is_active() then
 		self._paygrade_panel:set_visible(false)
 		self._job_schedule_panel:set_visible(false)
 		self._paygrade_text:set_visible(false)

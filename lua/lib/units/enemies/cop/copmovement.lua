@@ -14,6 +14,7 @@ require("lib/units/enemies/spooc/actions/lower_body/ActionSpooc")
 require("lib/units/civilians/actions/lower_body/CivilianActionWalk")
 require("lib/units/civilians/actions/lower_body/EscortWithSuitcaseActionWalk")
 require("lib/units/enemies/tank/actions/lower_body/TankCopActionWalk")
+require("lib/units/enemies/shield/actions/lower_body/ShieldCopActionWalk")
 require("lib/units/player_team/actions/lower_body/CriminalActionWalk")
 require("lib/units/enemies/cop/actions/upper_body/CopActionHealed")
 require("lib/units/enemies/medic/actions/upper_body/MedicActionHeal")
@@ -21,6 +22,11 @@ local ids_movement = Idstring("movement")
 local mvec3_set = mvector3.set
 local mvec3_set_z = mvector3.set_z
 local mvec3_lerp = mvector3.lerp
+local mvec3_add = mvector3.add
+local mvec3_sub = mvector3.subtract
+local mvec3_mul = mvector3.multiply
+local mvec3_norm = mvector3.normalize
+local mvec3_len = mvector3.length
 local mrot_set = mrotation.set_yaw_pitch_roll
 local temp_vec1 = Vector3()
 local temp_vec2 = Vector3()
@@ -199,6 +205,7 @@ action_variants.city_swat = security_variant
 action_variants.old_hoxton_mission = security_variant
 action_variants.shield = clone(security_variant)
 action_variants.shield.hurt = ShieldActionHurt
+action_variants.shield.walk = ShieldCopActionWalk
 action_variants.phalanx_minion = clone(action_variants.shield)
 action_variants.phalanx_vip = clone(action_variants.shield)
 action_variants.tank = clone(security_variant)
@@ -677,7 +684,22 @@ function CopMovement:chk_action_forbidden(action_type)
 	end
 end
 
+function CopMovement:can_request_actions()
+	if Network:is_server() then
+		if self._active_actions[1] and self._active_actions[1]:type() == "hurt" and self._active_actions[1]:hurt_type() == "death" then
+			return false
+		else
+			return true
+		end
+	else
+		return true
+	end
+end
+
 function CopMovement:action_request(action_desc)
+	if not self:can_request_actions() then
+		return
+	end
 	if Network:is_server() and self._active_actions[1] and self._active_actions[1]:type() == "hurt" and self._active_actions[1]:hurt_type() == "death" then
 		debug_pause_unit(self._unit, "[CopMovement:action_request] Dead man walking!!!", self._unit, inspect(action_desc))
 	end
@@ -942,7 +964,14 @@ function CopMovement:_chk_play_equip_weapon()
 			if weapon_unit then
 				local weap_tweak = weapon_unit:base():weapon_tweak_data()
 				local weapon_hold = weap_tweak.hold
-				self._machine:set_parameter(redir_res, "to_" .. weapon_hold, 1)
+				if type(weap_tweak.hold) == "table" then
+					local num = #weap_tweak.hold + 1
+					for i, hold_type in ipairs(weap_tweak.hold) do
+						self._machine:set_parameter(redir_res, "to_" .. hold_type, num - i)
+					end
+				else
+					self._machine:set_parameter(redir_res, "to_" .. weap_tweak.hold, 1)
+				end
 			end
 		end
 	end
@@ -1140,8 +1169,8 @@ function CopMovement:upd_ground_ray(from_pos)
 		mvec3_set_z(move_vec, 0)
 		local move_vec_len = mvector3.normalize(move_vec)
 		mvector3.multiply(move_vec, math.min(move_vec_len, 20))
-		mvector3.add(temp_vec1, move_vec)
-		mvector3.add(temp_vec2, move_vec)
+		mvec3_add(temp_vec1, move_vec)
+		mvec3_add(temp_vec2, move_vec)
 		if gnd_ray_1 then
 			hit_ray = gnd_ray_1
 			local gnd_ray_2 = World:raycast("ray", temp_vec1, temp_vec2, "slot_mask", self._slotmask_gnd_ray, "ray_type", "walk")
@@ -1189,14 +1218,68 @@ function CopMovement:on_suppressed(state)
 	self._action_common_data.is_suppressed = state and true or nil
 	if Network:is_server() and state and (not self._tweak_data.allowed_poses or self._tweak_data.allowed_poses.crouch) and (not self._tweak_data.allowed_poses or self._tweak_data.allowed_poses.stand) and not self:chk_action_forbidden("walk") then
 		if state == "panic" and not self:chk_action_forbidden("act") then
-			local action_desc = {
-				type = "act",
-				body_part = 1,
-				variant = self._ext_anim.run and self._ext_anim.move_fwd and "e_so_sup_fumble_run_fwd" or "e_so_sup_fumble_inplace",
-				clamp_to_graph = true,
-				blocks = {walk = -1, action = -1}
-			}
-			self:action_request(action_desc)
+			if self._ext_anim.run and self._ext_anim.move_fwd then
+				local action_desc = {
+					type = "act",
+					body_part = 1,
+					variant = "e_so_sup_fumble_run_fwd",
+					clamp_to_graph = true,
+					blocks = {walk = -1, action = -1}
+				}
+				self:action_request(action_desc)
+			else
+				local debug_fumble = function(result, from, to)
+				end
+				local vec_from = temp_vec1
+				local vec_to = temp_vec2
+				local ray_params = {
+					tracker_from = self:nav_tracker(),
+					pos_from = vec_from,
+					pos_to = vec_to,
+					allow_entry = false,
+					trace = true
+				}
+				local allowed_fumbles = {
+					"e_so_sup_fumble_inplace_3"
+				}
+				local allow
+				mvec3_set(vec_from, self:m_pos())
+				mvec3_set(vec_to, self:m_rot():y())
+				mvec3_mul(vec_to, -100)
+				mvec3_add(vec_to, self:m_pos())
+				allow = not managers.navigation:raycast(ray_params)
+				debug_fumble(allow, vec_from, vec_to)
+				if allow then
+					table.insert(allowed_fumbles, "e_so_sup_fumble_inplace_1")
+				end
+				mvec3_set(vec_from, self:m_pos())
+				mvec3_set(vec_to, self:m_rot():x())
+				mvec3_mul(vec_to, 200)
+				mvec3_add(vec_to, self:m_pos())
+				allow = not managers.navigation:raycast(ray_params)
+				debug_fumble(allow, vec_from, vec_to)
+				if allow then
+					table.insert(allowed_fumbles, "e_so_sup_fumble_inplace_2")
+				end
+				mvec3_set(vec_from, self:m_pos())
+				mvec3_set(vec_to, self:m_rot():x())
+				mvec3_mul(vec_to, -200)
+				mvec3_add(vec_to, self:m_pos())
+				allow = not managers.navigation:raycast(ray_params)
+				debug_fumble(allow, vec_from, vec_to)
+				if allow then
+					table.insert(allowed_fumbles, "e_so_sup_fumble_inplace_4")
+				end
+				if 0 < #allowed_fumbles then
+					local action_desc = {
+						type = "act",
+						body_part = 1,
+						variant = allowed_fumbles[math.random(#allowed_fumbles)],
+						blocks = {walk = -1, action = -1}
+					}
+					self:action_request(action_desc)
+				end
+			end
 		elseif self._ext_anim.idle and (not self._active_actions[2] or self._active_actions[2]:type() == "idle") then
 			local action_desc = {
 				type = "act",
@@ -1219,12 +1302,12 @@ end
 
 function CopMovement:damage_clbk(my_unit, damage_info)
 	local hurt_type = damage_info.result.type
-	if hurt_type == "knock_down" or hurt_type == "stagger" then
+	if hurt_type == "stagger" then
 		hurt_type = "heavy_hurt"
 	end
 	hurt_type = managers.crime_spree:modify_value("CopMovement:HurtType", hurt_type)
 	local block_type = hurt_type
-	if hurt_type == "expl_hurt" or hurt_type == "fire_hurt" or hurt_type == "poison_hurt" or hurt_type == "taser_tased" then
+	if hurt_type == "knock_down" or hurt_type == "expl_hurt" or hurt_type == "fire_hurt" or hurt_type == "poison_hurt" or hurt_type == "taser_tased" then
 		block_type = "heavy_hurt"
 	end
 	if hurt_type == "death" and self._queued_actions then
@@ -1329,7 +1412,11 @@ function CopMovement:damage_clbk(my_unit, damage_info)
 			fire_dot_data = damage_info.fire_dot_data
 		}
 	end
-	if Network:is_server() or not self:chk_action_forbidden(action_data) then
+	local request_action = Network:is_server() or not self:chk_action_forbidden(action_data)
+	if damage_info.is_synced and (hurt_type == "knock_down" or hurt_type == "heavy_hurt") then
+		request_action = false
+	end
+	if request_action then
 		self:action_request(action_data)
 		if hurt_type == "death" and self._queued_actions then
 			self._queued_actions = {}
@@ -1618,23 +1705,42 @@ function CopMovement:clbk_inventory(unit, event)
 	local weapon = self._ext_inventory:equipped_unit()
 	if weapon then
 		if self._weapon_hold then
-			self._machine:set_global(self._weapon_hold, 0)
+			for i, hold_type in ipairs(self._weapon_hold) do
+				self._machine:set_global(hold_type, 0)
+			end
 		end
 		if self._weapon_anim_global then
 			self._machine:set_global(self._weapon_anim_global, 0)
 		end
+		self._weapon_hold = {}
 		local weap_tweak = weapon:base():weapon_tweak_data()
-		local weapon_hold = weap_tweak.hold
-		self._machine:set_global(weapon_hold, 1)
-		self._weapon_hold = weapon_hold
-		local weapon_usage = weap_tweak.usage
+		if type(weap_tweak.hold) == "table" then
+			local num = #weap_tweak.hold + 1
+			for i, hold_type in ipairs(weap_tweak.hold) do
+				self._machine:set_global(hold_type, self:get_hold_type_weight(hold_type) or num - i)
+				table.insert(self._weapon_hold, hold_type)
+			end
+		else
+			self._machine:set_global(weap_tweak.hold, self:get_hold_type_weight(weap_tweak.hold) or 1)
+			table.insert(self._weapon_hold, weap_tweak.hold)
+		end
+		local weapon_usage = weap_tweak.anim_usage or weap_tweak.usage
 		self._machine:set_global(weapon_usage, 1)
 		self._weapon_anim_global = weapon_usage
+		self._machine:set_global("is_npc", 1)
 	end
 	for _, action in ipairs(self._active_actions) do
 		if action and action.on_inventory_event then
 			action:on_inventory_event(event)
 		end
+	end
+end
+
+function CopMovement:get_hold_type_weight(hold)
+	if tweak_data.animation.hold_types[hold] then
+		return tweak_data.animation.hold_types[hold].weight
+	else
+		return false
 	end
 end
 
@@ -1853,7 +1959,7 @@ function CopMovement:_cancel_latest_action(search_type, explicit)
 	end
 end
 
-function CopMovement:_get_latest_walk_action()
+function CopMovement:_get_latest_walk_action(explicit)
 	if self._queued_actions then
 		for i = #self._queued_actions, 1, -1 do
 			if self._queued_actions[i].type == "walk" and self._queued_actions[i].persistent then
@@ -1864,7 +1970,9 @@ function CopMovement:_get_latest_walk_action()
 	if self._active_actions[2] and self._active_actions[2]:type() == "walk" then
 		return self._active_actions[2]
 	end
-	debug_pause_unit(self._unit, "[CopMovement:_get_latest_walk_action] no queued or ongoing walk action", self._unit, inspect(self._queued_actions), inspect(self._active_actions))
+	if explicit then
+		debug_pause_unit(self._unit, "[CopMovement:_get_latest_walk_action] no queued or ongoing walk action", self._unit, inspect(self._queued_actions), inspect(self._active_actions))
+	end
 end
 
 function CopMovement:_get_latest_act_action()
@@ -1880,13 +1988,13 @@ function CopMovement:_get_latest_act_action()
 	end
 end
 
-function CopMovement:sync_action_walk_nav_point(pos)
-	local walk_action, is_queued = self:_get_latest_walk_action()
+function CopMovement:sync_action_walk_nav_point(pos, explicit)
+	local walk_action, is_queued = self:_get_latest_walk_action(explicit)
 	if is_queued then
 		table.insert(walk_action.nav_path, pos)
 	elseif walk_action then
 		walk_action:append_nav_point(pos)
-	else
+	elseif explicit then
 		debug_pause_unit(self._unit, "[CopMovement:sync_action_walk_nav_point] no walk action!!!", self._unit, pos)
 	end
 end
@@ -1911,14 +2019,14 @@ function CopMovement:sync_action_walk_nav_link(pos, rot, anim_index, from_idle)
 	end
 end
 
-function CopMovement:sync_action_walk_stop()
+function CopMovement:sync_action_walk_stop(explicit)
 	local walk_action, is_queued = self:_get_latest_walk_action()
 	if is_queued then
 		table.insert(walk_action.nav_path, CopActionWalk._nav_point_pos(walk_action.nav_path[#walk_action.nav_path]))
 		walk_action.persistent = nil
 	elseif walk_action then
 		walk_action:stop()
-	else
+	elseif explicit then
 		debug_pause("[CopMovement:sync_action_walk_stop] no walk action!!!", self._unit)
 	end
 end
@@ -2234,4 +2342,320 @@ end
 IgnoreAlertsMovement = IgnoreAlertsMovement or class(CopMovement)
 
 function IgnoreAlertsMovement:set_cool(state, giveaway)
+end
+
+function CopMovement:_equipped_weapon_base()
+	local equipped_weapon = self._unit:inventory():equipped_unit()
+	return alive(equipped_weapon) and equipped_weapon:base()
+end
+
+function CopMovement:_equipped_weapon_crew_tweak_data()
+	local equipped_weapon = self:_equipped_weapon_base()
+	if equipped_weapon then
+		return tweak_data.weapon[equipped_weapon._name_id]
+	end
+end
+
+function CopMovement:_equipped_weapon_tweak_data()
+	local equipped_weapon = self:_equipped_weapon_base()
+	if equipped_weapon and equipped_weapon.non_npc_name_id then
+		local weapon_id = equipped_weapon:non_npc_name_id()
+		if tweak_data.animation.animation_redirects[weapon_id] then
+			weapon_id = tweak_data.animation.animation_redirects[weapon_id]
+		end
+		return tweak_data.weapon[weapon_id]
+	end
+end
+
+CopMovement.magazine_collisions = {
+	small = {
+		Idstring("units/payday2/weapons/box_collision/box_collision_small_pistol"),
+		Idstring("rp_box_collision_small")
+	},
+	medium = {
+		Idstring("units/payday2/weapons/box_collision/box_collision_medium_ar"),
+		Idstring("rp_box_collision_medium")
+	},
+	large = {
+		Idstring("units/payday2/weapons/box_collision/box_collision_large_metal"),
+		Idstring("rp_box_collision_large")
+	},
+	pistol = {
+		Idstring("units/payday2/weapons/box_collision/box_collision_small_pistol"),
+		Idstring("rp_box_collision_small")
+	},
+	smg = {
+		Idstring("units/payday2/weapons/box_collision/box_collision_small_smg"),
+		Idstring("rp_box_collision_small")
+	},
+	rifle = {
+		Idstring("units/payday2/weapons/box_collision/box_collision_medium_ar"),
+		Idstring("rp_box_collision_medium")
+	},
+	large_plastic = {
+		Idstring("units/payday2/weapons/box_collision/box_collision_large_plastic"),
+		Idstring("rp_box_collision_large")
+	},
+	large_metal = {
+		Idstring("units/payday2/weapons/box_collision/box_collision_large_metal"),
+		Idstring("rp_box_collision_large")
+	}
+}
+
+function CopMovement:_material_config_name(part_id, unit_name, use_cc_material_config)
+	local unit_name = tweak_data.weapon.factory.parts[part_id].unit
+	if use_cc_material_config and tweak_data.weapon.factory.parts[part_id].cc_thq_material_config then
+		return tweak_data.weapon.factory.parts[part_id].cc_thq_material_config
+	end
+	if tweak_data.weapon.factory.parts[part_id].thq_material_config then
+		return tweak_data.weapon.factory.parts[part_id].thq_material_config
+	end
+	local cc_string = use_cc_material_config and "_cc" or ""
+	local thq_string = "_thq" or ""
+	return Idstring(unit_name .. cc_string .. thq_string)
+end
+
+function CopMovement:allow_dropped_magazines()
+	return managers.weapon_factory:use_thq_weapon_parts()
+end
+
+local material_defaults = {
+	diffuse_layer1_texture = Idstring("units/payday2_cash/safes/default/base_gradient/base_default_df"),
+	diffuse_layer2_texture = Idstring("units/payday2_cash/safes/default/pattern_gradient/gradient_default_df"),
+	diffuse_layer0_texture = Idstring("units/payday2_cash/safes/default/pattern/pattern_default_df"),
+	diffuse_layer3_texture = Idstring("units/payday2_cash/safes/default/sticker/sticker_default_df")
+}
+local material_textures = {
+	base_gradient = "diffuse_layer1_texture",
+	pattern_gradient = "diffuse_layer2_texture",
+	pattern = "diffuse_layer0_texture",
+	sticker = "diffuse_layer3_texture"
+}
+local material_variables = {
+	pattern_tweak = "pattern_tweak",
+	uv_scale = "uv_scale",
+	uv_offset_rot = "uv_offset_rot",
+	pattern_pos = "pattern_pos",
+	cubemap_pattern_control = "cubemap_pattern_control"
+}
+
+function CopMovement:_spawn_magazine_unit(part_id, unit_name, pos, rot)
+	local equipped_weapon = self._unit:inventory():equipped_unit()
+	local is_thq = managers.weapon_factory:use_thq_weapon_parts()
+	local use_cc_material_config = is_thq and equipped_weapon and equipped_weapon:base()._cosmetics_data and true or false
+	local material_config_ids = Idstring("material_config")
+	local magazine_unit = World:spawn_unit(unit_name, pos, rot)
+	local new_material_config_ids = self:_material_config_name(part_id, magazine_unit, use_cc_material_config)
+	if magazine_unit:material_config() ~= new_material_config_ids and DB:has(material_config_ids, new_material_config_ids) then
+		magazine_unit:set_material_config(new_material_config_ids, true)
+	end
+	local materials = {}
+	local unit_materials = magazine_unit:get_objects_by_type(Idstring("material")) or {}
+	for _, m in ipairs(unit_materials) do
+		if m:variable_exists(Idstring("wear_tear_value")) then
+			table.insert(materials, m)
+		end
+	end
+	local textures = {}
+	local base_variable, base_texture, mat_variable, mat_texture, type_variable, type_texture, p_type, custom_variable, texture_key
+	local cosmetics_data = equipped_weapon:base():get_cosmetics_data()
+	local cosmetics_quality = equipped_weapon:base()._cosmetics_quality
+	local wear_tear_value = cosmetics_quality and tweak_data.economy.qualities[cosmetics_quality] and tweak_data.economy.qualities[cosmetics_quality].wear_tear_value or 1
+	for _, material in pairs(materials) do
+		material:set_variable(Idstring("wear_tear_value"), wear_tear_value)
+		p_type = managers.weapon_factory:get_type_from_part_id(part_id)
+		for key, variable in pairs(material_variables) do
+			mat_variable = cosmetics_data.parts and cosmetics_data.parts[part_id] and cosmetics_data.parts[part_id][material:name():key()] and cosmetics_data.parts[part_id][material:name():key()][key]
+			type_variable = cosmetics_data.types and cosmetics_data.types[p_type] and cosmetics_data.types[p_type][key]
+			base_variable = cosmetics_data[key]
+			if mat_variable or type_variable or base_variable then
+				material:set_variable(Idstring(variable), mat_variable or type_variable or base_variable)
+			end
+		end
+		for key, material_texture in pairs(material_textures) do
+			mat_texture = cosmetics_data.parts and cosmetics_data.parts[part_id] and cosmetics_data.parts[part_id][material:name():key()] and cosmetics_data.parts[part_id][material:name():key()][key]
+			type_texture = cosmetics_data.types and cosmetics_data.types[p_type] and cosmetics_data.types[p_type][key]
+			base_texture = cosmetics_data[key]
+			local texture_name = mat_texture or type_texture or base_texture
+			if texture_name then
+				if type_name(texture_name) ~= "Idstring" then
+					texture_name = Idstring(texture_name)
+				end
+				Application:set_material_texture(material, Idstring(material_texture), texture_name, Idstring("normal"))
+			end
+		end
+	end
+	return magazine_unit
+end
+
+function CopMovement:_set_unit_bullet_objects_visible(unit, bullet_objects, visible)
+	if bullet_objects then
+		local prefix = bullet_objects.prefix
+		for i = 1, bullet_objects.amount do
+			local object = unit:get_object(Idstring(prefix .. i))
+			if object then
+				object:set_visibility(visible)
+			end
+		end
+	end
+end
+
+function CopMovement:anim_clbk_show_magazine_in_hand(unit, name)
+	if not self:allow_dropped_magazines() then
+		return
+	end
+	local w_td_crew = self:_equipped_weapon_crew_tweak_data()
+	if not w_td_crew or not w_td_crew.pull_magazine_during_reload then
+		return
+	end
+	local equipped_weapon = self._unit:inventory():equipped_unit()
+	if alive(equipped_weapon) then
+		if not equipped_weapon:base()._assembly_complete then
+			return
+		end
+		for part_id, part_data in pairs(equipped_weapon:base()._parts) do
+			local part = tweak_data.weapon.factory.parts[part_id]
+			if part and part.type == "magazine" then
+				part_data.unit:set_visible(false)
+				self._magazine_data = {
+					id = part_id,
+					name = part_data.name,
+					bullets = part.bullet_objects,
+					weapon_data = w_td_crew,
+					part_unit = part_data.unit,
+					unit = self:_spawn_magazine_unit(part_id, part_data.name, part_data.unit:position(), part_data.unit:rotation())
+				}
+				self:_set_unit_bullet_objects_visible(self._magazine_data.unit, part.bullet_objects, false)
+				self._unit:link(Idstring("LeftHandMiddle2"), self._magazine_data.unit)
+				break
+			end
+		end
+	end
+end
+
+function CopMovement:anim_clbk_spawn_dropped_magazine()
+	if not self:allow_dropped_magazines() then
+		return
+	end
+	local equipped_weapon = self._unit:inventory():equipped_unit()
+	if alive(equipped_weapon) and not equipped_weapon:base()._assembly_complete then
+		return
+	end
+	local ref_unit
+	local allow_throw = true
+	if not self._magazine_data then
+		local w_td_crew = self:_equipped_weapon_crew_tweak_data()
+		if not w_td_crew or not w_td_crew.pull_magazine_during_reload then
+			return
+		end
+		local attach_bone = Idstring("LeftHandMiddle2")
+		local bone_hand = self._unit:get_object(attach_bone)
+		self:anim_clbk_show_magazine_in_hand()
+		if bone_hand then
+			mvec3_set(temp_vec1, self._magazine_data.unit:position())
+			mvec3_sub(temp_vec1, self._magazine_data.unit:oobb():center())
+			mvec3_add(temp_vec1, bone_hand:position())
+			self._magazine_data.unit:set_position(temp_vec1)
+		end
+		ref_unit = self._magazine_data.part_unit
+		allow_throw = false
+	end
+	if self._magazine_data and alive(self._magazine_data.unit) then
+		ref_unit = ref_unit or self._magazine_data.unit
+		self._magazine_data.unit:set_visible(false)
+		local pos = ref_unit:position()
+		local rot = ref_unit:rotation()
+		local dropped_mag = self:_spawn_magazine_unit(self._magazine_data.id, self._magazine_data.name, pos, rot)
+		self:_set_unit_bullet_objects_visible(dropped_mag, self._magazine_data.bullets, false)
+		local mag_size = self._magazine_data.weapon_data.pull_magazine_during_reload
+		if type(mag_size) ~= "string" then
+			mag_size = "medium"
+		end
+		mvec3_set(temp_vec1, ref_unit:oobb():center())
+		mvec3_sub(temp_vec1, pos)
+		mvec3_set(temp_vec2, pos)
+		mvec3_add(temp_vec2, temp_vec1)
+		local dropped_col = World:spawn_unit(CopMovement.magazine_collisions[mag_size][1], temp_vec2, rot)
+		dropped_col:link(CopMovement.magazine_collisions[mag_size][2], dropped_mag)
+		if allow_throw then
+			if self._left_hand_direction then
+				local throw_force = 10
+				mvec3_set(temp_vec1, self._left_hand_direction)
+				mvec3_mul(temp_vec1, self._left_hand_velocity or 3)
+				mvec3_mul(temp_vec1, math.random(25, 45))
+				mvec3_mul(temp_vec1, -1)
+				dropped_col:push(throw_force, temp_vec1)
+			end
+		else
+			local throw_force = 10
+			local _t = (self._reload_speed_multiplier or 1) - 1
+			mvec3_set(temp_vec1, equipped_weapon:rotation():z())
+			mvec3_mul(temp_vec1, math.lerp(math.random(65, 80), math.random(140, 160), _t))
+			mvec3_mul(temp_vec1, math.random() < 5.0E-4 and 10 or -1)
+			dropped_col:push(throw_force, temp_vec1)
+		end
+		managers.enemy:add_magazine(dropped_mag, dropped_col)
+	end
+end
+
+function CopMovement:anim_clbk_show_new_magazine_in_hand(unit, name)
+	if not self:allow_dropped_magazines() then
+		return
+	end
+	local equipped_weapon = self._unit:inventory():equipped_unit()
+	if alive(equipped_weapon) and not equipped_weapon:base()._assembly_complete then
+		return
+	end
+	if self._magazine_data and alive(self._magazine_data.unit) then
+		self._magazine_data.unit:set_visible(true)
+		local equipped_weapon = self._unit:inventory():equipped_unit()
+		if alive(equipped_weapon) then
+			for part_id, part_data in pairs(equipped_weapon:base()._parts) do
+				local part = tweak_data.weapon.factory.parts[part_id]
+				if part and part.type == "magazine" then
+					self:_set_unit_bullet_objects_visible(self._magazine_data.unit, part.bullet_objects, true)
+				end
+			end
+		end
+	end
+end
+
+function CopMovement:anim_clbk_hide_magazine_in_hand()
+	if not self:allow_dropped_magazines() then
+		return
+	end
+	local equipped_weapon = self._unit:inventory():equipped_unit()
+	if alive(equipped_weapon) and not equipped_weapon:base()._assembly_complete then
+		return
+	end
+	local equipped_weapon = self._unit:inventory():equipped_unit()
+	if alive(equipped_weapon) then
+		for part_id, part_data in pairs(equipped_weapon:base()._parts) do
+			local part = tweak_data.weapon.factory.parts[part_id]
+			if part and part.type == "magazine" then
+				part_data.unit:set_visible(true)
+			end
+		end
+	end
+	self:destroy_magazine_in_hand()
+end
+
+function CopMovement:destroy_magazine_in_hand()
+	if self._magazine_data then
+		if alive(self._magazine_data.unit) then
+			self._magazine_data.unit:set_slot(0)
+		end
+		self._magazine_data = nil
+	end
+end
+
+function CopMovement:_play_weapon_reload_animation_sfx(unit, event)
+	if self:allow_dropped_magazines() then
+		local equipped_weapon = self._unit:inventory():equipped_unit()
+		if alive(equipped_weapon) then
+			local ss = SoundDevice:create_source("reload")
+			ss:set_position(equipped_weapon:position())
+			ss:post_event(event)
+		end
+	end
 end

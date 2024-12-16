@@ -4098,7 +4098,7 @@ end
 
 function PlayerManager:_exit_vehicle(peer_id, player)
 	local vehicle_data = self._global.synced_vehicle_data[peer_id]
-	if vehicle_data == nil then
+	if vehicle_data == nil or not alive(player) then
 		return
 	end
 	player:unlink()

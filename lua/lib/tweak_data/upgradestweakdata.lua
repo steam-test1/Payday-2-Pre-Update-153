@@ -1022,7 +1022,7 @@ function UpgradesTweakData:_init_pd2_values()
 		crew_regen = {"5", "5"},
 		crew_inspire = {"6", "2"},
 		crew_scavenge = {"20%", "+20%"},
-		crew_interact = {"30%", "+30%"}
+		crew_interact = {"25%", "+25%"}
 	}
 	self.crew_descs = {}
 	for id, desc in pairs(editable_crew_descrition) do

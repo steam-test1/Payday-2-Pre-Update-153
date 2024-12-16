@@ -57,7 +57,7 @@ function HUDLootScreen:init(hud, workspace, saved_lootdrop, saved_selected, save
 	self._hud_panel:set_h(self._hud_panel:h() - 25 - 150)
 	self._peer_data = {}
 	self._peers_panel = self._hud_panel:panel({})
-	for i = 1, 4 do
+	for i = 1, tweak_data.max_players do
 		self:create_peer(self._peers_panel, i)
 	end
 	self._num_visible = 1
@@ -112,7 +112,7 @@ function HUDLootScreen:create_peer(peers_panel, peer_id)
 	local large_font_size = tweak_data.menu.pd2_large_font_size
 	local medium_font_size = tweak_data.menu.pd2_medium_font_size
 	local small_font_size = tweak_data.menu.pd2_small_font_size
-	local color = tweak_data.chat_colors[peer_id]
+	local color = tweak_data.chat_colors[peer_id] or tweak_data.chat_colors[#tweak_data.chat_colors]
 	local is_local_peer = peer_id == self:get_local_peer_id()
 	self._peer_data[peer_id] = {}
 	self._peer_data[peer_id].selected = 2
@@ -281,7 +281,7 @@ end
 
 function HUDLootScreen:set_num_visible(peers_num)
 	self._num_visible = math.max(self._num_visible, peers_num)
-	for i = 1, 4 do
+	for i = 1, tweak_data.max_players do
 		self._peers_panel:child("peer" .. i):set_visible(i <= self._num_visible)
 	end
 	self._peers_panel:set_h(self._num_visible * 110)
@@ -365,7 +365,7 @@ end
 
 function HUDLootScreen:clear_other_peers(peer_id)
 	peer_id = peer_id or self:get_local_peer_id()
-	for i = 1, 4 do
+	for i = 1, tweak_data.max_players do
 		if i ~= peer_id then
 			self:remove_peer(i)
 		end
@@ -374,7 +374,7 @@ end
 
 function HUDLootScreen:check_all_ready()
 	local ready = true
-	for i = 1, 4 do
+	for i = 1, tweak_data.max_players do
 		if self._peer_data[i].active and ready then
 			ready = self._peer_data[i].ready
 		end
@@ -1057,7 +1057,7 @@ function HUDLootScreen:show_item(peer_id)
 end
 
 function HUDLootScreen:update(t, dt)
-	for peer_id = 1, 4 do
+	for peer_id = 1, tweak_data.max_players do
 		if self._peer_data[peer_id].wait_t then
 			self._peer_data[peer_id].wait_t = math.max(self._peer_data[peer_id].wait_t - dt, 0)
 			local panel = self._peers_panel:child("peer" .. tostring(peer_id))
@@ -1087,7 +1087,7 @@ end
 function HUDLootScreen:create_stars_giving_animation()
 	local lootdrops = self:fetch_local_lootdata()
 	local human_players = managers.network:session() and managers.network:session():amount_of_alive_players() or 1
-	local all_humans = human_players == 4
+	local all_humans = human_players == tweak_data.max_players
 	if not lootdrops or not lootdrops[5] then
 		return
 	end

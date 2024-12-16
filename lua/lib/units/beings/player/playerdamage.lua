@@ -875,7 +875,7 @@ function PlayerDamage:damage_bullet(attack_data)
 	end
 	self._last_received_dmg = attack_data.damage
 	self._next_allowed_dmg_t = Application:digest_value(pm:player_timer():time() + self._dmg_interval, true)
-	local dodge_roll = math.rand(1)
+	local dodge_roll = math.random()
 	local dodge_value = tweak_data.player.damage.DODGE_INIT or 0
 	local armor_dodge_chance = pm:body_armor_value("dodge")
 	local skill_dodge_chance = pm:skill_dodge_chance(self._unit:movement():running(), self._unit:movement():crouching(), self._unit:movement():zipline_unit())

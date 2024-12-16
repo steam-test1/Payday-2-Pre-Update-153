@@ -106,6 +106,9 @@ function ShotgunBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, shoo
 			if not hit_enemies[enemy_key] or col_ray.unit:character_damage().is_head and col_ray.unit:character_damage():is_head(col_ray.body) then
 				hit_enemies[enemy_key] = col_ray
 			end
+			if not col_ray.unit:character_damage().is_head then
+				self._bullet_class:on_collision_effects(col_ray, self._unit, user_unit, damage)
+			end
 		else
 			local add_shoot_through_bullet = self._can_shoot_through_shield or self._can_shoot_through_wall
 			if add_shoot_through_bullet then

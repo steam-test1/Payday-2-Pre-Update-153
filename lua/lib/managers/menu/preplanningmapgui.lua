@@ -1790,7 +1790,7 @@ function PrePlanningMapGui:setup(saferect_ws, fullscreen_ws, node)
 		}
 		params.clbk = callback(self, self, "toggle_drawing_clbk")
 		params.left = (button and button:right() + 5 or 0) + offset
-		params.color = tweak_data.chat_colors[i]
+		params.color = tweak_data.chat_colors[i] or tweak_data.chat_colors[#tweak_data.chat_colors]
 		params.value = i
 		offset = 0
 		button, button_index = self:create_text_button(params)

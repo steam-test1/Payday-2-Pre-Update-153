@@ -43,7 +43,7 @@ function HostStateInLobby:on_join_request_received(data, peer_name, client_prefe
 		end
 		return
 	end
-	if table.size(data.peers) >= 3 then
+	if table.size(data.peers) >= tweak_data.max_players - 1 then
 		print("server is full")
 		self:_send_request_denied(sender, 5, my_user_id)
 		return

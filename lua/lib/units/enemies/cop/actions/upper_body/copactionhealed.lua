@@ -11,7 +11,7 @@ function CopActionHealed:init(action_desc, common_data)
 	self._machine = common_data.machine
 	self._attention = common_data.attention
 	self._action_desc = action_desc
-	if self._unit:base()._tweak_table ~= "shield" then
+	if not self._unit:base():char_tweak().ignore_medic_revive_animation then
 		self._ext_movement:play_redirect("use_syringe")
 	end
 	self._unit:sound():say("hr01")

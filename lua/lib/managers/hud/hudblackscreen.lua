@@ -135,7 +135,7 @@ function HUDBlackScreen:skip_circle_done()
 end
 
 function HUDBlackScreen:set_job_data()
-	if managers.crime_spree:_is_active() then
+	if managers.crime_spree:is_active() then
 		self:_set_job_data_crime_spree()
 	else
 		self:_set_job_data()

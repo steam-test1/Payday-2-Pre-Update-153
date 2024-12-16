@@ -9,6 +9,7 @@ local m_min = math.min
 local tmp_vec1 = Vector3()
 EnemyManager = EnemyManager or class()
 EnemyManager._MAX_NR_CORPSES = 8
+EnemyManager.MAX_MAGAZINES = 30
 EnemyManager._nr_i_lod = {
 	{2, 2},
 	{5, 2},
@@ -544,7 +545,7 @@ function EnemyManager:on_enemy_died(dead_unit, damage_info)
 	end
 	local u_key = dead_unit:key()
 	local enemy_data = self._enemy_data
-	local u_data = enemy_data.unit_data[u_key]
+	local u_data = enemy_data.unit_data[u_key] or {unit = dead_unit}
 	self:on_enemy_unregistered(dead_unit)
 	enemy_data.unit_data[u_key] = nil
 	managers.mission:call_global_event("enemy_killed")
@@ -556,7 +557,9 @@ function EnemyManager:on_enemy_died(dead_unit, damage_info)
 	u_data.death_t = self._t
 	self:_destroy_unit_gfx_lod_data(u_key)
 	u_data.u_id = dead_unit:id()
-	Network:detach_unit(dead_unit)
+	if self:is_corpse_disposal_enabled() then
+		Network:detach_unit(dead_unit)
+	end
 	managers.crime_spree:run_func("OnEnemyDied", dead_unit, damage_info)
 end
 
@@ -644,7 +647,9 @@ function EnemyManager:on_civilian_died(dead_unit, damage_info)
 	self._civilian_data.unit_data[u_key] = nil
 	self:_destroy_unit_gfx_lod_data(u_key)
 	u_data.u_id = dead_unit:id()
-	Network:detach_unit(dead_unit)
+	if self:is_corpse_disposal_enabled() then
+		Network:detach_unit(dead_unit)
+	end
 end
 
 function EnemyManager:on_civilian_destroyed(enemy)
@@ -847,14 +852,9 @@ end
 
 function EnemyManager:dispose_all_corpses()
 	self._destroyed = true
-	while true do
-		do
-			local u_key, corpse_data = next(self._enemy_data.corpses)
-			if u_key then
-				World:delete_unit(corpse_data.unit)
-			else
-				break
-			end
+	for key, corpse_data in pairs(self._enemy_data.corpses) do
+		if alive(corpse_data.unit) then
+			World:delete_unit(corpse_data.unit)
 		end
 	end
 	if next(self._enemy_data.corpses) then
@@ -867,16 +867,18 @@ function EnemyManager:save(data)
 	if not managers.groupai:state():enemy_weapons_hot() then
 		my_data = my_data or {}
 		for u_key, u_data in pairs(self._enemy_data.corpses) do
-			my_data.corpses = my_data.corpses or {}
-			local corpse_data = {
-				u_data.u_id,
-				u_data.unit:movement():m_pos(),
-				u_data.is_civilian and true or false,
-				u_data.unit:interaction():active() and true or false,
-				u_data.unit:interaction().tweak_data,
-				u_data.unit:contour():is_flashing()
-			}
-			table.insert(my_data.corpses, corpse_data)
+			if u_data.unit:id() < 0 then
+				my_data.corpses = my_data.corpses or {}
+				local corpse_data = {
+					u_data.u_id,
+					u_data.unit:movement():m_pos(),
+					u_data.is_civilian and true or false,
+					u_data.unit:interaction():active() and true or false,
+					u_data.unit:interaction().tweak_data,
+					u_data.unit:contour():is_flashing()
+				}
+				table.insert(my_data.corpses, corpse_data)
+			end
 		end
 	end
 	data.enemy_manager = my_data
@@ -958,4 +960,23 @@ function EnemyManager:get_nearby_medic(unit)
 		end
 	end
 	return nil
+end
+
+function EnemyManager:add_magazine(magazine, collision)
+	self._magazines = self._magazines or {}
+	table.insert(self._magazines, {magazine, collision})
+	if #self._magazines > EnemyManager.MAX_MAGAZINES then
+		self:cleanup_magazines()
+	end
+end
+
+function EnemyManager:cleanup_magazines()
+	for i = 1, #self._magazines - EnemyManager.MAX_MAGAZINES do
+		for _, unit in ipairs(self._magazines[1]) do
+			if alive(unit) then
+				unit:set_slot(0)
+			end
+		end
+		table.remove(self._magazines, 1)
+	end
 end

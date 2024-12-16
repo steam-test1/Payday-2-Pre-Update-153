@@ -7,7 +7,7 @@ function CrimeSpreeContractBoxGui:init(ws, fullscreen_ws)
 	self._fullscreen_panel = self._fullscreen_ws:panel():panel()
 	self._peer_panels = {}
 	if not self:_can_update() then
-		for i = 1, 4 do
+		for i = 1, tweak_data.max_players do
 			self:_check_create_peer_panel(i)
 		end
 	end

@@ -2180,6 +2180,7 @@ function CrimeNetGui:add_special_contracts(no_casino, no_quickplay)
 		end
 		skip = skip or special_contract.sp_only and not Global.game_settings.single_player
 		skip = skip or special_contract.mp_only and Global.game_settings.single_player
+		skip = skip or special_contract.no_session_only and managers.network:session()
 		if not skip then
 			self:add_special_contract(special_contract, no_casino, no_quickplay)
 		end

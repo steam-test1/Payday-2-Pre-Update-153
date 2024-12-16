@@ -82,9 +82,17 @@ function QuickFlashGrenade:_beep()
 	self._light_multiplier = tweak_data.group_ai.flash_grenade.beep_multi
 end
 
+function QuickFlashGrenade:timer(new)
+	if not self._timer then
+		self._timer = 3
+	end
+	self._timer = new or self._timer
+	return self._timer
+end
+
 function QuickFlashGrenade:_get_next_beep_time()
 	local beep_speed = tweak_data.group_ai.flash_grenade.beep_speed
-	return self._timer / beep_speed[1] * beep_speed[2]
+	return self:timer() / beep_speed[1] * beep_speed[2]
 end
 
 function QuickFlashGrenade:activate(position, duration)
@@ -129,7 +137,6 @@ function QuickFlashGrenade:_state_bounced()
 end
 
 function QuickFlashGrenade:_state_detonated()
-	print("QuickFlashGrenade:_state_detonated()", TimerManager:game():time())
 	local detonate_pos = self._unit:position()
 	self:make_flash(detonate_pos, tweak_data.group_ai.flash_grenade.range)
 	managers.groupai:state():propagate_alert({
@@ -240,7 +247,6 @@ function QuickFlashGrenade:remove_light()
 end
 
 function QuickFlashGrenade:destroy()
-	print("QuickFlashGrenade:destroy()", TimerManager:game():time())
 	self:remove_light()
 end
 

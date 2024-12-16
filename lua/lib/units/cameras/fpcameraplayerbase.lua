@@ -1061,8 +1061,9 @@ end
 
 function FPCameraPlayerBase:anim_clbk_unspawn_handcuffs()
 	if self._handcuff_units then
-		for _, handcuff_unit in ipairs(self._handcuff_units) do
+		for _, handcuff_unit in pairs(self._handcuff_units) do
 			if alive(handcuff_unit) then
+				handcuff_unit:set_visible(false)
 				handcuff_unit:set_slot(0)
 			end
 		end

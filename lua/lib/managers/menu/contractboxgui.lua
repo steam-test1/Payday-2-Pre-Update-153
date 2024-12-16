@@ -462,7 +462,7 @@ function ContractBoxGui:create_contract_box()
 			1
 		}
 	})
-	for i = 1, 4 do
+	for i = 1, tweak_data.max_players do
 		local peer = managers.network:session():peer(i)
 		if peer then
 			local peer_pos = managers.menu_scene:character_screen_position(i)
@@ -603,7 +603,7 @@ function ContractBoxGui:refresh()
 end
 
 function ContractBoxGui:update(t, dt)
-	for i = 1, 4 do
+	for i = 1, tweak_data.max_players do
 		self:update_character(i)
 	end
 	if managers.job:current_contact_data() then
@@ -633,7 +633,7 @@ end
 function ContractBoxGui:create_character_text(peer_id, x, y, text, icon)
 	self._peers = self._peers or {}
 	local color_id = peer_id
-	local color = tweak_data.chat_colors[color_id]
+	local color = tweak_data.chat_colors[color_id] or tweak_data.chat_colors[#tweak_data.chat_colors]
 	self._peers[peer_id] = self._peers[peer_id] or self._panel:text({
 		name = tostring(peer_id),
 		text = "",

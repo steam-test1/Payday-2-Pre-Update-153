@@ -16,7 +16,7 @@ function ServerLeftState:at_enter(...)
 	if managers.network.matchmake then
 		managers.network.matchmake._room_id = nil
 	end
-	if managers.crime_spree:_is_active() then
+	if managers.crime_spree:is_active() then
 		MenuCallbackHandler:create_server_left_crime_spree_dialog()
 	else
 		self:_create_server_left_dialog()

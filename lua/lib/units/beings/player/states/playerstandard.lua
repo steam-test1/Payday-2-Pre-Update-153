@@ -68,6 +68,12 @@ PlayerStandard.ANIM_STATES = {
 		idle = Idstring("underbarrel_idle")
 	}
 }
+PlayerStandard.projectile_throw_delays = {
+	projectile_frag = 0.5298462,
+	projectile_frag_com = 0.83062744,
+	projectile_molotov = 0.8686733,
+	projectile_dynamite = 0.8665676
+}
 PlayerStandard.debug_bipod = nil
 
 function PlayerStandard:init(unit)
@@ -192,9 +198,9 @@ function PlayerStandard:enter(state_data, enter_data)
 		})
 	end
 	if enter_data then
-		self._change_weapon_data = enter_data.change_weapon_data
-		self._unequip_weapon_expire_t = enter_data.unequip_weapon_expire_t
-		self._equip_weapon_expire_t = enter_data.equip_weapon_expire_t
+		self._change_weapon_data = enter_data.change_weapon_data or self._change_weapon_data
+		self._unequip_weapon_expire_t = enter_data.unequip_weapon_expire_t or self._unequip_weapon_expire_t
+		self._equip_weapon_expire_t = enter_data.equip_weapon_expire_t or self._equip_weapon_expire_t
 	end
 	self:_reset_delay_action()
 	self._last_velocity_xy = Vector3()
@@ -236,7 +242,7 @@ function PlayerStandard:_enter(enter_data)
 	end
 	self._ext_inventory:set_mask_visibility(true)
 	self:_upd_attention()
-	self._ext_network:send("set_stance", 2, false, false)
+	self._ext_network:send("set_stance", 3, false, false)
 end
 
 function PlayerStandard:exit(state_data, new_state_name)
@@ -749,11 +755,10 @@ function PlayerStandard:_update_movement(t, dt)
 end
 
 function PlayerStandard:_update_network_position(t, dt, cur_pos, pos_new)
-	local move_dis = mvector3.distance_sq(cur_pos, self._last_sent_pos)
-	if self:is_network_move_allowed() and (22500 < move_dis or 400 < move_dis and (t - self._last_sent_pos_t > 1.5 or not pos_new)) then
+	if not self._last_sent_pos_t or t - self._last_sent_pos_t > 1 / tweak_data.network.player_tick_rate then
 		self._ext_network:send("action_walk_nav_point", cur_pos)
-		mvector3.set(self._last_sent_pos, cur_pos)
 		self._last_sent_pos_t = t
+		mvector3.set(self._last_sent_pos, cur_pos)
 	end
 end
 
@@ -929,6 +934,11 @@ function PlayerStandard:_get_max_walk_speed(t)
 		multiplier = multiplier * managers.player:temporary_upgrade_value("temporary", "increased_movement_speed", 1)
 	end
 	local final_speed = movement_speed * multiplier
+	self._cached_final_speed = self._cached_final_speed or 0
+	if final_speed ~= self._cached_final_speed then
+		self._cached_final_speed = final_speed
+		self._ext_network:send("action_change_speed", final_speed)
+	end
 	return final_speed
 end
 
@@ -981,7 +991,7 @@ function PlayerStandard:_end_action_steelsight(t)
 		self._state_data.steelsight_weight_target = 0
 		self._camera_unit:base():set_steelsight_anim_enabled(true)
 	end
-	self._ext_network:send("set_stance", 2, false, false)
+	self._ext_network:send("set_stance", 3, false, false)
 end
 
 function PlayerStandard:_need_to_play_idle_redirect()
@@ -1332,12 +1342,20 @@ function PlayerStandard:_check_action_throw_grenade(t, input)
 	return action_wanted
 end
 
+function PlayerStandard:_get_projectile_throw_offset()
+	if not self.projectile_throw_delays[self._projectile_global_value] then
+		Application:error("No projectile throw delay for ", self._projectile_global_value, "! This needs to be added to PlayerStandard!")
+		self._debug_throw_anim_req_update = true
+		return 0
+	end
+	return self.projectile_throw_delays[self._projectile_global_value]
+end
+
 function PlayerStandard:_start_action_throw_grenade(t, input)
 	self:_interupt_action_reload(t)
 	self:_interupt_action_steelsight(t)
 	self:_interupt_action_running(t)
 	self:_interupt_action_charging_weapon(t)
-	managers.network:session():send_to_peers_synched("play_distance_interact_redirect", self._unit, "throw_grenade")
 	local equipped_grenade = managers.blackmarket:equipped_grenade()
 	local projectile_tweak = tweak_data.blackmarket.projectiles[equipped_grenade]
 	if self._projectile_global_value then
@@ -1348,6 +1366,8 @@ function PlayerStandard:_start_action_throw_grenade(t, input)
 		self._projectile_global_value = projectile_tweak.anim_global_param
 		self._camera_unit:anim_state_machine():set_global(self._projectile_global_value, 1)
 	end
+	local delay = self:_get_projectile_throw_offset()
+	managers.network:session():send_to_peers_synched("play_distance_interact_redirect_delay", self._unit, "throw_grenade", delay)
 	self._ext_camera:play_redirect(Idstring(projectile_tweak.animation or "throw_grenade"))
 	local projectile_data = tweak_data.blackmarket.projectiles[equipped_grenade]
 	self._state_data.throw_grenade_expire_t = t + (projectile_data.expire_t or 1.1)
@@ -1473,6 +1493,7 @@ function PlayerStandard:_start_action_interact(t, input, timer, interact_object)
 	self._equipped_unit:base():tweak_data_anim_play("unequip")
 	managers.hud:show_interaction_bar(start_timer, final_timer)
 	managers.network:session():send_to_peers_synched("sync_teammate_progress", 1, true, self._interact_params.tweak_data, final_timer, false)
+	self._unit:network():send("sync_interaction_anim", true, self._interact_params.tweak_data)
 end
 
 function PlayerStandard:_interupt_action_interact(t, input, complete)
@@ -1491,6 +1512,7 @@ function PlayerStandard:_interupt_action_interact(t, input, complete)
 		managers.hud:hide_interaction_bar(complete)
 		self._equipped_unit:base():tweak_data_anim_stop("unequip")
 		self._equipped_unit:base():tweak_data_anim_play("equip")
+		self._unit:network():send("sync_interaction_anim", false, "")
 	end
 end
 
@@ -1615,6 +1637,10 @@ function PlayerStandard:_start_action_melee(t, input, instant)
 	local current_state_name = self._camera_unit:anim_state_machine():segment_state(self:get_animation("base"))
 	local attack_allowed_expire_t = tweak_data.blackmarket.melee_weapons[melee_entry].attack_allowed_expire_t or 0.15
 	self._state_data.melee_attack_allowed_t = t + (current_state_name ~= self:get_animation("melee_attack_state") and attack_allowed_expire_t or 0)
+	local instant_hit = tweak_data.blackmarket.melee_weapons[melee_entry].instant
+	if not instant_hit then
+		self._ext_network:send("sync_melee_start")
+	end
 	if current_state_name == self:get_animation("melee_attack_state") then
 		self._ext_camera:play_redirect(self:get_animation("melee_charge"))
 		return
@@ -1684,7 +1710,11 @@ function PlayerStandard:_do_action_melee(t, input, skip_damage)
 		end
 	end
 	local send_redirect = instant_hit and (bayonet_melee and "melee_bayonet" or "melee") or "melee_item"
-	managers.network:session():send_to_peers_synched("play_distance_interact_redirect", self._unit, send_redirect)
+	if instant_hit then
+		managers.network:session():send_to_peers_synched("play_distance_interact_redirect", self._unit, send_redirect)
+	else
+		self._ext_network:send("sync_melee_discharge")
+	end
 	if self._state_data.melee_charge_shake then
 		self._ext_camera:shaker():stop(self._state_data.melee_charge_shake)
 		self._state_data.melee_charge_shake = nil
@@ -2415,7 +2445,7 @@ function PlayerStandard:_get_unit_intimidation_action(intimidate_enemies, intimi
 	if intimidate_enemies then
 		local enemies = managers.enemy:all_enemies()
 		for u_key, u_data in pairs(enemies) do
-			if self._unit:movement():team().foes[u_data.unit:movement():team().id] and not u_data.unit:anim_data().hands_tied and not u_data.unit:anim_data().long_dis_interact_disabled and (u_data.char_tweak.priority_shout or not only_special_enemies) then
+			if self._unit:movement():team().foes[u_data.unit:movement():team().id] and not u_data.unit:anim_data().hands_tied and not u_data.unit:anim_data().long_dis_interact_disabled and (not u_data.unit:character_damage() or not u_data.unit:character_damage():dead()) and (u_data.char_tweak.priority_shout or not only_special_enemies) then
 				if managers.groupai:state():whisper_mode() then
 					if u_data.char_tweak.silent_priority_shout and u_data.unit:movement():cool() then
 						self:_add_unit_to_char_table(char_table, u_data.unit, unit_type_enemy, highlight_range, false, false, 0.01, my_head_pos, cam_fwd)
@@ -2769,14 +2799,12 @@ function PlayerStandard:_perform_jump(jump_vec)
 		managers.job:set_memory("jordan_2", memory, true)
 	end
 	if not managers.job:get_memory("jordan_3") then
-		print("[achievement] Failed Achievement " .. "brooklyn_3")
 		managers.job:set_memory("jordan_3", true)
 	end
 	local jordan_4 = managers.job:get_memory("jordan_4")
 	if jordan_4 or jordan_4 == nil then
 		local last_jump_t = managers.job:get_memory("last_jump_t", true) or 0
 		if last_jump_t and t > last_jump_t + tweak_data.achievement.complete_heist_achievements.jordan_4.jump_timer then
-			print("[achievement] Failed Achievement " .. "brooklyn_4")
 			managers.job:set_memory("jordan_4", false)
 		else
 			managers.job:set_memory("jordan_4", true)
@@ -2794,14 +2822,12 @@ function PlayerStandard:_update_network_jump(pos, is_exit)
 	local mover = self._unit:mover()
 	if self._is_jumping and (not (not is_exit and mover) or mover:standing() and mover:velocity().z < 0 or mover:gravity().z == 0) then
 		if not self._is_jump_middle_passed then
-			self._ext_network:send("action_jump_middle", pos or self._pos)
 			self._is_jump_middle_passed = true
 		end
 		self._is_jumping = nil
-		self._ext_network:send("action_land", pos or self._pos)
 	elseif self._send_jump_vec and not is_exit then
-		if self._is_jumping then
-			self._ext_network:send("action_land", pos or self._pos)
+		if self._is_jumping and type(self._gnd_ray) ~= "boolean" then
+			self._ext_network:send("action_walk_nav_point", self._gnd_ray and self._gnd_ray.position)
 		end
 		self._ext_network:send("action_jump", pos or self._pos, self._send_jump_vec)
 		self._send_jump_vec = nil
@@ -2809,7 +2835,6 @@ function PlayerStandard:_update_network_jump(pos, is_exit)
 		self._is_jump_middle_passed = nil
 		mvector3.set(self._last_sent_pos, pos or self._pos)
 	elseif self._is_jumping and not self._is_jump_middle_passed and mover and mover:velocity().z < 0 then
-		self._ext_network:send("action_jump_middle", pos or self._pos)
 		self._is_jump_middle_passed = true
 	end
 end
@@ -3095,6 +3120,12 @@ end
 function PlayerStandard:set_running(running)
 	self._running = running
 	self._unit:movement():set_running(self._running)
+	self._ext_network:send("action_change_run", running)
+	local stance_code = self._running and 2 or 3
+	if self._running and self._equipped_unit:base():run_and_shoot_allowed() then
+		stance_code = 3
+	end
+	self._ext_network:send("set_stance", stance_code, false, false)
 end
 
 function PlayerStandard:_check_action_ladder(t, input)
@@ -3476,6 +3507,10 @@ function PlayerStandard:_start_action_reload(t)
 	if weapon and weapon:can_reload() then
 		weapon:tweak_data_anim_stop("fire")
 		local speed_multiplier = weapon:reload_speed_multiplier()
+		local empty_reload = weapon:clip_empty() and 1 or 0
+		if weapon._use_shotgun_reload then
+			empty_reload = weapon:get_ammo_max_per_clip() - weapon:get_ammo_remaining_in_clip()
+		end
 		local tweak_data = weapon:weapon_tweak_data()
 		local reload_anim = "reload"
 		local reload_prefix = weapon:reload_prefix() or ""
@@ -3497,7 +3532,7 @@ function PlayerStandard:_start_action_reload(t)
 			weapon:tweak_data_anim_play("reload", speed_multiplier)
 			Application:trace("PlayerStandard:_start_action_reload( t ): ", reload_anim)
 		end
-		self._ext_network:send("reload_weapon")
+		self._ext_network:send("reload_weapon", empty_reload, speed_multiplier)
 	end
 end
 
@@ -3515,6 +3550,11 @@ function PlayerStandard:_interupt_action_reload(t)
 	self._state_data.reload_expire_t = nil
 	self._state_data.reload_exit_expire_t = nil
 	managers.player:remove_property("shock_and_awe_reload_multiplier")
+	self:send_reload_interupt()
+end
+
+function PlayerStandard:send_reload_interupt()
+	self._ext_network:send("reload_weapon_interupt")
 end
 
 function PlayerStandard:_is_reloading()
@@ -3565,6 +3605,7 @@ function PlayerStandard:_start_action_unequip_weapon(t, data)
 	local result = self._ext_camera:play_redirect(self:get_animation("unequip"), speed_multiplier)
 	self:_interupt_action_reload(t)
 	self:_interupt_action_steelsight(t)
+	self._ext_network:send("switch_weapon", speed_multiplier, 1)
 end
 
 function PlayerStandard:_start_action_equip_weapon(t)

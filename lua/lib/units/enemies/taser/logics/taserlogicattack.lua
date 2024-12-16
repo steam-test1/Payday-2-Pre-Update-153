@@ -9,7 +9,7 @@ function TaserLogicAttack.enter(data, new_logic_name, enter_params)
 	}
 	data.internal_data = my_data
 	my_data.detection = data.char_tweak.detection.combat
-	my_data.tase_distance = data.char_tweak.weapon.m4.tase_distance
+	my_data.tase_distance = data.char_tweak.weapon.is_rifle.tase_distance
 	if old_internal_data then
 		my_data.turning = old_internal_data.turning
 		my_data.firing = old_internal_data.firing
@@ -116,7 +116,7 @@ function TaserLogicAttack._upd_enemy_detection(data)
 	local tasing = my_data.tasing
 	local tased_u_key = tasing and tasing.target_u_key
 	local tase_in_effect = tasing and tasing.target_u_data.unit:movement():tased()
-	if tase_in_effect or tasing and data.t - tasing.start_t < math.max(1, data.char_tweak.weapon.m4.aim_delay_tase[2] * 1.5) then
+	if tase_in_effect or tasing and data.t - tasing.start_t < math.max(1, data.char_tweak.weapon.is_rifle.aim_delay_tase[2] * 1.5) then
 		if under_multiple_fire then
 			find_new_focus_enemy = true
 		end

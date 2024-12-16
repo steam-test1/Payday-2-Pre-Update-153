@@ -71,6 +71,8 @@ function PlayerTweakData:init()
 	local is_console = SystemInfo:platform() ~= Idstring("WIN32")
 	self.arrest = {arrest_timeout = 240, aggression_timeout = 60}
 	self.put_on_mask_time = 2
+	self.gravity = -982
+	self.terminal_velocity = -5500
 	self.damage = {}
 	if is_console then
 		self.damage.ARMOR_INIT = 5

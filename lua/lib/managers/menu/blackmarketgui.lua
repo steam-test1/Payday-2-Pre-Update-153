@@ -1756,7 +1756,6 @@ function BlackMarketGui:init(ws, fullscreen_ws, node)
 	local component_data = self._node:parameters().menu_component_data
 	local do_animation = not component_data and not self._data
 	local is_start_page = not component_data and true or false
-	managers.menu_component:close_contract_gui()
 	managers.network.account:inventory_load()
 	self:_setup(is_start_page, component_data)
 	if do_animation then
@@ -7363,6 +7362,7 @@ function BlackMarketGui.get_func_based(func_based)
 end
 
 function BlackMarketGui:populate_weapon_category(category, data)
+	managers.blackmarket:clear_temporary()
 	managers.blackmarket:clear_preview_blueprint()
 	local crafted_category = managers.blackmarket:get_crafted_category(category) or {}
 	local last_weapon = table.size(crafted_category) == 1
@@ -8940,6 +8940,8 @@ function BlackMarketGui:populate_masks_new(data)
 end
 
 function BlackMarketGui:populate_weapon_category_new(data)
+	managers.blackmarket:clear_temporary()
+	managers.blackmarket:clear_preview_blueprint()
 	local category = data.category
 	local crafted_category = managers.blackmarket:get_crafted_category(category) or {}
 	local last_weapon = table.size(crafted_category) == 1
@@ -9745,7 +9747,7 @@ function BlackMarketGui:populate_mods(data)
 				end
 			end
 			local factory = tweak_data.weapon.factory.parts[data[equipped].name]
-			if data.name == "sight" and factory and factory.texture_switch then
+			if (data.name == "sight" or data.name == "gadget") and factory and factory.texture_switch then
 				if not crafted.customize_locked then
 					table.insert(data[equipped], "wm_reticle_switch_menu")
 				end
@@ -12284,7 +12286,8 @@ function BlackMarketGui:_buy_mod_callback(data)
 	if factory then
 		local texture_switch = factory.texture_switch
 		if texture_switch then
-			managers.blackmarket:set_part_texture_switch(data.category, data.slot, data.name, "1 1")
+			local default = tweak_data.gui.part_texture_switches[data.name] or tweak_data.gui.default_part_texture_switch
+			managers.blackmarket:set_part_texture_switch(data.category, data.slot, data.name, default)
 		end
 	end
 	self:reload()

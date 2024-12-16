@@ -1633,9 +1633,9 @@ TeamLoadoutItem = TeamLoadoutItem or class(MissionBriefingTabItem)
 function TeamLoadoutItem:init(panel, text, i)
 	TeamLoadoutItem.super.init(self, panel, text, i)
 	self._player_slots = {}
-	local quarter_width = self._panel:w() / 4
+	local quarter_width = self._panel:w() / tweak_data.max_players
 	local slot_panel
-	for i = 1, 4 do
+	for i = 1, tweak_data.max_players do
 		local old_right = slot_panel and slot_panel:right() or 0
 		slot_panel = self._panel:panel({
 			x = old_right,
@@ -1663,7 +1663,7 @@ end
 
 function TeamLoadoutItem:reduce_to_small_font()
 	TeamLoadoutItem.super.reduce_to_small_font(self)
-	for i = 1, 4 do
+	for i = 1, tweak_data.max_players do
 		if self._player_slots[i].box then
 			self._player_slots[i].box:create_sides(self._player_slots[i].panel, {
 				sides = {
@@ -1692,7 +1692,7 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 	local y = player_slot.panel:h() / 18
 	local w = slot_h / 5 * 0.95
 	local h = w
-	local slot_color = tweak_data.chat_colors[slot]
+	local slot_color = tweak_data.chat_colors[slot] or tweak_data.chat_colors[#tweak_data.chat_colors]
 	local criminal_text = player_slot.panel:text({
 		font_size = tweak_data.menu.pd2_small_font_size,
 		font = tweak_data.menu.pd2_small_font,
@@ -2888,7 +2888,7 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 	self._assets_item = AssetsItem:new(self._panel, managers.preplanning:has_current_level_preplanning() and managers.localization:to_upper_text("menu_preplanning") or utf8.to_upper(managers.localization:text("menu_assets")), index, {}, nil, asset_data)
 	table.insert(self._items, self._assets_item)
 	index = index + 1
-	if managers.crime_spree:_is_active() then
+	if managers.crime_spree:is_active() then
 		local gage_assets_data = {}
 		self._gage_assets_item = GageAssetsItem:new(self._panel, managers.localization:to_upper_text("menu_cs_gage_assets"), index)
 		table.insert(self._items, self._gage_assets_item)
@@ -2932,7 +2932,7 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 		max_x = next_page:left() - 5
 	end
 	self._reduced_to_small_font = not managers.menu:is_pc_controller()
-	self._reduced_to_small_font = self._reduced_to_small_font or managers.crime_spree:_is_active()
+	self._reduced_to_small_font = self._reduced_to_small_font or managers.crime_spree:is_active()
 	self:chk_reduce_to_small_font()
 	self._selected_item = 0
 	self:set_tab(self._node:parameters().menu_component_data.selected_tab, true)

@@ -39,6 +39,8 @@ require("lib/tweak_data/InputTweakData")
 require("lib/tweak_data/ArmorSkinsTweakData")
 require("lib/tweak_data/CrimeSpreeTweakData")
 require("lib/tweak_data/FireTweakData")
+require("lib/tweak_data/NetworkTweakData")
+require("lib/tweak_data/AnimationTweakData")
 TweakData = TweakData or class()
 
 function TweakData:_init_wip_tweak_data()
@@ -322,6 +324,7 @@ function TweakData:index_to_menu_sync_state(index)
 end
 
 function TweakData:init()
+	self.max_players = 4
 	self.difficulties = {
 		"easy",
 		"normal",
@@ -629,6 +632,8 @@ function TweakData:init()
 	self.input = InputTweakData:new(self)
 	self.crime_spree = CrimeSpreeTweakData:new(self)
 	self.fire = FireTweakData:new(self)
+	self.network = NetworkTweakData:new(self)
+	self.animation = AnimationTweakData:new(self)
 	self.ai_carry = {}
 	self.ai_carry.throw_distance = 500
 	self.ai_carry.throw_force = 100
@@ -2151,6 +2156,8 @@ Play the full version soon to get your full PAYDAY!]],
 	self.quickplay.stealth_levels = {}
 	self.quickplay.stealth_levels.dark = true
 	self.quickplay.stealth_levels.kosugi = true
+	self.quickplay.stealth_levels.cage = true
+	self.quickplay.stealth_levels.fish = true
 	self.team_ai = {}
 	self.team_ai.stop_action = {}
 	self.team_ai.stop_action.delay = 0.8

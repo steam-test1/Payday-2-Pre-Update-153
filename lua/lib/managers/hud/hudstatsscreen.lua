@@ -391,7 +391,7 @@ function HUDStatsScreen:init()
 		local difficulty_string_id = tweak_data.difficulty_name_ids[difficulty]
 		local difficulty_string = managers.localization:to_upper_text(difficulty_string_id)
 		local difficulty_color = tweak_data.screen_colors.risk
-		if managers.crime_spree:_is_active() then
+		if managers.crime_spree:is_active() then
 			difficulty_string = managers.localization:text("menu_cs_level", {
 				level = managers.experience:cash_string(managers.crime_spree:server_spree_level(), "")
 			})
@@ -1149,7 +1149,7 @@ function HUDStatsScreen:_update_stats_screen_day(right_panel)
 			ghostable_text:set_visible(is_level_ghostable and is_whisper_mode)
 		end
 	end
-	if managers.crime_spree:_is_active() then
+	if managers.crime_spree:is_active() then
 		local day_payout = day_wrapper_panel:child("day_payout")
 		local day_description = day_wrapper_panel:child("day_description")
 		local bains_plan = day_wrapper_panel:child("bains_plan")

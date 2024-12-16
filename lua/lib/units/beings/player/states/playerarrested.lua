@@ -62,6 +62,7 @@ function PlayerArrested:exit(state_data, new_state_name)
 	self._rescuer = nil
 	self._unit:character_damage():on_freed()
 	self._unit:camera():camera_unit():base():remove_limits()
+	self._unit:camera():camera_unit():base():anim_clbk_unspawn_handcuffs()
 	managers.hud:pd_hide_text()
 	if self._entry_speech_clbk then
 		managers.enemy:remove_delayed_clbk(self._entry_speech_clbk)

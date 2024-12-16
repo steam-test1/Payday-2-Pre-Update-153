@@ -3,6 +3,7 @@ BootupState = BootupState or class(GameState)
 
 function BootupState:init(game_state_machine, setup)
 	GameState.init(self, "bootup", game_state_machine)
+	self._bootup_volume = 1
 	if setup then
 		self:setup()
 	end
@@ -77,6 +78,15 @@ function BootupState:old()
 	}
 end
 
+function BootupState:on_savefile_loaded(slot, success, is_setting_slot, cache_only)
+	if is_setting_slot then
+		self._bootup_volume = (managers.user:get_setting("sfx_volume") or 100) / 100
+		if self._play_data and self._play_data.video and alive(self._gui_obj) then
+			self._gui_obj:set_volume_gain(self._bootup_volume)
+		end
+	end
+end
+
 function BootupState:setup()
 	local res = RenderSettings.resolution
 	local safe_rect_pixels = managers.gui_data:scaled_size()
@@ -92,11 +102,10 @@ function BootupState:setup()
 	self._full_workspace:hide()
 	managers.gui_data:layout_workspace(self._workspace)
 	local esrb_y = safe_rect_pixels.height / 1.9
-	local can_skip = true
 	local has_full_game = managers.dlc:has_full_game()
-	local legal_text = managers.localization:text("legal_text")
 	local item_layer = self._back_drop_gui:background_layers()
 	local intro_trailer_layer = self._back_drop_gui:foreground_layers()
+	managers.savefile:add_load_done_callback(callback(self, self, "on_savefile_loaded"))
 	self._play_data_list = {}
 	table.insert(self._play_data_list, {
 		visible = not is_win32,
@@ -120,41 +129,10 @@ function BootupState:setup()
 		duration = show_esrb and 6.5 or 0,
 		fade_out = 1.25
 	})
-	if not Application:production_build() then
-		table.insert(self._play_data_list, {
-			layer = intro_trailer_layer,
-			video = "movies/intro_trailer",
-			width = res.x,
-			height = res.y,
-			padding = 200,
-			can_skip = true,
-			limit_file_streamer = true
-		})
+	local play_intros = not Application:production_build()
+	if play_intros then
+		self:setup_intro_videos()
 	end
-	table.insert(self._play_data_list, {
-		layer = item_layer,
-		text = legal_text,
-		font = tweak_data.menu.pd2_medium_font,
-		font_size = 24,
-		wrap = true,
-		word_wrap = true,
-		vertical = "center",
-		width = safe_rect_pixels.width,
-		height = safe_rect_pixels.height,
-		padding = 200,
-		can_skip = can_skip,
-		fade_in = 1.25,
-		duration = 6,
-		fade_out = 1.25
-	})
-	table.insert(self._play_data_list, {
-		layer = item_layer,
-		video = "movies/game_intro",
-		width = res.x,
-		height = res.y,
-		padding = 200,
-		can_skip = true
-	})
 	self._full_panel = self._full_workspace:panel()
 	self._panel = self._workspace:panel()
 	self._full_panel:rect({
@@ -168,6 +146,47 @@ function BootupState:setup()
 		con:enable()
 		self._controller_list[index] = con
 	end
+end
+
+function BootupState:setup_intro_videos()
+	local res = RenderSettings.resolution
+	local safe_rect_pixels = managers.gui_data:scaled_size()
+	local legal_text = managers.localization:text("legal_text")
+	local item_layer = self._back_drop_gui:background_layers()
+	local intro_trailer_layer = self._back_drop_gui:foreground_layers()
+	table.insert(self._play_data_list, {
+		layer = intro_trailer_layer,
+		video = "movies/intro_trailer",
+		width = res.x,
+		height = res.y,
+		padding = 200,
+		can_skip = true,
+		limit_file_streamer = true
+	})
+	table.insert(self._play_data_list, {
+		layer = item_layer,
+		text = legal_text,
+		font = tweak_data.menu.pd2_medium_font,
+		font_size = 24,
+		wrap = true,
+		word_wrap = true,
+		vertical = "center",
+		width = safe_rect_pixels.width,
+		height = safe_rect_pixels.height,
+		padding = 200,
+		can_skip = true,
+		fade_in = 1.25,
+		duration = 6,
+		fade_out = 1.25
+	})
+	table.insert(self._play_data_list, {
+		layer = item_layer,
+		video = "movies/game_intro",
+		width = res.x,
+		height = res.y,
+		padding = 200,
+		can_skip = true
+	})
 end
 
 function BootupState:at_enter()
@@ -191,7 +210,7 @@ end
 
 function BootupState:clbk_game_has_music_control(status)
 	if self._play_data and self._play_data.video then
-		self._gui_obj:set_volume_gain(status and 1 or 0)
+		self._gui_obj:set_volume_gain(status and self._bootup_volume or 0)
 	end
 end
 
@@ -340,6 +359,7 @@ function BootupState:play_next(is_skipped)
 			gui_config.video = self._play_data.video
 			gui_config.layer = self._play_data.layer or gui_config.layer
 			self._gui_obj = self._full_panel:video(gui_config)
+			self._gui_obj:set_volume_gain(self._bootup_volume)
 			if not managers.music:has_music_control() then
 				self._gui_obj:set_volume_gain(0)
 			end

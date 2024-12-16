@@ -170,7 +170,21 @@ function NPCRaycastWeaponBase:destroy(unit)
 	end
 end
 
+function NPCRaycastWeaponBase:non_npc_name_id()
+	if not self._non_npc_name_id then
+		self._non_npc_name_id = self._name_id
+		self._non_npc_name_id = string.gsub(self._non_npc_name_id, "_npc", "")
+		self._non_npc_name_id = string.gsub(self._non_npc_name_id, "_crew", "")
+	end
+	return self._non_npc_name_id
+end
+
 function NPCRaycastWeaponBase:_get_spread(user_unit)
+	local weapon_tweak = tweak_data.weapon[self._name_id]
+	if not weapon_tweak then
+		return 3
+	end
+	return weapon_tweak.spread
 end
 
 function NPCRaycastWeaponBase:_sound_autofire_start(nr_shots)
@@ -204,6 +218,7 @@ function NPCRaycastWeaponBase:_sound_singleshot()
 end
 
 local mvec_to = Vector3()
+local mvec_spread = Vector3()
 
 function NPCRaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, shoot_player, spread_mul, autohit_mul, suppr_mul, target_unit)
 	local result = {}
@@ -233,7 +248,14 @@ function NPCRaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_
 		target_unit:character_damage():build_suppression(tweak_data.weapon[self._name_id].suppression)
 	end
 	if not col_ray or col_ray.distance > 600 or result.guaranteed_miss then
-		self:_spawn_trail_effect(direction, col_ray)
+		local num_rays = (tweak_data.weapon[self._name_id] or {}).rays or 1
+		for i = 1, num_rays do
+			mvector3.set(mvec_spread, direction)
+			if 1 < i then
+				mvector3.spread(mvec_spread, self:_get_spread())
+			end
+			self:_spawn_trail_effect(mvec_spread, col_ray)
+		end
 	end
 	result.hit_enemy = char_hit
 	if self._alert_events then

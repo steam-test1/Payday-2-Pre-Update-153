@@ -22,6 +22,7 @@ local bezier_curve = {
 	1
 }
 CopActionShoot = CopActionShoot or class()
+CopActionShoot._pseudorandom = CopActionHurt._pseudorandom
 CopActionShoot._ik_presets = {
 	spine = {
 		start = "_begin_ik_spine",
@@ -162,10 +163,8 @@ function CopActionShoot:on_attention(attention, old_attention)
 			end
 			local usage_tweak = self._w_usage_tweak
 			local target_pos = attention.handler and attention.handler:get_attention_m_pos() or attention.unit:movement():m_head_pos()
-			local focus_error_roll = math.random(360)
 			local shoot_hist = self._shoot_history
 			if shoot_hist then
-				shoot_hist.focus_error_roll = focus_error_roll
 				local displacement = mvector3.distance(target_pos, shoot_hist.m_last_pos)
 				local focus_delay = usage_tweak.focus_delay * math.min(1, displacement / usage_tweak.focus_dis)
 				shoot_hist.focus_start_t = TimerManager:game():time()
@@ -173,7 +172,6 @@ function CopActionShoot:on_attention(attention, old_attention)
 				shoot_hist.m_last_pos = mvector3.copy(target_pos)
 			else
 				shoot_hist = {
-					focus_error_roll = focus_error_roll,
 					focus_start_t = TimerManager:game():time(),
 					focus_delay = usage_tweak.focus_delay,
 					m_last_pos = mvector3.copy(target_pos)
@@ -262,12 +260,13 @@ function CopActionShoot:update(t)
 			self._autofiring = nil
 			self._autoshots_fired = nil
 		end
-		if self._ext_anim.base_no_reload then
-			self._weapon_unit:base():on_reload()
-		else
+		if not self._ext_anim.base_no_reload then
 			local res = CopActionReload._play_reload(self)
 			if res then
 				self._machine:set_speed(res, self._reload_speed)
+			end
+			if Network:is_server() then
+				managers.network:session():send_to_peers("reload_weapon_cop", self._unit)
 			end
 		end
 	elseif self._autofiring then
@@ -298,16 +297,16 @@ function CopActionShoot:update(t)
 				if fired.hit_enemy and fired.hit_enemy.type == "death" and self._unit:unit_data().mission_element then
 					self._unit:unit_data().mission_element:event("killshot", self._unit)
 				end
-				if not ext_anim.recoil and vis_state == 1 and not ext_anim.base_no_recoil then
+				if not ext_anim.recoil and vis_state == 1 and not ext_anim.base_no_recoil and not ext_anim.move then
 					self._ext_movement:play_redirect("recoil_auto")
 				end
-				if not self._autofiring or self._autoshots_fired == self._autofiring - 1 then
+				if not self._autofiring or self._autoshots_fired >= self._autofiring - 1 then
 					self._autofiring = nil
 					self._autoshots_fired = nil
 					self._weapon_base:stop_autofire()
 					self._ext_movement:play_redirect("up_idle")
 					if vis_state == 1 then
-						self._shoot_t = t + (self._common_data.is_suppressed and 1.5 or 1) * math.lerp(falloff.recoil[1], falloff.recoil[2], math.random())
+						self._shoot_t = t + (self._common_data.is_suppressed and 1.5 or 1) * math.lerp(falloff.recoil[1], falloff.recoil[2], self:_pseudorandom())
 					else
 						self._shoot_t = t + falloff.recoil[2]
 					end
@@ -328,7 +327,7 @@ function CopActionShoot:update(t)
 					local aim_delay_minmax = self._w_usage_tweak.aim_delay
 					local lerp_dis = math.min(1, target_vec:length() / self._falloff[#self._falloff].r)
 					local aim_delay = math.lerp(aim_delay_minmax[1], aim_delay_minmax[2], lerp_dis)
-					aim_delay = aim_delay + math.random() * aim_delay * 0.3
+					aim_delay = aim_delay + self:_pseudorandom() * aim_delay * 0.3
 					if self._common_data.is_suppressed then
 						aim_delay = aim_delay * 1.5
 					end
@@ -354,6 +353,10 @@ function CopActionShoot:update(t)
 		else
 			shoot = true
 		end
+		if self._common_data.char_tweak.no_move_and_shoot and self._common_data.ext_anim and self._common_data.ext_anim.move then
+			shoot = false
+			self._shoot_t = t + (self._common_data.char_tweak.move_and_shoot_cooldown or 1)
+		end
 		if shoot then
 			local melee
 			if autotarget and (not self._common_data.melee_countered_t or t - self._common_data.melee_countered_t > 15) and target_dis < 130 and self._w_usage_tweak.melee_speed and t > self._melee_timeout_t then
@@ -365,7 +368,7 @@ function CopActionShoot:update(t)
 				local dmg_mul = (1 + dmg_buff) * falloff.dmg_mul
 				local firemode
 				if self._automatic_weap then
-					local random_mode = math.random()
+					local random_mode = self:_pseudorandom()
 					for i_mode, mode_chance in ipairs(falloff.mode) do
 						if mode_chance >= random_mode then
 							firemode = i_mode
@@ -378,12 +381,20 @@ function CopActionShoot:update(t)
 				if 1 < firemode then
 					self._weapon_base:start_autofire(firemode < 4 and firemode)
 					if self._w_usage_tweak.autofire_rounds then
-						self._autofiring = firemode < 4 and firemode or math.random(self._w_usage_tweak.autofire_rounds[1], self._w_usage_tweak.autofire_rounds[2])
+						if firemode < 4 then
+							self._autofiring = firemode
+						elseif falloff.autofire_rounds then
+							local diff = falloff.autofire_rounds[2] - falloff.autofire_rounds[1]
+							self._autofiring = math.round(falloff.autofire_rounds[1] + self:_pseudorandom() * diff)
+						else
+							local diff = self._w_usage_tweak.autofire_rounds[2] - self._w_usage_tweak.autofire_rounds[1]
+							self._autofiring = math.round(self._w_usage_tweak.autofire_rounds[1] + self:_pseudorandom() * diff)
+						end
 					else
 						Application:stack_dump_error("autofire_rounds is missing from weapon usage tweak data!", self._weap_tweak.usage)
 					end
 					self._autoshots_fired = 0
-					if vis_state == 1 and not ext_anim.base_no_recoil then
+					if vis_state == 1 and not ext_anim.base_no_recoil and not ext_anim.move then
 						self._ext_movement:play_redirect("recoil_auto")
 					end
 				else
@@ -406,10 +417,10 @@ function CopActionShoot:update(t)
 						self._unit:unit_data().mission_element:event("killshot", self._unit)
 					end
 					if vis_state == 1 then
-						if not ext_anim.base_no_recoil then
+						if not ext_anim.base_no_recoil and not ext_anim.move then
 							self._ext_movement:play_redirect("recoil_single")
 						end
-						self._shoot_t = t + (self._common_data.is_suppressed and 1.5 or 1) * math.lerp(falloff.recoil[1], falloff.recoil[2], math.random())
+						self._shoot_t = t + (self._common_data.is_suppressed and 1.5 or 1) * math.lerp(falloff.recoil[1], falloff.recoil[2], self:_pseudorandom())
 					else
 						self._shoot_t = t + falloff.recoil[2]
 					end
@@ -470,7 +481,7 @@ function CopActionShoot:_get_unit_shoot_pos(t, pos, dis, w_tweak, falloff, i_ran
 		hit_chance = hit_chance * self._common_data.active_actions[2]:accuracy_multiplier()
 	end
 	hit_chance = hit_chance * self._unit:character_damage():accuracy_multiplier()
-	if hit_chance > math.random() then
+	if hit_chance > self:_pseudorandom() then
 		mvec3_set(shoot_hist.m_last_pos, pos)
 	else
 		local enemy_vec = temp_vec2
@@ -478,10 +489,10 @@ function CopActionShoot:_get_unit_shoot_pos(t, pos, dis, w_tweak, falloff, i_ran
 		mvec3_sub(enemy_vec, self._common_data.pos)
 		local error_vec = Vector3()
 		mvec3_cross(error_vec, enemy_vec, math.UP)
-		mrot_axis_angle(temp_rot1, enemy_vec, shoot_hist.focus_error_roll)
+		mrot_axis_angle(temp_rot1, enemy_vec, math.random(360))
 		mvec3_rot(error_vec, temp_rot1)
 		local miss_min_dis = shooting_local_player and 31 or 150
-		local error_vec_len = miss_min_dis + w_tweak.spread + w_tweak.miss_dis * (1 - focus_prog)
+		local error_vec_len = miss_min_dis + w_tweak.spread * math.random() + w_tweak.miss_dis * math.random() * (1 - focus_prog)
 		mvec3_set_l(error_vec, error_vec_len)
 		mvec3_add(error_vec, pos)
 		mvec3_set(shoot_hist.m_last_pos, error_vec)
@@ -686,7 +697,8 @@ function CopActionShoot:_chk_start_melee(target_vec, target_dis, autotarget, tar
 	if state then
 		if not is_weapon then
 			local anim_attack_vars = self._common_data.char_tweak.melee_anims or {"var1", "var2"}
-			self._common_data.machine:set_parameter(state, anim_attack_vars[math.random(#anim_attack_vars)], 1)
+			local melee_var = self:_pseudorandom(#anim_attack_vars)
+			self._common_data.machine:set_parameter(state, anim_attack_vars[melee_var], 1)
 			local param = tweak_data.weapon.npc_melee[melee_weapon].animation_param
 			self._common_data.machine:set_parameter(state, param, 1)
 		end
@@ -694,7 +706,7 @@ function CopActionShoot:_chk_start_melee(target_vec, target_dis, autotarget, tar
 			local anim_speed = self._w_usage_tweak.melee_speed
 			self._common_data.machine:set_speed(state, anim_speed)
 		end
-		self._melee_timeout_t = TimerManager:game():time() + (self._w_usage_tweak.melee_retry_delay and math.lerp(self._w_usage_tweak.melee_retry_delay[1], self._w_usage_tweak.melee_retry_delay[2], math.random()) or 1)
+		self._melee_timeout_t = TimerManager:game():time() + (self._w_usage_tweak.melee_retry_delay and math.lerp(self._w_usage_tweak.melee_retry_delay[1], self._w_usage_tweak.melee_retry_delay[2], self:_pseudorandom()) or 1)
 	else
 		debug_pause_unit(self._common_data.unit, "[CopActionShoot:_chk_start_melee] redirect failed in state", self._common_data.machine:segment_state(Idstring("base")), self._common_data.unit)
 	end

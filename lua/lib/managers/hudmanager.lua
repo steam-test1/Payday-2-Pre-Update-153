@@ -1454,9 +1454,13 @@ function HUDManager:reset_player_hpbar()
 		return
 	end
 	local color_id = managers.network:session():local_peer():id()
-	self._teammate_panels[4]:add_panel()
-	self:set_teammate_callsign(4, color_id)
-	self:set_teammate_name(4, managers.network:session():local_peer():name())
+	if self._teammate_panels[HUDManager.PLAYER_PANEL] then
+		self._teammate_panels[HUDManager.PLAYER_PANEL]:add_panel()
+		self:set_teammate_callsign(HUDManager.PLAYER_PANEL, color_id)
+		self:set_teammate_name(HUDManager.PLAYER_PANEL, managers.network:session():local_peer():name())
+	else
+		Application:stack_dump_error("UI won't work!!")
+	end
 end
 
 function HUDManager:show_stats_screen()

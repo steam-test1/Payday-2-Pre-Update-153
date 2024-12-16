@@ -118,6 +118,45 @@ function MultiProfileManager:has_previous()
 	return self._global._current_profile > 1
 end
 
+function MultiProfileManager:open_quick_select()
+	local dialog_data = {}
+	dialog_data.title = ""
+	dialog_data.text = ""
+	dialog_data.button_list = {}
+	for idx, profile in pairs(self._global._profiles) do
+		local text = profile.name or "Profile " .. idx
+		table.insert(dialog_data.button_list, {
+			text = text,
+			callback_func = function()
+				self:set_current_profile(idx)
+			end,
+			focus_callback_func = function()
+			end
+		})
+	end
+	local no_button = {}
+	no_button.text = managers.localization:text("dialog_cancel")
+	
+	function no_button.focus_callback_func()
+	end
+	
+	no_button.cancel_button = true
+	table.insert(dialog_data.button_list, no_button)
+	dialog_data.image_blend_mode = "normal"
+	dialog_data.text_blend_mode = "add"
+	dialog_data.use_text_formating = true
+	dialog_data.w = 480
+	dialog_data.h = 532
+	dialog_data.title_font = tweak_data.menu.pd2_medium_font
+	dialog_data.title_font_size = tweak_data.menu.pd2_medium_font_size
+	dialog_data.font = tweak_data.menu.pd2_small_font
+	dialog_data.font_size = tweak_data.menu.pd2_small_font_size
+	dialog_data.text_formating_color = Color.white
+	dialog_data.text_formating_color_table = {}
+	dialog_data.clamp_to_screen = true
+	managers.system_menu:show_buttons(dialog_data)
+end
+
 function MultiProfileManager:save(data)
 	local save_data = deep_clone(self._global._profiles)
 	save_data.current_profile = self._global._current_profile

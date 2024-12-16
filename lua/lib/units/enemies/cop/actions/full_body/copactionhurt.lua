@@ -107,6 +107,7 @@ CopActionHurt.hurt_anim_variants = {
 	}
 }
 CopActionHurt.running_hurt_anim_variants = {fwd = 14}
+CopActionHurt.shield_knock_variants = 5
 ShieldActionHurt = ShieldActionHurt or class(CopActionHurt)
 ShieldActionHurt.hurt_anim_variants = deep_clone(CopActionHurt.hurt_anim_variants)
 ShieldActionHurt.hurt_anim_variants.expl_hurt = {
@@ -128,6 +129,20 @@ CopActionHurt.fire_death_anim_variants_length = {
 	7,
 	4
 }
+CopActionHurt.network_allowed_hurt_types = {
+	bleedout = true,
+	light_hurt = true,
+	heavy_hurt = true,
+	expl_hurt = true,
+	hurt = true,
+	shield_knock = true,
+	knock_down = true,
+	stagger = true,
+	death = true,
+	fatal = true,
+	fire_hurt = true,
+	poison_hurt = true
+}
 
 function CopActionHurt:init(action_desc, common_data)
 	self._common_data = common_data
@@ -148,6 +163,9 @@ function CopActionHurt:init(action_desc, common_data)
 	local action_type = action_desc.hurt_type
 	local ignite_character = action_desc.ignite_character
 	local start_dot_dance_antimation = action_desc.fire_dot_data and action_desc.fire_dot_data.start_dot_dance_antimation
+	if action_type == "knock_down" then
+		action_type = "heavy_hurt"
+	end
 	if action_type == "fatal" then
 		redir_res = self._ext_movement:play_redirect("fatal")
 		if not redir_res then
@@ -202,7 +220,7 @@ function CopActionHurt:init(action_desc, common_data)
 		local char_tweak = tweak_data.character[self._unit:base()._tweak_table]
 		if (char_tweak.can_be_tased == nil or char_tweak.can_be_tased) and self._unit:brain() and self._unit:brain()._current_logic_name ~= "intimidated" then
 			redir_res = self._ext_movement:play_redirect("taser")
-			local variant = math.random(4)
+			local variant = self:_pseudorandom(4)
 			local dir_str
 			if variant == 1 then
 				dir_str = "var1"
@@ -246,7 +264,7 @@ function CopActionHurt:init(action_desc, common_data)
 	elseif action_type == "concussion" then
 		redir_res = self._ext_movement:play_redirect("concussion_stun")
 		local rnd_max = 9
-		local rnd_anim = math.random(1, rnd_max)
+		local rnd_anim = self:_pseudorandom(rnd_max)
 		local rnd_anim_str = "var" .. tostring(rnd_anim)
 		self._machine:set_parameter(redir_res, rnd_anim_str, 1)
 		self._sick_time = t + 3
@@ -269,8 +287,9 @@ function CopActionHurt:init(action_desc, common_data)
 		for i, d in pairs(ecm_hurts_table) do
 			table.insert(sick_variants, i)
 		end
-		local variant = sick_variants[math.random(#sick_variants)]
-		local duration = math.random(ecm_hurts_table[variant].min_duration, ecm_hurts_table[variant].max_duration)
+		local variant = sick_variants[self:_pseudorandom(#sick_variants)]
+		local duration_diff = ecm_hurts_table[variant].max_duration - ecm_hurts_table[variant].min_duration
+		local duration = ecm_hurts_table[variant].min_duration + duration_diff * self:_pseudorandom()
 		for _, hurt_sick in ipairs(sick_variants) do
 			self._machine:set_global(hurt_sick, hurt_sick == variant and 1 or 0)
 		end
@@ -292,7 +311,7 @@ function CopActionHurt:init(action_desc, common_data)
 		local variant = 1
 		local variant_count = #CopActionHurt.fire_death_anim_variants_length or 5
 		if 1 < variant_count then
-			variant = math.random(variant_count)
+			variant = self:_pseudorandom(variant_count)
 		end
 		if not self._ext_movement:died_on_rope() then
 			redir_res = self._ext_movement:play_redirect("death_fire")
@@ -322,7 +341,7 @@ function CopActionHurt:init(action_desc, common_data)
 		end
 		local variant = self.running_death_anim_variants[is_female and "female" or "male"] or 1
 		if 1 < variant then
-			variant = math.random(variant)
+			variant = self:_pseudorandom(variant)
 		end
 		self._machine:set_parameter(redir_res, "var" .. tostring(variant), 1)
 	elseif action_type == "death" and (self._ext_anim.run or self._ext_anim.ragdoll) and self:_start_ragdoll() then
@@ -335,7 +354,7 @@ function CopActionHurt:init(action_desc, common_data)
 		end
 		local variant = self.running_hurt_anim_variants.fwd or 1
 		if 1 < variant then
-			variant = math.random(variant)
+			variant = self:_pseudorandom(variant)
 		end
 		self._machine:set_parameter(redir_res, "var" .. tostring(variant), 1)
 	else
@@ -361,9 +380,18 @@ function CopActionHurt:init(action_desc, common_data)
 				}
 			end
 		end
-		redir_res = self._ext_movement:play_redirect(action_type)
+		local redirect = action_type
+		if action_type == "shield_knock" then
+			local rand = self:_pseudorandom(CopActionHurt.shield_knock_variants, 0)
+			redirect = "shield_knock_var" .. tostring(rand)
+		end
+		if redirect then
+			redir_res = self._ext_movement:play_redirect(redirect)
+		else
+			Application:stack_dump_error("There's no redirect in CopActionHurt!")
+		end
 		if not redir_res then
-			debug_pause_unit(self._unit, "[CopActionHurt:init]", action_type, "redirect failed in", self._machine:segment_state(Idstring("base")), self._unit)
+			debug_pause_unit(self._unit, "[CopActionHurt:init]", redirect, "redirect failed in", self._machine:segment_state(Idstring("base")), self._unit)
 			return
 		end
 		if action_desc.variant == "bleeding" then
@@ -371,7 +399,7 @@ function CopActionHurt:init(action_desc, common_data)
 			local nr_variants = self._ext_anim.base_nr_variants
 			local death_type
 			if nr_variants then
-				variant = math.random(nr_variants)
+				variant = self:_pseudorandom(nr_variants)
 			else
 				local fwd_dot = action_desc.direction_vec:dot(common_data.fwd)
 				local right_dot = action_desc.direction_vec:dot(common_data.right)
@@ -398,7 +426,7 @@ function CopActionHurt:init(action_desc, common_data)
 						variant = self.death_anim_variants[death_type][crouching and "crouching" or "not_crouching"][dir_str][height]
 					end
 					if 1 < variant then
-						variant = math.random(variant)
+						variant = self:_pseudorandom(variant)
 					end
 				elseif action_type ~= "shield_knock" and action_type ~= "counter_tased" and action_type ~= "taser_tased" then
 					if old_variant and (old_info[dir_str] == 1 and old_info[height] == 1 and old_info.mod == 1 and action_type == "hurt" or old_info.hvy == 1 and action_type == "heavy_hurt") then
@@ -411,9 +439,10 @@ function CopActionHurt:init(action_desc, common_data)
 							variant = self.hurt_anim_variants[action_type].not_crouching[dir_str][height]
 						end
 						if 1 < variant then
-							variant = math.random(variant)
+							variant = self:_pseudorandom(variant)
 						end
 					end
+				elseif action_type == "shield_knock" then
 				end
 			end
 			variant = variant or 1
@@ -468,7 +497,7 @@ function CopActionHurt:init(action_desc, common_data)
 		self._anim = redir_res
 		if not self._shoot_history then
 			self._shoot_history = {
-				focus_error_roll = math.random(360),
+				focus_error_roll = self:_pseudorandom(360),
 				focus_start_t = t,
 				focus_delay = weapon_usage_tweak.focus_delay,
 				m_last_pos = common_data.pos + common_data.fwd * 500
@@ -497,7 +526,8 @@ function CopActionHurt:init(action_desc, common_data)
 	end
 	if shoot_chance then
 		local equipped_weapon = self._ext_inventory:equipped_unit()
-		if equipped_weapon and (not equipped_weapon:base().clip_empty or not equipped_weapon:base():clip_empty()) and shoot_chance > math.random() then
+		local rand = self:_pseudorandom()
+		if equipped_weapon and (not equipped_weapon:base().clip_empty or not equipped_weapon:base():clip_empty()) and shoot_chance >= rand then
 			self._weapon_unit = equipped_weapon
 			self._unit:movement():set_friendly_fire(true)
 			self._friendly_fire = true
@@ -506,7 +536,7 @@ function CopActionHurt:init(action_desc, common_data)
 				self._shooting_hurt = true
 			else
 				self._delayed_shooting_hurt_clbk_id = "shooting_hurt" .. tostring(self._unit:key())
-				managers.enemy:add_delayed_clbk(self._delayed_shooting_hurt_clbk_id, callback(self, self, "clbk_shooting_hurt"), TimerManager:game():time() + math.lerp(0.2, 0.4, math.random()))
+				managers.enemy:add_delayed_clbk(self._delayed_shooting_hurt_clbk_id, callback(self, self, "clbk_shooting_hurt"), TimerManager:game():time() + math.lerp(0.2, 0.4, self:_pseudorandom()))
 			end
 		end
 	end
@@ -562,7 +592,147 @@ function CopActionHurt:init(action_desc, common_data)
 			})
 		end
 	end
+	if self:is_network_allowed(action_desc) then
+		local params = {
+			CopActionHurt.hurt_type_to_idx(action_desc.hurt_type),
+			action_desc.body_part,
+			CopActionHurt.death_type_to_idx(action_desc.death_type),
+			CopActionHurt.type_to_idx(action_desc.type),
+			CopActionHurt.variant_to_idx(action_desc.variant),
+			action_desc.direction_vec or Vector3(),
+			action_desc.hit_pos or Vector3()
+		}
+		self._common_data.ext_network:send("action_hurt_start", unpack(params))
+	end
 	return true
+end
+
+function CopActionHurt:is_network_allowed(action_desc)
+	if not CopActionHurt.network_allowed_hurt_types[action_desc.hurt_type] then
+		return false
+	end
+	if action_desc.allow_network == false then
+		return false
+	end
+	if self._unit:in_slot(managers.slot:get_mask("criminals")) then
+		return false
+	end
+	return true
+end
+
+function CopActionHurt:_pseudorandom(a, b)
+	local mult = 10
+	local ht = managers.game_play_central:get_heist_timer()
+	local is_host = Network:is_server() or Global.game_settings.single_player
+	if not is_host then
+		self._host_peer = self._host_peer or managers.network:session():peer(1)
+		ht = ht + Network:qos(self._host_peer:rpc()).ping / 1000
+	end
+	local t = math.floor(ht * mult + 0.5) / mult
+	local uid = self._unit:id()
+	local seed = uid ^ (t / 183.62) * 100 % 100000
+	math.randomseed(seed)
+	local ret
+	if a and b then
+		ret = math.random(a, b)
+	elseif a then
+		ret = math.random(a)
+	else
+		ret = math.random()
+	end
+	math.randomseed(math.ceil(math.floor(os.time() * 0.01) / ret))
+	for i = 1, 5 do
+		math.random()
+	end
+	return ret
+end
+
+CopActionHurt.idx_to_hurt_type_map = {
+	"bleedout",
+	"light_hurt",
+	"heavy_hurt",
+	"expl_hurt",
+	"hurt",
+	"hurt_sick",
+	"shield_knock",
+	"knock_down",
+	"stagger",
+	"counter_tased",
+	"taser_tased",
+	"death",
+	"fatal",
+	"fire_hurt",
+	"poison_hurt",
+	"concussion",
+	"healed"
+}
+
+function CopActionHurt.hurt_type_to_idx(hurt_type)
+	local res
+	for idx, hurt in pairs(CopActionHurt.idx_to_hurt_type_map) do
+		if hurt == hurt_type then
+			res = idx
+			break
+		end
+	end
+	if not res then
+		Application:error("No idx for hurt type! ", hurt_type)
+		return table.index_of(CopActionHurt.idx_to_hurt_type_map, "death")
+	end
+	return res
+end
+
+function CopActionHurt.idx_to_hurt_type(idx)
+	return CopActionHurt.idx_to_hurt_type_map[idx]
+end
+
+CopActionHurt.idx_to_death_type_map = {
+	[1] = "normal",
+	[2] = "heavy"
+}
+
+function CopActionHurt.death_type_to_idx(death)
+	return table.index_of(CopActionHurt.idx_to_death_type_map, death)
+end
+
+function CopActionHurt.idx_to_death_type(idx)
+	return CopActionHurt.idx_to_death_type_map[idx]
+end
+
+CopActionHurt.idx_to_type_map = {
+	[1] = "hurt",
+	[2] = "heavy_hurt",
+	[3] = "hurt_sick",
+	[4] = "poison_hurt",
+	[5] = "death"
+}
+
+function CopActionHurt.type_to_idx(hurt_type)
+	return table.index_of(CopActionHurt.idx_to_type_map, hurt_type)
+end
+
+function CopActionHurt.idx_to_type(idx)
+	return CopActionHurt.idx_to_type_map[idx]
+end
+
+CopActionHurt.idx_to_variant_map = {
+	[1] = "bullet",
+	[2] = "melee",
+	[3] = "explosion",
+	[4] = "other"
+}
+
+function CopActionHurt.variant_to_idx(var)
+	local idx = table.index_of(CopActionHurt.idx_to_variant_map, var)
+	if idx < 0 then
+		return 4
+	else
+		return idx
+	end
+end
+
+function CopActionHurt.idx_to_variant(idx)
+	return CopActionHurt.idx_to_variant_map[idx]
 end
 
 function CopActionHurt:_start_fire_animation(redir_res, action_type, t, action_desc, common_data)
@@ -909,7 +1079,7 @@ function CopActionHurt:_upd_bleedout(t)
 					mvec3_add(spread_pos, target_pos)
 					target_dis = mvec3_dir(target_vec, shoot_from_pos, spread_pos)
 					self._weapon_base:singleshot(shoot_from_pos, target_vec, falloff.dmg_mul)
-					local rand = math.random()
+					local rand = self:_pseudorandom()
 					self._shoot_t = t + math.lerp(falloff.recoil[1], falloff.recoil[2], rand)
 				end
 			end
@@ -960,6 +1130,8 @@ function CopActionHurt:chk_block(action_type, t)
 		return true
 	elseif action_type == "death" then
 	elseif (action_type == "hurt" or action_type == "heavy_hurt" or action_type == "hurt_sick" or action_type == "poison_hurt") and not self._ext_anim.hurt_exit then
+		return true
+	elseif action_type == "turn" then
 		return true
 	end
 end

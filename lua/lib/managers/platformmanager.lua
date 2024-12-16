@@ -269,3 +269,58 @@ end
 
 WinPlatformManager = WinPlatformManager or class(GenericPlatformManager)
 PlatformManager.PLATFORM_CLASS_MAP[_G.Idstring("WIN32"):key()] = WinPlatformManager
+
+function WinPlatformManager:set_rich_presence(name)
+	self._current_rich_presence = name
+	if SystemInfo:distribution() == Idstring("STEAM") and not Global.game_settings.single_player then
+		local presence = ""
+		if name == "Idle" then
+			Steam:set_rich_presence("status", "")
+		else
+			if Global.game_settings.permission == "private" then
+				Steam:set_rich_presence("status", "")
+				return
+			end
+			local in_lobby = _G.game_state_machine and (_G.game_state_machine:current_state_name() == "ingame_lobby_menu" or _G.game_state_machine:current_state_name() == "menu_main")
+			local job_data = managers.job:current_job_data()
+			local job_name = job_data and managers.localization:text(job_data.name_id) or "no heist"
+			if managers.crime_spree and managers.crime_spree:is_active() then
+				local level_id = Global.game_settings.level_id
+				local name_id = level_id and _G.tweak_data.levels[level_id] and _G.tweak_data.levels[level_id].name_id
+				job_name = name_id and managers.localization:text(name_id) or job_name
+			end
+			if in_lobby then
+				if job_data then
+					presence = presence .. managers.localization:text("steam_rp_in_lobby_heist", {heist = job_name})
+				else
+					presence = presence .. managers.localization:text("steam_rp_in_lobby")
+				end
+			elseif job_data then
+				if #(managers.job:current_job_chain_data() or {}) > 1 then
+					presence = presence .. managers.localization:text("steam_rp_current_heist_multi_day", {
+						heist = job_name,
+						day = tostring(managers.job:current_stage())
+					})
+				else
+					presence = presence .. managers.localization:text("steam_rp_current_heist_one_day", {heist = job_name})
+				end
+			end
+			presence = presence .. "\n" .. managers.localization:text("steam_rp_current_players", {
+				current = tostring(#managers.network:session():all_peers()),
+				max = tostring(_G.tweak_data.max_players)
+			})
+			if managers.crime_spree and managers.crime_spree:is_active() then
+				presence = presence .. "\n" .. managers.localization:text("steam_rp_current_spree", {
+					level = managers.experience:cash_string(managers.crime_spree:spree_level(), "")
+				})
+			elseif managers.job:has_active_job() then
+				local difficulty_stars = managers.job:current_difficulty_stars()
+				local difficulty = _G.tweak_data.difficulties[managers.job:current_difficulty_stars() + 2] or 1
+				presence = presence .. "\n" .. managers.localization:text("steam_rp_current_difficulty", {
+					difficulty = managers.localization:to_upper_text(_G.tweak_data.difficulty_name_ids[difficulty])
+				})
+			end
+			Steam:set_rich_presence("status", presence)
+		end
+	end
+end

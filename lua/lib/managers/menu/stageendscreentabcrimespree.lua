@@ -58,7 +58,7 @@ end
 
 function CrimeSpreeResultTabItem:_create_level(total_w)
 	self._level_panel = self._cs_panel:panel({})
-	local level_gain = managers.crime_spree:spree_level_gained()
+	local level_gain = managers.crime_spree:mission_completion_gain()
 	local gain_x = self._level_panel:w() * (1 - total_w) * 0.5
 	local gain_y = self._level_panel:h() * 0.25
 	local gain_text = "+" .. managers.localization:text("menu_cs_level", {
@@ -165,7 +165,10 @@ function CrimeSpreeResultTabItem:_create_timeline(total_w)
 	for category, step in pairs(tweak_data.crime_spree.modifier_levels) do
 		local count = managers.crime_spree:modifiers_to_select(category)
 		for i = 0, math.min(count, math.floor(max_step / step) - 1) do
-			table.insert(modifier_levels, managers.crime_spree:next_modifier_level(category, start_level, i))
+			local level = managers.crime_spree:next_modifier_level(category, start_level, i)
+			if level then
+				table.insert(modifier_levels, level)
+			end
 		end
 	end
 	local timeline_w = self._timeline_panel:w() * total_w - padding * 2

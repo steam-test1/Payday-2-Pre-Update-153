@@ -4,6 +4,7 @@ LocalizationManager = LocalizationManager or class(CoreLocalizationManager.Local
 
 function LocalizationManager:init()
 	LocalizationManager.super.init(self)
+	self._input_translations = {}
 	self:_setup_macros()
 	Application:set_default_letter(95)
 end
@@ -120,12 +121,33 @@ function LocalizationManager:_setup_macros()
 	self:set_default_macro("BTN_CHANGE_EQ", btn_change_equipment)
 	self:set_default_macro("BTN_CHANGE_PROFILE_RIGHT", btn_change_profile_right)
 	self:set_default_macro("BTN_CHANGE_PROFILE_LEFT", btn_change_profile_left)
+	self._input_translations.xbox360 = {
+		a = btn_a,
+		b = btn_b,
+		x = btn_x,
+		y = btn_y,
+		back = btn_back,
+		start = btn_start,
+		left = stick_l,
+		right = stick_r,
+		left_shoulder = btn_top_l,
+		right_shoulder = btn_top_r,
+		left_trigger = btn_bottom_l,
+		right_trigger = btn_bottom_r,
+		left_thumb = btn_stick_l,
+		right_thumb = btn_stick_r,
+		d_up = btn_dpad_u,
+		d_down = btn_dpad_d,
+		d_left = btn_dpad_l,
+		d_right = btn_dpad_r
+	}
+	self._input_translations.xb1 = table.map_copy(self._input_translations.xbox360)
 end
 
 local is_PS3 = SystemInfo:platform() == Idstring("PS3")
 
 function LocalizationManager:btn_macro(button, to_upper, nil_if_empty)
-	if not managers.menu:is_pc_controller() then
+	if not button then
 		return
 	end
 	local type = managers.controller:get_default_wrapper_type()
@@ -134,6 +156,13 @@ function LocalizationManager:btn_macro(button, to_upper, nil_if_empty)
 		return
 	end
 	key = tostring(key)
+	local translations = self._input_translations[type]
+	local res = translations and translations[key]
+	if res then
+		return to_upper and utf8.to_upper(res) or res
+	elseif not managers.menu:is_pc_controller() then
+		return
+	end
 	local text = "[" .. key .. "]"
 	return to_upper and utf8.to_upper(text) or text
 end
@@ -198,6 +227,10 @@ function LocalizationManager:check_translation()
 			end
 		end
 	end
+end
+
+function LocalizationManager:set_input_translation(button_name, translation)
+	self._input_translations[button_name] = translation
 end
 
 CoreClass.override_class(CoreLocalizationManager.LocalizationManager, LocalizationManager)

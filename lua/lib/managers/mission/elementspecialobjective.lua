@@ -421,6 +421,7 @@ function ElementSpecialObjective:get_objective(instigator)
 		end
 	else
 		local action
+		self._values.so_action = self:_check_new_stealth_idle()
 		if self._values.so_action then
 			action = {
 				type = "act",
@@ -673,4 +674,38 @@ end
 
 function ElementSpecialObjective:_get_default_value_if_nil(name_in)
 	return self._values[name_in] or self._DEFAULT_VALUES[name_in]
+end
+
+ElementSpecialObjective._stealth_idles = {
+	"e_so_ntl_idle_kickpebble",
+	"e_so_ntl_idle_look",
+	"e_so_ntl_idle_look2",
+	"e_so_ntl_idle_look3",
+	"e_so_ntl_idle_clock",
+	"e_so_ntl_idle_brush",
+	"e_so_ntl_idle_stickygum",
+	"e_so_ntl_idle_tired",
+	"e_so_ntl_brush_jacket",
+	"e_so_ntl_brush_shoe",
+	"e_so_ntl_clear_throat",
+	"e_so_ntl_idle_breath",
+	"e_so_ntl_idle_stand",
+	"e_so_ntl_idle_thinking",
+	"e_so_ntl_jawn",
+	"e_so_ntl_look_around",
+	"e_so_ntl_look_behind",
+	"e_so_ntl_look_up",
+	"e_so_ntl_pick_up",
+	"e_so_ntl_restless",
+	"e_so_ntl_scratches_chin",
+	"e_so_ntl_stretch_shoulders",
+	"e_so_ntl_watch_look_calm"
+}
+
+function ElementSpecialObjective:_check_new_stealth_idle()
+	if table.contains(ElementSpecialObjective._stealth_idles, self._values.so_action) then
+		local new = ElementSpecialObjective._stealth_idles[math.random(#ElementSpecialObjective._stealth_idles)]
+		return new
+	end
+	return self._values.so_action
 end

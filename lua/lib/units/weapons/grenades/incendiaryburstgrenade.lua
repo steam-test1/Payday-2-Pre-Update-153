@@ -12,6 +12,7 @@ function IncendiaryBurstGrenade:_detonate(tag, unit, body, other_unit, other_bod
 	local slot_mask = managers.slot:get_mask("explosion_targets")
 	managers.fire:give_local_player_dmg(pos, range, self._player_damage)
 	managers.explosion:play_sound_and_effects(pos, normal, range, self._custom_params)
+	managers.explosion:client_damage_and_push(pos, normal, nil, self._damage, range, self._curve_pow)
 	local params = {
 		hit_pos = pos,
 		range = range,

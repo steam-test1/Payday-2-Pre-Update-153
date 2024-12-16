@@ -571,7 +571,7 @@ function HUDManager:add_teammate_panel(character_name, player_name, ai, peer_id)
 		
 		self._teammate_panels[i]:set_peer_id(peer_id)
 		self._teammate_panels[i]:set_ai(ai)
-		self:set_teammate_callsign(i, ai and 5 or peer_id)
+		self:set_teammate_callsign(i, ai and tweak_data.max_players + 1 or peer_id)
 		self:set_teammate_name(i, player_name)
 		self:set_teammate_state(i, ai and "ai" or "player")
 		local synced_cocaine_stacks = managers.player:get_synced_cocaine_stacks(peer_id)
@@ -1149,7 +1149,7 @@ function HUDManager:_add_name_label(data)
 		17
 	}
 	local color_id = managers.criminals:character_color_id_by_unit(data.unit)
-	local crim_color = tweak_data.chat_colors[color_id]
+	local crim_color = tweak_data.chat_colors[color_id] or tweak_data.chat_colors[#tweak_data.chat_colors]
 	local text = panel:text({
 		name = "text",
 		text = data.name,

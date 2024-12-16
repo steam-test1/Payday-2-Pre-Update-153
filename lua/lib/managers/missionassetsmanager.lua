@@ -22,7 +22,7 @@ end
 function MissionAssetsManager:_setup_mission_assets()
 	local is_host = Network:is_server() or Global.game_settings.single_player
 	local current_stage = managers.job:current_level_id()
-	if managers.crime_spree and managers.crime_spree:_is_active() then
+	if managers.crime_spree and managers.crime_spree:is_active() then
 		local mission = managers.crime_spree:get_mission(managers.crime_spree:current_mission())
 		current_stage = mission and mission.level and mission.level.level_id
 	end

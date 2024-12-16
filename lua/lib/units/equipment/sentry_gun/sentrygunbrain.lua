@@ -258,7 +258,7 @@ function SentryGunBrain:_upd_detection(t)
 					attention_info.verified_dis = dis
 				elseif attention_info.has_team and my_team.foes[attention_info.unit:movement():team().id] then
 					if attention_info.criminal_record and attention_info.settings.reaction >= AIAttentionObject.REACT_COMBAT then
-						if 1000 < dis and mvector3.distance(attention_pos, attention_info.criminal_record.pos) > 700 or max_detection_range < dis then
+						if 1000 < dis and mvector3.distance(attention_pos, attention_info.last_verified_pos or attention_info.criminal_record.pos) > 700 or max_detection_range < dis then
 							self:_destroy_detected_attention_object_data(attention_info)
 						else
 							update_delay = math.min(0.2, update_delay)
@@ -406,7 +406,7 @@ function SentryGunBrain:_upd_fire(t)
 				mvec3_dir(tmp_vec1, self._ext_movement:m_head_pos(), attention.handler:get_detection_m_pos())
 			end
 			local max_dot = self._tweak_data.KEEP_FIRE_ANGLE
-			max_dot = math.min(0.99, 1 - (1 - max_dot) * self._shaprness_mul)
+			max_dot = math.min(0.99, 1 - (1 - max_dot) * (self._shaprness_mul or 1))
 			if max_dot < mvec3_dot(tmp_vec1, self._ext_movement:m_head_fwd()) then
 				self._unit:weapon():start_autofire()
 				self._unit:weapon():trigger_held(false, expend_ammo, damage_player, attention.unit)

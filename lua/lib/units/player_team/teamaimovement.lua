@@ -1,6 +1,10 @@
 TeamAIMovement = TeamAIMovement or class(CopMovement)
 TeamAIMovement._char_name_to_index = HuskPlayerMovement._char_name_to_index
 TeamAIMovement._char_model_names = HuskPlayerMovement._char_model_names
+local mvec3_set = mvector3.set
+local mvec3_sub = mvector3.subtract
+local mvec3_norm = mvector3.normalize
+local mvec3_len = mvector3.length
 
 function TeamAIMovement:_post_init()
 	if managers.groupai:state():whisper_mode() then
@@ -296,7 +300,7 @@ function TeamAIMovement:carry_tweak()
 	return self:carry_id() and tweak_data.carry.types[tweak_data.carry[self:carry_id()].type]
 end
 
-function TeamAIMovement:throw_bag(target_unit)
+function TeamAIMovement:throw_bag(target_unit, reason)
 	if not self:carrying_bag() then
 		return
 	end
@@ -332,4 +336,20 @@ function TeamAIMovement:update(...)
 		self._last_position = Vector3()
 	end
 	mvector3.set(self._last_position, self:m_detect_pos())
+	if self._ext_anim and self._ext_anim.reload then
+		if not alive(self._left_hand_obj) then
+			self._left_hand_obj = self._unit:get_object(Idstring("LeftHandMiddle1"))
+		end
+		if alive(self._left_hand_obj) then
+			if self._left_hand_pos then
+				self._left_hand_direction = self._left_hand_direction or Vector3()
+				mvec3_set(self._left_hand_direction, self._left_hand_pos)
+				mvec3_sub(self._left_hand_direction, self._left_hand_obj:position())
+				self._left_hand_velocity = mvec3_len(self._left_hand_direction)
+				mvec3_norm(self._left_hand_direction)
+			end
+			self._left_hand_pos = self._left_hand_pos or Vector3()
+			mvec3_set(self._left_hand_pos, self._left_hand_obj:position())
+		end
+	end
 end

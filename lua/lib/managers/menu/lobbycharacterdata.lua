@@ -6,7 +6,7 @@ function LobbyCharacterData:init(panel, peer)
 	self._panel = panel:panel({w = 128, h = 128})
 	local peer_id = peer:id()
 	local color_id = peer_id
-	local color = tweak_data.chat_colors[color_id]
+	local color = tweak_data.chat_colors[color_id] or tweak_data.chat_colors[#tweak_data.chat_colors]
 	local name_text = self._panel:text({
 		name = "name",
 		text = "",
@@ -108,7 +108,7 @@ function LobbyCharacterData:update_character()
 	show_infamy = 0 < player_rank
 	self._name_text:set_text(name_text)
 	self._infamy_icon:set_visible(show_infamy)
-	if managers.crime_spree:_is_active() then
+	if managers.crime_spree:is_active() then
 		local level = managers.crime_spree:get_peer_spree_level(peer:id())
 		if 0 <= level then
 			local level_text = managers.localization:text("menu_cs_level", {
@@ -147,7 +147,7 @@ function LobbyCharacterData:sort_text_and_reposition()
 		self._name_text,
 		self._state_text
 	}
-	if managers.crime_spree:_is_active() then
+	if managers.crime_spree:is_active() then
 		table.insert(order, 1, self._spree_text)
 	end
 	local max_w = 0

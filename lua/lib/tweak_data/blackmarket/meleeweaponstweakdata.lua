@@ -647,7 +647,7 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.model24.dlc = "gage_pack_historical"
 	self.melee_weapons.model24.texture_bundle_folder = "gage_pack_historical"
 	self.melee_weapons.model24.free = nil
-	self.melee_weapons.model24.anim_global_param = "melee_blunt"
+	self.melee_weapons.model24.anim_global_param = "melee_axe"
 	self.melee_weapons.model24.type = "knife"
 	self.melee_weapons.model24.align_objects = {
 		"a_weapon_right"
@@ -731,8 +731,8 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.shillelagh.dlc = "character_pack_clover"
 	self.melee_weapons.shillelagh.texture_bundle_folder = "character_pack_clover"
 	self.melee_weapons.shillelagh.free = nil
-	self.melee_weapons.shillelagh.anim_global_param = "melee_blunt"
-	self.melee_weapons.shillelagh.type = "knife"
+	self.melee_weapons.shillelagh.anim_global_param = "melee_axe"
+	self.melee_weapons.shillelagh.type = "axe"
 	self.melee_weapons.shillelagh.align_objects = {
 		"a_weapon_right"
 	}
@@ -810,7 +810,7 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.hammer.dlc = "hlm2_deluxe"
 	self.melee_weapons.hammer.texture_bundle_folder = "hlm2"
 	self.melee_weapons.hammer.free = nil
-	self.melee_weapons.hammer.anim_global_param = "melee_blunt"
+	self.melee_weapons.hammer.anim_global_param = "melee_axe"
 	self.melee_weapons.hammer.type = "axe"
 	self.melee_weapons.hammer.align_objects = {
 		"a_weapon_right"
@@ -837,7 +837,7 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.whiskey.dlc = "pd2_clan"
 	self.melee_weapons.whiskey.texture_bundle_folder = "character_pack_bonnie"
 	self.melee_weapons.whiskey.free = nil
-	self.melee_weapons.whiskey.anim_global_param = "melee_blunt"
+	self.melee_weapons.whiskey.anim_global_param = "melee_axe"
 	self.melee_weapons.whiskey.type = "axe"
 	self.melee_weapons.whiskey.align_objects = {
 		"a_weapon_right"
@@ -943,7 +943,7 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.tenderizer.name_id = "bm_melee_tenderizer"
 	self.melee_weapons.tenderizer.dlc = "bbq"
 	self.melee_weapons.tenderizer.texture_bundle_folder = "bbq"
-	self.melee_weapons.tenderizer.anim_global_param = "melee_blunt"
+	self.melee_weapons.tenderizer.anim_global_param = "melee_axe"
 	self.melee_weapons.tenderizer.type = "axe"
 	self.melee_weapons.tenderizer.align_objects = {
 		"a_weapon_right"
@@ -1025,7 +1025,7 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.branding_iron.name_id = "bm_melee_branding_iron"
 	self.melee_weapons.branding_iron.dlc = "west"
 	self.melee_weapons.branding_iron.texture_bundle_folder = "west"
-	self.melee_weapons.branding_iron.anim_global_param = "melee_blunt"
+	self.melee_weapons.branding_iron.anim_global_param = "melee_axe"
 	self.melee_weapons.branding_iron.type = "axe"
 	self.melee_weapons.branding_iron.align_objects = {
 		"a_weapon_right"
@@ -1139,7 +1139,7 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.micstand.name_id = "bm_melee_micstand"
 	self.melee_weapons.micstand.dlc = "arena"
 	self.melee_weapons.micstand.texture_bundle_folder = "dlc_arena"
-	self.melee_weapons.micstand.anim_global_param = "melee_hockey"
+	self.melee_weapons.micstand.anim_global_param = "melee_axe"
 	self.melee_weapons.micstand.type = "axe"
 	self.melee_weapons.micstand.align_objects = {
 		"a_weapon_right"
@@ -1167,7 +1167,7 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.oldbaton.name_id = "bm_melee_oldbaton"
 	self.melee_weapons.oldbaton.dlc = "arena"
 	self.melee_weapons.oldbaton.texture_bundle_folder = "dlc_arena"
-	self.melee_weapons.oldbaton.anim_global_param = "melee_blunt"
+	self.melee_weapons.oldbaton.anim_global_param = "melee_axe"
 	self.melee_weapons.oldbaton.type = "axe"
 	self.melee_weapons.oldbaton.align_objects = {
 		"a_weapon_right"
@@ -1195,7 +1195,7 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.hockey.name_id = "bm_melee_hockey"
 	self.melee_weapons.hockey.dlc = "character_pack_sokol"
 	self.melee_weapons.hockey.texture_bundle_folder = "character_pack_sokol"
-	self.melee_weapons.hockey.anim_global_param = "melee_hockey"
+	self.melee_weapons.hockey.anim_global_param = "melee_axe"
 	self.melee_weapons.hockey.type = "axe"
 	self.melee_weapons.hockey.align_objects = {
 		"a_weapon_right"
@@ -1378,7 +1378,7 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	}
 	self.melee_weapons.tiger.unit = "units/pd2_dlc_turtles/weapons/wpn_fps_mel_tiger/wpn_fps_mel_tiger"
 	self.melee_weapons.tiger.third_unit = "units/pd2_dlc_turtles/weapons/wpn_fps_mel_tiger/wpn_third_mel_tiger"
-	self.melee_weapons.tiger.anim_global_param = "melee_tiger"
+	self.melee_weapons.tiger.anim_global_param = "melee_fist"
 	self.melee_weapons.tiger.stats.min_damage = 3
 	self.melee_weapons.tiger.stats.max_damage = 8
 	self.melee_weapons.tiger.stats.min_damage_effect = 1
@@ -2104,7 +2104,7 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.road.anim_global_param = "melee_road"
 	self.melee_weapons.road.dlc = "wild"
 	self.melee_weapons.road.texture_bundle_folder = "wild"
-	self.melee_weapons.road.type = "fists"
+	self.melee_weapons.road.type = "axe"
 	self.melee_weapons.road.align_objects = {
 		"a_weapon_right"
 	}

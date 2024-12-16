@@ -2,7 +2,6 @@ PlayerProfileGuiObject = PlayerProfileGuiObject or class()
 
 function PlayerProfileGuiObject:init(ws)
 	local panel = ws:panel():panel()
-	managers.menu_component:close_contract_gui()
 	local next_level_data = managers.experience:next_level_data() or {}
 	local max_left_len = 0
 	local max_right_len = 0

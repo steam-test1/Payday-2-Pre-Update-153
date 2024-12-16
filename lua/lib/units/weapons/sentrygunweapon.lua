@@ -123,7 +123,7 @@ function SentryGunWeapon:setup(setup_data)
 	self._fire_rate_reduction = 1
 	if setup_data.alert_AI then
 		self._alert_events = {}
-		self._alert_size = tweak_data.weapon[self._name_id].alert_size
+		self._alert_size = self._alert_size or tweak_data.weapon[self._name_id].alert_size
 		self._alert_fires = {}
 	else
 		self._alert_events = nil

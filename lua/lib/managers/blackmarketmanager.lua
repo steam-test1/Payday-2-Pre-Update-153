@@ -4311,7 +4311,7 @@ function BlackMarketManager:get_part_texture_switch_data(category, slot, part_id
 	local crafted_category = self._global.crafted_items[category]
 	local crafted_item = crafted_category and crafted_category[slot]
 	local texture_switches = crafted_item and crafted_item.texture_switches
-	local data_string = texture_switches and texture_switches[part_id] or "1 1"
+	local data_string = texture_switches and texture_switches[part_id] or tweak_data.gui.part_texture_switches[part_id] or tweak_data.gui.default_part_texture_switch
 	local color_index, type_index = unpack(string.split(data_string, " "))
 	color_index = tonumber(color_index)
 	type_index = tonumber(type_index)
@@ -4325,7 +4325,7 @@ function BlackMarketManager:get_part_texture_switch(category, slot, part_id)
 	if not texture_switches then
 		return
 	end
-	local data_string = texture_switches and texture_switches[part_id] or "1 1"
+	local data_string = texture_switches and texture_switches[part_id] or tweak_data.gui.part_texture_switches[part_id] or tweak_data.gui.default_part_texture_switch
 	return self:get_texture_switch_from_data(data_string, part_id)
 end
 

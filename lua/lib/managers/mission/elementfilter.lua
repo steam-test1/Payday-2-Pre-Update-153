@@ -91,7 +91,7 @@ function ElementFilter:_check_players()
 	if self._values.player_3 and players == 3 then
 		return true
 	end
-	if self._values.player_4 and players == 4 then
+	if self._values.player_4 and 4 <= players then
 		return true
 	end
 	return false

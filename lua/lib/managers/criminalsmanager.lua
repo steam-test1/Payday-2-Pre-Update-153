@@ -334,7 +334,7 @@ function CriminalsManager:character_color_id_by_unit(unit)
 	for id, data in pairs(self._characters) do
 		if data.unit and data.taken and search_key == data.unit:key() then
 			if data.data.ai then
-				return 5
+				return #tweak_data.chat_colors
 			end
 			return data.peer_id
 		end

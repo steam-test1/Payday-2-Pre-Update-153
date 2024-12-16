@@ -44,55 +44,54 @@ CopActionWalk._walk_anim_velocities = {
 		},
 		cbt = {
 			walk = {
-				fwd = 208.27,
-				bwd = 208.27,
-				l = 192.75,
-				r = 192.75
+				fwd = 194.2,
+				bwd = 187.5,
+				l = 186.589,
+				r = 191.379
 			},
 			run = {
-				fwd = 414.73,
-				bwd = 416.77,
-				l = 416.35,
-				r = 411.9
+				fwd = 348.3,
+				bwd = 333.33,
+				l = 333.33,
+				r = 340.62
 			},
 			sprint = {
-				fwd = 672.79,
-				bwd = 547.35,
-				l = 488,
-				14,
-				r = 547.09
+				fwd = 546,
+				bwd = 434.1,
+				l = 368.116,
+				r = 470.636
 			}
 		}
 	},
 	crouch = {
 		cbt = {
 			walk = {
-				fwd = 174.45,
-				bwd = 163.74,
-				l = 152.14,
-				r = 162.85
+				fwd = 164.87,
+				bwd = 184.38,
+				l = 150.65,
+				r = 163.31
 			},
 			run = {
-				fwd = 312.25,
-				bwd = 268.68,
-				l = 282.93,
-				r = 282.93
+				fwd = 292.5,
+				bwd = 266.66,
+				l = 282.35,
+				r = 266.66
 			}
 		}
 	},
 	wounded = {
 		cbt = {
 			walk = {
-				fwd = 148,
-				bwd = 114,
-				l = 122,
-				r = 135
+				fwd = 164.87,
+				bwd = 184.38,
+				l = 150.65,
+				r = 163.31
 			},
 			run = {
-				fwd = 280,
-				bwd = 230,
-				l = 246,
-				r = 224
+				fwd = 292.5,
+				bwd = 266.66,
+				l = 282.35,
+				r = 266.66
 			}
 		}
 	}
@@ -111,7 +110,7 @@ CopActionWalk._walk_anim_lengths = {
 				r = 34
 			},
 			run = {
-				fwd = 20,
+				fwd = 22,
 				bwd = 18,
 				l = 18,
 				r = 20
@@ -119,28 +118,28 @@ CopActionWalk._walk_anim_lengths = {
 		},
 		cbt = {
 			walk = {
-				fwd = 26,
-				bwd = 26,
-				l = 26,
-				r = 26
+				fwd = 29,
+				bwd = 27,
+				l = 29,
+				r = 29
 			},
 			run = {
-				fwd = 19,
+				fwd = 22,
 				bwd = 18,
 				l = 18,
 				r = 20
 			},
 			sprint = {
-				fwd = 16,
-				bwd = 16,
-				l = 16,
+				fwd = 18,
+				bwd = 15,
+				l = 18,
 				r = 19
 			},
 			run_start = {
-				fwd = 29,
-				bwd = 25,
+				fwd = 31,
+				bwd = 26,
 				l = 27,
-				r = 24
+				r = 29
 			},
 			run_start_turn = {
 				bwd = 26,
@@ -148,31 +147,31 @@ CopActionWalk._walk_anim_lengths = {
 				r = 26
 			},
 			run_stop = {
-				fwd = 29,
-				bwd = 23,
-				l = 28,
-				r = 31
+				fwd = 28,
+				bwd = 29,
+				l = 34,
+				r = 30
 			}
 		}
 	},
 	crouch = {
 		cbt = {
 			walk = {
-				fwd = 31,
-				bwd = 31,
-				l = 27,
-				r = 28
+				fwd = 32,
+				bwd = 27,
+				l = 28,
+				r = 30
 			},
 			run = {
-				fwd = 21,
-				bwd = 20,
-				l = 19,
-				r = 19
+				fwd = 20,
+				bwd = 18,
+				l = 17,
+				r = 18
 			},
 			run_start = {
-				fwd = 31,
-				bwd = 16,
-				l = 30,
+				fwd = 30,
+				bwd = 20,
+				l = 29,
 				r = 22
 			},
 			run_start_turn = {
@@ -182,25 +181,25 @@ CopActionWalk._walk_anim_lengths = {
 			},
 			run_stop = {
 				fwd = 27,
-				bwd = 25,
-				l = 28,
-				r = 26
+				bwd = 30,
+				l = 31,
+				r = 32
 			}
 		}
 	},
 	wounded = {
 		cbt = {
 			walk = {
-				fwd = 28,
-				bwd = 29,
-				l = 29,
-				r = 29
+				fwd = 32,
+				bwd = 27,
+				l = 28,
+				r = 30
 			},
 			run = {
-				fwd = 19,
+				fwd = 20,
 				bwd = 18,
-				l = 19,
-				r = 19
+				l = 17,
+				r = 18
 			}
 		}
 	},
@@ -251,10 +250,10 @@ CopActionWalk._anim_movement = {
 		run_start_turn_r = {
 			ds = Vector3(133, 16, 0)
 		},
-		run_stop_fwd = 154,
-		run_stop_bwd = 91,
-		run_stop_l = 87,
-		run_stop_r = 106
+		run_stop_fwd = 162.78,
+		run_stop_bwd = 115.59,
+		run_stop_l = 141.21,
+		run_stop_r = 141.41
 	},
 	crouch = {
 		run_start_turn_bwd = {
@@ -266,10 +265,10 @@ CopActionWalk._anim_movement = {
 		run_start_turn_r = {
 			ds = Vector3(103, 0, 0)
 		},
-		run_stop_fwd = 83,
-		run_stop_bwd = 62,
-		run_stop_l = 75,
-		run_stop_r = 65
+		run_stop_fwd = 108,
+		run_stop_bwd = 75,
+		run_stop_l = 98,
+		run_stop_r = 120
 	}
 }
 CopActionWalk._anim_block_presets = {
@@ -464,6 +463,8 @@ function CopActionWalk:_init()
 		else
 			self._simplified_path = self._nav_path
 		end
+	elseif not managers.groupai:state():enemy_weapons_hot() then
+		self._simplified_path = self._nav_path
 	else
 		local good_pos = mvector3.copy(common_data.pos)
 		self._simplified_path = self._calculate_simplified_path(good_pos, self._nav_path, (not self._sync or self._common_data.stance.name == "ntl") and 2 or 1, self._sync, true)
@@ -516,6 +517,14 @@ function CopActionWalk:_init()
 			nav_link_from_idle = next_nav_point.element:nav_link_wants_align_pos() and true or false
 			self._nav_link_synched_with_start = true
 		end
+		local pose_code
+		if not action_desc.pose then
+			pose_code = 0
+		elseif action_desc.pose == "stand" then
+			pose_code = 1
+		else
+			pose_code = 2
+		end
 		local end_pose_code
 		if not action_desc.end_pose then
 			end_pose_code = 0
@@ -524,7 +533,16 @@ function CopActionWalk:_init()
 		else
 			end_pose_code = 2
 		end
-		self._ext_network:send("action_walk_start", self._nav_point_pos(next_nav_point), nav_link_act_yaw, nav_link_act_index, nav_link_from_idle, sync_haste, sync_yaw, self._no_walk and true or false, self._no_strafe and true or false, end_pose_code)
+		self._ext_network:send("action_walk_start", self._nav_point_pos(next_nav_point), nav_link_act_yaw, nav_link_act_index, nav_link_from_idle, sync_haste, sync_yaw, self._no_walk and true or false, self._no_strafe and true or false, pose_code, end_pose_code)
+	else
+		local pose = action_desc.pose
+		if pose and not self._unit:anim_data()[pose] then
+			if pose == "stand" then
+				local action, success = CopActionStand:new(action_desc, self._common_data)
+			else
+				local action, success = CopActionCrouch:new(action_desc, self._common_data)
+			end
+		end
 	end
 	if Network:is_server() then
 		self._unit:brain():rem_pos_rsrv("stand")
@@ -1214,12 +1232,31 @@ function CopActionWalk:_get_max_walk_speed()
 	return speed
 end
 
+CopActionWalk.lod_multipliers = {
+	0.15,
+	0.3,
+	0.5
+}
+
 function CopActionWalk:_get_current_max_walk_speed(move_dir)
 	if move_dir == "l" or move_dir == "r" then
 		move_dir = "strafe"
 	end
 	local multiplier = self._unit:brain().is_hostage and self._unit:brain():is_hostage() and self._common_data.char_tweak.hostage_move_speed or 1
-	return self._common_data.char_tweak.move_speed[self._ext_anim.pose][self._haste][self._stance.name][move_dir] * multiplier
+	local speed = self._common_data.char_tweak.move_speed[self._ext_anim.pose][self._haste][self._stance.name][move_dir] * multiplier
+	local is_host = Network:is_server() or Global.game_settings.single_player
+	if not is_host then
+		self._host_peer = self._host_peer or managers.network:session():peer(1)
+		local ping_multiplier = 1 + Network:qos(self._host_peer:rpc()).ping / 1000
+		local lod = self._ext_base:lod_stage()
+		local lod_multiplier = 1 + (Unit.occluded(self._unit) and 1 or CopActionWalk.lod_multipliers[lod] or 1)
+		if managers.groupai:state():enemy_weapons_hot() then
+			speed = speed * lod_multiplier
+		else
+			speed = speed * tweak_data.network.stealth_speed_boost
+		end
+	end
+	return speed
 end
 
 function CopActionWalk:save(save_data)
@@ -2009,8 +2046,8 @@ function CopActionWalk:_upd_nav_link(t)
 				local end_pos = self._nav_link.c_class:end_position()
 				table.insert(self._simplified_path, 2, end_pos)
 				self._next_is_nav_link = nil
-				self:_send_nav_point(self._simplified_path[2])
 			end
+			self:_send_nav_point(self._simplified_path[2])
 		end
 		if mvec3_dis(self._simplified_path[1], self._nav_point_pos(self._simplified_path[2])) > 400 and self._ext_base:lod_stage() == 1 then
 			self._curve_path = self:_calculate_curved_path(self._simplified_path, 1, 1, self._common_data.fwd)

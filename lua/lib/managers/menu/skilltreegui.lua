@@ -699,7 +699,6 @@ function SkillTreeGui:init(ws, fullscreen_ws, node)
 	self._active_page = nil
 	self._active_tree = nil
 	self._prerequisites_links = {}
-	managers.menu_component:close_contract_gui()
 	managers.features:announce_feature("perk_deck")
 	local menu_components_data = node:parameters().menu_component_data or {}
 	local add_skilltree = not menu_components_data.hide_skilltree

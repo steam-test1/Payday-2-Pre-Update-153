@@ -441,7 +441,7 @@ function MenuNodePrePlanningGui:_set_item_positions()
 							w = row_item.gui_panel:h(),
 							h = row_item.gui_panel:h(),
 							blend_mode = "add",
-							color = tweak_data.chat_colors[peer_id],
+							color = tweak_data.chat_colors[peer_id] or tweak_data.chat_colors[#tweak_data.chat_colors],
 							layer = self.layers.items
 						})
 						new_icon:set_world_right(prev_icon and prev_icon:world_left() - 2 or row_item.gui_panel:world_right() - 2)

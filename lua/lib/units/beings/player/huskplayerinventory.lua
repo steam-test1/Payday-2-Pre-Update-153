@@ -17,12 +17,19 @@ function HuskPlayerInventory:_send_equipped_weapon()
 end
 
 function HuskPlayerInventory:synch_equipped_weapon(weap_index, blueprint_string, cosmetics_string, peer)
+	self:_perform_switch_equipped_weapon(weap_index, blueprint_string, cosmetics_string, peer)
+	if self._unit:movement().sync_equip_weapon then
+		self._unit:movement():sync_equip_weapon()
+	end
+end
+
+function HuskPlayerInventory:_perform_switch_equipped_weapon(weap_index, blueprint_string, cosmetics_string, peer)
 	local weapon_name = self._get_weapon_name_from_sync_index(weap_index)
 	if type(weapon_name) == "string" then
 		self:add_unit_by_factory_name(weapon_name, true, true, blueprint_string, cosmetics_string or self:cosmetics_string_from_peer(peer, weapon_name))
-		return
+	else
+		self:add_unit_by_name(weapon_name, true, true)
 	end
-	self:add_unit_by_name(weapon_name, true, true)
 end
 
 function HuskPlayerInventory:check_peer_weapon_spawn()

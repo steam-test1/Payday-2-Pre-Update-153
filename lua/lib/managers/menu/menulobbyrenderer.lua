@@ -64,7 +64,7 @@ function MenuLobbyRenderer:open(...)
 	if not server_peer then
 		return
 	end
-	for i = 1, is_single_player and 1 or 4 do
+	for i = 1, is_single_player and 1 or tweak_data.max_players do
 		local t = {}
 		t.player = {}
 		t.free = true

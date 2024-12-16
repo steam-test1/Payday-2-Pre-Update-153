@@ -91,6 +91,11 @@ function NewFlamethrowerBase:_fire_raycast(user_unit, from_pos, direction, dmg_m
 		end
 	end
 	result.hit_enemy = 0 < hit_enemies and true or false
+	if self._alert_events then
+		result.rays = {
+			{position = from_pos}
+		}
+	end
 	managers.statistics:shot_fired({
 		hit = false,
 		weapon_unit = self._unit

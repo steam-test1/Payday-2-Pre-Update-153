@@ -300,7 +300,7 @@ function RaycastWeaponBase:fire(from_pos, direction, dmg_mul, shoot_player, spre
 	end
 	local is_player = self._setup.user_unit == managers.player:player_unit()
 	local consume_ammo = not managers.player:has_active_temporary_property("bullet_storm") and (not managers.player:has_activate_temporary_upgrade("temporary", "berserker_damage_multiplier") or not managers.player:has_category_upgrade("player", "berserker_no_ammo_cost")) or not is_player
-	if consume_ammo then
+	if consume_ammo and (is_player or Network:is_server()) then
 		local base = self:ammo_base()
 		if base:get_ammo_remaining_in_clip() == 0 then
 			return
@@ -1476,7 +1476,7 @@ function InstantBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage,
 		end
 	end
 	local result
-	if hit_unit:character_damage() and hit_unit:character_damage().damage_bullet then
+	if alive(weapon_unit) and hit_unit:character_damage() and hit_unit:character_damage().damage_bullet then
 		local is_alive = not hit_unit:character_damage():dead()
 		local knock_down = weapon_unit:base()._knock_down and 0 < weapon_unit:base()._knock_down and math.random() < weapon_unit:base()._knock_down
 		result = self:give_impact_damage(col_ray, weapon_unit, user_unit, damage, weapon_unit:base()._use_armor_piercing, false, knock_down, weapon_unit:base()._stagger, weapon_unit:base()._variant)
@@ -1495,6 +1495,15 @@ function InstantBulletBase:on_collision(col_ray, weapon_unit, user_unit, damage,
 		self:play_impact_sound_and_effects(col_ray, no_sound)
 	end
 	return result
+end
+
+function InstantBulletBase:on_collision_effects(col_ray, weapon_unit, user_unit, damage, blank, no_sound)
+	local hit_unit = col_ray.unit
+	local play_impact_flesh = not hit_unit:character_damage() or not hit_unit:character_damage()._no_blood
+	if play_impact_flesh then
+		managers.game_play_central:play_impact_flesh({col_ray = col_ray, no_sound = no_sound})
+		self:play_impact_sound_and_effects(col_ray, no_sound)
+	end
 end
 
 function InstantBulletBase:_get_character_push_multiplier(weapon_unit, died)

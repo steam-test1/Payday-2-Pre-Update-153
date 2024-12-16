@@ -1335,12 +1335,20 @@ end
 function NewRaycastWeaponBase:on_reload_stop()
 	self._bloodthist_value_during_reload = 0
 	self._current_reload_speed_multiplier = nil
+	local user_unit = managers.player:player_unit()
+	if user_unit then
+		user_unit:movement():current_state():send_reload_interupt()
+	end
 	self:set_reload_objects_visible(false)
 	self._reload_objects = {}
 end
 
 function NewRaycastWeaponBase:on_reload()
 	NewRaycastWeaponBase.super.on_reload(self)
+	local user_unit = managers.player:player_unit()
+	if user_unit then
+		user_unit:movement():current_state():send_reload_interupt()
+	end
 	self:set_reload_objects_visible(false)
 	self._reload_objects = {}
 end

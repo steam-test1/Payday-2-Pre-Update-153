@@ -8,7 +8,6 @@ function InfamyTreeGui:init(ws, fullscreen_ws, node)
 	self._ws = ws
 	self._fullscreen_ws = fullscreen_ws
 	self._init_layer = self._ws:panel():layer()
-	managers.menu_component:close_contract_gui()
 	self:_setup()
 	self:set_layer(1000)
 end

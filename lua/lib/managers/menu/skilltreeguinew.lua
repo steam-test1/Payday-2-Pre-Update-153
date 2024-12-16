@@ -42,7 +42,6 @@ function NewSkillTreeGui:init(ws, fullscreen_ws, node)
 	self._active_tree_item = nil
 	self._active_tier_item = nil
 	self._selected_item = nil
-	managers.menu_component:close_contract_gui()
 	self:_setup()
 	self:set_layer(5)
 	self._event_listener:add(self, {"refresh"}, callback(self, self, "_on_refresh_event"))
@@ -246,6 +245,7 @@ function NewSkillTreeGui:_setup()
 		end
 	end
 	self._selected_page = self._tree_items[1]
+	self._legend_buttons = {}
 	local legends_panel = self._panel:panel({
 		name = "LegendsPanel",
 		w = self._panel:w() * 0.75,
@@ -267,7 +267,7 @@ function NewSkillTreeGui:_setup()
 		w = self._panel:w() * 0.75,
 		h = tweak_data.menu.pd2_medium_font_size
 	})
-	legend_panel_reset_skills:set_righttop(self._panel:w(), tweak_data.menu.pd2_medium_font_size)
+	legend_panel_reset_skills:set_righttop(self._panel:w() - 2, tweak_data.menu.pd2_medium_font_size)
 	legend_panel_reset_skills:text({
 		name = "LegendTextResetSkills",
 		text = "RESET SKILLS",
@@ -344,11 +344,18 @@ function NewSkillTreeGui:refresh_reset_skills_legends(trees_idx)
 			}),
 			font = small_font,
 			font_size = small_font_size,
-			blend_mode = "add"
+			blend_mode = "add",
+			color = managers.menu:is_pc_controller() and tweak_data.screen_colors.button_stage_3 or Color.white
 		})
 		make_fine_text(text)
 		text:set_right(right)
 		right = text:left()
+		table.insert(self._legend_buttons, {
+			text = text,
+			callback = function()
+				self:respec_all()
+			end
+		})
 	else
 		return
 	end
@@ -359,10 +366,17 @@ function NewSkillTreeGui:refresh_reset_skills_legends(trees_idx)
 			}),
 			font = small_font,
 			font_size = small_font_size,
-			blend_mode = "add"
+			blend_mode = "add",
+			color = managers.menu:is_pc_controller() and tweak_data.screen_colors.button_stage_3 or Color.white
 		})
 		make_fine_text(text)
 		text:set_right(right)
+		table.insert(self._legend_buttons, {
+			text = text,
+			callback = function()
+				self:respec_page(self._tree_items[self._active_page])
+			end
+		})
 	end
 end
 
@@ -562,7 +576,11 @@ function NewSkillTreeGui:_update_legends(item)
 	local can_refund = 1 < step
 	local legends = {}
 	table.insert(legends, {
-		string_id = "menu_st_switch_skillset"
+		string_id = "menu_st_switch_skillset",
+		is_button = managers.menu:is_pc_controller(),
+		callback = function()
+			managers.menu:open_node("skill_switch", {})
+		end
 	})
 	if managers.menu:is_pc_controller() then
 		if can_refund then
@@ -633,6 +651,13 @@ function NewSkillTreeGui:_update_legends(item)
 			})
 			icon:set_right(right)
 			right = icon:left()
+		end
+		if text and legend.is_button then
+			text:set_color(managers.menu:is_pc_controller() and tweak_data.screen_colors.button_stage_3 or Color.white)
+			table.insert(self._legend_buttons, {
+				text = text,
+				callback = legend.callback
+			})
 		end
 		right = right - 4
 	end
@@ -739,6 +764,17 @@ function NewSkillTreeGui:mouse_moved(o, x, y)
 			self._back_highlight = false
 			self._panel:child("BackButton"):set_color(tweak_data.screen_colors.button_stage_3)
 		end
+		for _, legend in ipairs(self._legend_buttons) do
+			if alive(legend.text) then
+				if legend.text:inside(x, y) then
+					legend.text:set_color(tweak_data.screen_colors.button_stage_2)
+					inside = true
+					pointer = "link"
+				else
+					legend.text:set_color(tweak_data.screen_colors.button_stage_3)
+				end
+			end
+		end
 	end
 	if not inside and self._panel:inside(x, y) then
 		inside = true
@@ -787,9 +823,19 @@ function NewSkillTreeGui:mouse_pressed(button, x, y)
 		self:set_active_page(self._selected_tab:index())
 		return
 	end
-	if managers.menu:is_pc_controller() and self._back_highlight and self._panel:child("BackButton"):inside(x, y) then
-		managers.menu:back()
-		return
+	if managers.menu:is_pc_controller() then
+		if self._back_highlight and self._panel:child("BackButton"):inside(x, y) then
+			managers.menu:back()
+			return
+		end
+		for _, legend in ipairs(self._legend_buttons) do
+			if alive(legend.text) and legend.text:inside(x, y) then
+				if legend.callback then
+					legend.callback()
+				end
+				return
+			end
+		end
 	end
 end
 

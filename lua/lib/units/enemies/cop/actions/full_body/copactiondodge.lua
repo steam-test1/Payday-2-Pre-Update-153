@@ -23,7 +23,8 @@ function CopActionDodge:init(action_desc, common_data)
 	self._timeout = action_desc.timeout
 	self._machine = common_data.machine
 	self._ids_base = Idstring("base")
-	local redir_res = self._ext_movement:play_redirect("dodge")
+	local redir_name = "dodge"
+	local redir_res = self._ext_movement:play_redirect(redir_name)
 	if redir_res then
 		self._descriptor = action_desc
 		self._last_vel_z = 0

@@ -1152,18 +1152,16 @@ function MenuSceneManager:_setup_lobby_characters()
 		-35,
 		-115
 	}
-	local masks = {
-		"dallas",
-		"dallas",
-		"dallas",
-		"dallas"
-	}
+	local masks = {}
+	for i = 1, tweak_data.max_players do
+		table.insert(masks, "dallas")
+	end
 	local mvec = Vector3()
 	local math_up = math.UP
 	local pos = Vector3()
 	local rot = Rotation()
-	for i = 1, 4 do
-		mrotation.set_yaw_pitch_roll(rot, self._characters_rotation[i], 0, 0)
+	for i = 1, tweak_data.max_players do
+		mrotation.set_yaw_pitch_roll(rot, self._characters_rotation[i] or self._characters_rotation[1], 0, 0)
 		mvector3.set(pos, self._characters_offset)
 		mvector3.rotate_with(pos, rot)
 		mvector3.set(mvec, pos)
@@ -1248,7 +1246,7 @@ function MenuSceneManager:test_show_all_lobby_characters(enable_card)
 end
 
 function MenuSceneManager:hide_all_lobby_characters()
-	for i = 1, 4 do
+	for i = 1, tweak_data.max_players do
 		self:set_lobby_character_visible(i, false, true)
 	end
 end
@@ -1354,7 +1352,8 @@ function MenuSceneManager:_select_lobby_character_pose(peer_id, unit, weapon_inf
 		local pose = lobby_poses[math.random(#lobby_poses)]
 		unit:anim_state_machine():set_parameter(state, pose, 1)
 	else
-		local pose = lobby_poses[peer_id][math.random(#lobby_poses[peer_id])]
+		local id = peer_id % #lobby_poses + 1
+		local pose = lobby_poses[id][math.random(#lobby_poses[id])]
 		unit:anim_state_machine():set_parameter(state, pose, 1)
 	end
 end

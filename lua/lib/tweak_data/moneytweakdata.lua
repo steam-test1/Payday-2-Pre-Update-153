@@ -131,7 +131,7 @@ function MoneyTweakData:init(tweak_data)
 		14
 	}
 	self.small_loot_difficulty_multiplier = self._create_value_table(0, 0, 6, false, 1)
-	self.alive_humans_multiplier = self._create_value_table(1, self.alive_players_max, 4, false, 1)
+	self.alive_humans_multiplier = self._create_value_table(1, self.alive_players_max, tweak_data.max_players, false, 1)
 	self.alive_humans_multiplier[0] = 1
 	self.limited_bonus_multiplier = 1
 	self.sell_weapon_multiplier = 0.25

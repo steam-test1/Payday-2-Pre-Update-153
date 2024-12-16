@@ -399,7 +399,7 @@ function HostNetworkSession:_get_free_client_id()
 			end
 		end
 		i = i + 1
-	until i == 5
+	until i == tweak_data.max_players + 1
 end
 
 function HostNetworkSession:remove_peer(peer, peer_id, reason)
@@ -554,7 +554,7 @@ function HostNetworkSession:chk_server_joinable_state()
 			return
 		end
 	end
-	if table.size(self._peers) >= 3 then
+	if table.size(self._peers) >= tweak_data.max_players - 1 then
 		managers.network.matchmake:set_server_joinable(false)
 		return
 	end

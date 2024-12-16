@@ -92,7 +92,7 @@ function HUDTeammate:init(i, teammates_panel, is_player, width)
 		texture = tabs_texture,
 		texture_rect = cs_rect,
 		layer = 1,
-		color = tweak_data.chat_colors[i]:with_alpha(1),
+		color = (tweak_data.chat_colors[i] or tweak_data.chat_colors[#tweak_data.chat_colors]):with_alpha(1),
 		blend_mode = "normal",
 		x = name:x() - name:h(),
 		y = name:y() + 1,
@@ -1384,7 +1384,7 @@ function HUDTeammate:set_callsign(id)
 	local teammate_panel = self._panel
 	local callsign = teammate_panel:child("callsign")
 	local alpha = callsign:color().a
-	callsign:set_color(tweak_data.chat_colors[id]:with_alpha(alpha))
+	callsign:set_color((tweak_data.chat_colors[id] or tweak_data.chat_colors[#tweak_data.chat_colors]):with_alpha(alpha))
 end
 
 function HUDTeammate:set_cable_tie(data)
