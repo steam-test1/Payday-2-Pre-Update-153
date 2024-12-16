@@ -9727,12 +9727,13 @@ function BlackMarketGui:populate_mods(data)
 			if not crafted.customize_locked then
 				table.insert(data[equipped], "wm_remove_buy")
 				if not data[equipped].is_internal then
+					local preview_forbidden = managers.blackmarket:is_previewing_legendary_skin() or managers.blackmarket:preview_mod_forbidden(data[equipped].category, data[equipped].slot, data[equipped].name)
 					if managers.blackmarket:is_previewing_any_mod() then
 						table.insert(data[equipped], "wm_clear_mod_preview")
 					end
 					if managers.blackmarket:is_previewing_mod(data[equipped].name) then
 						table.insert(data[equipped], "wm_remove_preview")
-					else
+					elseif not preview_forbidden then
 						table.insert(data[equipped], "wm_preview_mod")
 					end
 				else

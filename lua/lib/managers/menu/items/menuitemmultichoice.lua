@@ -474,17 +474,15 @@ function MenuItemMultiChoice:popup_choice(row_item)
 			text = text,
 			callback_func = function()
 				self:set_value(option:parameters().value)
-			end,
-			focus_callback_func = function()
 			end
 		})
 	end
+	local divider = {}
+	divider.no_text = true
+	divider.allow_selection = false
+	table.insert(dialog_data.button_list, divider)
 	local no_button = {}
 	no_button.text = managers.localization:text("dialog_cancel")
-	
-	function no_button.focus_callback_func()
-	end
-	
 	no_button.cancel_button = true
 	table.insert(dialog_data.button_list, no_button)
 	dialog_data.image_blend_mode = "normal"

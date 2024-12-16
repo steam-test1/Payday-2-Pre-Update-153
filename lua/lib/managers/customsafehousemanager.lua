@@ -429,13 +429,17 @@ function CustomSafehouseManager:get_daily(id)
 	end
 end
 
-function CustomSafehouseManager:register_trophy_unlocked_callback(callback)
-	table.insert(self._trophy_unlocked_callbacks, callback)
+function CustomSafehouseManager:register_trophy_unlocked_callback(callback, id)
+	self._trophy_unlocked_callbacks[id or callback] = callback
 end
 
-function CustomSafehouseManager:run_trophy_unlocked_callbacks(trophy_id)
-	for i, callback in ipairs(self._trophy_unlocked_callbacks) do
-		callback(trophy_id)
+function CustomSafehouseManager:unregister_trophy_unlocked_callback(id_or_function)
+	self._trophy_unlocked_callbacks[id_or_function] = nil
+end
+
+function CustomSafehouseManager:run_trophy_unlocked_callbacks(...)
+	for _, callback in pairs(self._trophy_unlocked_callbacks) do
+		callback(...)
 	end
 end
 
@@ -528,13 +532,14 @@ end
 
 function CustomSafehouseManager:complete_trophy(trophy_or_id)
 	local trophy = type(trophy_or_id) == "table" and trophy_or_id or self:get_trophy(trophy_or_id)
+	print(inspect(trophy))
 	if trophy and not trophy.completed then
 		trophy.completed = true
 		self:add_completed_trophy(trophy, "trophy")
 		if trophy.gives_reward == nil or trophy.gives_reward then
 			self:add_coins(tweak_data.safehouse.rewards.challenge)
 		end
-		self:run_trophy_unlocked_callbacks(trophy.id)
+		self:run_trophy_unlocked_callbacks(trophy.id, "trophy")
 	end
 end
 
@@ -654,7 +659,7 @@ function CustomSafehouseManager:complete_daily()
 			objective.completed = true
 			objective.progress = objective.max_progress
 		end
-		self:run_trophy_unlocked_callbacks(self._global.daily.trophy.id)
+		self:run_trophy_unlocked_callbacks(self._global.daily.trophy.id, "daily")
 		if managers.mission then
 			managers.mission:call_global_event(Message.OnDailyCompleted)
 		end

@@ -1,4 +1,9 @@
 SkinEditor = SkinEditor or class()
+SkinEditor.allowed_extensions = {
+	png = true,
+	tga = true,
+	dds = true
+}
 
 function SkinEditor:init()
 	Global.skin_editor = {}
@@ -20,7 +25,7 @@ function SkinEditor:init_items()
 	self._global.skins = {}
 	self._current_skin = 1
 	for _, item in ipairs(managers.workshop:items()) do
-		if item:config().name and item:config().data then
+		if item:config().name and item:config().data and item:config().data.weapon_id then
 			self:add_literal_paths(item)
 			self:_append_skin(item:config().data.weapon_id, item)
 			self:load_textures(item)
@@ -104,6 +109,7 @@ end
 function SkinEditor:save_skin(skin, name, data)
 	skin:config().name = name or skin:config().name
 	skin:config().data = data or skin:config().data
+	skin:config().type = "weapon_skin"
 	local tags = self:get_current_weapon_tags()
 	skin:clear_tags()
 	for _, tag in ipairs(tags) do
@@ -355,23 +361,16 @@ function SkinEditor:set_ignore_unsaved(ignore)
 end
 
 function SkinEditor:get_texture_list(skin, path)
-	local allowed_extensions = {
-		png = true,
-		tga = true,
-		dds = true
-	}
 	path = path or skin:path()
 	local texture_list = {}
 	local file_list = SystemFS:list(path, false)
-	
-	local function valid_ext(filename)
+	local valid_ext = function(filename)
 		local dot_index = string.find(filename, ".[^.]*$")
 		if dot_index == 1 then
 			return false
 		end
-		return allowed_extensions[string.sub(filename, dot_index + 1)]
+		return SkinEditor.allowed_extensions[string.sub(filename, dot_index + 1)]
 	end
-	
 	for _, file_name in pairs(file_list) do
 		if valid_ext(file_name) then
 			table.insert(texture_list, file_name)
@@ -408,7 +407,6 @@ function SkinEditor:load_textures(skin, path_or_tex_type)
 		if tex_type then
 			rel_path = rel_path .. tex_type .. "/"
 		end
-		print("Creating texture entry: " .. tostring(texture_id) .. " pointing at " .. rel_path .. texture)
 		DB:create_entry(type_texture_id, texture_id, rel_path .. texture)
 		table.insert(new_textures, texture_id)
 	end
@@ -443,7 +441,7 @@ function SkinEditor:get_texture_idstring(skin, texture_name, texture_type)
 	return Idstring(self:get_texture_string(skin, texture_name, texture_type))
 end
 
-function SkinEditor:check_texture_db(texture)
+function SkinEditor:check_texture_db(texture, silent)
 	if not DB:has(Idstring("texture"), Idstring(texture)) then
 		Application:error("Texture is not in DB: " .. texture)
 		return false

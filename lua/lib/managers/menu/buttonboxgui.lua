@@ -81,7 +81,7 @@ function ButtonBoxGui:_set_button_selected(index, is_selected, allow_callbacks)
 	end
 	if allow_callbacks and is_selected and self._button_list then
 		local button = self._button_list[index]
-		if button then
+		if button and button.focus_callback_func then
 			button.focus_callback_func()
 		end
 	end

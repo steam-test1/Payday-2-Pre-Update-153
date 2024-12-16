@@ -4712,7 +4712,12 @@ function GuiTweakData:init()
 		"category",
 		"bonus"
 	}
-	self.new_heists = {limit = 4}
+	self.new_heists = {limit = 5}
+	table.insert(self.new_heists, {
+		name_id = "menu_nh_community_safe_4",
+		texture_path = "guis/textures/pd2/new_heists/community_safe_4",
+		url = "http://www.overkillsoftware.com/games/communitysafe4/"
+	})
 	table.insert(self.new_heists, {
 		name_id = "menu_nh_dsync_beta_is_live",
 		texture_path = "guis/textures/pd2/new_heists/desync_beta_is_live",

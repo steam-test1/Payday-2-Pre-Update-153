@@ -1477,6 +1477,7 @@ function MenuSceneManager:set_character_armor(armor_id, unit)
 	unit = unit or self._character_unit
 	local sequence = tweak_data.blackmarket.armors[armor_id].sequence
 	unit:damage():run_sequence_simple(sequence)
+	unit:base():set_armor_id(armor_id)
 	self:set_character_armor_skin(managers.blackmarket:equipped_armor_skin())
 end
 
