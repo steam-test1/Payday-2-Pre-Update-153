@@ -950,20 +950,10 @@ function EnemyManager:get_nearby_medic(unit)
 	if self:is_civilian(unit) then
 		return nil
 	end
-	local medics = {}
-	for _, enemy in pairs(self:all_enemies()) do
-		if enemy.unit:base()._tweak_table == "medic" then
-			table.insert(medics, enemy.unit)
-		end
-	end
-	if #medics == 0 then
-		return nil
-	end
-	local heal_radius = tweak_data.medic.radius
-	for _, medic in ipairs(medics) do
-		local distance = mvector3.distance_sq(unit:position(), medic:position())
-		if distance < heal_radius * heal_radius and unit ~= medic then
-			return medic
+	local enemies = World:find_units_quick(unit, "sphere", unit:position(), tweak_data.medic.radius, managers.slot:get_mask("enemies"))
+	for _, enemy in ipairs(enemies) do
+		if enemy:base()._tweak_table == "medic" then
+			return enemy
 		end
 	end
 	return nil

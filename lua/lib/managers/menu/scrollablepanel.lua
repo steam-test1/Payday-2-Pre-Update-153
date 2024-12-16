@@ -10,9 +10,8 @@ function ScrollablePanel:init(parent_panel, name, data)
 	self._padding = data.padding ~= nil and data.padding or PANEL_PADDING
 	self._force_scroll_indicators = data.force_scroll_indicators
 	local layer = data.layer ~= nil and data.layer or 50
-	self._panel = parent_panel:panel({
-		name = name .. "Base"
-	})
+	data.name = data.name or name .. "Base"
+	self._panel = parent_panel:panel(data)
 	self._scroll_panel = self._panel:panel({
 		name = name .. "Scroll",
 		x = self:padding(),

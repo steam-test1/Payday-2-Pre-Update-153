@@ -453,19 +453,29 @@ function HUDManager:remove_teammate_carry_info(i)
 end
 
 function HUDManager:start_teammate_timer(i, time)
-	self._teammate_panels[i]:start_timer(time)
+	if self._teammate_panels[i] then
+		self._teammate_panels[i]:start_timer(time)
+	end
 end
 
 function HUDManager:is_teammate_timer_running(i)
-	return self._teammate_panels[i]:is_timer_running()
+	if self._teammate_panels[i] then
+		return self._teammate_panels[i]:is_timer_running()
+	else
+		return false
+	end
 end
 
 function HUDManager:pause_teammate_timer(i, pause)
-	self._teammate_panels[i]:set_pause_timer(pause)
+	if self._teammate_panels[i] then
+		self._teammate_panels[i]:set_pause_timer(pause)
+	end
 end
 
 function HUDManager:stop_teammate_timer(i)
-	self._teammate_panels[i]:stop_timer()
+	if self._teammate_panels[i] then
+		self._teammate_panels[i]:stop_timer()
+	end
 end
 
 function HUDManager:_setup_player_info_hud_pd2()

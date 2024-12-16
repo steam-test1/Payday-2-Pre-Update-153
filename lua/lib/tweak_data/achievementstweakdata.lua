@@ -3142,6 +3142,11 @@ function AchievementsTweakData:init(tweak_data)
 		}
 	}
 	self.inventory = {}
+	self.crime_spree = {
+		{level = 50, id = "cee_1"},
+		{level = 100, id = "cee_2"},
+		{level = 250, id = "cee_3"}
+	}
 	local gage_5_1_achievement = {
 		text_id = "bm_wp_gage5_1_achievment",
 		stat = "gage5_1_stats",

@@ -4747,7 +4747,7 @@ function CharacterTweakData:_presets(tweak_data)
 	presets.weapon.sniper.m4.RELOAD_SPEED = 1.25
 	presets.weapon.sniper.m4.melee_speed = presets.weapon.normal.m4.melee_speed
 	presets.weapon.sniper.m4.melee_dmg = presets.weapon.normal.m4.melee_dmg
-	presets.weapon.expert.m4.melee_retry_delay = presets.weapon.normal.m4.melee_retry_delay
+	presets.weapon.sniper.m4.melee_retry_delay = presets.weapon.normal.m4.melee_retry_delay
 	presets.weapon.sniper.m4.range = {
 		close = 15000,
 		optimal = 15000,
@@ -7920,7 +7920,6 @@ function CharacterTweakData:_set_overkill()
 	self.presets.weapon.gang_member.rifle.autofire_rounds = nil
 	self.presets.weapon.gang_member.akimbo_pistol = self.presets.weapon.gang_member.beretta92
 	self.presets.weapon.gang_member.saiga = deep_clone(self.presets.weapon.gang_member.r870)
-	self:_set_characters_weapon_preset("good")
 	self:_set_characters_weapon_preset("good")
 	self.spooc.spooc_attack_timeout = {6, 8}
 	self.sniper.weapon.m4.FALLOFF = {

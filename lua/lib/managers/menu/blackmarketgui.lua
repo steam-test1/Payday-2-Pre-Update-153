@@ -3097,7 +3097,7 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 			font = small_font,
 			layer = 1,
 			color = tweak_data.screen_colors.text,
-			text = "EQUIPPED",
+			text = managers.localization:to_upper_text("bm_menu_equipped"),
 			x = armor_image:right() + 10,
 			y = armor_name:bottom(),
 			w = armor_info_panel:w() - armor_image:right(),

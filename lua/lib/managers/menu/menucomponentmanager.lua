@@ -63,6 +63,7 @@ function MenuComponentManager:init()
 	self._is_game_installing = is_installing
 	self._crimenet_enabled = not is_installing
 	self._crimenet_offline_enabled = not is_installing
+	self._generated = self._generated or {}
 	self._active_components = {}
 	self._active_components.news = {
 		create = callback(self, self, "_create_newsfeed_gui"),
@@ -304,6 +305,32 @@ function MenuComponentManager:run_return_on_all_live_components(func, ...)
 		end
 	end
 	return nil
+end
+
+function MenuComponentManager:create_component_callback(class_name, component_name)
+	local key = class_name
+	return {
+		create = callback(self, self, "_generated_create", {class_name, component_name}),
+		close = callback(self, self, "_generated_close", component_name)
+	}
+end
+
+function MenuComponentManager:_generated_create(params, node)
+	if not node then
+		return
+	end
+	local class_name, component_name = unpack(params)
+	self._generated[component_name] = self._generated[component_name] or _G[class_name]:new(self._ws, self._fullscreen_ws, node)
+	self:register_component(component_name, self._generated[component_name])
+end
+
+function MenuComponentManager:_generated_close(component_name)
+	local current = self._generated[component_name]
+	if current then
+		current:close()
+		self._generated[component_name] = nil
+		self:unregister_component(component_name)
+	end
 end
 
 function MenuComponentManager:get_controller_input_bool(button)

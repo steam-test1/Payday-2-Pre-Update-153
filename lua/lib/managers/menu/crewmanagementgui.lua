@@ -102,7 +102,7 @@ function CrewManagementGui:init(ws, fullscreen_ws, node)
 	for i = 1, 3 do
 		managers.menu_scene:set_henchmen_loadout(i)
 	end
-	if CrewManagementGui.panel_crash_protection then
+	if alive(CrewManagementGui.panel_crash_protection) then
 		CrewManagementGui.panel_crash_protection:parent():remove(CrewManagementGui.panel_crash_protection)
 	end
 	self._panel = ws:panel():panel()

@@ -1062,7 +1062,7 @@ function CrimeSpreeManager:check_achievements()
 	if not self:_is_active() or not self:in_progress() then
 		return
 	end
-	for i, achievement in ipairs(tweak_data.crime_spree.achievements.levels) do
+	for i, achievement in ipairs(tweak_data.achievement.crime_spree) do
 		if achievement.level <= self:spree_level() then
 			managers.achievment:award(achievement.id)
 		end

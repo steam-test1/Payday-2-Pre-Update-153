@@ -409,7 +409,7 @@ end
 
 function InventoryIconCreator:_create_backdrop()
 	self:_destroy_backdrop()
-	self._backdrop = safe_spawn_unit(Idstring("units/test/jocke/oneplanetorulethemall"), Vector3(-500, 0, 0), Rotation(180, 0, -90))
+	self._backdrop = safe_spawn_unit(Idstring("units/test/jocke/oneplanetorulethemall"), self._backdrop_position, self._backdrop_rotation)
 end
 
 function InventoryIconCreator:_destroy_backdrop()
@@ -594,6 +594,78 @@ function InventoryIconCreator:_create_custom_job(panel, sizer)
 	local ctrlr = CoreEws.number_controller(number_params)
 	self._custom_ctrlrs.resolution.height = ctrlr
 	h_sizer:add(EWS:BoxSizer("HORIZONTAL"), 1, 0, "EXPAND")
+	self._backdrop_position = Vector3(-500, 0, 0)
+	self._backdrop_rotation = Rotation(180, 0, -90)
+	self._backdrop_position_control = self:_create_position_control("Backdrop position ", self._backdrop_position, panel, sizer, callback(self, self, "_update_backdrop_position"))
+	self._backdrop_rotation_control = self:_create_rotation_control("Backdrop rotation ", self._backdrop_rotation, panel, sizer, callback(self, self, "_update_backdrop_rotation"))
+end
+
+function InventoryIconCreator:_update_backdrop_position(position)
+	self._backdrop_position = position
+end
+
+function InventoryIconCreator:_update_backdrop_rotation(rotation)
+	self._backdrop_rotation = rotation
+end
+
+function InventoryIconCreator:_create_axis_control(name, default_value, panel, sizer, cb, prop)
+	local axis_params = {
+		name = name,
+		panel = panel,
+		sizer = sizer,
+		value = default_value,
+		floats = 0,
+		name_proportions = 1,
+		ctrlr_proportions = prop or 5,
+		events = {
+			{
+				event = "EVT_COMMAND_TEXT_ENTER",
+				callback = cb
+			},
+			{
+				event = "EVT_KILL_FOCUS",
+				callback = cb
+			}
+		}
+	}
+	CoreEws.number_controller(axis_params)
+	return axis_params
+end
+
+function InventoryIconCreator:_create_position_control(name, default_value, panel, sizer, cb)
+	local h_sizer = EWS:BoxSizer("HORIZONTAL")
+	sizer:add(h_sizer, 0, 0, "EXPAND")
+	local text_ctrlr = EWS:StaticText(panel, name, 0, "ALIGN_LEFT")
+	h_sizer:add(text_ctrlr, 0, 0, "ALIGN_LEFT")
+	local pp = {}
+	table.insert(pp, self:_create_axis_control("X:", default_value.x, panel, h_sizer, function()
+		cb(Vector3(pp[1].value, pp[2].value, pp[3].value))
+	end))
+	table.insert(pp, self:_create_axis_control("Y:", default_value.y, panel, h_sizer, function()
+		cb(Vector3(pp[1].value, pp[2].value, pp[3].value))
+	end))
+	table.insert(pp, self:_create_axis_control("Z:", default_value.z, panel, h_sizer, function()
+		cb(Vector3(pp[1].value, pp[2].value, pp[3].value))
+	end))
+	return pp
+end
+
+function InventoryIconCreator:_create_rotation_control(name, default_value, panel, sizer, cb)
+	local h_sizer = EWS:BoxSizer("HORIZONTAL")
+	sizer:add(h_sizer, 0, 0, "EXPAND")
+	local text_ctrlr = EWS:StaticText(panel, name, 0, "ALIGN_LEFT")
+	h_sizer:add(text_ctrlr, 0, 0, "ALIGN_LEFT")
+	local rp = {}
+	table.insert(rp, self:_create_axis_control("Yaw:", default_value:yaw(), panel, h_sizer, function()
+		cb(Rotation(rp[1].value, rp[2].value, rp[3].value))
+	end, 2))
+	table.insert(rp, self:_create_axis_control("Pitch:", default_value:pitch(), panel, h_sizer, function()
+		cb(Rotation(rp[1].value, rp[2].value, rp[3].value))
+	end, 2))
+	table.insert(rp, self:_create_axis_control("Roll:", default_value:roll(), panel, h_sizer, function()
+		cb(Rotation(rp[1].value, rp[2].value, rp[3].value))
+	end, 2))
+	return rp
 end
 
 function InventoryIconCreator:_create_weapons_page(notebook)

@@ -83,7 +83,7 @@ end
 function TeamAIBase:save(data)
 	data.base = {
 		tweak_table = self._tweak_table,
-		loadout = managers.criminals:get_loadout_string_for(self._tweak_table)
+		loadout = managers.blackmarket:henchman_loadout_string_from_loadout(self._loadout)
 	}
 end
 

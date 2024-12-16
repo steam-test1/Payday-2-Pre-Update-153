@@ -1276,7 +1276,7 @@ function WeaponFactoryTweakData:_init_sights()
 	self.parts.wpn_fps_upg_o_shortdot.third_unit = "units/pd2_dlc_gage_snp/weapons/wpn_fps_upg_o_shortdot/wpn_third_upg_o_shortdot"
 	self.parts.wpn_fps_upg_o_leupold.third_unit = "units/pd2_dlc_gage_snp/weapons/wpn_fps_upg_o_leupold/wpn_third_upg_o_leupold"
 	self.parts.wpn_fps_upg_o_shortdot_vanilla = deep_clone(self.parts.wpn_fps_upg_o_shortdot)
-	self.parts.wpn_fps_upg_o_shortdot_vanilla.stats = nil
+	self.parts.wpn_fps_upg_o_shortdot_vanilla.stats = {zoom = 6}
 	self.parts.wpn_fps_upg_o_shortdot_vanilla.pcs = nil
 end
 

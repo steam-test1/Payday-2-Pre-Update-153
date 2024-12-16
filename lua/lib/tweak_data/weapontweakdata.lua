@@ -14304,8 +14304,7 @@ function WeaponTweakData:_create_table_structure()
 	self.m14_sniper_npc = {
 		usage = "m4",
 		sounds = {},
-		use_data = {},
-		auto = {}
+		use_data = {}
 	}
 	self.r870_npc = {
 		usage = "r870",

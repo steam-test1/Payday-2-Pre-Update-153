@@ -23,7 +23,6 @@ function CrimeSpreeTweakData:init(tweak_data)
 	self.announce_modifier_stinger = "stinger_feedback_positive"
 	self:init_missions(tweak_data)
 	self:init_rewards(tweak_data)
-	self:init_achievements(tweak_data)
 	self:init_modifiers(tweak_data)
 	self:init_gage_assets(tweak_data)
 	self:init_gui(tweak_data)
@@ -742,15 +741,6 @@ function CrimeSpreeTweakData:init_rewards(tweak_data)
 			type = "armor",
 			id = "cvc_navy_blue"
 		}
-	}
-end
-
-function CrimeSpreeTweakData:init_achievements(tweak_data)
-	self.achievements = {}
-	self.achievements.levels = {
-		{level = 50, id = "cee_1"},
-		{level = 100, id = "cee_2"},
-		{level = 250, id = "cee_3"}
 	}
 end
 

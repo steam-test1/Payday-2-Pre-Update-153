@@ -10,6 +10,6 @@ function HuskMedicDamage:update(...)
 	MedicDamage.update(self, ...)
 end
 
-function HuskMedicDamage:heal_unit(unit)
-	return MedicDamage.heal_unit(self, unit)
+function HuskMedicDamage:heal_unit(...)
+	return MedicDamage.heal_unit(self, ...)
 end

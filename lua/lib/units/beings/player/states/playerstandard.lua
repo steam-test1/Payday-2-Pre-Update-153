@@ -1462,6 +1462,7 @@ function PlayerStandard:_start_action_interact(t, input, timer, interact_object)
 	local final_timer = timer
 	final_timer = managers.crime_spree:modify_value("PlayerStandard:OnStartInteraction", final_timer, interact_object)
 	self._interact_expire_t = final_timer
+	local start_timer = 0
 	self._interact_params = {
 		object = interact_object,
 		timer = final_timer,
@@ -1470,7 +1471,7 @@ function PlayerStandard:_start_action_interact(t, input, timer, interact_object)
 	self._ext_camera:play_redirect(self:get_animation("unequip"))
 	self._equipped_unit:base():tweak_data_anim_stop("equip")
 	self._equipped_unit:base():tweak_data_anim_play("unequip")
-	managers.hud:show_interaction_bar(0, final_timer)
+	managers.hud:show_interaction_bar(start_timer, final_timer)
 	managers.network:session():send_to_peers_synched("sync_teammate_progress", 1, true, self._interact_params.tweak_data, final_timer, false)
 end
 
@@ -1522,7 +1523,9 @@ function PlayerStandard:_update_interaction_timers(t)
 		if not alive(self._interact_params.object) or self._interact_params.object ~= self._interaction:active_unit() or self._interact_params.tweak_data ~= self._interact_params.object:interaction().tweak_data or self._interact_params.object:interaction():check_interupt() then
 			self:_interupt_action_interact(t)
 		else
-			managers.hud:set_interaction_bar_width(self._interact_params.timer - self._interact_expire_t, self._interact_params.timer)
+			local current = self._interact_params.timer - self._interact_expire_t
+			local total = self._interact_params.timer
+			managers.hud:set_interaction_bar_width(current, total)
 			if self._interact_expire_t <= 0 then
 				self:_end_action_interact(t)
 				self._interact_expire_t = nil

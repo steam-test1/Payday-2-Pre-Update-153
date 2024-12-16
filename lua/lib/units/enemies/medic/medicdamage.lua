@@ -8,11 +8,11 @@ end
 function MedicDamage:update(t, dt)
 end
 
-function MedicDamage:heal_unit(unit)
+function MedicDamage:heal_unit(unit, override_cooldown)
 	local t = Application:time()
 	local cooldown = tweak_data.medic.cooldown
 	cooldown = managers.crime_spree:modify_value("MedicDamage:CooldownTime", cooldown)
-	if t < self._heal_cooldown_t + cooldown then
+	if t < self._heal_cooldown_t + cooldown and not override_cooldown then
 		return false
 	end
 	if self._unit:anim_data() and self._unit:anim_data().act then
@@ -34,14 +34,16 @@ function MedicDamage:heal_unit(unit)
 	local cop_dmg = unit:character_damage()
 	cop_dmg._health = cop_dmg._HEALTH_INIT
 	cop_dmg._health_ratio = 1
+	cop_dmg:_update_debug_ws()
 	self._heal_cooldown_t = t
-	print("[MedicDamage:heal_unit] Unit successfully healed")
-	local action_data = {
-		type = "heal",
-		body_part = 3,
-		client_interrupt = Network:is_client() and true or false
-	}
-	self._unit:movement():action_request(action_data)
+	if not self._unit:character_damage():dead() then
+		local action_data = {
+			type = "heal",
+			body_part = 3,
+			client_interrupt = Network:is_client() and true or false
+		}
+		self._unit:movement():action_request(action_data)
+	end
 	managers.network:session():send_to_peers("sync_medic_heal", self._unit)
 	return true
 end

@@ -358,6 +358,12 @@ function GroupAIStateBesiege:_begin_assault_task(assault_areas)
 	self._task_data.recon.tasks = {}
 end
 
+function GroupAIStateBesiege:assault_phase_end_time()
+	local task_data = self._task_data.assault
+	local end_t = task_data and task_data.phase_end_t
+	return end_t
+end
+
 function GroupAIStateBesiege:_upd_assault_task()
 	local task_data = self._task_data.assault
 	if not task_data.active then
@@ -407,14 +413,16 @@ function GroupAIStateBesiege:_upd_assault_task()
 			task_data.phase = "fade"
 			task_data.phase_end_t = t + self._tweak_data.assault.fade_duration
 		elseif t > task_data.phase_end_t or self._drama_data.zone == "high" then
+			local sustain_duration = math.lerp(self:_get_difficulty_dependent_value(self._tweak_data.assault.sustain_duration_min), self:_get_difficulty_dependent_value(self._tweak_data.assault.sustain_duration_max), math.random()) * self:_get_balancing_multiplier(self._tweak_data.assault.sustain_duration_balance_mul)
 			task_data.phase = "sustain"
-			task_data.phase_end_t = t + math.lerp(self:_get_difficulty_dependent_value(self._tweak_data.assault.sustain_duration_min), self:_get_difficulty_dependent_value(self._tweak_data.assault.sustain_duration_max), math.random()) * self:_get_balancing_multiplier(self._tweak_data.assault.sustain_duration_balance_mul)
+			task_data.phase_end_t = t + sustain_duration
 		end
 	elseif task_data.phase == "sustain" then
+		local end_t = self:assault_phase_end_time()
 		if task_spawn_allowance <= 0 then
 			task_data.phase = "fade"
 			task_data.phase_end_t = t + self._tweak_data.assault.fade_duration
-		elseif t > task_data.phase_end_t and not self._hunt_mode then
+		elseif t > end_t and not self._hunt_mode then
 			task_data.phase = "fade"
 			task_data.phase_end_t = t + self._tweak_data.assault.fade_duration
 		end

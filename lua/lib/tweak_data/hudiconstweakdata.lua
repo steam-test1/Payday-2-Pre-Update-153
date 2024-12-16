@@ -2745,8 +2745,9 @@ function HudIconsTweakData:create_next_icon(image_name)
 end
 
 function HudIconsTweakData:get_icon_data(icon_id, default_rect)
-	local icon = tweak_data.hud_icons[icon_id] and tweak_data.hud_icons[icon_id].texture or icon_id
-	local texture_rect = tweak_data.hud_icons[icon_id] and tweak_data.hud_icons[icon_id].texture_rect or default_rect or {
+	local icon_data = self[icon_id]
+	local icon = icon_data and icon_data.texture or icon_id
+	local texture_rect = icon_data and icon_data.texture_rect or default_rect or {
 		0,
 		0,
 		48,
