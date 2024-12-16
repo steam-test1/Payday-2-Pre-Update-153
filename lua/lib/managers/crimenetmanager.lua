@@ -3418,7 +3418,7 @@ function CrimeNetGui:check_job_pressed(x, y)
 				local dlc_data = Global.dlc_manager.all_dlc_data[data.dlc]
 				local app_id = dlc_data and dlc_data.app_id
 				if app_id and SystemInfo:distribution() == Idstring("STEAM") then
-					Steam:overlay_activate("store", app_id)
+					Steam:overlay_activate("store", 218620)
 				end
 			end
 			if job.expanded then

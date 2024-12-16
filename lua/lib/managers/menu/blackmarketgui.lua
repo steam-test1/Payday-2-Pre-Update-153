@@ -7344,16 +7344,16 @@ function BlackMarketGui:get_lock_icon(data, default)
 	if unlocked and (type(unlocked) ~= "number" or 0 < unlocked) then
 		return nil
 	end
+	local gv_tweak = tweak_data.lootdrop.global_values[global_value]
+	if gv_tweak and gv_tweak.dlc and not managers.dlc:is_dlc_unlocked(global_value) then
+		return gv_tweak.unique_lock_icon or "guis/textures/pd2/lock_dlc"
+	end
 	if skill_based then
 		return "guis/textures/pd2/lock_skill"
 	end
 	if func_based then
 		local _, _, icon = BlackMarketGui.get_func_based(func_based)
 		return icon or "guis/textures/pd2/lock_skill"
-	end
-	local gv_tweak = tweak_data.lootdrop.global_values[global_value]
-	if gv_tweak and gv_tweak.dlc and not managers.dlc:is_dlc_unlocked(global_value) then
-		return gv_tweak.unique_lock_icon or "guis/textures/pd2/lock_dlc"
 	end
 	return default or "guis/textures/pd2/lock_level"
 end

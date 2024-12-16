@@ -5923,4 +5923,15 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.dgm_bundle = {}
+	self.dgm_bundle.free = true
+	self.dgm_bundle.content = {}
+	self.dgm_bundle.content.loot_global_value = "pd2_clan"
+	self.dgm_bundle.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "dgm",
+			amount = 1
+		}
+	}
 end

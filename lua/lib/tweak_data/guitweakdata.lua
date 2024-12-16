@@ -4709,14 +4709,24 @@ function GuiTweakData:init()
 	}
 	self.new_heists = {}
 	table.insert(self.new_heists, {
+		name_id = "menu_nh_ultimate_edition",
+		texture_path = "guis/textures/pd2/new_heists/ultimate_edition",
+		url = "http://store.steampowered.com/app/218620"
+	})
+	table.insert(self.new_heists, {
+		name_id = "menu_nh_russian_national_day",
+		texture_path = "guis/textures/pd2/new_heists/russian_national_day",
+		url = "http://store.steampowered.com/news/?appids=218620"
+	})
+	table.insert(self.new_heists, {
+		name_id = "menu_nh_dsync_beta",
+		texture_path = "guis/textures/pd2/new_heists/desync_beta",
+		url = "http://steamcommunity.com/app/218620/discussions/29/"
+	})
+	table.insert(self.new_heists, {
 		name_id = "menu_nh_sangres_safe",
 		texture_path = "guis/textures/pd2/new_heists/sangres_safe",
 		url = "http://www.overkillsoftware.com/games/sangres/#safe"
-	})
-	table.insert(self.new_heists, {
-		name_id = "menu_nh_sangres",
-		texture_path = "guis/textures/pd2/new_heists/sangres",
-		url = "http://www.overkillsoftware.com/games/sangres/"
 	})
 	table.insert(self.new_heists, {
 		name_id = "menu_nh_search_for_kento",
@@ -4724,24 +4734,29 @@ function GuiTweakData:init()
 		url = "http://www.searchforkento.com/"
 	})
 	table.insert(self.new_heists, {
-		name_id = "menu_nh_gage_russian_weapon_pack",
-		texture_path = "guis/textures/pd2/new_heists/gage_russian_weapon_pack",
-		url = "http://www.overkillsoftware.com/games/russianweaponpack/"
-	})
-	table.insert(self.new_heists, {
 		name_id = "menu_nh_wick_safe",
 		texture_path = "guis/textures/pd2/new_heists/wick_safe",
 		url = "http://www.overkillsoftware.com/games/johnwickheists/#safe"
 	})
 	table.insert(self.new_heists, {
-		name_id = "menu_nh_wick_heist",
-		texture_path = "guis/textures/pd2/new_heists/wick_heists",
-		url = "http://store.steampowered.com/app/591710"
-	})
-	table.insert(self.new_heists, {
 		name_id = "menu_nh_sw_collab",
 		texture_path = "guis/textures/pd2/new_heists/sw_collab",
 		url = "http://steamcommunity.com/app/218620/allnews/#scrollTop=0"
+	})
+	table.insert(self.new_heists, {
+		name_id = "menu_nh_sangres",
+		texture_path = "guis/textures/pd2/new_heists/sangres",
+		url = "http://www.overkillsoftware.com/games/sangres/"
+	})
+	table.insert(self.new_heists, {
+		name_id = "menu_nh_gage_russian_weapon_pack",
+		texture_path = "guis/textures/pd2/new_heists/gage_russian_weapon_pack",
+		url = "http://www.overkillsoftware.com/games/russianweaponpack/"
+	})
+	table.insert(self.new_heists, {
+		name_id = "menu_nh_wick_heist",
+		texture_path = "guis/textures/pd2/new_heists/wick_heists",
+		url = "http://store.steampowered.com/app/591710"
 	})
 	table.insert(self.new_heists, {
 		name_id = "menu_nh_scarface_safe",

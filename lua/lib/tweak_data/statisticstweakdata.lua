@@ -800,7 +800,8 @@ function StatisticsTweakData:statistics_table()
 		"wpn_prj_target",
 		"concussion",
 		"fir_com",
-		"smoke_screen_grenade"
+		"smoke_screen_grenade",
+		"dada_com"
 	}
 	local enemy_list = {
 		"civilian",

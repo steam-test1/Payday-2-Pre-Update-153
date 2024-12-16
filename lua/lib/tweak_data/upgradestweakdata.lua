@@ -2315,7 +2315,8 @@ function UpgradesTweakData:init(tweak_data)
 			"dynamite",
 			"molotov",
 			"concussion",
-			"fir_com"
+			"fir_com",
+			"dada_com"
 		}
 	}
 	self.level_tree[2] = {

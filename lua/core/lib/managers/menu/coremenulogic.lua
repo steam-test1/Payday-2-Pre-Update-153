@@ -77,6 +77,9 @@ function Logic:_select_node(node_name, ...)
 		if node:parameters().menu_components then
 			managers.menu_component:set_active_components(node:parameters().menu_components, node)
 		end
+		node:parameters().create_params = {
+			...
+		}
 		table.insert(self._node_stack, node)
 		self:_call_callback("renderer_show_node", node)
 		node:select_item()

@@ -1848,7 +1848,7 @@ Play the full version soon to get your full PAYDAY!]],
 	self.casino.infamous_chance = 3
 	self.projectiles = {}
 	self.projectiles.frag = {}
-	self.projectiles.frag.damage = 90
+	self.projectiles.frag.damage = 160
 	self.projectiles.frag.curve_pow = 0.1
 	self.projectiles.frag.player_damage = 10
 	self.projectiles.frag.range = 500
@@ -2126,6 +2126,12 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.smoke_screen_grenade.init_timer = 0
 	self.projectiles.smoke_screen_grenade.accuracy_roll_chance = 0.5
 	self.projectiles.smoke_screen_grenade.accuracy_fail_spread = {5, 10}
+	self.projectiles.dada_com = {}
+	self.projectiles.dada_com.damage = 160
+	self.projectiles.dada_com.curve_pow = 0.1
+	self.projectiles.dada_com.range = 500
+	self.projectiles.dada_com.name_id = "bm_grenade_dada_com"
+	self.projectiles.dada_com.sound_event = "mtl_explosion"
 	self.voting = {}
 	self.voting.timeout = 30
 	self.voting.cooldown = 50

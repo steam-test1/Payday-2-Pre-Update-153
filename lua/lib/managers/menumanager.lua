@@ -1254,142 +1254,142 @@ end
 
 function MenuCallbackHandler:dlc_buy_gage_pack_pc()
 	print("[MenuCallbackHandler:dlc_buy_gage_pack_pc]")
-	Steam:overlay_activate("store", 267380)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_big_bank_pc()
 	print("[MenuCallbackHandler:dlc_buy_big_bank_pc]")
-	Steam:overlay_activate("store", 306690)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_gage_pack_historical_pc()
 	print("[MenuCallbackHandler:dlc_buy_gage_pack_historical_pc]")
-	Steam:overlay_activate("store", 331900)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_hl_miami_pc()
 	print("[MenuCallbackHandler:dlc_buy_hl_miami_pc]")
-	Steam:overlay_activate("store", 323500)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_gage_pack_assault_pc()
 	print("[MenuCallbackHandler:dlc_buy_gage_pack_assault_pc]")
-	Steam:overlay_activate("store", 320030)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_gage_pack_shotgun_pc()
 	print("[MenuCallbackHandler:dlc_buy_gage_pack_shotgun_pc]")
-	Steam:overlay_activate("store", 311050)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_gage_pack_snp_pc()
 	print("[MenuCallbackHandler:dlc_buy_gage_pack_snp_pc]")
-	Steam:overlay_activate("store", 259380)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_gage_pack_jobs_pc()
 	print("[MenuCallbackHandler:dlc_buy_gage_pack_jobs_pc]")
-	Steam:overlay_activate("store", 259381)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_gage_pack_lmg_pc()
 	print("[MenuCallbackHandler:dlc_buy_gage_pack_lmg_pc]")
-	Steam:overlay_activate("store", 275590)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_armadillo_pc()
 	print("[MenuCallbackHandler:dlc_buy_armadillo_pc]")
-	Steam:overlay_activate("store", 264610)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_character_pack_clover_pc()
 	print("[MenuCallbackHandler:dlc_buy_character_pack_clover_pc]")
-	Steam:overlay_activate("store", 337661)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_character_pack_dragan_pc()
 	print("[MenuCallbackHandler:dlc_buy_character_pack_dragan_pc]")
-	Steam:overlay_activate("store", 344140)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_hope_diamond_pc()
 	print("[MenuCallbackHandler:dlc_buy_hope_diamond_pc]")
-	Steam:overlay_activate("store", 337660)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_the_bomb_pc()
 	print("[MenuCallbackHandler:dlc_buy_the_bomb_pc]")
-	Steam:overlay_activate("store", 339480)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_akm4_pack_pc()
 	print("[MenuCallbackHandler:dlc_buy_akm4_pack_pc]")
-	Steam:overlay_activate("store", 351890)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_overkill_pack_pc()
 	print("[MenuCallbackHandler:dlc_buy_overkill_pack_pc]")
-	Steam:overlay_activate("store", 348090)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_complete_overkill_pack_pc()
 	print("[MenuCallbackHandler:dlc_buy_complete_overkill_pack_pc]")
-	Steam:overlay_activate("store", 348091)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_bbq_pc()
 	print("[MenuCallbackHandler:dlc_buy_bbq_pc]")
-	Steam:overlay_activate("store", 358150)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_west_pc()
 	print("[MenuCallbackHandler:dlc_buy_west_pc]")
-	Steam:overlay_activate("store", 349830)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_arena_pc()
 	print("[MenuCallbackHandler:dlc_buy_arena_pc]")
-	Steam:overlay_activate("store", 366660)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_character_pack_sokol_pc()
 	print("[MenuCallbackHandler:dlc_buy_character_pack_sokol_pc]")
-	Steam:overlay_activate("store", 374301)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_kenaz_pc()
 	print("[MenuCallbackHandler:dlc_buy_kenaz_pc]")
-	Steam:overlay_activate("store", 374300)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_turtles_pc()
 	print("[MenuCallbackHandler:dlc_buy_turtles_pc]")
-	Steam:overlay_activate("store", 384021)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_dragon_pc()
 	print("[MenuCallbackHandler:dlc_buy_dragon_pc]")
-	Steam:overlay_activate("store", 384020)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_steel_pc()
 	print("[MenuCallbackHandler:dlc_buy_steel_pc]")
-	Steam:overlay_activate("store", 401650)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_berry_pc()
 	print("[MenuCallbackHandler:dlc_buy_berry_pc]")
-	Steam:overlay_activate("store", 422400)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_peta_pc()
 	print("[MenuCallbackHandler:dlc_buy_peta_pc]")
-	Steam:overlay_activate("store", 433730)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_pal_pc()
 	print("[MenuCallbackHandler:dlc_buy_pal_pc]")
-	Steam:overlay_activate("store", 441600)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_coco_pc()
@@ -1399,12 +1399,12 @@ end
 
 function MenuCallbackHandler:dlc_buy_opera_pc()
 	print("[MenuCallbackHandler:dlc_buy_opera_pc]")
-	Steam:overlay_activate("store", 468410)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_wild_pc()
 	print("[MenuCallbackHandler:dlc_buy_wild_pc]")
-	Steam:overlay_activate("store", 450660)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_born_pc()
@@ -1414,27 +1414,27 @@ end
 
 function MenuCallbackHandler:dlc_buy_pim_pc()
 	print("[MenuCallbackHandler:dlc_buy_pim_pc]")
-	Steam:overlay_activate("store", 545100)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_tango_pc()
 	print("[MenuCallbackHandler:dlc_buy_tango_pc]")
-	Steam:overlay_activate("store", 548420)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_friend_pc()
 	print("[MenuCallbackHandler:dlc_buy_friend_pc]")
-	Steam:overlay_activate("store", 548421)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_chico_pc()
 	print("[MenuCallbackHandler:dlc_buy_chico_pc]")
-	Steam:overlay_activate("store", 548422)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_spa_pc()
 	print("[MenuCallbackHandler:dlc_buy_spa_pc]")
-	Steam:overlay_activate("store", 591710)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_grv_pc()
@@ -1454,7 +1454,7 @@ end
 
 function MenuCallbackHandler:dlc_buy_max_pc()
 	print("[MenuCallbackHandler:dlc_buy_max_pc]")
-	Steam:overlay_activate("store", 618941)
+	Steam:overlay_activate("store", 218620)
 end
 
 function MenuCallbackHandler:dlc_buy_ps3()
@@ -1585,163 +1585,243 @@ function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	return false
 end
 
-function MenuCallbackHandler:visible_callback_armored_transport()
+function MenuCallbackHandler:visible_callback_armored_transport(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("armored_transport")
 end
 
-function MenuCallbackHandler:visible_callback_gage_pack()
+function MenuCallbackHandler:visible_callback_gage_pack(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("gage_pack")
 end
 
-function MenuCallbackHandler:visible_callback_gage_pack_lmg()
+function MenuCallbackHandler:visible_callback_gage_pack_lmg(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("gage_pack_lmg")
 end
 
-function MenuCallbackHandler:visible_callback_gage_pack_jobs()
+function MenuCallbackHandler:visible_callback_gage_pack_jobs(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("gage_pack_jobs")
 end
 
-function MenuCallbackHandler:visible_callback_gage_pack_snp()
+function MenuCallbackHandler:visible_callback_gage_pack_snp(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("gage_pack_snp")
 end
 
-function MenuCallbackHandler:visible_callback_gage_pack_shotgun()
+function MenuCallbackHandler:visible_callback_gage_pack_shotgun(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("gage_pack_shotgun")
 end
 
-function MenuCallbackHandler:visible_callback_gage_pack_assault()
+function MenuCallbackHandler:visible_callback_gage_pack_assault(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("gage_pack_assault")
 end
 
-function MenuCallbackHandler:visible_callback_hl_miami()
+function MenuCallbackHandler:visible_callback_hl_miami(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("hl_miami")
 end
 
-function MenuCallbackHandler:visible_callback_big_bank()
+function MenuCallbackHandler:visible_callback_big_bank(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("big_bank")
 end
 
-function MenuCallbackHandler:visible_callback_gage_pack_historical()
+function MenuCallbackHandler:visible_callback_gage_pack_historical(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("gage_pack_historical")
 end
 
-function MenuCallbackHandler:visible_callback_character_pack_clover()
+function MenuCallbackHandler:visible_callback_character_pack_clover(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("character_pack_clover")
 end
 
-function MenuCallbackHandler:visible_callback_character_pack_dragan()
+function MenuCallbackHandler:visible_callback_character_pack_dragan(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("character_pack_dragan")
 end
 
-function MenuCallbackHandler:visible_callback_hope_diamond()
+function MenuCallbackHandler:visible_callback_hope_diamond(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("hope_diamond")
 end
 
-function MenuCallbackHandler:visible_callback_the_bomb()
+function MenuCallbackHandler:visible_callback_the_bomb(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("the_bomb")
 end
 
-function MenuCallbackHandler:visible_callback_akm4_pack()
+function MenuCallbackHandler:visible_callback_akm4_pack(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("akm4_pack")
 end
 
-function MenuCallbackHandler:visible_callback_overkill_pack()
+function MenuCallbackHandler:visible_callback_overkill_pack(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("overkill_pack")
 end
 
-function MenuCallbackHandler:visible_callback_complete_overkill_pack()
+function MenuCallbackHandler:visible_callback_complete_overkill_pack(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("complete_overkill_pack")
 end
 
-function MenuCallbackHandler:visible_callback_bbq()
+function MenuCallbackHandler:visible_callback_bbq(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("bbq")
 end
 
-function MenuCallbackHandler:visible_callback_west()
+function MenuCallbackHandler:visible_callback_west(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("west")
 end
 
-function MenuCallbackHandler:visible_callback_arena()
+function MenuCallbackHandler:visible_callback_arena(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("arena")
 end
 
-function MenuCallbackHandler:visible_callback_character_pack_sokol()
+function MenuCallbackHandler:visible_callback_character_pack_sokol(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("character_pack_sokol")
 end
 
-function MenuCallbackHandler:visible_callback_kenaz()
+function MenuCallbackHandler:visible_callback_kenaz(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("kenaz")
 end
 
-function MenuCallbackHandler:visible_callback_turtles()
+function MenuCallbackHandler:visible_callback_turtles(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("turtles")
 end
 
-function MenuCallbackHandler:visible_callback_dragon()
+function MenuCallbackHandler:visible_callback_dragon(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("dragon")
 end
 
-function MenuCallbackHandler:visible_callback_steel()
+function MenuCallbackHandler:visible_callback_steel(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("steel")
 end
 
-function MenuCallbackHandler:visible_callback_berry()
+function MenuCallbackHandler:visible_callback_berry(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("berry")
 end
 
-function MenuCallbackHandler:visible_callback_peta()
+function MenuCallbackHandler:visible_callback_peta(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("peta")
 end
 
-function MenuCallbackHandler:visible_callback_pal()
+function MenuCallbackHandler:visible_callback_pal(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("pal")
 end
 
-function MenuCallbackHandler:visible_callback_opera()
+function MenuCallbackHandler:visible_callback_opera(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("opera")
 end
 
-function MenuCallbackHandler:visible_callback_born()
+function MenuCallbackHandler:visible_callback_born(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("born")
 end
 
-function MenuCallbackHandler:visible_callback_wild()
+function MenuCallbackHandler:visible_callback_wild(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("wild")
 end
 
-function MenuCallbackHandler:visible_callback_pim()
+function MenuCallbackHandler:visible_callback_pim(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("pim")
 end
 
-function MenuCallbackHandler:visible_callback_tango()
+function MenuCallbackHandler:visible_callback_tango(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("tango")
 end
 
-function MenuCallbackHandler:visible_callback_friend()
+function MenuCallbackHandler:visible_callback_friend(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("friend")
 end
 
-function MenuCallbackHandler:visible_callback_chico()
+function MenuCallbackHandler:visible_callback_chico(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("chico")
 end
 
-function MenuCallbackHandler:visible_callback_spa()
+function MenuCallbackHandler:visible_callback_spa(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("spa")
 end
 
-function MenuCallbackHandler:visible_callback_grv()
+function MenuCallbackHandler:visible_callback_grv(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("grv")
 end
 
-function MenuCallbackHandler:visible_callback_amp()
+function MenuCallbackHandler:visible_callback_amp(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("amp")
 end
 
-function MenuCallbackHandler:visible_callback_mp2()
+function MenuCallbackHandler:visible_callback_mp2(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("mp2")
 end
 
-function MenuCallbackHandler:visible_callback_max()
+function MenuCallbackHandler:visible_callback_max(item)
+	item:set_parameter("text_id", "menu_dlc_buy_ue")
+	item:set_parameter("help_id", "menu_dlc_buy_ue_help")
 	return self:is_dlc_latest_locked("max")
 end
 

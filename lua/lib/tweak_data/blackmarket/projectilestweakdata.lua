@@ -391,6 +391,22 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 	self.projectiles.smoke_screen_grenade.is_a_grenade = true
 	self.projectiles.smoke_screen_grenade.throwable = true
 	self.projectiles.smoke_screen_grenade.no_shouting = true
+	self.projectiles.dada_com = {}
+	self.projectiles.dada_com.name_id = "bm_grenade_dada_com"
+	self.projectiles.dada_com.desc_id = "bm_grenade_dada_com_desc"
+	self.projectiles.dada_com.unit = "units/pd2_dlc_mtl/weapons/wpn_fps_thr_dada/wpn_third_thr_dada"
+	self.projectiles.dada_com.unit_dummy = "units/pd2_dlc_mtl/weapons/wpn_fps_thr_dada/wpn_fps_thr_dada_husk"
+	self.projectiles.dada_com.icon = "dada_com"
+	self.projectiles.dada_com.throwable = true
+	self.projectiles.dada_com.max_amount = 3
+	self.projectiles.dada_com.animation = "throw_dada"
+	self.projectiles.dada_com.anim_global_param = "projectile_dada"
+	self.projectiles.dada_com.throw_allowed_expire_t = 0.1
+	self.projectiles.dada_com.expire_t = 1.3
+	self.projectiles.dada_com.repeat_expire_t = 1.5
+	self.projectiles.dada_com.is_a_grenade = true
+	self.projectiles.dada_com.dlc = "pd2_clan"
+	self.projectiles.dada_com.texture_bundle_folder = "mtl"
 	self._projectiles_index = {
 		"frag",
 		"launcher_frag",
@@ -430,7 +446,8 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 		"launcher_m203",
 		"rocket_ray_frag",
 		"fir_com",
-		"smoke_screen_grenade"
+		"smoke_screen_grenade",
+		"dada_com"
 	}
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.projectiles) do
