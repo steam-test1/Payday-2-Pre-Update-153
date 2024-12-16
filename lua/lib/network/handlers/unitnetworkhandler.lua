@@ -3050,3 +3050,16 @@ function UnitNetworkHandler:run_local_push_child_unit(parent_unit, parent_extens
 	end
 	parent_unit[parent_extension_name](parent_unit):local_push_child_unit(unit_id, mass, pow, vec3_a, vec3_b)
 end
+
+function UnitNetworkHandler:sync_special_character_material(character_unit, material_name)
+	if not alive(character_unit) then
+		return
+	end
+	local mtr_ids = Idstring(material_name)
+	if DB:has(Idstring("material_config"), mtr_ids) then
+		character_unit:set_material_config(mtr_ids, true)
+		if character_unit:armor_skin() then
+			character_unit:armor_skin():_apply_cosmetics()
+		end
+	end
+end

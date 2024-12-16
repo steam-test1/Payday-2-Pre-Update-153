@@ -291,6 +291,9 @@ end
 function NetworkPeer:verify_grenade(value)
 	local grenade_id = self:grenade_id()
 	local tweak_entry = grenade_id and tweak_data.blackmarket.projectiles[grenade_id]
+	if tweak_entry.base_cooldown then
+		return true
+	end
 	local max_amount = tweak_entry and tweak_entry.max_amount or tweak_data.equipments.max_amount.grenades
 	max_amount = managers.crime_spree:modify_value("PlayerManager:GetThrowablesMaxAmount", max_amount)
 	if self._grenades and max_amount < self._grenades + value then
@@ -1566,6 +1569,26 @@ function NetworkPeer:spawn_unit(spawn_point_id, is_drop_in, spawn_as)
 			unit:armor_skin():set_cosmetics_data(outfit.armor_skin, true)
 		end
 	end
+	local char_tweak = tweak_data.blackmarket.characters.locked[character_name] or tweak_data.blackmarket.characters[character_name]
+	if is_local_peer and char_tweak and char_tweak.special_materials then
+		local special_material
+		local special_materials = char_tweak.special_materials
+		for material, chance in pairs(special_materials) do
+			if type(chance) == "number" then
+				local rand = math.rand(chance)
+				if rand <= 1 then
+					special_material = material
+					break
+				end
+			end
+		end
+		special_material = special_material or table.random(special_materials)
+		if managers.blackmarket:equipped_armor_skin() ~= "none" then
+			special_material = special_material .. "_cc"
+		end
+		self._special_material = special_material
+		managers.network:session():send_to_peers_synched("sync_special_character_material", unit, special_material)
+	end
 	local vehicle = managers.vehicle:find_active_vehicle_with_player()
 	if vehicle and not spawn_in_custody then
 		Application:debug("[NetworkPeer] Spawning peer_id in vehicle, peer_id:" .. self._id)
@@ -1629,6 +1652,26 @@ function NetworkPeer:set_unit(unit, character_name, team_id)
 			unit:damage():run_sequence_simple(sequence)
 		end
 		unit:movement():set_character_anim_variables()
+		local char_td = tweak_data.blackmarket.characters[character_name]
+		if self._id == managers.network:session():local_peer():id() and char_td and char_td.special_materials then
+			local special_material
+			local special_materials = char_td.special_materials
+			for material, chance in pairs(special_materials) do
+				if type(chance) == "number" then
+					local rand = math.rand(chance)
+					if rand <= 1 then
+						special_material = material
+						break
+					end
+				end
+			end
+			special_material = special_material or table.random(special_materials)
+			if managers.blackmarket:equipped_armor_skin() ~= "none" then
+				special_material = special_material .. "_cc"
+			end
+			self._special_material = special_material
+			managers.network:session():send_to_peers_synched("sync_special_character_material", unit, special_material)
+		end
 	end
 end
 

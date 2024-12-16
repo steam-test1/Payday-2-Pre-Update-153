@@ -166,6 +166,9 @@ function CustomSafehouseTweakData:_init_heisters(tweak_data)
 	self.heisters.terry = clone(self.heisters.base)
 	self.heisters.terry.character_material = "var_mtr_terry"
 	self.heisters.terry.voice = self:get_voice(tweak_data, "chico")
+	self.heisters.max = clone(self.heisters.base)
+	self.heisters.max.character_material = "var_mtr_max"
+	self.heisters.max.voice = self:get_voice(tweak_data, "max")
 	self.heisters.butler = clone(self.heisters.base)
 	self.heisters.butler.character_material = ""
 	self.heisters.vlad = clone(self.heisters.base)
@@ -566,6 +569,18 @@ function CustomSafehouseTweakData:_init_safehouse_rooms(tweak_data)
 			"guis/dlcs/chill/textures/pd2/rooms/safehouse_room_preview_scarface_lvl1",
 			"guis/dlcs/chill/textures/pd2/rooms/safehouse_room_preview_scarface_lvl2",
 			"guis/dlcs/chill/textures/pd2/rooms/safehouse_room_preview_scarface_lvl3"
+		}
+	})
+	table.insert(self.rooms, {
+		room_id = "max",
+		name_id = "menu_max",
+		title_id = "menu_cs_title_max",
+		help_id = "menu_cs_help_max",
+		tier_max = 3,
+		images = {
+			"guis/dlcs/chill/textures/pd2/rooms/safehouse_room_preview_max_lvl1",
+			"guis/dlcs/chill/textures/pd2/rooms/safehouse_room_preview_max_lvl2",
+			"guis/dlcs/chill/textures/pd2/rooms/safehouse_room_preview_max_lvl3"
 		}
 	})
 	table.insert(self.rooms, {
@@ -1644,7 +1659,8 @@ function CustomSafehouseTweakData:_init_map(tweak_data)
 			"american",
 			"sydney",
 			"wild",
-			"livingroom"
+			"livingroom",
+			"max"
 		}
 	})
 	table.insert(self.map.floors, {
@@ -1771,5 +1787,11 @@ function CustomSafehouseTweakData:_init_map(tweak_data)
 		y = 700,
 		icon = "safehouse_character_icon_terry",
 		path = "guis/dlcs/chico/textures/pd2/blackmarket/icons/safehouse_icons/"
+	}
+	self.map.rooms.max = {
+		x = 1295,
+		y = 1015,
+		icon = "safehouse_character_icon_max",
+		path = "guis/dlcs/max/textures/pd2/blackmarket/icons/safehouse_icons/"
 	}
 end

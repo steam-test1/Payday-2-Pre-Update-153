@@ -2674,7 +2674,7 @@ function NewLoadoutTab:create_grenade_loadout()
 		name = "bm_menu_grenades",
 		category = "grenades",
 		on_create_func_name = "populate_grenades",
-		override_slots = {4, 3},
+		override_slots = {4, 4},
 		identifier = Idstring("grenade")
 	})
 	data.topic_id = "menu_loadout_blackmarket"

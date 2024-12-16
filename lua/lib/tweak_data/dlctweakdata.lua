@@ -65,6 +65,7 @@ function DLCTweakData:init(tweak_data)
 			mdm = 1,
 			fir = true,
 			pn2 = true,
+			max = true,
 			rip = true,
 			pd2_goty = 1,
 			pd2_hw_boxing = true,
@@ -5844,6 +5845,12 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
+	self.max_bundle = {}
+	self.max_bundle.free = true
+	self.max_bundle.content = {}
+	self.max_bundle.content.loot_global_value = "normal"
+	self.max_bundle.dlc = "has_max"
+	self.max_bundle.content.loot_drops = {}
 	self.flip_bundle = {}
 	self.flip_bundle.free = true
 	self.flip_bundle.content = {}

@@ -2091,6 +2091,15 @@ function GuiTweakData:init()
 					videos = {"chico1"},
 					post_event = "pln_contact_tony"
 				}
+			},
+			{
+				id = "max",
+				name_id = "menu_max",
+				{
+					desc_id = "menu_max_desc_codex",
+					videos = {"max1"},
+					post_event = "pln_contact_sangres"
+				}
 			}
 		}
 	}
@@ -4699,6 +4708,11 @@ function GuiTweakData:init()
 		"bonus"
 	}
 	self.new_heists = {}
+	table.insert(self.new_heists, {
+		name_id = "menu_nh_sangres",
+		texture_path = "guis/textures/pd2/new_heists/sangres",
+		url = "http://www.overkillsoftware.com/games/sangres/"
+	})
 	table.insert(self.new_heists, {
 		name_id = "menu_nh_search_for_kento",
 		texture_path = "guis/textures/pd2/new_heists/search_for_kento",

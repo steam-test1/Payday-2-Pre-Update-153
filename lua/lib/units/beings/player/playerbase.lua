@@ -83,7 +83,7 @@ function PlayerBase:save(data)
 			if pm:is_upgrade_synced(category, upgrade) then
 				if category == "temporary" then
 					local index = pm:temporary_upgrade_index(category, upgrade)
-					data.emporary_upgrades[category] = data.temporary_upgrades[category] or {}
+					data.temporary_upgrades[category] = data.temporary_upgrades[category] or {}
 					data.temporary_upgrades[category][upgrade] = {index = index, level = level}
 				else
 					data.upgrades[category] = data.upgrades[category] or {}

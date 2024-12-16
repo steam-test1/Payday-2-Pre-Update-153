@@ -790,7 +790,8 @@ function CrewManagementGui:populate_ability(henchman_index, data, gui)
 	local abilities = {
 		"crew_interact",
 		"crew_inspire",
-		"crew_scavenge"
+		"crew_scavenge",
+		"crew_ai_ap_ammo"
 	}
 	self:populate_custom("ability", henchman_index, tweak_data.upgrades.crew_ability_definitions, abilities, data, gui)
 end

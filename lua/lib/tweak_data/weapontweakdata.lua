@@ -148,6 +148,8 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_flint_crew()
 	self:_init_data_coal_crew()
 	self:_init_data_lemming_crew()
+	self:_init_data_chinchilla_crew()
+	self:_init_data_x_chinchilla_crew()
 	self:_precalculate_values()
 end
 
@@ -2588,6 +2590,33 @@ function WeaponTweakData:_init_data_lemming_crew()
 	self.lemming_crew.hold = "pistol"
 	self.lemming_crew.alert_size = 2500
 	self.lemming_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_chinchilla_crew()
+	self.chinchilla_crew.sounds.prefix = "chinchilla_npc"
+	self.chinchilla_crew.use_data.selection_index = 1
+	self.chinchilla_crew.DAMAGE = 1
+	self.chinchilla_crew.muzzleflash = "effects/payday2/particles/weapons/762_auto"
+	self.chinchilla_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.chinchilla_crew.CLIP_AMMO_MAX = 6
+	self.chinchilla_crew.NR_CLIPS_MAX = 5
+	self.chinchilla_crew.hold = "pistol"
+	self.chinchilla_crew.alert_size = 2500
+	self.chinchilla_crew.suppression = 1
+end
+
+function WeaponTweakData:_init_data_x_chinchilla_crew()
+	self.x_chinchilla_crew.sounds.prefix = "chinchilla_npc"
+	self.x_chinchilla_crew.use_data.selection_index = 2
+	self.x_chinchilla_crew.DAMAGE = 1
+	self.x_chinchilla_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
+	self.x_chinchilla_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
+	self.x_chinchilla_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.x_chinchilla_crew.CLIP_AMMO_MAX = 12
+	self.x_chinchilla_crew.NR_CLIPS_MAX = 5
+	self.x_chinchilla_crew.hold = "akimbo_pistol"
+	self.x_chinchilla_crew.alert_size = 2500
+	self.x_chinchilla_crew.suppression = 1
 end
 
 function WeaponTweakData:_init_data_player_weapons(tweak_data)
@@ -13896,6 +13925,189 @@ function WeaponTweakData:_init_new_weapons(autohit_rifle_default, autohit_pistol
 		reload = 11
 	}
 	self.lemming.armor_piercing_chance = 1
+	self.chinchilla = {}
+	self.chinchilla.category = "pistol"
+	self.chinchilla.sub_category = "revolver"
+	self.chinchilla.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.chinchilla.damage_melee = damage_melee_default
+	self.chinchilla.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.chinchilla.sounds = {}
+	self.chinchilla.sounds.fire = "chinchilla_fire"
+	self.chinchilla.sounds.dryfire = "secondary_dryfire"
+	self.chinchilla.sounds.enter_steelsight = "pistol_steel_sight_enter"
+	self.chinchilla.sounds.leave_steelsight = "pistol_steel_sight_exit"
+	self.chinchilla.timers = {}
+	self.chinchilla.timers.reload_not_empty = 2.97
+	self.chinchilla.timers.reload_empty = 2.97
+	self.chinchilla.timers.unequip = 0.5
+	self.chinchilla.timers.equip = 0.45
+	self.chinchilla.FIRE_MODE = "single"
+	self.chinchilla.fire_mode_data = {}
+	self.chinchilla.fire_mode_data.fire_rate = 0.166
+	self.chinchilla.single = {}
+	self.chinchilla.single.fire_rate = 0.166
+	self.chinchilla.name_id = "bm_w_chinchilla"
+	self.chinchilla.desc_id = "bm_w_chinchilla_desc"
+	self.chinchilla.description_id = "des_chinchilla"
+	self.chinchilla.muzzleflash = "effects/payday2/particles/weapons/762_auto_fps"
+	self.chinchilla.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.chinchilla.use_data = {}
+	self.chinchilla.use_data.selection_index = 1
+	self.chinchilla.DAMAGE = 2
+	self.chinchilla.CLIP_AMMO_MAX = 6
+	self.chinchilla.NR_CLIPS_MAX = 9
+	self.chinchilla.AMMO_MAX = self.chinchilla.CLIP_AMMO_MAX * self.chinchilla.NR_CLIPS_MAX
+	self.chinchilla.AMMO_PICKUP = self:_pickup_chance(self.chinchilla.AMMO_MAX, 1)
+	self.chinchilla.spread = {}
+	self.chinchilla.spread.standing = self.new_m4.spread.standing
+	self.chinchilla.spread.crouching = self.new_m4.spread.crouching
+	self.chinchilla.spread.steelsight = self.new_m4.spread.steelsight
+	self.chinchilla.spread.moving_standing = self.new_m4.spread.moving_standing
+	self.chinchilla.spread.moving_crouching = self.new_m4.spread.moving_crouching
+	self.chinchilla.spread.moving_steelsight = self.new_m4.spread.moving_steelsight
+	self.chinchilla.kick = {}
+	self.chinchilla.kick.standing = self.glock_17.kick.standing
+	self.chinchilla.kick.crouching = self.chinchilla.kick.standing
+	self.chinchilla.kick.steelsight = self.chinchilla.kick.standing
+	self.chinchilla.crosshair = {}
+	self.chinchilla.crosshair.standing = {}
+	self.chinchilla.crosshair.crouching = {}
+	self.chinchilla.crosshair.steelsight = {}
+	self.chinchilla.crosshair.standing.offset = 0.2
+	self.chinchilla.crosshair.standing.moving_offset = 0.6
+	self.chinchilla.crosshair.standing.kick_offset = 0.4
+	self.chinchilla.crosshair.crouching.offset = 0.1
+	self.chinchilla.crosshair.crouching.moving_offset = 0.6
+	self.chinchilla.crosshair.crouching.kick_offset = 0.3
+	self.chinchilla.crosshair.steelsight.hidden = true
+	self.chinchilla.crosshair.steelsight.offset = 0
+	self.chinchilla.crosshair.steelsight.moving_offset = 0
+	self.chinchilla.crosshair.steelsight.kick_offset = 0.1
+	self.chinchilla.shake = {}
+	self.chinchilla.shake.fire_multiplier = 1
+	self.chinchilla.shake.fire_steelsight_multiplier = -1
+	self.chinchilla.autohit = autohit_pistol_default
+	self.chinchilla.aim_assist = aim_assist_pistol_default
+	self.chinchilla.weapon_hold = "raging_bull"
+	self.chinchilla.animations = {}
+	self.chinchilla.animations.equip_id = "equip_raging_bull"
+	self.chinchilla.animations.recoil_steelsight = true
+	self.chinchilla.texture_bundle_folder = "max"
+	self.chinchilla.panic_suppression_chance = 0.2
+	self.chinchilla.stats = {
+		damage = 180,
+		spread = 20,
+		recoil = 2,
+		spread_moving = 5,
+		zoom = 3,
+		concealment = 28,
+		suppression = 7,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1,
+		reload = 11
+	}
+	self.x_chinchilla = {}
+	self.x_chinchilla.category = "akimbo"
+	self.x_chinchilla.sub_category = "revolver"
+	self.x_chinchilla.upgrade_blocks = {
+		weapon = {
+			"clip_ammo_increase"
+		}
+	}
+	self.x_chinchilla.damage_melee = damage_melee_default
+	self.x_chinchilla.damage_melee_effect_mul = damage_melee_effect_multiplier_default
+	self.x_chinchilla.sounds = {}
+	self.x_chinchilla.sounds.fire = "chinchilla_x_fire"
+	self.x_chinchilla.sounds.enter_steelsight = "pistol_steel_sight_enter"
+	self.x_chinchilla.sounds.leave_steelsight = "pistol_steel_sight_exit"
+	self.x_chinchilla.sounds.dryfire = "secondary_dryfire"
+	self.x_chinchilla.timers = {}
+	self.x_chinchilla.timers.reload_not_empty = 3.47
+	self.x_chinchilla.timers.reload_empty = 3.47
+	self.x_chinchilla.timers.unequip = 0.5
+	self.x_chinchilla.timers.equip = 0.5
+	self.x_chinchilla.name_id = "bm_w_x_chinchilla"
+	self.x_chinchilla.desc_id = "bm_w_x_chinchilla_desc"
+	self.x_chinchilla.description_id = "des_x_chinchilla"
+	self.x_chinchilla.muzzleflash = "effects/payday2/particles/weapons/9mm_auto_fps"
+	self.x_chinchilla.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
+	self.x_chinchilla.use_data = {}
+	self.x_chinchilla.use_data.selection_index = 2
+	self.x_chinchilla.DAMAGE = 1
+	self.x_chinchilla.CLIP_AMMO_MAX = 12
+	self.x_chinchilla.NR_CLIPS_MAX = 6
+	self.x_chinchilla.AMMO_MAX = self.x_chinchilla.CLIP_AMMO_MAX * self.x_chinchilla.NR_CLIPS_MAX
+	self.x_chinchilla.AMMO_PICKUP = self:_pickup_chance(self.x_chinchilla.AMMO_MAX, 1)
+	self.x_chinchilla.FIRE_MODE = "single"
+	self.x_chinchilla.fire_mode_data = {}
+	self.x_chinchilla.fire_mode_data.fire_rate = 0.166
+	self.x_chinchilla.single = {}
+	self.x_chinchilla.single.fire_rate = 0.166
+	self.x_chinchilla.spread = {}
+	self.x_chinchilla.spread.standing = self.colt_1911.spread.standing
+	self.x_chinchilla.spread.crouching = self.colt_1911.spread.crouching
+	self.x_chinchilla.spread.steelsight = self.colt_1911.spread.steelsight
+	self.x_chinchilla.spread.moving_standing = self.colt_1911.spread.moving_standing
+	self.x_chinchilla.spread.moving_crouching = self.colt_1911.spread.moving_crouching
+	self.x_chinchilla.spread.moving_steelsight = self.colt_1911.spread.moving_steelsight
+	self.x_chinchilla.kick = {}
+	self.x_chinchilla.kick.standing = {
+		1.6,
+		1.3,
+		-0.3,
+		0.3
+	}
+	self.x_chinchilla.kick.crouching = self.x_chinchilla.kick.standing
+	self.x_chinchilla.kick.steelsight = self.x_chinchilla.kick.standing
+	self.x_chinchilla.crosshair = {}
+	self.x_chinchilla.crosshair.standing = {}
+	self.x_chinchilla.crosshair.crouching = {}
+	self.x_chinchilla.crosshair.steelsight = {}
+	self.x_chinchilla.crosshair.standing.offset = 0.2
+	self.x_chinchilla.crosshair.standing.moving_offset = 0.6
+	self.x_chinchilla.crosshair.standing.kick_offset = 0.4
+	self.x_chinchilla.crosshair.crouching.offset = 0.1
+	self.x_chinchilla.crosshair.crouching.moving_offset = 0.6
+	self.x_chinchilla.crosshair.crouching.kick_offset = 0.3
+	self.x_chinchilla.crosshair.steelsight.hidden = true
+	self.x_chinchilla.crosshair.steelsight.offset = 0
+	self.x_chinchilla.crosshair.steelsight.moving_offset = 0
+	self.x_chinchilla.crosshair.steelsight.kick_offset = 0.1
+	self.x_chinchilla.shake = {}
+	self.x_chinchilla.shake.fire_multiplier = 1
+	self.x_chinchilla.shake.fire_steelsight_multiplier = -1
+	self.x_chinchilla.autohit = autohit_pistol_default
+	self.x_chinchilla.aim_assist = aim_assist_pistol_default
+	self.x_chinchilla.weapon_hold = "x_chinchilla"
+	self.x_chinchilla.animations = {}
+	self.x_chinchilla.animations.second_gun_versions = {
+		reload = "reload_left",
+		reload_not_empty = "reload_not_empty_left"
+	}
+	self.x_chinchilla.animations.has_steelsight_stance = true
+	self.x_chinchilla.animations.recoil_steelsight = true
+	self.x_chinchilla.texture_bundle_folder = "max"
+	self.x_chinchilla.panic_suppression_chance = 0.2
+	self.x_chinchilla.stats = {
+		damage = 180,
+		spread = 20,
+		recoil = 2,
+		spread_moving = 5,
+		zoom = 3,
+		concealment = 28,
+		suppression = 7,
+		alert_size = 7,
+		extra_ammo = 6,
+		total_ammo_mod = 21,
+		value = 1,
+		reload = 11
+	}
 end
 
 function WeaponTweakData:_init_data_offhand_weapons()
@@ -14867,6 +15079,18 @@ function WeaponTweakData:_create_table_structure()
 	}
 	self.lemming_crew = {
 		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.chinchilla_crew = {
+		usage = "c45",
+		sounds = {},
+		use_data = {},
+		auto = {}
+	}
+	self.x_chinchilla_crew = {
+		usage = "akimbo_pistol",
 		sounds = {},
 		use_data = {},
 		auto = {}

@@ -147,6 +147,15 @@ CopMovement._gadgets = {
 	},
 	vodka_bottle = {
 		Idstring("units/pd2_dlc_slu/props/slu_prop_vodka_bottle/slu_prop_vodka_bottle")
+	},
+	machete = {
+		Idstring("units/pd2_dlc_max/characters/npc_acc_machete/npc_acc_machete")
+	},
+	beer = {
+		Idstring("units/pd2_dlc_max/props/max_prop_dos_calveras/max_sicario_beer_a")
+	},
+	tequila = {
+		Idstring("units/pd2_dlc_max/props/max_prop_tequila_bottle/max_prop_tequila_bottle")
 	}
 }
 local action_variants = {
@@ -2206,6 +2215,16 @@ end
 function CopMovement:get_location_id()
 	local metadata = managers.navigation:get_nav_seg_metadata(self._standing_nav_seg_id)
 	return metadata and metadata.location_id
+end
+
+function CopMovement:in_smoke()
+	for _, smoke_screen in ipairs(managers.player:smoke_screens()) do
+		local in_smoke, variant = smoke_screen:is_in_smoke(self._unit)
+		if in_smoke then
+			return true, variant
+		end
+	end
+	return false
 end
 
 IgnoreAlertsMovement = IgnoreAlertsMovement or class(CopMovement)

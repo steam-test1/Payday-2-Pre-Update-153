@@ -443,6 +443,10 @@ function GenericDLCManager:has_pn2()
 	return self:is_dlc_unlocked("pn2")
 end
 
+function GenericDLCManager:has_max()
+	return self:is_dlc_unlocked("max")
+end
+
 function GenericDLCManager:has_goty_all_dlc_bundle_2014()
 	return self:has_goty_weapon_bundle_2014() and self:has_goty_heist_bundle_2014() and self:is_dlcs_unlocked({
 		"character_pack_clover"
@@ -1188,7 +1192,8 @@ function WINDLCManager:init()
 			grv = {app_id = "612900", no_install = true},
 			amp = {app_id = "218620", no_install = true},
 			mp2 = {app_id = "218620", no_install = true},
-			pn2 = {app_id = "618940", no_install = true}
+			pn2 = {app_id = "618940", no_install = true},
+			max = {app_id = "218620", no_install = true}
 		}
 		self:_verify_dlcs()
 	end

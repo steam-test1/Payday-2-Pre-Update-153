@@ -2335,6 +2335,40 @@ function BlackMarketTweakData:_init_melee_weapons(tweak_data)
 	self.melee_weapons.sword.sounds.charge = "toothbrush_charge"
 	self.melee_weapons.sword.repeat_expire_t = 0.3
 	self.melee_weapons.sword.stats.concealment = 30
+	self.melee_weapons.agave = deep_clone(self.melee_weapons.machete)
+	self.melee_weapons.agave.animation = nil
+	self.melee_weapons.agave.anim_attack_vars = {
+		"var1",
+		"var2",
+		"var3",
+		"var4"
+	}
+	self.melee_weapons.agave.anim_global_param = "melee_agave"
+	self.melee_weapons.agave.name_id = "bm_melee_agave"
+	self.melee_weapons.agave.type = "knife"
+	self.melee_weapons.agave.align_objects = {
+		"a_weapon_right"
+	}
+	self.melee_weapons.agave.unit = "units/pd2_dlc_max/weapons/wpn_fps_mel_agave/wpn_fps_mel_agave"
+	self.melee_weapons.agave.third_unit = "units/pd2_dlc_max/weapons/wpn_fps_mel_agave/wpn_third_mel_agave"
+	self.melee_weapons.agave.dlc = nil
+	self.melee_weapons.agave.texture_bundle_folder = "max"
+	self.melee_weapons.agave.sounds = {}
+	self.melee_weapons.agave.sounds.equip = "agave_equip"
+	self.melee_weapons.agave.sounds.hit_air = "agave_hit_air"
+	self.melee_weapons.agave.sounds.hit_gen = "agave_hit_gen"
+	self.melee_weapons.agave.sounds.hit_body = "agave_hit_body"
+	self.melee_weapons.agave.sounds.charge = "knife_charge"
+	self.melee_weapons.agave.stats.min_damage = 7
+	self.melee_weapons.agave.stats.max_damage = 45
+	self.melee_weapons.agave.stats.min_damage_effect = 1
+	self.melee_weapons.agave.stats.max_damage_effect = 1
+	self.melee_weapons.agave.melee_damage_delay = 0.1
+	self.melee_weapons.agave.stats.charge_time = 4
+	self.melee_weapons.agave.stats.range = 225
+	self.melee_weapons.agave.expire_t = 0.6
+	self.melee_weapons.agave.repeat_expire_t = 0.8
+	self.melee_weapons.agave.stats.concealment = 29
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.melee_weapons) do
 		if free_dlcs[data.dlc] then

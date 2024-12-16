@@ -689,7 +689,9 @@ function StatisticsTweakData:statistics_table()
 		"siltstone",
 		"flint",
 		"coal",
-		"lemming"
+		"lemming",
+		"chinchilla",
+		"x_chinchilla"
 	}
 	local melee_list = {
 		"weapon",

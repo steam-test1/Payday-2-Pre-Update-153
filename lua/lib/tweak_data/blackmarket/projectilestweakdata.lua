@@ -377,6 +377,20 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 	self.projectiles.launcher_m203.dlc = "chico"
 	self.projectiles.launcher_m203.weapon_id = "contraband_m203"
 	self.projectiles.launcher_m203.time_cheat = 0.1
+	self.projectiles.smoke_screen_grenade = {}
+	self.projectiles.smoke_screen_grenade.name_id = "bm_grenade_smoke_screen_grenade"
+	self.projectiles.smoke_screen_grenade.desc_id = "bm_grenade_smoke_screen_grenade_desc"
+	self.projectiles.smoke_screen_grenade.unit = "units/pd2_dlc_max/weapons/wpn_fps_smoke_screen_grenade/wpn_third_smoke_screen_grenade"
+	self.projectiles.smoke_screen_grenade.unit_dummy = "units/pd2_dlc_max/weapons/wpn_fps_smoke_screen_grenade/wpn_fps_smoke_screen_grenade_husk"
+	self.projectiles.smoke_screen_grenade.sprint_unit = "units/pd2_dlc_max/weapons/wpn_fps_smoke_screen_grenade/wpn_third_smoke_screen_grenade_sprint"
+	self.projectiles.smoke_screen_grenade.icon = "smoke_screen_grenade"
+	self.projectiles.smoke_screen_grenade.texture_bundle_folder = "max"
+	self.projectiles.smoke_screen_grenade.dlc = "max"
+	self.projectiles.smoke_screen_grenade.base_cooldown = 30
+	self.projectiles.smoke_screen_grenade.max_amount = 1
+	self.projectiles.smoke_screen_grenade.is_a_grenade = true
+	self.projectiles.smoke_screen_grenade.throwable = true
+	self.projectiles.smoke_screen_grenade.no_shouting = true
 	self._projectiles_index = {
 		"frag",
 		"launcher_frag",
@@ -415,7 +429,8 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 		"chico_injector",
 		"launcher_m203",
 		"rocket_ray_frag",
-		"fir_com"
+		"fir_com",
+		"smoke_screen_grenade"
 	}
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.projectiles) do

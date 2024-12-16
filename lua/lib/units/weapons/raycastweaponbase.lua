@@ -740,7 +740,7 @@ function RaycastWeaponBase:_check_alert(rays, fire_pos, direction, user_unit)
 	end
 end
 
-function RaycastWeaponBase:damage_player(col_ray, from_pos, direction)
+function RaycastWeaponBase:damage_player(col_ray, from_pos, direction, params)
 	local unit = managers.player:player_unit()
 	if not unit then
 		return
@@ -770,7 +770,7 @@ function RaycastWeaponBase:damage_player(col_ray, from_pos, direction)
 		if not col_ray and proj_len < 60 then
 			unit:character_damage():build_suppression(self._suppression)
 		end
-		if proj_len < 30 then
+		if proj_len < 30 and (not params or not params.guaranteed_miss) then
 			if World:raycast("ray", from_pos, head_pos, "slot_mask", self._bullet_slotmask, "ignore_unit", self._setup.ignore_units, "report") then
 				return nil, ray_data
 			else

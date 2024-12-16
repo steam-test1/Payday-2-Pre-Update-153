@@ -3094,6 +3094,7 @@ function CrimeNetGui:update_server_job(data, i)
 	local updated_friend = self:_update_job_variable(job_index, "is_friend", data.is_friend)
 	local updated_job_plan = self:_update_job_variable(job_index, "job_plan", data.job_plan)
 	local recreate_job = updated_room or updated_job or updated_level_id or updated_level_data or updated_difficulty or updated_difficulty_id or updated_state or updated_friend or updated_job_plan
+	job.mutators = data.mutators
 	self:_update_job_variable(job_index, "state_name", data.state_name)
 	if self:_update_job_variable(job_index, "num_plrs", data.num_plrs) and job.peers_panel then
 		for i, peer_icon in ipairs(job.peers_panel:children()) do

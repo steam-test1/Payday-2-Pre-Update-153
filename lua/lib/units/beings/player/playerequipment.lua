@@ -413,8 +413,12 @@ function PlayerEquipment:throw_grenade()
 	local from = self._unit:movement():m_head_pos()
 	local pos = from + self._unit:movement():m_head_rot():y() * 30 + Vector3(0, 0, 0)
 	local dir = self._unit:movement():m_head_rot():y()
-	self._unit:sound():play("g43", nil, true)
-	local grenade_index = tweak_data.blackmarket:get_index_from_projectile_id(managers.blackmarket:equipped_grenade())
+	local grenade_name = managers.blackmarket:equipped_grenade()
+	local grenade_tweak = tweak_data.blackmarket.projectiles[grenade_name]
+	if not grenade_tweak.no_shouting then
+		self._unit:sound():play("g43", nil, true)
+	end
+	local grenade_index = tweak_data.blackmarket:get_index_from_projectile_id(grenade_name)
 	if Network:is_client() then
 		managers.network:session():send_to_host("request_throw_projectile", grenade_index, pos, dir)
 	else

@@ -3580,7 +3580,7 @@ function PlayerInventoryGui:open_throwable_menu()
 		category = "grenades",
 		on_create_func_name = "populate_grenades",
 		allow_preview = true,
-		override_slots = {4, 3},
+		override_slots = {4, 4},
 		identifier = BlackMarketGui.identifiers.grenade
 	})
 	new_node_data.scroll_tab_anywhere = true

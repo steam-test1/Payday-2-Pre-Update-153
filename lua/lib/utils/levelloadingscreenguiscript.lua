@@ -18,10 +18,10 @@ local make_fine_text = function(text_obj)
 end
 local shrinkwrap = function(panel, padding)
 	padding = padding or {}
-	padding[1] = padding[1] or 0
-	padding[2] = padding[2] or 0
-	padding[3] = padding[3] or padding[1]
-	padding[4] = padding[4] or padding[2]
+	local padding_top = padding[1] or 0
+	local padding_right = padding[2] or padding_top
+	local padding_bottom = padding[3] or padding_top
+	local padding_left = padding[4] or padding_right
 	local children = panel:children()
 	local min_x, max_x = math.huge, -math.huge
 	local min_y, max_y = math.huge, -math.huge
@@ -43,12 +43,12 @@ local shrinkwrap = function(panel, padding)
 	local offset_y = min_y - panel:world_y()
 	if min_x ~= 0 or min_y ~= 0 then
 		for _, child in ipairs(children) do
-			child:set_x(child:x() - offset_x + padding[4])
-			child:set_y(child:y() - offset_y + padding[1])
+			child:set_x(child:x() - offset_x + padding_left)
+			child:set_y(child:y() - offset_y + padding_top)
 		end
 	end
-	panel:set_world_position(min_x, min_y)
-	panel:set_size(max_x - min_x + padding[2] + padding[4], max_y - min_y + padding[1] + padding[3])
+	panel:set_world_position(min_x - padding_left, min_y - padding_top)
+	panel:set_size(max_x - min_x + padding_right + padding_left, max_y - min_y + padding_top + padding_bottom)
 end
 LevelLoadingScreenGuiScript = LevelLoadingScreenGuiScript or class()
 
@@ -60,9 +60,6 @@ function LevelLoadingScreenGuiScript:init(scene_gui, res, progress, base_layer)
 	self._gui_tweak_data = arg.load_level_data.gui_tweak_data
 	self._menu_tweak_data = arg.load_level_data.menu_tweak_data
 	self._scale_tweak_data = arg.load_level_data.scale_tweak_data
-	self._coords = arg.load_level_data.controller_coords or false
-	self._coords_font = arg.load_level_data.coords_font or "fonts/font_medium_mf"
-	self._coords_font_size = arg.load_level_data.coords_font_size or 24
 	self._gui_data = arg.load_level_data.gui_data
 	self._workspace_size = self._gui_data.workspace_size
 	self._saferect_size = self._gui_data.saferect_size
@@ -86,7 +83,7 @@ function LevelLoadingScreenGuiScript:init(scene_gui, res, progress, base_layer)
 	local background_fullpanel = self._back_drop_gui:get_new_background_layer()
 	local background_safepanel = self._back_drop_gui:get_new_background_layer()
 	self._back_drop_gui:set_panel_to_saferect(background_safepanel)
-	if not self._coords and arg.load_level_data.tip then
+	if arg.load_level_data.tip then
 		self._loading_hint = self:_make_loading_hint(background_safepanel, arg.load_level_data.tip)
 	end
 	self._indicator = background_safepanel:bitmap({
@@ -128,78 +125,11 @@ function LevelLoadingScreenGuiScript:init(scene_gui, res, progress, base_layer)
 	bg_loading_text:set_world_center_y(y)
 	bg_loading_text:move(13, 3)
 	self._back_drop_gui:animate_bg_text(bg_loading_text)
-	if self._coords then
-		self._controller_shapes = arg.load_level_data.controller_shapes or {
-			{
-				position = {cx = 0.5, cy = 0.5},
-				texture_rect = {
-					0,
-					0,
-					512,
-					256
-				}
-			}
-		}
-		self._controllers = {}
-		local controller, position
-		for i, shape in ipairs(self._controller_shapes) do
-			controller = background_safepanel:bitmap({
-				texture = arg.load_level_data.controller_image or "guis/textures/controller",
-				layer = i,
-				texture_rect = shape.texture_rect
-			})
-			position = shape.position or {}
-			controller:set_center(background_safepanel:w() * (position.cx or 0.5), background_safepanel:h() * (position.cy or 0.5))
-			if position.x then
-				if 0 > position.x then
-					controller:set_right(background_safepanel:w() + position.x)
-				else
-					controller:set_left(position.x)
-				end
-			end
-			if position.y then
-				if 0 > position.y then
-					controller:set_bottom(background_safepanel:h() + position.y)
-				else
-					controller:set_top(position.y)
-				end
-			end
-			controller:move(position.mx or 0, position.my or 0)
-			table.insert(self._controllers, controller)
-		end
-		for id, data in pairs(self._coords) do
-			controller = self._controllers[data.c or 1]
-			data.text = background_safepanel:text({
-				name = data.id,
-				text = data.string,
-				font_size = self._coords_font_size,
-				font = self._coords_font,
-				align = data.align,
-				vertical = data.vertical,
-				halign = "center",
-				valign = "center",
-				color = data.color
-			})
-			local _, _, w, h = data.text:text_rect()
-			data.text:set_size(w, h)
-			if data.x then
-				local x = controller:x() + data.x
-				local y = controller:y() + data.y
-				if data.align == "left" then
-					data.text:set_left(x)
-				elseif data.align == "right" then
-					data.text:set_right(x)
-				elseif data.align == "center" then
-					data.text:set_center_x(x)
-				end
-				if data.vertical == "top" then
-					data.text:set_top(y)
-				elseif data.vertical == "bottom" then
-					data.text:set_bottom(y)
-				else
-					data.text:set_center_y(y)
-				end
-			end
+	local coords = arg.load_level_data.controller_coords
+	if coords then
+		self._controller = self:_make_controller_hint(background_safepanel, coords)
+		if arg.load_level_data.tip then
+			self._controller:move(0, -110)
 		end
 	end
 end
@@ -212,6 +142,8 @@ function LevelLoadingScreenGuiScript:_make_loading_hint(parent, tip)
 	local container = parent:panel()
 	local hint_text_width = 450
 	local hint_title_top_offset = 5
+	local font = "fonts/font_medium_mf"
+	local font_size = 24
 	local hint_image = container:bitmap({
 		texture = "guis/textures/loading/hints/" .. tip.image,
 		width = 192,
@@ -219,26 +151,35 @@ function LevelLoadingScreenGuiScript:_make_loading_hint(parent, tip)
 	})
 	local hint_title = container:text({
 		text = tip.title,
-		font = "fonts/font_medium_mf",
-		font_size = 20,
+		font = font,
+		font_size = font_size,
 		color = Color.white
 	})
 	local hint_box = container:panel()
 	local hint_text = hint_box:text({
 		text = tip.text,
-		font = "fonts/font_medium_mf",
-		font_size = 24,
+		font = font,
+		font_size = font_size,
 		color = Color.white,
 		width = hint_text_width,
 		wrap = true,
 		word_wrap = true
 	})
+	local hint_index_text = hint_box:text({
+		text = string.format("%d / %d", tip.index, tip.total),
+		font = font,
+		font_size = font_size,
+		color = Color(0.3, 1, 1, 1)
+	})
 	make_fine_text(hint_title)
 	make_fine_text(hint_text)
-	shrinkwrap(hint_box, {18, 18})
-	hint_box:set_width(hint_text_width + 36)
-	hint_title:set_position(hint_image:right(), hint_title_top_offset)
-	hint_box:set_position(hint_image:right(), hint_title:bottom() + 8)
+	make_fine_text(hint_index_text)
+	hint_box:set_width(hint_text_width + 187 + 16)
+	hint_box:set_height(142)
+	hint_text:set_lefttop(187, 16)
+	hint_index_text:set_rightbottom(hint_box:width() - 16, hint_box:height() - 16)
+	hint_title:set_leftbottom(hint_text:left(), hint_box:top())
+	hint_image:set_center_y(hint_box:center_y())
 	BoxGuiObject:new(hint_box, {
 		sides = {
 			1,
@@ -248,9 +189,85 @@ function LevelLoadingScreenGuiScript:_make_loading_hint(parent, tip)
 		}
 	})
 	shrinkwrap(container)
-	local bottom_margin = math.max(0, hint_box:bottom() + 20 - container:height())
 	container:set_center_x(parent:width() * 0.5 - 20)
-	container:set_bottom(parent:height() - bottom_margin)
+	container:set_bottom(parent:height() - 50)
+	return container
+end
+
+function LevelLoadingScreenGuiScript:_make_controller_hint(parent, coords)
+	local container = parent:panel()
+	local font = arg.load_level_data.coords_font or "fonts/font_medium_mf"
+	local font_size = arg.load_level_data.coords_font_size or 24
+	local controller_shapes = arg.load_level_data.controller_shapes or {
+		{
+			position = {cx = 0.5, cy = 0.5},
+			texture_rect = {
+				0,
+				0,
+				512,
+				256
+			}
+		}
+	}
+	local controllers = {}
+	local controller, position
+	for i, shape in ipairs(controller_shapes) do
+		controller = container:bitmap({
+			texture = arg.load_level_data.controller_image or "guis/textures/controller",
+			layer = i,
+			texture_rect = shape.texture_rect
+		})
+		position = shape.position or {}
+		controller:set_center(container:w() * (position.cx or 0.5), container:h() * (position.cy or 0.5))
+		if position.x then
+			if 0 > position.x then
+				controller:set_right(container:w() + position.x)
+			else
+				controller:set_left(position.x)
+			end
+		end
+		if position.y then
+			if 0 > position.y then
+				controller:set_bottom(container:h() + position.y)
+			else
+				controller:set_top(position.y)
+			end
+		end
+		controller:move(position.mx or 0, position.my or 0)
+		table.insert(controllers, controller)
+	end
+	for id, data in pairs(coords) do
+		controller = controllers[data.c or 1]
+		data.text = container:text({
+			name = data.id,
+			text = data.string,
+			font_size = font_size,
+			font = font,
+			align = data.align,
+			vertical = data.vertical,
+			color = data.color
+		})
+		local _, _, w, h = data.text:text_rect()
+		data.text:set_size(w, h)
+		if data.x then
+			local x = controller:x() + data.x
+			local y = controller:y() + data.y
+			if data.align == "left" then
+				data.text:set_left(x)
+			elseif data.align == "right" then
+				data.text:set_right(x)
+			elseif data.align == "center" then
+				data.text:set_center_x(x)
+			end
+			if data.vertical == "top" then
+				data.text:set_top(y)
+			elseif data.vertical == "bottom" then
+				data.text:set_bottom(y)
+			else
+				data.text:set_center_y(y)
+			end
+		end
+	end
 	return container
 end
 

@@ -1452,6 +1452,11 @@ function MenuCallbackHandler:dlc_buy_mp2_pc()
 	Steam:overlay_activate("store", 218620)
 end
 
+function MenuCallbackHandler:dlc_buy_max_pc()
+	print("[MenuCallbackHandler:dlc_buy_max_pc]")
+	Steam:overlay_activate("store", 618941)
+end
+
 function MenuCallbackHandler:dlc_buy_ps3()
 	print("[MenuCallbackHandler:dlc_buy_ps3]")
 	managers.dlc:buy_product("dlc1")
@@ -1529,6 +1534,7 @@ end
 
 function MenuCallbackHandler:is_dlc_latest_locked(check_dlc)
 	local dlcs = {
+		"max",
 		"mp2",
 		"amp",
 		"grv",
@@ -1733,6 +1739,10 @@ end
 
 function MenuCallbackHandler:visible_callback_mp2()
 	return self:is_dlc_latest_locked("mp2")
+end
+
+function MenuCallbackHandler:visible_callback_max()
+	return self:is_dlc_latest_locked("max")
 end
 
 function MenuCallbackHandler:not_has_all_dlcs()
@@ -8005,6 +8015,8 @@ function MenuOptionInitiator:modify_node(node)
 		return self:modify_network_options(node)
 	elseif node_name == "gameplay_options" then
 		return self:modify_gameplay_options(node)
+	elseif node_name == "user_interface_options" then
+		return self:modify_user_interface_options(node)
 	end
 end
 
@@ -8305,6 +8317,20 @@ function MenuOptionInitiator:modify_gameplay_options(node)
 	local mute_heist_vo = node:item("toggle_mute_heist_vo")
 	if mute_heist_vo then
 		mute_heist_vo:set_value(managers.user:get_setting("mute_heist_vo") and "on" or "off")
+	end
+	return node
+end
+
+function MenuOptionInitiator:modify_user_interface_options(node)
+	local controller_hint_box = node:item("toggle_controller_hint")
+	local controller_hint_setting = managers.user:get_setting("loading_screen_show_controller")
+	if controller_hint_box then
+		controller_hint_box:set_value(controller_hint_setting and "on" or "off")
+	end
+	local loading_hints_box = node:item("toggle_loading_hints")
+	local loading_hints_setting = managers.user:get_setting("loading_screen_show_hints")
+	if loading_hints_box then
+		loading_hints_box:set_value(loading_hints_setting and "on" or "off")
 	end
 	return node
 end

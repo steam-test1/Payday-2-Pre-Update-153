@@ -50,6 +50,11 @@ function MenuGuiItem:flash()
 end
 
 MenuGuiTabItem = MenuGuiTabItem or class(MenuGuiItem)
+MenuGuiTabItem.FONT = medium_font
+MenuGuiTabItem.FONT_SIZE = medium_font_size
+MenuGuiTabItem.PAGE_PADDING = 15
+MenuGuiTabItem.TEXT_PADDING_W = 15
+MenuGuiTabItem.TEXT_PADDING_H = 10
 
 function MenuGuiTabItem:init(index, title_id, page_item, gui, tab_x, tab_panel)
 	MenuGuiTabItem.super.init(self)
@@ -66,15 +71,15 @@ function MenuGuiTabItem:init(index, title_id, page_item, gui, tab_x, tab_panel)
 	local page_text = page_panel:text({
 		name = "PageText",
 		text = managers.localization:to_upper_text(title_id),
-		font = medium_font,
-		font_size = medium_font_size,
+		font = self.FONT,
+		font_size = self.FONT_SIZE,
 		layer = 1,
 		align = "center",
 		vertical = "center",
 		color = Color.black
 	})
 	local _, _, tw, th = page_text:text_rect()
-	page_panel:set_size(tw + 15, th + 10)
+	page_panel:set_size(tw + self.TEXT_PADDING_W, th + self.TEXT_PADDING_H)
 	page_text:set_size(page_panel:size())
 	local page_tab_bg = page_panel:bitmap({
 		name = "PageTabBG",
@@ -96,11 +101,11 @@ function MenuGuiTabItem:page()
 end
 
 function MenuGuiTabItem:prev_page_position()
-	return self._page_panel:left() - 15
+	return self._page_panel:left() - self.PAGE_PADDING
 end
 
 function MenuGuiTabItem:next_page_position()
-	return self._page_panel:right() + 15
+	return self._page_panel:right() + self.PAGE_PADDING
 end
 
 function MenuGuiTabItem:set_active(active)
@@ -124,6 +129,12 @@ function MenuGuiTabItem:refresh()
 	end
 end
 
+MenuGuiSmallTabItem = MenuGuiSmallTabItem or class(MenuGuiTabItem)
+MenuGuiSmallTabItem.FONT = small_font
+MenuGuiSmallTabItem.FONT_SIZE = small_font_size
+MenuGuiSmallTabItem.PAGE_PADDING = 8
+MenuGuiSmallTabItem.TEXT_PADDING_W = 15
+MenuGuiSmallTabItem.TEXT_PADDING_H = 4
 MenuGuiTabPage = MenuGuiTabPage or class(MenuGuiItem)
 
 function MenuGuiTabPage:init(page_id, page_panel, fullscreen_panel, gui)

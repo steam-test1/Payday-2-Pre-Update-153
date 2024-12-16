@@ -837,6 +837,14 @@ function PlayerDamage:damage_bullet(attack_data)
 	local armor_dodge_chance = pm:body_armor_value("dodge")
 	local skill_dodge_chance = pm:skill_dodge_chance(self._unit:movement():running(), self._unit:movement():crouching(), self._unit:movement():zipline_unit())
 	dodge_value = dodge_value + armor_dodge_chance + skill_dodge_chance
+	local smoke_dodge = 0
+	for _, smoke_screen in ipairs(managers.player._smoke_screen_effects or {}) do
+		if smoke_screen:is_in_smoke(self._unit) then
+			smoke_dodge = tweak_data.projectiles.smoke_screen_grenade.dodge_chance
+			break
+		end
+	end
+	dodge_value = 1 - (1 - dodge_value) * (1 - smoke_dodge)
 	if dodge_roll < dodge_value then
 		if attack_data.damage > 0 then
 			self:_send_damage_drama(attack_data, 0)

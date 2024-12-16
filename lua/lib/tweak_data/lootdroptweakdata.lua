@@ -1238,6 +1238,19 @@ function LootDropTweakData:init(tweak_data)
 	self.global_values.pn2.sort_number = 306
 	self.global_values.pn2.hide_unavailable = true
 	self.global_values.pn2.category = "global_event"
+	self.global_values.max = {}
+	self.global_values.max.name_id = "bm_global_value_max"
+	self.global_values.max.desc_id = "menu_l_global_value_max"
+	self.global_values.max.unlock_id = "bm_global_value_max_unlock"
+	self.global_values.max.color = Color(255, 255, 212, 0) / 255
+	self.global_values.max.dlc = true
+	self.global_values.max.chance = 1
+	self.global_values.max.value_multiplier = 1
+	self.global_values.max.durability_multiplier = 1
+	self.global_values.max.drops = true
+	self.global_values.max.track = true
+	self.global_values.max.sort_number = 300
+	self.global_values.max.category = "dlc"
 	if SystemInfo:platform() == Idstring("PS3") then
 		self.global_values.sweettooth = {}
 		self.global_values.sweettooth.name_id = "bm_global_value_sweettooth"
@@ -1305,7 +1318,8 @@ function LootDropTweakData:init(tweak_data)
 		"grv",
 		"amp",
 		"mp2",
-		"pn2"
+		"pn2",
+		"max"
 	}
 	self:_create_global_value_list_map()
 end

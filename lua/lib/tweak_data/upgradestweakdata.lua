@@ -963,6 +963,12 @@ function UpgradesTweakData:_init_pd2_values()
 	self.values.player.chico_injector_health_to_speed = {
 		{5, 1}
 	}
+	self.values.player.dodge_shot_gain = {
+		{0.2, 4}
+	}
+	self.values.player.dodge_replenish_armor = {true}
+	self.values.player.smoke_screen_ally_dodge_bonus = {0.1}
+	self.values.player.sicario_multiplier = {2}
 	local editable_skill_descs = {
 		ammo_2x = {
 			{"2"},
@@ -2191,6 +2197,31 @@ function UpgradesTweakData:_init_pd2_values()
 				"1",
 				"10%"
 			}
+		},
+		{
+			{
+				"8",
+				"50%",
+				"30",
+				"50%",
+				"1"
+			},
+			{"25%"},
+			{"20%", "4"},
+			{
+				"+1",
+				"15%",
+				"45%"
+			},
+			{"10%"},
+			{"135%"},
+			{},
+			{"5%", "20%"},
+			{
+				"100%",
+				"10%",
+				"10%"
+			}
 		}
 	}
 	self.specialization_descs = {}
@@ -2353,7 +2384,8 @@ function UpgradesTweakData:init(tweak_data)
 		name_id = "lvl_20",
 		upgrades = {
 			"rep_upgrade2",
-			"schakal"
+			"schakal",
+			"agave"
 		}
 	}
 	self.level_tree[21] = {
@@ -2414,7 +2446,9 @@ function UpgradesTweakData:init(tweak_data)
 			"saiga",
 			"sandsteel",
 			"packrat",
-			"lemming"
+			"lemming",
+			"chinchilla",
+			"x_chinchilla"
 		}
 	}
 	self.level_tree[27] = {
@@ -2907,6 +2941,8 @@ function UpgradesTweakData:init(tweak_data)
 	self:_flint_weapon_definitions()
 	self:_coal_weapon_definitions()
 	self:_lemming_weapon_definitions()
+	self:_chinchilla_weapon_definitions()
+	self:_x_chinchilla_weapon_definitions()
 	self:_melee_weapon_definitions()
 	self:_grenades_definitions()
 	self:_carry_definitions()
@@ -6523,6 +6559,43 @@ function UpgradesTweakData:_player_definitions()
 			value = 1
 		}
 	}
+	self.definitions.player_dodge_shot_gain = {
+		category = "feature",
+		name_id = "menu_player_dodge_shot_gain",
+		upgrade = {
+			category = "player",
+			upgrade = "dodge_shot_gain",
+			value = 1
+		}
+	}
+	self.definitions.player_dodge_replenish_armor = {
+		category = "feature",
+		name_id = "menu_player_dodge_replenish_armor",
+		upgrade = {
+			category = "player",
+			upgrade = "dodge_replenish_armor",
+			value = 1
+		}
+	}
+	self.definitions.player_smoke_screen_ally_dodge_bonus = {
+		category = "feature",
+		name_id = "menu_player_smoke_screen_ally_dodge_bonus",
+		upgrade = {
+			category = "player",
+			upgrade = "smoke_screen_ally_dodge_bonus",
+			value = 1
+		}
+	}
+	self.definitions.player_sicario_multiplier = {
+		category = "feature",
+		name_id = "menu_player_sicario_multiplier",
+		upgrade = {
+			category = "player",
+			upgrade = "sicario_multiplier",
+			value = 1,
+			synced = true
+		}
+	}
 	self.definitions.toolset = {
 		tree = 4,
 		step = 1,
@@ -8635,6 +8708,9 @@ function UpgradesTweakData:_melee_weapon_definitions()
 		category = "melee_weapon",
 		dlc = "pn2"
 	}
+	self.definitions.agave = {
+		category = "melee_weapon"
+	}
 end
 
 function UpgradesTweakData:_grenades_definitions()
@@ -8650,6 +8726,7 @@ function UpgradesTweakData:_grenades_definitions()
 	self.definitions.concussion = {category = "grenade"}
 	self.definitions.chico_injector = {category = "grenade", dlc = "chico"}
 	self.definitions.fir_com = {category = "grenade", dlc = "pd2_clan"}
+	self.definitions.smoke_screen_grenade = {category = "grenade", dlc = "max"}
 end
 
 function UpgradesTweakData:_weapon_definitions()
@@ -11725,5 +11802,23 @@ function UpgradesTweakData:_lemming_weapon_definitions()
 		weapon_id = "lemming",
 		factory_id = "wpn_fps_pis_lemming",
 		dlc = "pd2_clan"
+	}
+end
+
+function UpgradesTweakData:_chinchilla_weapon_definitions()
+	self.definitions.chinchilla = {
+		category = "weapon",
+		weapon_id = "chinchilla",
+		factory_id = "wpn_fps_pis_chinchilla",
+		dlc = "max"
+	}
+end
+
+function UpgradesTweakData:_x_chinchilla_weapon_definitions()
+	self.definitions.x_chinchilla = {
+		category = "weapon",
+		weapon_id = "x_chinchilla",
+		factory_id = "wpn_fps_pis_x_chinchilla",
+		dlc = "max"
 	}
 end

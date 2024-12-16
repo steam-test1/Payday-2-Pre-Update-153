@@ -43,6 +43,7 @@ function NewRaycastWeaponBase:init(unit)
 		self._property_mgr:set_property("bipod_deploy_multiplier", self:weapon_tweak_data().bipod_deploy_multiplier)
 	end
 	self._bloodthist_value_during_reload = 0
+	self._reload_objects = {}
 end
 
 function NewRaycastWeaponBase:set_stagger(value)
@@ -612,6 +613,42 @@ function NewRaycastWeaponBase:_get_tweak_data_weapon_animation(anim)
 	return anim
 end
 
+function NewRaycastWeaponBase:set_objects_visible(unit, objects, visible)
+	if type(objects) == "string" then
+		objects = {objects}
+	end
+	for _, object_name in ipairs(objects) do
+		local graphic_object = unit:get_object(Idstring(object_name))
+		if graphic_object then
+			graphic_object:set_visibility(visible)
+		end
+	end
+end
+
+function NewRaycastWeaponBase:set_reload_objects_visible(visible, anim)
+	local data = tweak_data.weapon.factory[self._factory_id]
+	local reload_objects = anim and data.reload_objects and data.reload_objects[anim]
+	if reload_objects then
+		self._reload_objects[self._name_id] = reload_objects
+	elseif self._reload_objects then
+		reload_objects = self._reload_objects[self.name_id]
+	end
+	if reload_objects then
+		self:set_objects_visible(self._unit, reload_objects, visible)
+	end
+	for part_id, part in pairs(self._parts) do
+		local reload_objects = anim and part.reload_objects and part.reload_objects[anim]
+		if reload_objects then
+			self._reload_objects[part_id] = reload_objects
+		elseif self._reload_objects then
+			reload_objects = self._reload_objects[part_id]
+		end
+		if reload_objects then
+			self:set_objects_visible(part.unit, reload_objects, visible)
+		end
+	end
+end
+
 function NewRaycastWeaponBase:tweak_data_anim_play(anim, speed_multiplier)
 	local orig_anim = anim
 	local unit_anim = self:_get_tweak_data_weapon_animation(orig_anim)
@@ -632,6 +669,7 @@ function NewRaycastWeaponBase:tweak_data_anim_play(anim, speed_multiplier)
 			data.unit:anim_play_to(Idstring(anim_name), length, speed_multiplier)
 		end
 	end
+	self:set_reload_objects_visible(true, anim)
 	NewRaycastWeaponBase.super.tweak_data_anim_play(self, orig_anim, speed_multiplier)
 	return true
 end
@@ -650,6 +688,7 @@ function NewRaycastWeaponBase:tweak_data_anim_stop(anim)
 			data.unit:anim_stop(Idstring(anim_name))
 		end
 	end
+	self:set_reload_objects_visible(false, anim)
 	NewRaycastWeaponBase.super.tweak_data_anim_stop(self, orig_anim)
 end
 
@@ -1324,10 +1363,14 @@ end
 function NewRaycastWeaponBase:on_reload_stop()
 	self._bloodthist_value_during_reload = 0
 	self._current_reload_speed_multiplier = nil
+	self:set_reload_objects_visible(false)
+	self._reload_objects = {}
 end
 
 function NewRaycastWeaponBase:on_reload()
 	NewRaycastWeaponBase.super.on_reload(self)
+	self:set_reload_objects_visible(false)
+	self._reload_objects = {}
 end
 
 function NewRaycastWeaponBase:set_timer(timer, ...)

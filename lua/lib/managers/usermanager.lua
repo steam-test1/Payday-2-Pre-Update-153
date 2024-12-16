@@ -131,6 +131,8 @@ function GenericUserManager:setup_setting_map()
 	self:setup_setting(80, "sticky_aim", true)
 	self:setup_setting(82, "crimenet_gamemode_filter", "standard")
 	self:setup_setting(83, "crime_spree_lobby_diff", -1)
+	self:setup_setting(84, "loading_screen_show_controller", true)
+	self:setup_setting(85, "loading_screen_show_hints", true)
 end
 
 function GenericUserManager:setup_setting(id, name, default_value)

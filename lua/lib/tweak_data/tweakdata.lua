@@ -372,214 +372,195 @@ function TweakData:init()
 	self.difficulty_name_ids.overkill_290 = "menu_difficulty_apocalypse"
 	self.difficulty_name_ids.sm_wish = "menu_difficulty_sm_wish"
 	self.criminals = {}
-	self.criminals.character_names = {
-		"russian",
-		"german",
-		"spanish",
-		"american",
-		"jowi",
-		"old_hoxton",
-		"female_1",
-		"dragan",
-		"jacket",
-		"bonnie",
-		"sokol",
-		"dragon",
-		"bodhi",
-		"jimmy",
-		"sydney",
-		"wild",
-		"chico"
-	}
 	self.criminals.characters = {
 		{
-			name = "american",
+			name = "russian",
 			static_data = {
-				ai_character_id = "ai_hoxton",
-				ssuffix = "l",
-				color_id = 1,
-				voice = "rb2",
-				ai_mask_id = "hoxton",
-				mask_id = 1
-			}
+				ai_character_id = "ai_dallas",
+				ssuffix = "a",
+				voice = "rb4",
+				ai_mask_id = "dallas"
+			},
+			order = 1
 		},
 		{
 			name = "german",
 			static_data = {
 				ai_character_id = "ai_wolf",
 				ssuffix = "c",
-				color_id = 2,
 				voice = "rb3",
-				ai_mask_id = "wolf",
-				mask_id = 2
-			}
-		},
-		{
-			name = "russian",
-			static_data = {
-				ai_character_id = "ai_dallas",
-				ssuffix = "a",
-				color_id = 3,
-				voice = "rb4",
-				ai_mask_id = "dallas",
-				mask_id = 3
-			}
+				ai_mask_id = "wolf"
+			},
+			order = 2
 		},
 		{
 			name = "spanish",
 			static_data = {
 				ai_character_id = "ai_chains",
 				ssuffix = "b",
-				color_id = 4,
 				voice = "rb1",
-				ai_mask_id = "chains",
-				mask_id = 4
-			}
+				ai_mask_id = "chains"
+			},
+			order = 3
+		},
+		{
+			name = "american",
+			static_data = {
+				ai_character_id = "ai_hoxton",
+				ssuffix = "l",
+				voice = "rb2",
+				ai_mask_id = "hoxton"
+			},
+			order = 4
 		},
 		{
 			name = "jowi",
 			static_data = {
 				ai_character_id = "ai_jowi",
 				ssuffix = "m",
-				color_id = 4,
 				voice = "rb6",
-				ai_mask_id = "jw_shades",
-				mask_id = 4
-			}
+				ai_mask_id = "jw_shades"
+			},
+			order = 5
 		},
 		{
 			name = "old_hoxton",
 			static_data = {
 				ai_character_id = "ai_old_hoxton",
 				ssuffix = "d",
-				color_id = 4,
 				voice = "rb5",
-				ai_mask_id = "old_hoxton",
-				mask_id = 4
-			}
+				ai_mask_id = "old_hoxton"
+			},
+			order = 6
 		},
 		{
 			name = "female_1",
 			static_data = {
 				ai_character_id = "ai_female_1",
 				ssuffix = "n",
-				color_id = 4,
 				voice = "rb7",
-				ai_mask_id = "msk_grizel",
-				mask_id = 4
-			}
+				ai_mask_id = "msk_grizel"
+			},
+			order = 7
 		},
 		{
 			name = "dragan",
 			static_data = {
 				ai_character_id = "ai_dragan",
 				ssuffix = "o",
-				color_id = 4,
 				voice = "rb8",
-				ai_mask_id = "dragan",
-				mask_id = 4
-			}
+				ai_mask_id = "dragan"
+			},
+			order = 8
 		},
 		{
 			name = "jacket",
 			static_data = {
 				ai_character_id = "ai_jacket",
 				ssuffix = "p",
-				color_id = 4,
 				voice = "rb9",
-				ai_mask_id = "richard_returns",
-				mask_id = 4
-			}
+				ai_mask_id = "richard_returns"
+			},
+			order = 9
 		},
 		{
 			name = "bonnie",
 			static_data = {
 				ai_character_id = "ai_bonnie",
 				ssuffix = "q",
-				color_id = 4,
 				voice = "rb10",
-				ai_mask_id = "bonnie",
-				mask_id = 4
-			}
+				ai_mask_id = "bonnie"
+			},
+			order = 10
 		},
 		{
 			name = "sokol",
 			static_data = {
 				ai_character_id = "ai_sokol",
 				ssuffix = "r",
-				color_id = 4,
 				voice = "rb11",
-				ai_mask_id = "sokol",
-				mask_id = 4
-			}
+				ai_mask_id = "sokol"
+			},
+			order = 11
 		},
 		{
 			name = "dragon",
 			static_data = {
 				ai_character_id = "ai_dragon",
 				ssuffix = "s",
-				color_id = 4,
 				voice = "rb12",
-				ai_mask_id = "jiro",
-				mask_id = 4
-			}
+				ai_mask_id = "jiro"
+			},
+			order = 12
 		},
 		{
 			name = "bodhi",
 			static_data = {
 				ai_character_id = "ai_bodhi",
 				ssuffix = "t",
-				color_id = 4,
 				voice = "rb13",
-				ai_mask_id = "bodhi",
-				mask_id = 4
-			}
+				ai_mask_id = "bodhi"
+			},
+			order = 13
 		},
 		{
 			name = "jimmy",
 			static_data = {
 				ai_character_id = "ai_jimmy",
 				ssuffix = "u",
-				color_id = 4,
 				voice = "rb14",
-				ai_mask_id = "jimmy_duct",
-				mask_id = 4
-			}
+				ai_mask_id = "jimmy_duct"
+			},
+			order = 14
 		},
 		{
 			name = "sydney",
 			static_data = {
 				ai_character_id = "ai_sydney",
 				ssuffix = "v",
-				color_id = 4,
 				voice = "rb15",
-				ai_mask_id = "sydney",
-				mask_id = 4
-			}
+				ai_mask_id = "sydney"
+			},
+			order = 15
 		},
 		{
 			name = "wild",
 			static_data = {
 				ai_character_id = "ai_wild",
 				ssuffix = "w",
-				color_id = 4,
 				voice = "rb16",
-				ai_mask_id = "rust",
-				mask_id = 4
-			}
+				ai_mask_id = "rust"
+			},
+			order = 16
 		},
 		{
 			name = "chico",
 			static_data = {
 				ai_character_id = "ai_chico",
 				ssuffix = "x",
-				color_id = 4,
 				voice = "rb17",
-				ai_mask_id = "chc_terry",
-				mask_id = 4
-			}
+				ai_mask_id = "chc_terry"
+			},
+			order = 17
+		},
+		{
+			name = "max",
+			static_data = {
+				ai_character_id = "ai_max",
+				ssuffix = "y",
+				voice = "rb18",
+				ai_mask_id = "max"
+			},
+			order = 18
 		}
 	}
+	self.criminals.character_names = {}
+	table.sort(self.criminals.characters, function(a, b)
+		return a.order < b.order
+	end)
+	for _, character in ipairs(self.criminals.characters) do
+		table.insert(self.criminals.character_names, character.name)
+	end
 	self.hud_icons = HudIconsTweakData:new()
 	self.weapon = WeaponTweakData:new(self)
 	self.equipments = EquipmentsTweakData:new()
@@ -5587,6 +5568,16 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.rocket_ray_frag.damage = 500
 	self.projectiles.rocket_ray_frag.projectile_trail = true
 	self.projectiles.rocket_ray_frag.adjust_z = 0
+	self.projectiles.smoke_screen_grenade = {}
+	self.projectiles.smoke_screen_grenade.damage = 0
+	self.projectiles.smoke_screen_grenade.curve_pow = 0.1
+	self.projectiles.smoke_screen_grenade.range = 1500
+	self.projectiles.smoke_screen_grenade.name_id = "bm_smoke_screen_grenade"
+	self.projectiles.smoke_screen_grenade.duration = 6
+	self.projectiles.smoke_screen_grenade.dodge_chance = 0.5
+	self.projectiles.smoke_screen_grenade.init_timer = 0
+	self.projectiles.smoke_screen_grenade.accuracy_roll_chance = 0.5
+	self.projectiles.smoke_screen_grenade.accuracy_fail_spread = {5, 10}
 	self.voting = {}
 	self.voting.timeout = 30
 	self.voting.cooldown = 50

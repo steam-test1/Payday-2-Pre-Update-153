@@ -23,6 +23,7 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.character_locked.sydney = "sydney"
 	self.masks.character_locked.wild = "rust"
 	self.masks.character_locked.chico = "chc_terry"
+	self.masks.character_locked.max = "max"
 	self.masks.skull = {}
 	self.masks.skull.unit = "units/payday2/masks/msk_skull/msk_skull"
 	self.masks.skull.name_id = "bm_msk_skull"
@@ -1700,6 +1701,11 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.balaclava_chico.name_id = "bm_msk_cheat_error"
 	self.masks.balaclava_chico.type = "helmet"
 	self.masks.balaclava_chico.inaccessible = true
+	self.masks.balaclava_max = {}
+	self.masks.balaclava_max.unit = "units/pd2_dlc_max/masks/msk_balaclava_max/msk_balaclava_max"
+	self.masks.balaclava_max.name_id = "bm_msk_cheat_error"
+	self.masks.balaclava_max.type = "helmet"
+	self.masks.balaclava_max.inaccessible = true
 	self.masks.balaclava = {}
 	self.masks.balaclava.name_id = "bm_msk_balaclava"
 	self.masks.balaclava.global_value = "infamy"
@@ -1725,7 +1731,8 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 		jimmy = "balaclava_dallas",
 		sydney = "balaclava_sokol",
 		wild = "balaclava_wild",
-		chico = "balaclava_chico"
+		chico = "balaclava_chico",
+		max = "balaclava_dallas"
 	}
 	self.masks.the_overkill_mask = {}
 	self.masks.the_overkill_mask.unit = "units/pd2_dlc_overkill_pack/masks/msk_the_overkill_mask/msk_the_overkill_mask"
@@ -3360,6 +3367,10 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 		dragan = {
 			Vector3(0, -0.160978, 0.912239),
 			Rotation(0, 0, 0)
+		},
+		max = {
+			Vector3(0, -0.160978, 0.912239),
+			Rotation(0, 0, 0)
 		}
 	}
 	self.masks.grv_01_bonnie = {}
@@ -3420,7 +3431,8 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 		chico = "grv_01_bodhi",
 		chains = "grv_01_bodhi",
 		bodhi = "grv_01_bodhi",
-		bonnie = "grv_01_bonnie"
+		bonnie = "grv_01_bonnie",
+		max = "grv_01_bodhi"
 	}
 	self.masks.grv_02 = {}
 	self.masks.grv_02.unit = "units/pd2_dlc_grv/masks/grv_02/msk_grv_02"
@@ -3669,6 +3681,10 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 		dragan = {
 			Vector3(0, 4.13189, -0.0417315),
 			Rotation(0, -6.31048, 0)
+		},
+		max = {
+			Vector3(0, 4.13189, -0.0417315),
+			Rotation(0, -6.31048, 0)
 		}
 	}
 	self.masks.bny_01_clover = {}
@@ -3719,7 +3735,8 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 		wild = "bny_01_bodhi",
 		chico = "bny_01_bonnie",
 		bodhi = "bny_01_bodhi",
-		bonnie = "bny_01_bonnie"
+		bonnie = "bny_01_bonnie",
+		max = "bny_01_bodhi"
 	}
 	self.masks.bny_02_bonnie = {}
 	self.masks.bny_02_bonnie.unit = "units/pd2_dlc_bny/masks/bny_02/msk_bny_02_bonnie"
@@ -3797,6 +3814,10 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 		old_hoxton = {
 			Vector3(0, 2.1047, -1.83043),
 			Rotation(0, 3.9924, 0)
+		},
+		max = {
+			Vector3(0, 2.82018, -1.35344),
+			Rotation(0, 0, 0)
 		}
 	}
 	self.masks.bny_02_clover = {}
@@ -3834,7 +3855,8 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 		wild = "bny_02_bonnie",
 		chico = "bny_02_bonnie",
 		bodhi = "bny_02_bodhi",
-		bonnie = "bny_02_bonnie"
+		bonnie = "bny_02_bonnie",
+		max = "bny_02_bodhi"
 	}
 	self.masks.bny_03_clover = {}
 	self.masks.bny_03_clover.unit = "units/pd2_dlc_bny/masks/bny_03/msk_bny_03_clover"
@@ -3916,6 +3938,10 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 		bonnie = {
 			Vector3(0, 3.17792, 0.316008),
 			Rotation(0, 0, 0)
+		},
+		max = {
+			Vector3(0, 3.17792, 0.316008),
+			Rotation(0, 0, 0)
 		}
 	}
 	self.masks.bny_03 = {}
@@ -3942,7 +3968,8 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 		wild = "bny_03_bodhi",
 		chico = "bny_03_bodhi",
 		bodhi = "bny_03_bodhi",
-		bonnie = "bny_03_bodhi"
+		bonnie = "bny_03_bodhi",
+		max = "bny_03_bodhi"
 	}
 	self.masks.bny_04 = {}
 	self.masks.bny_04.unit = "units/pd2_dlc_bny/masks/bny_04/msk_bny_04"
@@ -3966,6 +3993,22 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.mdm.sort_number = 47
 	self.masks.mdm.infamous = true
 	self.masks.mdm.global_value = "infamous"
+	self.masks.max = {}
+	self.masks.max.unit = "units/pd2_dlc_max/masks/msk_max"
+	self.masks.max.name_id = "bm_msk_max"
+	self.masks.max.pcs = {}
+	self.masks.max.value = 0
+	self.masks.max.infamous = true
+	self.masks.max.texture_bundle_folder = "max"
+	self.masks.max.sort_number = 48
+	self.masks.max_begins = {}
+	self.masks.max_begins.unit = "units/pd2_dlc_max/masks/msk_max_begins"
+	self.masks.max_begins.name_id = "bm_msk_max_begins"
+	self.masks.max_begins.pcs = {}
+	self.masks.max_begins.value = 0
+	self.masks.max_begins.infamous = true
+	self.masks.max_begins.texture_bundle_folder = "max"
+	self.masks.max_begins.sort_number = 48
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.masks) do
 		if free_dlcs[data.dlc] then

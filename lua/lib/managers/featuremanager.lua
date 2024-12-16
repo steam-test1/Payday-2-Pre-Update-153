@@ -246,6 +246,7 @@ function FeatureManager:short_heist()
 		if SystemInfo:distribution() == Idstring("STEAM") then
 			managers.statistics:publish_custom_stat_to_steam("info_playing_tutorial_yes")
 		end
+		managers.system_menu:force_close_all()
 		MenuCallbackHandler:play_short_heist()
 	end
 	local no_func = function()

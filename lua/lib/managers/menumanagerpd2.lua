@@ -2514,3 +2514,11 @@ function MenuCallbackHandler:weapon_skin_changed(item)
 	self:cleanup_weapon_skin_data(data)
 	skin_editor:apply_changes(skin:config().data)
 end
+
+function MenuCallbackHandler:toggle_controller_hint(item)
+	managers.user:set_setting("loading_screen_show_controller", item:value() == "on")
+end
+
+function MenuCallbackHandler:toggle_loading_hints(item)
+	managers.user:set_setting("loading_screen_show_hints", item:value() == "on")
+end

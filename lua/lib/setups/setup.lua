@@ -284,6 +284,8 @@ function Setup:_start_loading_screen()
 			PackageManager:load("packages/load_level")
 		end
 		local using_steam_controller = false
+		local show_controller = managers.user:get_setting("loading_screen_show_controller")
+		local show_hints = managers.user:get_setting("loading_screen_show_hints")
 		setup = "lib/setups/LevelLoadingSetup"
 		load_level_data = {}
 		load_level_data.level_data = Global.level_data
@@ -292,28 +294,32 @@ function Setup:_start_loading_screen()
 		load_level_data.gui_tweak_data = tweak_data.load_level
 		load_level_data.menu_tweak_data = tweak_data.menu
 		load_level_data.scale_tweak_data = tweak_data.scale
-		load_level_data.tip = tweak_data.tips:get_a_tip()
-		if using_steam_controller then
-		else
-			local coords = tweak_data:get_controller_help_coords()
-			load_level_data.controller_coords = coords and coords[table.random({"normal", "vehicle"})]
-			load_level_data.controller_image = "guis/textures/controller"
-			load_level_data.controller_shapes = {
-				{
-					position = {cx = 0.5, cy = 0.5},
-					texture_rect = {
-						0,
-						0,
-						512,
-						256
+		if show_hints then
+			load_level_data.tip = tweak_data.tips:get_a_tip()
+		end
+		if show_controller then
+			if using_steam_controller then
+			else
+				local coords = tweak_data:get_controller_help_coords()
+				load_level_data.controller_coords = coords and coords[table.random({"normal", "vehicle"})]
+				load_level_data.controller_image = "guis/textures/controller"
+				load_level_data.controller_shapes = {
+					{
+						position = {cx = 0.5, cy = 0.5},
+						texture_rect = {
+							0,
+							0,
+							512,
+							256
+						}
 					}
 				}
-			}
-		end
-		if load_level_data.controller_coords then
-			for id, data in pairs(load_level_data.controller_coords) do
-				data.string = data.localize == false and data.id or managers.localization:to_upper_text(data.id)
-				data.color = (data.id == "menu_button_unassigned" or data.localize == false) and Color(0.5, 0.5, 0.5) or Color.white
+			end
+			if load_level_data.controller_coords then
+				for id, data in pairs(load_level_data.controller_coords) do
+					data.string = data.localize == false and data.id or managers.localization:to_upper_text(data.id)
+					data.color = (data.id == "menu_button_unassigned" or data.localize == false) and Color(0.5, 0.5, 0.5) or Color.white
+				end
 			end
 		end
 		local load_data = load_level_data.level_tweak_data.load_data

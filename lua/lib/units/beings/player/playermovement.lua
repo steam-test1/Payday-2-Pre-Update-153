@@ -795,6 +795,7 @@ function PlayerMovement:save(data)
 	data.down_time = self._unit:character_damage():down_time()
 	self._current_state:save(data.movement)
 	data.movement.team_id = self._team.id
+	data.movement.special_material = managers.network:session():peer(peer_id)._special_material
 end
 
 function PlayerMovement:pre_destroy(unit)

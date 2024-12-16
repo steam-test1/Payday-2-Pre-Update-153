@@ -3668,6 +3668,66 @@ function SkillTreeTweakData:init()
 				name_id = "menu_deck17_9",
 				desc_id = "menu_deck17_9_desc"
 			}
+		},
+		{
+			name_id = "menu_st_spec_18",
+			desc_id = "menu_st_spec_18_desc",
+			{
+				upgrades = {
+					"smoke_screen_grenade"
+				},
+				cost = 200,
+				icon_xy = {0, 0},
+				texture_bundle_folder = "max",
+				name_id = "menu_deck18_1",
+				desc_id = "menu_deck18_1_desc"
+			},
+			deck2,
+			{
+				upgrades = {
+					"player_dodge_shot_gain"
+				},
+				cost = 400,
+				icon_xy = {1, 0},
+				texture_bundle_folder = "max",
+				name_id = "menu_deck18_3",
+				desc_id = "menu_deck18_3_desc"
+			},
+			deck4,
+			{
+				upgrades = {
+					"player_passive_dodge_chance_1"
+				},
+				cost = 1000,
+				icon_xy = {2, 0},
+				texture_bundle_folder = "max",
+				name_id = "menu_deck18_5",
+				desc_id = "menu_deck18_5_desc"
+			},
+			deck6,
+			{
+				upgrades = {
+					"player_dodge_replenish_armor"
+				},
+				cost = 2400,
+				icon_xy = {3, 0},
+				texture_bundle_folder = "max",
+				name_id = "menu_deck18_7",
+				desc_id = "menu_deck18_7_desc"
+			},
+			deck8,
+			{
+				upgrades = {
+					"player_passive_loot_drop_multiplier",
+					"player_smoke_screen_ally_dodge_bonus",
+					"player_sicario_multiplier"
+				},
+				cost = 4000,
+				icon_xy = {0, 1},
+				texture_bundle_folder = "max",
+				name_id = "menu_deck18_9",
+				desc_id = "menu_deck18_9_desc"
+			}
 		}
 	}
 end

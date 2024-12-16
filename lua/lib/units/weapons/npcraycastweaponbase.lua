@@ -205,9 +205,14 @@ end
 
 local mvec_to = Vector3()
 
-function NPCRaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, shoot_player, target_unit)
+function NPCRaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_mul, shoot_player, spread_mul, autohit_mul, suppr_mul, target_unit)
 	local result = {}
 	local hit_unit
+	local miss, extra_spread = self:_check_smoke_shot(user_unit, target_unit)
+	if miss then
+		result.guaranteed_miss = miss
+		mvector3.spread(direction, math.rand(unpack(extra_spread)))
+	end
 	mvector3.set(mvec_to, direction)
 	mvector3.multiply(mvec_to, 20000)
 	mvector3.add(mvec_to, from_pos)
@@ -215,7 +220,7 @@ function NPCRaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_
 	local col_ray = World:raycast("ray", from_pos, mvec_to, "slot_mask", self._bullet_slotmask, "ignore_unit", self._setup.ignore_units)
 	local player_hit, player_ray_data
 	if shoot_player and self._hit_player then
-		player_hit, player_ray_data = self:damage_player(col_ray, from_pos, direction)
+		player_hit, player_ray_data = self:damage_player(col_ray, from_pos, direction, result)
 		if player_hit then
 			InstantBulletBase:on_hit_player(col_ray or player_ray_data, self._unit, user_unit, damage)
 		end
@@ -227,14 +232,48 @@ function NPCRaycastWeaponBase:_fire_raycast(user_unit, from_pos, direction, dmg_
 	if (not col_ray or col_ray.unit ~= target_unit) and target_unit and target_unit:character_damage() and target_unit:character_damage().build_suppression then
 		target_unit:character_damage():build_suppression(tweak_data.weapon[self._name_id].suppression)
 	end
-	if not col_ray or col_ray.distance > 600 then
+	if not col_ray or col_ray.distance > 600 or result.guaranteed_miss then
 		self:_spawn_trail_effect(direction, col_ray)
 	end
 	result.hit_enemy = char_hit
 	if self._alert_events then
 		result.rays = {col_ray}
 	end
+	self:_cleanup_smoke_shot()
 	return result
+end
+
+function NPCRaycastWeaponBase:_check_smoke_shot(user_unit, target_unit)
+	if not (user_unit:movement() and user_unit:movement().in_smoke) or not alive(target_unit) then
+		return
+	end
+	if managers.groupai:state():is_unit_team_AI(user_unit) then
+		return
+	end
+	local in_smoke, variant = user_unit:movement():in_smoke()
+	if in_smoke then
+		local smoke_tweak = tweak_data.projectiles[variant]
+		if math.random() > smoke_tweak.accuracy_roll_chance then
+			return
+		end
+		if not self._ignore_unit_tables then
+			self._ignore_unit_tables = {}
+			self._ignore_unit_tables.normal = clone(self._setup.ignore_units)
+		end
+		local key = "smoke_" .. tostring(target_unit:key())
+		if not self._ignore_unit_tables[key] then
+			self._ignore_unit_tables[key] = clone(self._setup.ignore_units)
+			table.insert(self._ignore_unit_tables[key], target_unit)
+		end
+		self._setup.ignore_units = self._ignore_unit_tables[key]
+		return true, smoke_tweak.accuracy_fail_spread
+	end
+end
+
+function NPCRaycastWeaponBase:_cleanup_smoke_shot()
+	if self._ignore_unit_tables then
+		self._setup.ignore_units = self._ignore_unit_tables.normal
+	end
 end
 
 function NPCRaycastWeaponBase:_spawn_trail_effect(direction, col_ray)

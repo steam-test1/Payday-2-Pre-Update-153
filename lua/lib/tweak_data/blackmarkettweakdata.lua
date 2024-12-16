@@ -140,7 +140,6 @@ function BlackMarketTweakData:_init_characters(tweak_data)
 	self.characters.female_1.sequence = "var_mtr_fem1"
 	self.characters.female_1.mask_on_sequence = "mask_on"
 	self.characters.female_1.mask_off_sequence = "mask_off"
-	self.characters.female_1.name_id = "bm_character_female_1"
 	self.characters.female_1.dlc = "character_pack_clover"
 	self.characters.bonnie = {}
 	self.characters.bonnie.fps_unit = "units/pd2_dlc_bonnie/characters/npc_criminal_bonnie/fps_bonnie_mover"
@@ -150,58 +149,46 @@ function BlackMarketTweakData:_init_characters(tweak_data)
 	self.characters.bonnie.sequence = "var_mtr_bonnie"
 	self.characters.bonnie.mask_on_sequence = "bonnie_mask_on"
 	self.characters.bonnie.mask_off_sequence = "bonnie_mask_off"
-	self.characters.bonnie.name_id = "bm_character_bonnie"
 	self.characters.bonnie.dlc = "pd2_clan"
 	self.characters.ai_hoxton = {}
 	self.characters.ai_hoxton.npc_unit = "units/payday2/characters/npc_criminals_suit_1/hoxton/npc_criminal_suit_hoxton"
 	self.characters.ai_hoxton.sequence = "var_mtr_hoxton"
-	self.characters.ai_hoxton.name_id = "bm_character_ai_hoxton"
 	self.characters.ai_chains = {}
 	self.characters.ai_chains.npc_unit = "units/payday2/characters/npc_criminals_suit_1/chains/npc_criminal_suit_chains"
 	self.characters.ai_chains.sequence = "var_mtr_chains"
-	self.characters.ai_chains.name_id = "bm_character_ai_chains"
 	self.characters.ai_dallas = {}
 	self.characters.ai_dallas.npc_unit = "units/payday2/characters/npc_criminals_suit_1/dallas/npc_criminal_suit_dallas"
 	self.characters.ai_dallas.sequence = "var_mtr_dallas"
-	self.characters.ai_dallas.name_id = "bm_character_ai_dallas"
 	self.characters.ai_wolf = {}
 	self.characters.ai_wolf.npc_unit = "units/payday2/characters/npc_criminals_suit_1/wolf/npc_criminal_suit_wolf"
 	self.characters.ai_wolf.sequence = "var_mtr_wolf"
-	self.characters.ai_wolf.name_id = "bm_character_ai_/wolf"
 	self.characters.ai_jowi = {}
 	self.characters.ai_jowi.npc_unit = "units/payday2/characters/npc_criminals_suit_1/jowi/npc_criminal_suit_jowi"
 	self.characters.ai_jowi.sequence = "var_mtr_john_wick"
-	self.characters.ai_jowi.name_id = "bm_character_ai_jowi"
 	self.characters.ai_old_hoxton = {}
 	self.characters.ai_old_hoxton.npc_unit = "units/payday2/characters/npc_criminals_suit_1/old_hoxton/npc_criminal_suit_old_hoxton"
 	self.characters.ai_old_hoxton.sequence = "var_mtr_old_hoxton"
-	self.characters.ai_old_hoxton.name_id = "bm_character_ai_old_hoxton"
 	self.characters.ai_female_1 = {}
 	self.characters.ai_female_1.npc_unit = "units/payday2/characters/npc_criminal_female_1/fem1/npc_criminal_female_fem1"
 	self.characters.ai_female_1.sequence = "var_mtr_fem1"
 	self.characters.ai_female_1.mask_on_sequence = "mask_on"
 	self.characters.ai_female_1.mask_off_sequence = "mask_off"
-	self.characters.ai_female_1.name_id = "bm_character_ai_female_1"
 	self.characters.ai_dragan = {}
 	self.characters.ai_dragan.npc_unit = "units/payday2/characters/npc_criminals_suit_1/dragan/npc_criminal_suit_dragan"
 	self.characters.ai_dragan.sequence = "var_mtr_dragan"
-	self.characters.ai_dragan.name_id = "bm_character_ai_dragan"
 	self.characters.ai_jacket = {}
 	self.characters.ai_jacket.npc_unit = "units/payday2/characters/npc_criminals_suit_1/jacket/npc_criminal_suit_jacket"
 	self.characters.ai_jacket.sequence = "var_mtr_jacket"
-	self.characters.ai_jacket.name_id = "bm_character_ai_jacket"
 	self.characters.ai_bonnie = {}
 	self.characters.ai_bonnie.npc_unit = "units/pd2_dlc_bonnie/characters/npc_criminal_bonnie/fem1/npc_criminal_female_bonnie_1"
 	self.characters.ai_bonnie.sequence = "var_mtr_bonnie"
 	self.characters.ai_bonnie.mask_on_sequence = "bonnie_mask_on"
 	self.characters.ai_bonnie.mask_off_sequence = "bonnie_mask_off"
-	self.characters.ai_bonnie.name_id = "bm_character_ai_bonnie"
 	self.characters.ai_sokol = {}
 	self.characters.ai_sokol.npc_unit = "units/payday2/characters/npc_criminals_suit_1/sokol/npc_criminal_suit_sokol"
 	self.characters.ai_sokol.sequence = "var_mtr_sokol"
 	self.characters.ai_sokol.mask_on_sequence = "mask_on_sokol"
 	self.characters.ai_sokol.mask_off_sequence = "mask_off_sokol"
-	self.characters.ai_sokol.name_id = "bm_character_ai_sokol"
 	self.characters.ai_dragon = {}
 	self.characters.ai_dragon.npc_unit = "units/payday2/characters/npc_criminals_suit_1/dragon/npc_criminal_suit_dragon"
 	self.characters.ai_dragon.sequence = "var_mtr_jiro"
@@ -219,38 +206,53 @@ function BlackMarketTweakData:_init_characters(tweak_data)
 	self.characters.sydney.sequence = "var_mtr_sydney"
 	self.characters.sydney.mask_on_sequence = "mask_on"
 	self.characters.sydney.mask_off_sequence = "mask_off"
-	self.characters.sydney.name_id = "bm_character_sydney"
 	self.characters.sydney.dlc = "opera"
 	self.characters.ai_sydney = {}
 	self.characters.ai_sydney.npc_unit = "units/pd2_dlc_opera/characters/npc_criminals_fem_3/fem3/npc_criminal_female_3"
 	self.characters.ai_sydney.sequence = "var_mtr_sydney"
 	self.characters.ai_sydney.mask_on_sequence = "mask_on"
 	self.characters.ai_sydney.mask_off_sequence = "mask_off"
-	self.characters.ai_sydney.name_id = "bm_character_ai_sydney"
 	self.characters.wild = {}
 	self.characters.wild.fps_unit = "units/pd2_dlc_wild/characters/npc_criminals_wild_1/fps_wild_mover"
 	self.characters.wild.npc_unit = "units/pd2_dlc_wild/characters/npc_criminals_wild_1/npc_criminal_wild_1"
 	self.characters.wild.menu_unit = "units/pd2_dlc_wild/characters/npc_criminals_wild_1/npc_criminal_wild_1_menu"
 	self.characters.wild.texture_bundle_folder = "wild"
 	self.characters.wild.sequence = "var_mtr_wild"
-	self.characters.wild.name_id = "bm_character_wild"
 	self.characters.wild.dlc = "wild"
 	self.characters.ai_wild = {}
 	self.characters.ai_wild.npc_unit = "units/pd2_dlc_wild/characters/npc_criminals_wild_1/wild_1/npc_criminal_wild_1"
 	self.characters.ai_wild.sequence = "var_mtr_wild"
-	self.characters.ai_wild.name_id = "bm_character_ai_wild"
 	self.characters.chico = {}
 	self.characters.chico.fps_unit = "units/pd2_dlc_chico/characters/npc_criminals_terry/fps_terry_mover"
 	self.characters.chico.npc_unit = "units/pd2_dlc_chico/characters/npc_criminals_terry/npc_criminal_terry"
 	self.characters.chico.menu_unit = "units/pd2_dlc_chico/characters/npc_criminals_terry/npc_criminal_terry_menu"
 	self.characters.chico.texture_bundle_folder = "chico"
 	self.characters.chico.sequence = "var_mtr_terry"
-	self.characters.chico.name_id = "bm_character_chico"
 	self.characters.chico.dlc = "chico"
 	self.characters.ai_chico = {}
 	self.characters.ai_chico.npc_unit = "units/pd2_dlc_chico/characters/npc_criminals_terry/terry/npc_criminal_terry"
 	self.characters.ai_chico.sequence = "var_mtr_terry"
-	self.characters.ai_chico.name_id = "bm_character_ai_chico"
+	self.characters.max = {}
+	self.characters.max.fps_unit = "units/pd2_dlc_max/characters/npc_criminals_max/fps_max_mover"
+	self.characters.max.npc_unit = "units/pd2_dlc_max/characters/npc_criminals_max/npc_criminal_max"
+	self.characters.max.menu_unit = "units/pd2_dlc_max/characters/npc_criminals_max/npc_criminal_max_menu"
+	self.characters.max.texture_bundle_folder = "max"
+	self.characters.max.sequence = "var_mtr_max"
+	self.characters.max.special_materials = {
+		"units/pd2_dlc_max/characters/npc_criminals_max/mtr_criminal_max_shirt_01",
+		"units/pd2_dlc_max/characters/npc_criminals_max/mtr_criminal_max_shirt_02",
+		"units/pd2_dlc_max/characters/npc_criminals_max/mtr_criminal_max_shirt_03",
+		"units/pd2_dlc_max/characters/npc_criminals_max/mtr_criminal_max_shirt_04",
+		"units/pd2_dlc_max/characters/npc_criminals_max/mtr_criminal_max_shirt_05",
+		"units/pd2_dlc_max/characters/npc_criminals_max/mtr_criminal_max_shirt_06",
+		"units/pd2_dlc_max/characters/npc_criminals_max/mtr_criminal_max"
+	}
+	self.characters.max.special_materials["units/pd2_dlc_max/characters/npc_criminals_max/mtr_criminal_max_taco"] = 200
+	self.characters.max.special_materials["units/pd2_dlc_max/characters/npc_criminals_max/mtr_criminal_max_snakeskin"] = 50
+	self.characters.max.special_materials["units/pd2_dlc_max/characters/npc_criminals_max/mtr_criminal_max_pink"] = 50
+	self.characters.ai_max = {}
+	self.characters.ai_max.npc_unit = "units/pd2_dlc_max/characters/npc_criminals_max/max/npc_criminal_max"
+	self.characters.ai_max.sequence = "var_mtr_max"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.characters) do
 		if free_dlcs[data.dlc] then

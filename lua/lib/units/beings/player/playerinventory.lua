@@ -100,7 +100,6 @@ function PlayerInventory:add_unit(new_unit, is_equip, equip_is_instant)
 	end
 	self._available_selections[selection_index] = new_selection
 	self._latest_addition = selection_index
-	self._selected_primary = self._selected_primary or selection_index
 	self:_call_listeners("add")
 	if is_equip then
 		self:equip_latest_addition(equip_is_instant)

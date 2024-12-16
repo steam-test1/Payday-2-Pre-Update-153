@@ -2306,6 +2306,12 @@ function HuskPlayerMovement:_post_load(unit, t, dt)
 		if data.zip_line_unit_id then
 			self:on_enter_zipline(managers.worlddefinition:get_unit_on_load(data.zip_line_unit_id, callback(self, self, "on_enter_zipline")))
 		end
+		if data.movement.special_material and DB:has(Idstring("material_config"), Idstring(data.movement.special_material)) then
+			self._unit:set_material_config(Idstring(data.movement.special_material), true)
+			if self._unit:armor_skin() then
+				self._unit:armor_skin():_apply_cosmetics()
+			end
+		end
 	end
 end
 

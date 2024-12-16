@@ -221,6 +221,8 @@ function WeaponFactoryTweakData:init()
 	self:_init_coal()
 	self:_init_varmods()
 	self:_init_lemming()
+	self:_init_chinchilla()
+	self:_init_x_chinchilla()
 	self:create_ammunition()
 	self:_init_cc_material_config()
 	self:_init_bipods()
@@ -2236,6 +2238,9 @@ function WeaponFactoryTweakData:_init_content_jobs()
 				translation = Vector3(0, 0, -1.15)
 			},
 			wpn_fps_pis_lemming = {
+				translation = Vector3(0, 5, -0.75)
+			},
+			wpn_fps_pis_chinchilla = {
 				translation = Vector3(0, 5, -0.75)
 			}
 		},
@@ -30389,4 +30394,224 @@ function WeaponFactoryTweakData:_init_lemming()
 	}
 	self.wpn_fps_pis_lemming_npc = deep_clone(self.wpn_fps_pis_lemming)
 	self.wpn_fps_pis_lemming_npc.unit = "units/pd2_dlc_fi7/weapons/wpn_fps_pis_lemming/wpn_fps_pis_lemming_npc"
+end
+
+function WeaponFactoryTweakData:_init_chinchilla()
+	self.parts.wpn_fps_pis_chinchilla_b_standard = {
+		type = "barrel",
+		name_id = "bm_wp_chinchilla_b_standard",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_fps_pis_chinchilla_b_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_pis_chinchilla_b_satan = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "barrel",
+		name_id = "bm_wp_chinchilla_b_satan",
+		a_obj = "a_b",
+		unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_fps_pis_chinchilla_b_satan",
+		stats = {value = 1, spread = 2},
+		stance_mod = {
+			wpn_fps_pis_chinchilla = {
+				translation = Vector3(0, 0, -0.58)
+			}
+		},
+		texture_bundle_folder = "max"
+	}
+	self.parts.wpn_fps_pis_chinchilla_body = {
+		type = "lower_receiver",
+		name_id = "bm_wp_chinchilla_body",
+		a_obj = "a_body",
+		unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_fps_pis_chinchilla_body",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_pis_chinchilla_cylinder = {
+		type = "cylinder",
+		name_id = "bm_wp_chinchilla_cylinder",
+		a_obj = "a_cylinder",
+		unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_fps_pis_chinchilla_cylinder",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_pis_chinchilla_dh_hammer = {
+		type = "drag_handle",
+		name_id = "bm_wp_chinchilla_dh_standard",
+		a_obj = "a_dh",
+		unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_fps_pis_chinchilla_dh_hammer",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_pis_chinchilla_ejector = {
+		type = "ejector",
+		name_id = "bm_wp_chinchilla_ejector",
+		a_obj = "a_ejector",
+		unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_fps_pis_chinchilla_ejector",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_pis_chinchilla_ejectorpin = {
+		type = "ejectorpin",
+		name_id = "bm_wp_chinchilla_ejectorpin",
+		a_obj = "a_ejectorpin",
+		unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_fps_pis_chinchilla_ejectorpin",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_pis_chinchilla_g_black = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "grip",
+		name_id = "bm_wp_chinchilla_g_black",
+		a_obj = "a_g",
+		unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_fps_pis_chinchilla_g_black",
+		stats = {value = 1, recoil = 2},
+		texture_bundle_folder = "max"
+	}
+	self.parts.wpn_fps_pis_chinchilla_g_death = {
+		pcs = {
+			10,
+			20,
+			30,
+			40
+		},
+		type = "grip",
+		name_id = "bm_wp_chinchilla_g_death",
+		a_obj = "a_g",
+		unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_fps_pis_chinchilla_g_death",
+		stats = {value = 1, recoil = 2},
+		texture_bundle_folder = "max"
+	}
+	self.parts.wpn_fps_pis_chinchilla_g_standard = {
+		type = "grip",
+		name_id = "bm_wp_chinchilla_g_standard",
+		a_obj = "a_g",
+		unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_fps_pis_chinchilla_g_standard",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_pis_chinchilla_lock_arm = {
+		type = "lock_arm",
+		name_id = "bm_wp_chinchilla_lock_arm",
+		a_obj = "a_lock",
+		unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_fps_pis_chinchilla_lock_arm",
+		stats = {value = 1}
+	}
+	self.parts.wpn_fps_pis_chinchilla_m_bullets = {
+		type = "magazine",
+		name_id = "bm_wp_chinchilla_m_bullet1",
+		a_obj = "a_m",
+		bullet_objects = {prefix = "g_bullet_", amount = 6},
+		unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_fps_pis_chinchilla_m_bullets",
+		reload_objects = {
+			reload = "g_speedloader",
+			reload_not_empty = "g_speedloader"
+		},
+		stats = {value = 1},
+		animations = {
+			reload = "reload",
+			reload_not_empty = "reload",
+			reload_left = "reload_left"
+		}
+	}
+	self.parts.wpn_fps_pis_chinchilla_b_standard.third_unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_third_pis_chinchilla_b_standard"
+	self.parts.wpn_fps_pis_chinchilla_b_satan.third_unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_third_pis_chinchilla_b_satan"
+	self.parts.wpn_fps_pis_chinchilla_body.third_unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_third_pis_chinchilla_body"
+	self.parts.wpn_fps_pis_chinchilla_cylinder.third_unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_third_pis_chinchilla_cylinder"
+	self.parts.wpn_fps_pis_chinchilla_dh_hammer.third_unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_third_pis_chinchilla_dh_hammer"
+	self.parts.wpn_fps_pis_chinchilla_ejector.third_unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_third_pis_chinchilla_ejector"
+	self.parts.wpn_fps_pis_chinchilla_ejectorpin.third_unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_third_pis_chinchilla_ejectorpin"
+	self.parts.wpn_fps_pis_chinchilla_g_black.third_unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_third_pis_chinchilla_g_black"
+	self.parts.wpn_fps_pis_chinchilla_g_death.third_unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_third_pis_chinchilla_g_death"
+	self.parts.wpn_fps_pis_chinchilla_g_standard.third_unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_third_pis_chinchilla_g_standard"
+	self.parts.wpn_fps_pis_chinchilla_lock_arm.third_unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_third_pis_chinchilla_lock_arm"
+	self.parts.wpn_fps_pis_chinchilla_m_bullets.third_unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla_pts/wpn_third_pis_chinchilla_m_bullets"
+	self.wpn_fps_pis_chinchilla = {}
+	self.wpn_fps_pis_chinchilla.optional_types = {
+		"barrel_ext",
+		"gadget",
+		"sight"
+	}
+	self.wpn_fps_pis_chinchilla.unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla/wpn_fps_pis_chinchilla"
+	self.wpn_fps_pis_chinchilla.animations = {
+		reload = "reload",
+		reload_not_empty = "reload",
+		fire = "recoil",
+		fire_steelsight = "recoil"
+	}
+	self.wpn_fps_pis_chinchilla.default_blueprint = {
+		"wpn_fps_pis_chinchilla_b_standard",
+		"wpn_fps_pis_chinchilla_body",
+		"wpn_fps_pis_chinchilla_cylinder",
+		"wpn_fps_pis_chinchilla_dh_hammer",
+		"wpn_fps_pis_chinchilla_ejector",
+		"wpn_fps_pis_chinchilla_ejectorpin",
+		"wpn_fps_pis_chinchilla_g_standard",
+		"wpn_fps_pis_chinchilla_lock_arm",
+		"wpn_fps_pis_chinchilla_m_bullets"
+	}
+	self.wpn_fps_pis_chinchilla.uses_parts = {
+		"wpn_fps_pis_chinchilla_b_standard",
+		"wpn_fps_pis_chinchilla_b_satan",
+		"wpn_fps_pis_chinchilla_body",
+		"wpn_fps_pis_chinchilla_cylinder",
+		"wpn_fps_pis_chinchilla_dh_hammer",
+		"wpn_fps_pis_chinchilla_ejector",
+		"wpn_fps_pis_chinchilla_ejectorpin",
+		"wpn_fps_pis_chinchilla_g_black",
+		"wpn_fps_pis_chinchilla_g_death",
+		"wpn_fps_pis_chinchilla_g_standard",
+		"wpn_fps_pis_chinchilla_lock_arm",
+		"wpn_fps_pis_chinchilla_m_bullets"
+	}
+	self.wpn_fps_pis_chinchilla_npc = deep_clone(self.wpn_fps_pis_chinchilla)
+	self.wpn_fps_pis_chinchilla_npc.unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_chinchilla/wpn_fps_pis_chinchilla_npc"
+end
+
+function WeaponFactoryTweakData:_init_x_chinchilla()
+	self.wpn_fps_pis_x_chinchilla = {}
+	self.wpn_fps_pis_x_chinchilla.optional_types = {
+		"barrel_ext",
+		"gadget",
+		"sight"
+	}
+	self.wpn_fps_pis_x_chinchilla.unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_x_chinchilla/wpn_fps_pis_x_chinchilla"
+	self.wpn_fps_pis_x_chinchilla.animations = {
+		fire = "recoil",
+		reload = "reload_right",
+		reload_left = "reload_left",
+		reload_not_empty = "reload_right",
+		reload_not_empty_left = "reload_left",
+		fire_steelsight = "recoil"
+	}
+	self.wpn_fps_pis_x_chinchilla.default_blueprint = {
+		"wpn_fps_pis_chinchilla_b_standard",
+		"wpn_fps_pis_chinchilla_body",
+		"wpn_fps_pis_chinchilla_cylinder",
+		"wpn_fps_pis_chinchilla_dh_hammer",
+		"wpn_fps_pis_chinchilla_ejector",
+		"wpn_fps_pis_chinchilla_ejectorpin",
+		"wpn_fps_pis_chinchilla_g_standard",
+		"wpn_fps_pis_chinchilla_lock_arm",
+		"wpn_fps_pis_chinchilla_m_bullets"
+	}
+	self.wpn_fps_pis_x_chinchilla.uses_parts = {
+		"wpn_fps_pis_chinchilla_b_standard",
+		"wpn_fps_pis_chinchilla_b_satan",
+		"wpn_fps_pis_chinchilla_body",
+		"wpn_fps_pis_chinchilla_cylinder",
+		"wpn_fps_pis_chinchilla_dh_hammer",
+		"wpn_fps_pis_chinchilla_ejector",
+		"wpn_fps_pis_chinchilla_ejectorpin",
+		"wpn_fps_pis_chinchilla_g_black",
+		"wpn_fps_pis_chinchilla_g_death",
+		"wpn_fps_pis_chinchilla_g_standard",
+		"wpn_fps_pis_chinchilla_lock_arm",
+		"wpn_fps_pis_chinchilla_m_bullets"
+	}
+	self.wpn_fps_pis_x_chinchilla_npc = deep_clone(self.wpn_fps_pis_chinchilla)
+	self.wpn_fps_pis_x_chinchilla_npc.unit = "units/pd2_dlc_max/weapons/wpn_fps_pis_x_chinchilla/wpn_fps_pis_x_chinchilla_npc"
 end
