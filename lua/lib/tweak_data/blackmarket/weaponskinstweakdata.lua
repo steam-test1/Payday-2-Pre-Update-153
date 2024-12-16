@@ -14429,7 +14429,6 @@ function BlackMarketTweakData:_init_weapon_skins()
 	self.weapon_skins.new_raging_bull_smosh.desc_id = "bm_wskn_new_raging_bull_smosh_desc"
 	self.weapon_skins.new_raging_bull_smosh.weapon_id = "new_raging_bull"
 	self.weapon_skins.new_raging_bull_smosh.rarity = "legendary"
-	self.weapon_skins.new_raging_bull_smosh.locked = true
 	self.weapon_skins.new_raging_bull_smosh.bonus = "spread_p1"
 	self.weapon_skins.new_raging_bull_smosh.reserve_quality = true
 	self.weapon_skins.new_raging_bull_smosh.texture_bundle_folder = "cash/safes/smosh"
@@ -15669,7 +15668,6 @@ function BlackMarketTweakData:_init_weapon_skins()
 	self.weapon_skins.contraband_sfs.reserve_quality = true
 	self.weapon_skins.contraband_sfs.texture_bundle_folder = "cash/safes/sfs"
 	self.weapon_skins.contraband_sfs.unique_name_id = "bm_wskn_contraband_sfs"
-	self.weapon_skins.contraband_sfs.locked = true
 	self.weapon_skins.contraband_sfs.base_gradient = Idstring("units/payday2_cash/safes/sfs/base_gradient/base_sfs_017_b_df")
 	self.weapon_skins.contraband_sfs.pattern_gradient = Idstring("units/payday2_cash/safes/bah/pattern_gradient/gradient_bah_001_df")
 	self.weapon_skins.contraband_sfs.pattern = Idstring("units/payday2_cash/safes/sfs/pattern/sfs_pattern_003_df")
@@ -17311,7 +17309,6 @@ function BlackMarketTweakData:_init_weapon_skins()
 	self.weapon_skins.x_akmsu_wac.reserve_quality = true
 	self.weapon_skins.x_akmsu_wac.texture_bundle_folder = "cash/safes/wac"
 	self.weapon_skins.x_akmsu_wac.unique_name_id = "bm_wskn_x_akmsu_wac"
-	self.weapon_skins.x_akmsu_wac.locked = true
 	self.weapon_skins.x_akmsu_wac.base_gradient = Idstring("units/payday2_cash/safes/wac/base_gradient/base_wac_017_df")
 	self.weapon_skins.x_akmsu_wac.pattern_gradient = Idstring("units/payday2_cash/safes/wac/pattern_gradient/gradient_wac_004_df")
 	self.weapon_skins.x_akmsu_wac.pattern = Idstring("units/payday2_cash/safes/grunt/pattern/grunt_pattern_007_df")
@@ -18536,7 +18533,6 @@ function BlackMarketTweakData:_init_weapon_skins()
 	self.weapon_skins.ppk_cs3.reserve_quality = true
 	self.weapon_skins.ppk_cs3.texture_bundle_folder = "cash/safes/cs3"
 	self.weapon_skins.ppk_cs3.unique_name_id = "bm_wskn_ppk_cs3"
-	self.weapon_skins.ppk_cs3.locked = true
 	self.weapon_skins.ppk_cs3.base_gradient = "units/payday2_cash/safes/cs3/base_gradient/base_cs3_014_df"
 	self.weapon_skins.ppk_cs3.pattern_gradient = "units/payday2_cash/safes/cs3/pattern_gradient/gradient_cs3_010_df"
 	self.weapon_skins.ppk_cs3.default_blueprint = {
@@ -19960,7 +19956,6 @@ function BlackMarketTweakData:_init_weapon_skins()
 	self.weapon_skins.x_chinchilla_mxs.reserve_quality = true
 	self.weapon_skins.x_chinchilla_mxs.texture_bundle_folder = "cash/safes/mxs"
 	self.weapon_skins.x_chinchilla_mxs.unique_name_id = "bm_wskn_x_chinchilla_mxs"
-	self.weapon_skins.x_chinchilla_mxs.locked = true
 	self.weapon_skins.x_chinchilla_mxs.base_gradient = Idstring("units/payday2_cash/safes/mxs/base_gradient/base_mxs_011_b_df")
 	self.weapon_skins.x_chinchilla_mxs.pattern_gradient = Idstring("units/payday2_cash/safes/mxs/pattern_gradient/gradient_mxs_008_df")
 	self.weapon_skins.x_chinchilla_mxs.pattern = Idstring("units/payday2_cash/safes/mxs/pattern/mxs_pattern_010_b_df")
@@ -22805,7 +22800,6 @@ function BlackMarketTweakData:_init_weapon_skins()
 	self.weapon_skins.p90_cs4.desc_id = "bm_wskn_p90_cs4_desc"
 	self.weapon_skins.p90_cs4.weapon_id = "p90"
 	self.weapon_skins.p90_cs4.rarity = "legendary"
-	self.weapon_skins.p90_cs4.locked = true
 	self.weapon_skins.p90_cs4.unique_name_id = "bm_wskn_p90_cs4"
 	self.weapon_skins.p90_cs4.bonus = "concealment_p1"
 	self.weapon_skins.p90_cs4.reserve_quality = true
@@ -22849,99 +22843,6 @@ function BlackMarketTweakData:_init_weapon_skins()
 		gadget = {},
 		grip = {},
 		upper_reciever = {}
-	}
-	self.weapon_skins.lemming_cs4 = {}
-	self.weapon_skins.lemming_cs4.name_id = "bm_wskn_lemming_cs4"
-	self.weapon_skins.lemming_cs4.desc_id = "bm_wskn_lemming_cs4_desc"
-	self.weapon_skins.lemming_cs4.weapon_id = "lemming"
-	self.weapon_skins.lemming_cs4.rarity = "common"
-	self.weapon_skins.lemming_cs4.bonus = "concealment_p1"
-	self.weapon_skins.lemming_cs4.reserve_quality = true
-	self.weapon_skins.lemming_cs4.texture_bundle_folder = "cash/safes/cs4"
-	self.weapon_skins.lemming_cs4.base_gradient = "units/payday2_cash/safes/cs4/base_gradient/base_cs4_017_df"
-	self.weapon_skins.lemming_cs4.pattern_gradient = "units/payday2_cash/safes/cs4/pattern_gradient/gradient_cs4_017_df"
-	self.weapon_skins.lemming_cs4.parts = {
-		wpn_fps_upg_ns_pis_ipsccomp = {
-			[Idstring("mtr_comp"):key()] = {
-				sticker = "units/payday2_cash/safes/cs4/sticker/cs4_sticker_017_df",
-				uv_scale = Vector3(0.962999, 0.962999, 0)
-			}
-		},
-		wpn_fps_upg_ns_ass_filter = {
-			[Idstring("mtr_filter"):key()] = {
-				uv_offset_rot = Vector3(-0.175, 0.951, 0),
-				sticker = "units/payday2_cash/safes/cs4/sticker/cs4_sticker_017_df",
-				uv_scale = Vector3(1.011, 0.868, 0)
-			}
-		},
-		wpn_fps_upg_ns_pis_meatgrinder = {
-			[Idstring("mtr_strikeface"):key()] = {
-				uv_offset_rot = Vector3(0, 0.989, 0),
-				sticker = "units/payday2_cash/safes/cs4/sticker/cs4_sticker_017_df",
-				uv_scale = Vector3(0.533998, 0.868, 0)
-			}
-		},
-		wpn_fps_pis_lemming_sl_standard = {
-			[Idstring("mtr_slider"):key()] = {
-				pattern_tweak = Vector3(2.065, 0, 1),
-				uv_offset_rot = Vector3(-0.137, 0.903, 0),
-				uv_scale = Vector3(0.82, 1.917, 0),
-				base_gradient = "units/payday2_cash/safes/cs4/base_gradient/base_cs4_017_b_df",
-				sticker = "units/payday2_cash/safes/cs4/sticker/cs4_sticker_017_df",
-				pattern_pos = Vector3(0, 0.14, 0),
-				pattern = "units/payday2_cash/safes/cs4/pattern/cs4_pattern_017_df"
-			}
-		},
-		wpn_fps_pis_lemming_b_nitride = {
-			[Idstring("mtr_barrel_nitride"):key()] = {
-				sticker = "units/payday2_cash/safes/cs4/sticker/cs4_sticker_017_df",
-				uv_scale = Vector3(1, 1, 0)
-			}
-		},
-		wpn_fps_upg_ns_pis_small = {
-			[Idstring("small"):key()] = {
-				uv_offset_rot = Vector3(-0.0409999, 0.932, 0),
-				sticker = "units/payday2_cash/safes/cs4/sticker/cs4_sticker_017_df",
-				uv_scale = Vector3(0.868, 0.962999, 0)
-			}
-		},
-		wpn_fps_upg_ns_pis_medium_gem = {
-			[Idstring("silencer"):key()] = {
-				uv_offset_rot = Vector3(-0.0699999, 0.932, 0),
-				sticker = "units/payday2_cash/safes/cs4/sticker/cs4_sticker_017_df",
-				uv_scale = Vector3(0.724998, 1.202, 0)
-			}
-		},
-		wpn_fps_upg_ns_pis_large_kac = {
-			[Idstring("silencer"):key()] = {
-				uv_offset_rot = Vector3(-0.118, 0.922, 0),
-				sticker = "units/payday2_cash/safes/cs4/sticker/cs4_sticker_017_df",
-				uv_scale = Vector3(0.724998, 1.107, 0)
-			}
-		},
-		wpn_fps_upg_ns_pis_large = {
-			[Idstring("large"):key()] = {
-				uv_offset_rot = Vector3(-0.213, 0.96, 0),
-				sticker = "units/payday2_cash/safes/cs4/sticker/cs4_sticker_017_df",
-				uv_scale = Vector3(0.676998, 1.583, 0)
-			}
-		},
-		wpn_fps_upg_ns_pis_medium = {
-			[Idstring("medium"):key()] = {
-				uv_offset_rot = Vector3(-0.118, 0.96, 0),
-				sticker = "units/payday2_cash/safes/cs4/sticker/cs4_sticker_017_df",
-				uv_scale = Vector3(0.82, 1.011, 0)
-			}
-		}
-	}
-	self.weapon_skins.lemming_cs4.types = {
-		barrel_ext = {
-			pattern_tweak = Vector3(1.398, 0, 1),
-			uv_offset_rot = Vector3(-0.127, 0.96, 0),
-			uv_scale = Vector3(0.676998, 1.536, 0),
-			sticker = "units/payday2_cash/safes/cs4/sticker/cs4_sticker_017_df",
-			pattern = "units/payday2_cash/safes/cs4/pattern/cs4_pattern_017_df"
-		}
 	}
 	self.weapon_skins.mac10_cs4 = {}
 	self.weapon_skins.mac10_cs4.name_id = "bm_wskn_mac10_cs4"
