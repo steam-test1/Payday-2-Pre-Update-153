@@ -8,6 +8,8 @@ function CustomSafehouseTweakData:init(tweak_data)
 		24
 	}
 	self.prices.weapon_mod = 6
+	self.prices.crew_boost = 2
+	self.prices.crew_ability = 6
 	self.rewards = {}
 	self.rewards.initial = self.prices.rooms[2] * 1
 	self.rewards.challenge = 6

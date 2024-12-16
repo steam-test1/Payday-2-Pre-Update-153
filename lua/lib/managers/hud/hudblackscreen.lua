@@ -176,18 +176,16 @@ function HUDBlackScreen:_set_job_data()
 		risk_panel:set_bottom(job_panel:h() / 2)
 		risk_panel:set_position(math.round(risk_panel:x()), math.round(risk_panel:y()))
 	end
-	if last_risk_level then
-		local risk_text = job_panel:text({
-			text = managers.localization:to_upper_text(tweak_data.difficulty_name_id),
-			font = tweak_data.menu.pd2_large_font,
-			font_size = tweak_data.menu.pd2_small_large_size,
-			align = "center",
-			vertical = "bottom",
-			color = tweak_data.screen_colors.risk
-		})
-		risk_text:set_bottom(risk_panel:top())
-		risk_text:set_center_x(risk_panel:center_x())
-	end
+	local risk_text = job_panel:text({
+		text = managers.localization:to_upper_text(tweak_data.difficulty_name_id),
+		font = tweak_data.menu.pd2_large_font,
+		font_size = tweak_data.menu.pd2_small_large_size,
+		align = "center",
+		vertical = "bottom",
+		color = tweak_data.screen_colors.risk
+	})
+	risk_text:set_bottom(risk_panel:top())
+	risk_text:set_center_x(risk_panel:center_x())
 end
 
 function HUDBlackScreen:_set_job_data_crime_spree()

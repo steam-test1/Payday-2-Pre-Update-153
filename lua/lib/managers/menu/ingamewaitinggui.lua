@@ -288,9 +288,15 @@ function IngameWaitingGui:try_get_dummy()
 	return self._dummy_item
 end
 
+IngameWaitingGui.game_state_blacklist = {gameoverscreen = true, victoryscreen = true}
+
 function IngameWaitingGui:update(t, dt)
 	if not self._dummy_item then
 		self:try_get_dummy()
+	end
+	if self.game_state_blacklist[game_state_machine:last_queued_state_name()] then
+		self:set_enabled(false)
+		return
 	end
 	if not self._content_panel:visible() or not self._current_slot then
 		local valid_slot = self:calc_next(1)
@@ -622,8 +628,10 @@ function IngameWaitingGui:mouse_moved(o, x, y)
 		return
 	end
 	if self._content_panel:inside(x, y) then
-		self:dummy_set_highlight(true)
-		managers.menu:active_menu().logic:mouse_over_select_item(self._dummy_item.name, false)
+		if not self._highlighted then
+			self:dummy_set_highlight(true)
+			managers.menu:active_menu().logic:mouse_over_select_item(self._dummy_item.name, false)
+		end
 	else
 		return
 	end

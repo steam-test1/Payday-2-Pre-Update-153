@@ -1510,9 +1510,14 @@ function PlayerStandard:interupt_interact()
 	end
 end
 
+function PlayerStandard:_get_interaction_speed()
+	local dt = managers.player:player_timer():delta_time()
+	return dt
+end
+
 function PlayerStandard:_update_interaction_timers(t)
 	if self._interact_expire_t then
-		local dt = managers.player:player_timer():delta_time()
+		local dt = self:_get_interaction_speed()
 		self._interact_expire_t = self._interact_expire_t - dt
 		if not alive(self._interact_params.object) or self._interact_params.object ~= self._interaction:active_unit() or self._interact_params.tweak_data ~= self._interact_params.object:interaction().tweak_data or self._interact_params.object:interaction():check_interupt() then
 			self:_interupt_action_interact(t)
@@ -3537,6 +3542,7 @@ function PlayerStandard:_get_swap_speed_multiplier()
 	for _, category in ipairs(weapon_tweak_data.categories) do
 		multiplier = multiplier * managers.player:upgrade_value(category, "swap_speed_multiplier", 1)
 	end
+	multiplier = multiplier * managers.player:upgrade_value("team", "crew_faster_swap", 1)
 	if managers.player:has_activate_temporary_upgrade("temporary", "swap_weapon_faster") then
 		multiplier = multiplier * managers.player:temporary_upgrade_value("temporary", "swap_weapon_faster", 1)
 	end

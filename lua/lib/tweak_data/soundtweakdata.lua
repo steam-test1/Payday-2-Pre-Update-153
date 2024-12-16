@@ -2,6 +2,7 @@ SoundTweakData = SoundTweakData or class()
 
 function SoundTweakData:init()
 	self:_init_acoustics()
+	self:_init_criminals_sound()
 end
 
 function SoundTweakData:_init_acoustics()
@@ -46,4 +47,11 @@ function SoundTweakData:_init_acoustics()
 	self.acoustics.pd2_acoustics_tunnel_medium.states = {
 		acoustic_flag = "acoustic_tunnel_medium"
 	}
+end
+
+function SoundTweakData:_init_criminals_sound()
+	self.criminal_sound = {}
+	self.criminal_sound.ai_callout_cooldown = 15
+	self.criminal_sound.combat_callout_delay = {10, 0.5}
+	self.criminal_sound.combat_callout_chance = {0.005, 0.05}
 end

@@ -275,6 +275,8 @@ function PlayerDamage:force_into_bleedout(can_activate_berserker)
 end
 
 function PlayerDamage:update(unit, t, dt)
+	self:_check_update_max_health()
+	self:_check_update_max_armor()
 	self:_update_can_take_dmg_timer(dt)
 	self:_update_regen_on_the_side(dt)
 	if not self._armor_stored_health_max_set then
@@ -615,22 +617,26 @@ function PlayerDamage:get_real_armor()
 	return Application:digest_value(self._armor, false)
 end
 
+function PlayerDamage:_check_update_max_health()
+	local max_health = self:_max_health()
+	self._current_max_health = self._current_max_health or self:_max_health()
+	if self._current_max_health ~= max_health then
+		local ratio = max_health / self._current_max_health
+		self._health = Application:digest_value(math.clamp(self:get_real_health() * ratio, 0, max_health), true)
+		print("[PlayerDamage] new max health", self._current_max_health, "->", max_health)
+		self._current_max_health = max_health
+		self:update_armor_stored_health()
+	end
+end
+
 function PlayerDamage:change_health(change_of_health)
 	return self:set_health(self:get_real_health() + change_of_health)
 end
 
 function PlayerDamage:set_health(health)
+	self:_check_update_max_health()
 	local max_health = self:_max_health() * self._max_health_reduction
 	health = math.min(health, max_health)
-	self._current_max_health = self._current_max_health or max_health
-	if self._current_max_health ~= max_health then
-		local prev_health_ratio = health / self._current_max_health
-		local new_health_ratio = health / max_health
-		local diff_health_ratio = prev_health_ratio - new_health_ratio
-		health = health + math.max(0, diff_health_ratio * max_health)
-		self._current_max_health = max_health
-		self:update_armor_stored_health()
-	end
 	local prev_health = self._health and Application:digest_value(self._health, false) or health
 	self._health = Application:digest_value(math.clamp(health, 0, max_health), true)
 	self:_send_set_health()
@@ -646,11 +652,24 @@ function PlayerDamage:set_health(health)
 	return prev_health ~= Application:digest_value(self._health, false)
 end
 
+function PlayerDamage:_check_update_max_armor()
+	local max_armor = self:_max_armor()
+	self._current_max_armor = self._current_max_armor or self:_max_armor()
+	if self._current_max_armor ~= max_armor then
+		local ratio = max_armor / self._current_max_armor
+		self._current_armor_fill = self._current_armor_fill * ratio
+		self._armor = Application:digest_value(math.clamp(self:get_real_armor() * ratio, 0, max_armor), true)
+		print("[PlayerDamage] new max armor", self._current_max_armor, "->", max_armor)
+		self._current_max_armor = max_armor
+	end
+end
+
 function PlayerDamage:change_armor(change)
 	self:set_armor(self:get_real_armor() + change)
 end
 
 function PlayerDamage:set_armor(armor)
+	self:_check_update_max_armor()
 	armor = math.clamp(armor, 0, self:_max_armor())
 	if self._armor then
 		local current_armor = self:get_real_armor()
@@ -832,6 +851,29 @@ function PlayerDamage:damage_bullet(attack_data)
 	if 0 < hostage_absorption then
 		attack_data.damage = math.max(0, attack_data.damage - hostage_absorption)
 	end
+	if self._god_mode then
+		if attack_data.damage > 0 then
+			self:_send_damage_drama(attack_data, attack_data.damage)
+		end
+		self:_call_listeners(damage_info)
+		return
+	elseif self._invulnerable or self._mission_damage_blockers.invulnerable then
+		self:_call_listeners(damage_info)
+		return
+	elseif self:incapacitated() then
+		return
+	elseif self:is_friendly_fire(attack_data.attacker_unit) then
+		return
+	elseif self:_chk_dmg_too_soon(attack_data.damage) then
+		return
+	elseif self._unit:movement():current_state().immortal then
+		return
+	elseif self._revive_miss and math.random() < self._revive_miss then
+		self:play_whizby(attack_data.col_ray.position)
+		return
+	end
+	self._last_received_dmg = attack_data.damage
+	self._next_allowed_dmg_t = Application:digest_value(pm:player_timer():time() + self._dmg_interval, true)
 	local dodge_roll = math.rand(1)
 	local dodge_value = tweak_data.player.damage.DODGE_INIT or 0
 	local armor_dodge_chance = pm:body_armor_value("dodge")
@@ -855,27 +897,6 @@ function PlayerDamage:damage_bullet(attack_data)
 		self._next_allowed_dmg_t = Application:digest_value(pm:player_timer():time() + self._dmg_interval, true)
 		self._last_received_dmg = attack_data.damage
 		managers.player:send_message(Message.OnPlayerDodge)
-		return
-	end
-	if self._god_mode then
-		if attack_data.damage > 0 then
-			self:_send_damage_drama(attack_data, attack_data.damage)
-		end
-		self:_call_listeners(damage_info)
-		return
-	elseif self._invulnerable or self._mission_damage_blockers.invulnerable then
-		self:_call_listeners(damage_info)
-		return
-	elseif self:incapacitated() then
-		return
-	elseif self:is_friendly_fire(attack_data.attacker_unit) then
-		return
-	elseif self:_chk_dmg_too_soon(attack_data.damage) then
-		return
-	elseif self._unit:movement():current_state().immortal then
-		return
-	elseif self._revive_miss and math.random() < self._revive_miss then
-		self:play_whizby(attack_data.col_ray.position)
 		return
 	end
 	if attack_data.attacker_unit:base()._tweak_table == "tank" then
@@ -914,8 +935,6 @@ function PlayerDamage:damage_bullet(attack_data)
 		attack_data.damage = attack_data.damage * armor_reduction_multiplier
 	end
 	health_subtracted = health_subtracted + self:_calc_health_damage(attack_data)
-	self._next_allowed_dmg_t = Application:digest_value(pm:player_timer():time() + self._dmg_interval, true)
-	self._last_received_dmg = health_subtracted
 	if not self._bleed_out and 0 < health_subtracted then
 		self:_send_damage_drama(attack_data, health_subtracted)
 	elseif self._bleed_out and attack_data.attacker_unit and attack_data.attacker_unit:alive() and attack_data.attacker_unit:base()._tweak_table == "tank" then
@@ -1127,8 +1146,6 @@ function PlayerDamage:damage_fall(data)
 end
 
 function PlayerDamage:damage_explosion(attack_data)
-	print("[Debug] PlayerDamage:damage_explosion")
-	Application:stack_dump()
 	if not self:_chk_can_take_dmg() then
 		return
 	end
@@ -1775,6 +1792,7 @@ function PlayerDamage:_upd_health_regen(t, dt)
 		local max_health = self:_max_health()
 		if max_health > self:get_real_health() then
 			self:restore_health(managers.player:health_regen(), false)
+			self:restore_health(managers.player:fixed_health_regen(self:health_ratio()), true)
 			self._health_regen_update_timer = 5
 		end
 	end

@@ -87,7 +87,40 @@ function TeamAILogicTravel.exit(data, new_logic_name, enter_params)
 	data.brain:rem_pos_rsrv("path")
 end
 
+function TeamAILogicTravel.check_inspire(data, attention)
+	if not attention then
+		return
+	end
+	local range_sq = 810000
+	local pos = data.unit:position()
+	local target = attention.unit:position()
+	local dist = mvector3.distance_sq(pos, target)
+	if range_sq > dist then
+		data.unit:brain():set_objective()
+		data.unit:sound():say("f36x_any", true, false)
+		local cooldown = managers.player:crew_ability_upgrade_value("crew_inspire", 360)
+		managers.player:start_custom_cooldown("team", "crew_inspire", cooldown)
+		TeamAILogicTravel.actually_revive(data, attention.unit, true)
+		local skip_alert = managers.groupai:state():whisper_mode()
+		if not skip_alert then
+			local alert_rad = 500
+			local new_alert = {
+				"vo_cbt",
+				data.unit:movement():m_head_pos(),
+				alert_rad,
+				data.SO_access,
+				data.unit
+			}
+			managers.groupai:state():propagate_alert(new_alert)
+		end
+	end
+end
+
 function TeamAILogicTravel.update(data)
+	if data.objective.type == "revive" and managers.player:is_custom_cooldown_not_active("team", "crew_inspire") then
+		local attention = data.detected_attention_objects[data.objective.follow_unit:key()]
+		TeamAILogicTravel.check_inspire(data, attention)
+	end
 	return CopLogicTravel.upd_advance(data)
 end
 

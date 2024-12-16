@@ -2320,12 +2320,13 @@ function GroupAIStateBase:spawn_one_teamAI(is_drop_in, char_name, pos, rotation,
 		local unit_folder = lvl_tweak_data and lvl_tweak_data.unit_suit or "suit"
 		local ai_character_id = managers.criminals:character_static_data_by_name(character_name).ai_character_id
 		local unit_name = Idstring(tweak_data.blackmarket.characters[ai_character_id].npc_unit)
+		local loadout = managers.criminals:_reserve_loadout_for(character_name)
 		local unit = World:spawn_unit(unit_name, spawn_pos, spawn_rot)
-		managers.network:session():send_to_peers_synched("set_unit", unit, character_name, "", 0, 0, tweak_data.levels:get_default_team_ID("player"))
+		managers.network:session():send_to_peers_synched("set_unit", unit, character_name, managers.blackmarket:henchman_loadout_string_from_loadout(loadout), 0, 0, tweak_data.levels:get_default_team_ID("player"))
 		if char_name and not is_drop_in then
-			managers.criminals:set_unit(character_name, unit)
+			managers.criminals:set_unit(character_name, unit, loadout)
 		else
-			managers.criminals:add_character(character_name, unit, nil, true)
+			managers.criminals:add_character(character_name, unit, nil, true, loadout)
 		end
 		unit:movement():set_character_anim_variables()
 		unit:brain():set_spawn_ai({
@@ -3197,13 +3198,15 @@ function GroupAIStateBase:chk_say_teamAI_combat_chatter(unit)
 	end
 	local drama_amount = self._drama_data.amount
 	local frequency_lerp = drama_amount
-	local delay = math.lerp(5, 0.5, frequency_lerp)
+	local delay_tweak = tweak_data.sound.criminal_sound.combat_callout_delay
+	local delay = math.lerp(delay_tweak[1], delay_tweak[2], frequency_lerp)
 	local delay_t = self._teamAI_last_combat_chatter_t + delay
 	if delay_t > self._t then
 		return
 	end
 	local frequency_lerp_clamp = math.clamp(frequency_lerp ^ 2, 0, 1)
-	local chance = math.lerp(0.01, 0.1, frequency_lerp_clamp)
+	local chance_tweak = tweak_data.sound.criminal_sound.combat_callout_chance
+	local chance = math.lerp(chance_tweak[1], chance_tweak[2], frequency_lerp_clamp)
 	if chance < math.random() then
 		return
 	end
@@ -4819,6 +4822,13 @@ function GroupAIStateBase:_get_balancing_multiplier(balance_multipliers)
 			nr_players = nr_players + 1
 		end
 	end
+	local nr_ai = 0
+	for u_key, u_data in pairs(self:all_AI_criminals()) do
+		if not u_data.status then
+			nr_ai = nr_ai + 1
+		end
+	end
+	nr_players = nr_players == 1 and nr_players + math.max(0, nr_ai - 1) or nr_players + nr_ai
 	nr_players = math.clamp(nr_players, 1, 4)
 	return balance_multipliers[nr_players]
 end

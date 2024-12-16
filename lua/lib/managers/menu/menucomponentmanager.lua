@@ -13,6 +13,7 @@ require("lib/managers/menu/CrimeNetCasinoGui")
 require("lib/managers/menu/MenuSceneGui")
 require("lib/managers/menu/PlayerProfileGuiObject")
 require("lib/managers/menu/IngameContractGui")
+require("lib/managers/menu/IngameWaitingGui")
 require("lib/managers/menu/IngameManualGui")
 require("lib/managers/menu/PrePlanningMapGui")
 require("lib/managers/menu/GameInstallingGui")
@@ -43,6 +44,7 @@ require("lib/managers/menu/StageEndScreenTabCrimeSpree")
 require("lib/managers/menu/IngameContractGuiCrimeSpree")
 require("lib/managers/menu/CrimeSpreeContractBoxGui")
 require("lib/managers/menu/LobbyCharacterData")
+require("lib/managers/menu/CrewManagementGui")
 MenuComponentManager = MenuComponentManager or class()
 
 function MenuComponentManager:init()
@@ -162,6 +164,10 @@ function MenuComponentManager:init()
 		create = callback(self, self, "_create_ingame_contract_gui"),
 		close = callback(self, self, "close_ingame_contract_gui")
 	}
+	self._active_components.ingame_waiting = {
+		create = callback(self, self, "_create_ingame_waiting_gui"),
+		close = callback(self, self, "close_ingame_waiting_gui")
+	}
 	self._active_components.ingame_manual = {
 		create = callback(self, self, "_create_ingame_manual_gui"),
 		close = callback(self, self, "close_ingame_manual_gui")
@@ -237,6 +243,10 @@ function MenuComponentManager:init()
 	self._active_components.debug_quicklaunch = {
 		create = callback(self, self, "create_debug_quicklaunch_gui"),
 		close = callback(self, self, "close_debug_quicklaunch_gui")
+	}
+	self._active_components.crew_management = {
+		create = callback(self, self, "create_crew_management_gui"),
+		close = callback(self, self, "close_crew_management_gui")
 	}
 	self._alive_components = {}
 end
@@ -815,6 +825,9 @@ function MenuComponentManager:next_page()
 	if self._player_inventory_gui and self._player_inventory_gui:next_page() then
 		return true
 	end
+	if self._crimenet_contract_gui and self._crimenet_contract_gui:next_page() then
+		return true
+	end
 	local used, values = self:run_return_on_all_live_components("next_page")
 	if used then
 		return unpack(values)
@@ -853,6 +866,9 @@ function MenuComponentManager:previous_page()
 		return true
 	end
 	if self._player_inventory_gui and self._player_inventory_gui:previous_page() then
+		return true
+	end
+	if self._crimenet_contract_gui and self._crimenet_contract_gui:previous_page() then
 		return true
 	end
 	local used, values = self:run_return_on_all_live_components("previous_page")
@@ -2750,6 +2766,28 @@ function MenuComponentManager:close_ingame_contract_gui()
 	end
 end
 
+function MenuComponentManager:_create_ingame_waiting_gui()
+	self:create_ingame_waiting_gui()
+end
+
+function MenuComponentManager:create_ingame_waiting_gui()
+	if not Network:is_server() then
+		return
+	end
+	self:close_ingame_waiting_gui()
+	self._ingame_waiting_gui = IngameWaitingGui:new(self._ws)
+	self._ingame_waiting_gui:set_layer(tweak_data.gui.MENU_COMPONENT_LAYER)
+	self:register_component("ingame_waiting", self._ingame_waiting_gui)
+end
+
+function MenuComponentManager:close_ingame_waiting_gui()
+	if self._ingame_waiting_gui then
+		self._ingame_waiting_gui:close()
+		self._ingame_waiting_gui = nil
+		self:unregister_component("ingame_waiting")
+	end
+end
+
 function MenuComponentManager:_create_profile_gui()
 	if self._profile_gui then
 		self._profile_gui:set_enabled(true)
@@ -4056,4 +4094,20 @@ function MenuComponentManager:create_debug_quicklaunch_gui(node)
 end
 
 function MenuComponentManager:close_debug_quicklaunch_gui()
+end
+
+function MenuComponentManager:create_crew_management_gui(node)
+	if not node then
+		return
+	end
+	self._crew_management_gui = self._crew_management_gui or CrewManagementGui:new(self._ws, self._fullscreen_ws, node)
+	self:register_component("crew_management", self._crew_management_gui)
+end
+
+function MenuComponentManager:close_crew_management_gui()
+	if self._crew_management_gui then
+		self._crew_management_gui:close()
+		self._crew_management_gui = nil
+		self:unregister_component("crew_management")
+	end
 end

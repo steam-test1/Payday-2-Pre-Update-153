@@ -592,7 +592,10 @@ function MenuInput:update(t, dt)
 					"menu_challenge_claim",
 					"menu_edit_skin",
 					"menu_change_profile_right",
-					"menu_change_profile_left"
+					"menu_change_profile_left",
+					"drop_in_accept",
+					"drop_in_return",
+					"drop_in_kick"
 				}
 				for _, button in ipairs(special_btns) do
 					if self._accept_input and self._controller then

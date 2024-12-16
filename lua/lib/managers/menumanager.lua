@@ -2188,7 +2188,8 @@ function MenuCallbackHandler:toggle_push_to_talk(item)
 end
 
 function MenuCallbackHandler:toggle_team_AI(item)
-	Global.game_settings.team_ai = item:value() == "on"
+	Global.game_settings.team_ai = item:value() ~= 0
+	Global.game_settings.team_ai_option = item:value()
 	managers.groupai:state():on_criminal_team_AI_enabled_state_changed()
 end
 
@@ -2641,13 +2642,14 @@ function MenuCallbackHandler:choice_lobby_reputation_permission(item)
 end
 
 function MenuCallbackHandler:choice_team_ai(item)
-	local team_ai = item:value() == "on"
-	Global.game_settings.team_ai = team_ai
+	Global.game_settings.team_ai = item:value() ~= 0
+	Global.game_settings.team_ai_option = item:value()
 end
 
 function MenuCallbackHandler:choice_drop_in(item)
-	local choice_drop_in = item:value() == "on"
-	Global.game_settings.drop_in_allowed = choice_drop_in
+	local choice_drop_in = item:value()
+	Global.game_settings.drop_in_allowed = choice_drop_in ~= 0
+	Global.game_settings.drop_in_option = choice_drop_in
 	self:update_matchmake_attributes()
 	if managers.network:session() then
 		managers.network:session():chk_server_joinable_state()
@@ -2670,8 +2672,8 @@ function MenuCallbackHandler:choice_crimenet_lobby_reputation_permission(item)
 end
 
 function MenuCallbackHandler:choice_crimenet_team_ai(item)
-	local team_ai = item:value() == "on"
-	Global.game_settings.team_ai = team_ai
+	Global.game_settings.team_ai = item:value() ~= 0
+	Global.game_settings.team_ai_option = item:value()
 	self:_on_host_setting_updated()
 end
 
@@ -2681,8 +2683,9 @@ function MenuCallbackHandler:choice_crimenet_auto_kick(item)
 end
 
 function MenuCallbackHandler:choice_crimenet_drop_in(item)
-	local choice_drop_in = item:value() == "on"
-	Global.game_settings.drop_in_allowed = choice_drop_in
+	local choice_drop_in = item:value()
+	Global.game_settings.drop_in_allowed = choice_drop_in ~= 0
+	Global.game_settings.drop_in_option = choice_drop_in
 	if managers.network:session() then
 		managers.network:session():chk_server_joinable_state()
 	end
@@ -2718,7 +2721,7 @@ function MenuCallbackHandler:get_matchmake_attributes()
 	local difficulty_id = tweak_data:difficulty_to_index(Global.game_settings.difficulty)
 	local permission_id = tweak_data:permission_to_index(Global.game_settings.permission)
 	local min_lvl = Global.game_settings.reputation_permission or 0
-	local drop_in = Global.game_settings.drop_in_allowed and 1 or 0
+	local drop_in = Global.game_settings.drop_in_option
 	local job_id = tweak_data.narrative:get_index_from_job_id(managers.job:current_real_job_id())
 	local attributes = {
 		numbers = {
@@ -2783,6 +2786,7 @@ end
 
 function MenuCallbackHandler:play_short_heist(item)
 	Global.game_settings.team_ai = true
+	Global.game_settings.team_ai_option = 2
 	self:play_single_player()
 	self:start_single_player_job({
 		job_id = item and item:parameters().job or "short",
@@ -3235,6 +3239,14 @@ end
 function MenuCallbackHandler:view_invites()
 	print("View invites")
 	print(PSN:display_message_invitation())
+end
+
+function MenuCallbackHandler:waiting_players_visible(item)
+	return #managers.wait:list_of_waiting() > 0
+end
+
+function MenuCallbackHandler:show_waiting_players(item)
+	managers.wait:spawn_all_waiting()
 end
 
 function MenuCallbackHandler:kick_player(item)
@@ -4863,13 +4875,13 @@ function LobbyOptionInitiator:modify_node(node)
 	if item_permission_campaign then
 		item_permission_campaign:set_value(Global.game_settings.permission)
 	end
-	local item_lobby_toggle_drop_in = node:item("toggle_drop_in")
-	if item_lobby_toggle_drop_in then
-		item_lobby_toggle_drop_in:set_value(Global.game_settings.drop_in_allowed and "on" or "off")
+	local item_lobby_drop_in_option = node:item("lobby_drop_in_option")
+	if item_lobby_drop_in_option then
+		item_lobby_drop_in_option:set_value(Global.game_settings.drop_in_option)
 	end
 	local item_lobby_toggle_ai = node:item("toggle_ai")
 	if item_lobby_toggle_ai then
-		item_lobby_toggle_ai:set_value(Global.game_settings.team_ai and "on" or "off")
+		item_lobby_toggle_ai:set_value(Global.game_settings.team_ai and Global.game_settings.team_ai_option or 0)
 	end
 	local item_lobby_toggle_auto_kick = node:item("toggle_auto_kick")
 	if item_lobby_toggle_auto_kick then
@@ -4939,7 +4951,10 @@ MenuCustomizeControllerCreator.CONTROLS = {
 	"vehicle_rear_camera",
 	"vehicle_shooting_stance",
 	"vehicle_exit",
-	"toggle_hud"
+	"toggle_hud",
+	"drop_in_accept",
+	"drop_in_return",
+	"drop_in_kick"
 }
 MenuCustomizeControllerCreator.AXIS_ORDERED = {
 	move = {
@@ -5103,6 +5118,18 @@ MenuCustomizeControllerCreator.CONTROLS_INFO.vehicle_exit = {
 	text_id = "menu_button_vehicle_exit",
 	category = "vehicle"
 }
+MenuCustomizeControllerCreator.CONTROLS_INFO.drop_in_accept = {
+	text_id = "menu_button_drop_in_accept",
+	category = "normal"
+}
+MenuCustomizeControllerCreator.CONTROLS_INFO.drop_in_return = {
+	text_id = "menu_button_drop_in_return",
+	category = "normal"
+}
+MenuCustomizeControllerCreator.CONTROLS_INFO.drop_in_kick = {
+	text_id = "menu_button_drop_in_kick",
+	category = "normal"
+}
 
 function MenuCustomizeControllerCreator.controls_info_by_category(category)
 	local t = {}
@@ -5206,15 +5233,15 @@ MenuCrimeNetContractInitiator = MenuCrimeNetContractInitiator or class()
 function MenuCrimeNetContractInitiator:modify_node(original_node, data)
 	local node = deep_clone(original_node)
 	if Global.game_settings.single_player then
-		node:item("toggle_ai"):set_value(Global.game_settings.team_ai and "on" or "off")
+		node:item("toggle_ai"):set_value(Global.game_settings.team_ai and Global.game_settings.team_ai_option or 0)
 	elseif data.smart_matchmaking then
 	elseif not data.server then
 		node:item("lobby_job_plan"):set_value(Global.game_settings.job_plan)
 		node:item("lobby_kicking_option"):set_value(Global.game_settings.kick_option)
 		node:item("lobby_permission"):set_value(Global.game_settings.permission)
 		node:item("lobby_reputation_permission"):set_value(Global.game_settings.reputation_permission)
-		node:item("toggle_drop_in"):set_value(Global.game_settings.drop_in_allowed and "on" or "off")
-		node:item("toggle_ai"):set_value(Global.game_settings.team_ai and "on" or "off")
+		node:item("lobby_drop_in_option"):set_value(Global.game_settings.drop_in_option)
+		node:item("toggle_ai"):set_value(Global.game_settings.team_ai and Global.game_settings.team_ai_option or 0)
 		node:item("toggle_auto_kick"):set_value(Global.game_settings.auto_kick and "on" or "off")
 		if tweak_data.quickplay.stealth_levels[data.job_id] then
 			local job_plan_item = node:item("lobby_job_plan")

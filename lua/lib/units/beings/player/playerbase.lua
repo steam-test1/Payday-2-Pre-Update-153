@@ -34,6 +34,10 @@ function PlayerBase:post_init()
 		self._unregistered = true
 	end
 	self._unit:character_damage():post_init()
+	self:update_concealment()
+end
+
+function PlayerBase:update_concealment()
 	local con_mul, index = managers.blackmarket:get_concealment_of_peer(managers.network:session():local_peer())
 	self:set_suspicion_multiplier("equipment", 1 / con_mul)
 	self:set_detection_multiplier("equipment", 1 / con_mul)

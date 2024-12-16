@@ -1248,12 +1248,14 @@ function RaycastWeaponBase:add_ammo(ratio, add_amount_override)
 		else
 			multiplier_min = managers.player:upgrade_value("player", "pick_up_ammo_multiplier", 1)
 			multiplier_min = multiplier_min + (managers.player:upgrade_value("player", "pick_up_ammo_multiplier_2", 1) - 1)
+			multiplier_min = multiplier_min + managers.player:crew_ability_upgrade_value("crew_scavenge", 0)
 		end
 		if ammo_base._ammo_data and ammo_base._ammo_data.ammo_pickup_max_mul then
 			multiplier_max = ammo_base._ammo_data.ammo_pickup_max_mul
 		else
 			multiplier_max = managers.player:upgrade_value("player", "pick_up_ammo_multiplier", 1)
 			multiplier_max = multiplier_max + (managers.player:upgrade_value("player", "pick_up_ammo_multiplier_2", 1) - 1)
+			multiplier_max = multiplier_max + managers.player:crew_ability_upgrade_value("crew_scavenge", 0)
 		end
 		local add_amount = add_amount_override
 		local picked_up = true

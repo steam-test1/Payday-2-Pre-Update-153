@@ -1192,6 +1192,7 @@ function WINDLCManager:init()
 			grv = {app_id = "612900", no_install = true},
 			amp = {app_id = "218620", no_install = true},
 			mp2 = {app_id = "218620", no_install = true},
+			mom = {app_id = "218620", no_install = true},
 			pn2 = {app_id = "618940", no_install = true},
 			max = {app_id = "218620", no_install = true}
 		}

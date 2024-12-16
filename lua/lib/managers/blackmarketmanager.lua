@@ -21,6 +21,12 @@ function BlackMarketManager:_setup()
 	self._defaults.preferred_character = "russian"
 	self._defaults.grenade = "frag"
 	self._defaults.melee_weapon = "weapon"
+	self._defaults.henchman = {
+		mask = "character_locked",
+		primary = nil,
+		ability = nil,
+		skill = nil
+	}
 	if not Global.blackmarket_manager then
 		Global.blackmarket_manager = {}
 		self:_setup_armors()
@@ -1126,6 +1132,138 @@ function BlackMarketManager:outfit_string_from_list(outfit)
 	return s
 end
 
+function BlackMarketManager:henchman_loadout_string(index)
+	return self:henchman_loadout_string_from_loadout(self:henchman_loadout(index))
+end
+
+function BlackMarketManager:henchman_loadout_string_from_loadout(loadout)
+	local function get_string(data, name, ...)
+		if not name or not data then
+			assert(type(data) ~= table, "This shoudln't be a table!")
+			
+			return tostring(data)
+		end
+		return get_string(data[name], ...)
+	end
+	
+	local s = ""
+	s = s .. tostring(loadout.mask)
+	local mask_blueprint = loadout.mask_blueprint
+	if loadout.mask_slot then
+		local crafted = managers.blackmarket:get_crafted_category_slot("masks", loadout.mask_slot)
+		mask_blueprint = crafted and crafted.blueprint
+	end
+	s = s .. " " .. get_string(mask_blueprint, "color", "id")
+	s = s .. " " .. get_string(mask_blueprint, "pattern", "id")
+	s = s .. " " .. get_string(mask_blueprint, "material", "id")
+	s = s .. " " .. tostring(loadout.primary)
+	s = s .. " " .. tostring(loadout.ability)
+	s = s .. " " .. tostring(loadout.skill)
+	return s
+end
+
+function BlackMarketManager:unpack_henchman_loadout_string(string)
+	local rtn = {}
+	local data = string.split(string or "", " ")
+	local index = 1
+	
+	local function get_data()
+		local rtn = data[index]
+		index = index + 1
+		return rtn ~= "nil" and rtn ~= "" and rtn or nil
+	end
+	
+	rtn.mask = get_data()
+	rtn.mask_blueprint = {}
+	rtn.mask_blueprint.color = {}
+	rtn.mask_blueprint.pattern = {}
+	rtn.mask_blueprint.material = {}
+	rtn.mask_blueprint.color.id = get_data() or "nothing"
+	rtn.mask_blueprint.pattern.id = get_data() or "no_color_no_material"
+	rtn.mask_blueprint.material.id = get_data() or "plastic"
+	rtn.primary = get_data()
+	rtn.ability = get_data()
+	rtn.skill = get_data()
+	return rtn
+end
+
+function BlackMarketManager:preferred_henchmen(index)
+	self._global._preferred_henchmen = self._global._preferred_henchmen or {}
+	return not index and self._global._preferred_henchmen or self._global._preferred_henchmen[index]
+end
+
+function BlackMarketManager:set_preferred_henchmen(index, character_name)
+	self._global._preferred_henchmen = self._global._preferred_henchmen or {}
+	local current_num = #self._global._preferred_henchmen
+	index = math.clamp(index, 1, current_num + 1)
+	for i, name in pairs(self._global._preferred_henchmen) do
+		if name == character_name and i ~= index then
+			self:set_preferred_henchmen(i, nil)
+			if i < index then
+				index = math.max(index - 1, 1)
+			end
+		end
+	end
+	if character_name then
+		self._global._preferred_henchmen[index] = character_name
+	elseif current_num >= index then
+		table.remove(self._global._preferred_henchmen, index)
+	end
+end
+
+function BlackMarketManager:buy_crew_item(item)
+	local is_boost = tweak_data.upgrades.crew_skill_definitions[item]
+	local is_ability = tweak_data.upgrades.crew_ability_definitions[item]
+	if not (is_boost or is_ability) or self:is_crew_item_unlocked(item) then
+		Application:error("Failed to buy crew item", item)
+		return
+	end
+	local cost = is_boost and tweak_data.safehouse.prices.crew_boost or tweak_data.safehouse.prices.crew_ability
+	if cost <= managers.custom_safehouse:coins() then
+		managers.blackmarket:_unlock_crew_item(item)
+		managers.custom_safehouse:deduct_coins(cost)
+	end
+end
+
+function BlackMarketManager:crew_item_cost(item)
+	local is_boost = tweak_data.upgrades.crew_skill_definitions[item]
+	local is_ability = tweak_data.upgrades.crew_ability_definitions[item]
+	return is_boost and tweak_data.safehouse.prices.crew_boost or tweak_data.safehouse.prices.crew_ability
+end
+
+function BlackMarketManager:can_afford_crew_item(item)
+	return managers.custom_safehouse:coins() >= self:crew_item_cost(item)
+end
+
+function BlackMarketManager:_unlock_crew_item(item)
+	self._global._unlocked_crew_items = self._global._unlocked_crew_items or {}
+	self._global._unlocked_crew_items[item] = true
+end
+
+function BlackMarketManager:is_crew_item_unlocked(item)
+	return self._global._unlocked_crew_items and self._global._unlocked_crew_items[item]
+end
+
+function BlackMarketManager:_setup_unlocked_crew_items()
+	self._global._unlocked_crew_items = self._global._unlocked_crew_items or {}
+	self:_unlock_crew_item("crew_interact")
+	self:_unlock_crew_item("crew_healthy")
+	self:_unlock_crew_item("crew_sturdy")
+	self:_unlock_crew_item("crew_evasive")
+end
+
+function BlackMarketManager:henchman_loadout(index, should_filter_usage)
+	self._global._selected_henchmen = self._global._selected_henchmen or {}
+	self._global._selected_henchmen[index] = self._global._selected_henchmen[index] or deep_clone(self._defaults.henchman)
+	local loadout = self._global._selected_henchmen[index]
+	return loadout
+end
+
+function BlackMarketManager:reset_henchman_loadout(index)
+	self._global._selected_henchmen = self._global._selected_henchmen or {}
+	self._global._selected_henchmen[index] = nil
+end
+
 function BlackMarketManager:signature()
 	return managers.network.account:inventory_outfit_signature()
 end
@@ -2061,6 +2199,7 @@ function BlackMarketManager:_get_concealment(primary, secondary, armor, melee_we
 	local armor_visibility = self:calculate_armor_visibility(armor)
 	local melee_weapon_visibility = self:calculate_melee_weapon_visibility(melee_weapon)
 	local modifier = modifier or 0
+	modifier = modifier - self:team_visibility_modifiers()
 	local total_visibility = math.clamp(primary_visibility + secondary_visibility + armor_visibility + melee_weapon_visibility + modifier, 1, #stats_tweak_data.concealment)
 	total_visibility = managers.crime_spree:modify_value("BlackMarketManager:GetConcealment", total_visibility)
 	local total_concealment = math.clamp(#stats_tweak_data.concealment - total_visibility, 1, #stats_tweak_data.concealment)
@@ -2176,6 +2315,12 @@ function BlackMarketManager:concealment_modifier(type, upgrade_level)
 	elseif type == "melee_weapons" then
 		modifier = modifier + managers.player:upgrade_value("player", "melee_concealment_modifier", 0)
 	end
+	return modifier
+end
+
+function BlackMarketManager:team_visibility_modifiers()
+	local modifier = 0
+	modifier = modifier + managers.player:upgrade_value("team", "crew_add_concealment", 0)
 	return modifier
 end
 
@@ -5366,6 +5511,7 @@ function BlackMarketManager:reset()
 	self:aquire_default_masks()
 	self:_verfify_equipped()
 	self:_on_reset_unlock_aquired_weapons()
+	self:_setup_unlocked_crew_items()
 	if managers.menu_scene then
 		managers.menu_scene:on_blackmarket_reset()
 	end
@@ -5625,6 +5771,9 @@ function BlackMarketManager:load(data)
 					end
 				end
 			end
+		end
+		if not self._unlocked_crew_items then
+			self:_setup_unlocked_crew_items()
 		end
 		self._refill_global_values = self:_setup_track_global_values() or nil
 		if not self._global._has_given_infamy_clrs then
@@ -6195,6 +6344,107 @@ function BlackMarketManager:_verfify_equipped()
 	self:_verfify_equipped_category("armors")
 	self:_verfify_equipped_category("grenades")
 	self:_verfify_equipped_category("melee_weapons")
+	self:verfify_crew_loadout()
+end
+
+function BlackMarketManager:verfify_crew_loadout()
+	if not self._global._selected_henchmen then
+		return
+	end
+	for k, v in pairs(self._global._selected_henchmen) do
+		v.skill = self:verify_has_crew_skill(v.skill) and v.skill or self._defaults.henchman.skill
+		v.ability = self:verify_has_crew_ability(v.ability) and v.ability or self._defaults.henchman.ability
+		local valid = self:_verify_crew_weapon("primaries", v.primary, v.primary_slot)
+		v.primary_slot = valid and v.primary_slot or nil
+		v.primary = valid and v.primary or self._defaults.henchman.primary
+		local valid = self:_verify_crew_mask(v.mask, v.mask_slot)
+		v.mask_slot = valid and v.mask_slot or nil
+		v.mask = valid and v.mask or self._defaults.henchman.mask
+	end
+end
+
+function BlackMarketManager:verfify_recived_crew_loadout(loadout, mark_host_as_cheater)
+	local weapon_id = loadout.primary and managers.weapon_factory:get_weapon_id_by_factory_id(loadout.primary)
+	local weapon_passed = self:is_weapon_allowed_for_crew(weapon_id)
+	local skill_passed = self:verify_is_crew_skill(loadout.skill)
+	local ability_passed = self:verify_is_crew_ability(loadout.ability)
+	loadout.skill = skill_passed and loadout.skill or nil
+	loadout.ability = ability_passed and loadout.ability or nil
+	loadout.primary = weapon_passed and loadout.primary or nil
+	local passed = weapon_passed and skill_passed and ability_passed
+	if not passed and mark_host_as_cheater then
+		local session = managers.network and managers.network:session()
+		if session and session:server_peer() then
+			session:server_peer():mark_cheater(VoteManager.REASON.invalid_henchmen)
+		end
+	end
+	return passed
+end
+
+function BlackMarketManager:verify_has_crew_skill(name)
+	if not name then
+		return true
+	end
+	return self:verify_is_crew_skill(name) and self:is_crew_item_unlocked(name)
+end
+
+function BlackMarketManager:verify_has_crew_ability(name)
+	if not name then
+		return true
+	end
+	return self:verify_is_crew_ability(name) and self:is_crew_item_unlocked(name)
+end
+
+function BlackMarketManager:verify_is_crew_skill(name)
+	if not name then
+		return true
+	end
+	return not not tweak_data.upgrades.crew_skill_definitions[name]
+end
+
+function BlackMarketManager:verify_is_crew_ability(name)
+	if not name then
+		return true
+	end
+	return not not tweak_data.upgrades.crew_ability_definitions[name]
+end
+
+function BlackMarketManager:_verify_crew_mask(npc_mask_id, slot)
+	if not npc_mask_id or not slot then
+		return
+	end
+	local found = managers.blackmarket:get_crafted_category_slot("masks", slot)
+	local mask_id = found and found.mask_id
+	return mask_id == npc_mask_id
+end
+
+function BlackMarketManager:_verify_crew_weapon(category, npc_factory_id, slot)
+	if not npc_factory_id or not slot then
+		return
+	end
+	local found = managers.blackmarket:get_crafted_category_slot(category, slot)
+	local npc_name = found and found.factory_id .. "_npc"
+	return npc_name == npc_factory_id and self:is_weapon_allowed_for_crew(found.weapon_id)
+end
+
+function BlackMarketManager:is_weapon_allowed_for_crew(weapon_id)
+	if weapon_id == nil then
+		return true
+	end
+	local data = tweak_data.weapon[weapon_id]
+	return data and self:is_weapon_category_allowed_for_crew(data.categories[1]) or false
+end
+
+local ALLOWED_CREW_WEAPON_CATEGORIES = {
+	assault_rifle = true,
+	shotgun = true,
+	snp = true,
+	lmg = true,
+	smg = true
+}
+
+function BlackMarketManager:is_weapon_category_allowed_for_crew(weapon_category)
+	return not not ALLOWED_CREW_WEAPON_CATEGORIES[weapon_category]
 end
 
 function BlackMarketManager:_verfify_equipped_category(category)

@@ -653,14 +653,14 @@ function MenuCrimeNetCrimeSpreeContractInitiator:modify_node(original_node, data
 	local node = deep_clone(original_node)
 	print("MenuCrimeNetCrimeSpreeContractInitiator:modify_node", original_node, data)
 	if Global.game_settings.single_player then
-		node:item("toggle_ai"):set_value(Global.game_settings.team_ai and "on" or "off")
+		node:item("toggle_ai"):set_value(Global.game_settings.team_ai and Global.game_settings.team_ai_option or 0)
 	elseif data.smart_matchmaking then
 	elseif data.id == "crime_spree" then
 		node:item("lobby_kicking_option"):set_value(Global.game_settings.kick_option)
 		node:item("lobby_permission"):set_value(Global.game_settings.permission)
 		node:item("lobby_reputation_permission"):set_value(Global.game_settings.reputation_permission)
-		node:item("toggle_drop_in"):set_value(Global.game_settings.drop_in_allowed and "on" or "off")
-		node:item("toggle_ai"):set_value(Global.game_settings.team_ai and "on" or "off")
+		node:item("lobby_drop_in_option"):set_value(Global.game_settings.drop_in_option)
+		node:item("toggle_ai"):set_value(Global.game_settings.team_ai and Global.game_settings.team_ai_option or 0)
 		node:item("toggle_auto_kick"):set_value(Global.game_settings.auto_kick and "on" or "off")
 		if tweak_data.quickplay.stealth_levels[data.job_id] then
 			local job_plan_item = node:item("lobby_job_plan")

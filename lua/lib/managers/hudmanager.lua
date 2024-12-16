@@ -65,7 +65,11 @@ function HUDManager:init()
 	self._disabled = Global.hud_disabled
 	self._controller = managers.controller:create_controller("HUDManager", nil, false)
 	self._controller:add_trigger("toggle_hud", callback(self, self, "_toggle_hud_callback"))
+	self._controller:add_trigger("drop_in_accept", callback(self, self, "_drop_in_input_callback", "drop_in_accept"))
+	self._controller:add_trigger("drop_in_return", callback(self, self, "_drop_in_input_callback", "drop_in_return"))
+	self._controller:add_trigger("drop_in_kick", callback(self, self, "_drop_in_input_callback", "drop_in_kick"))
 	self._controller:enable()
+	self._waiting_index = {}
 end
 
 function HUDManager:destroy()
@@ -80,6 +84,12 @@ function HUDManager:_toggle_hud_callback()
 		managers.hud:set_enabled()
 	else
 		managers.hud:set_disabled()
+	end
+end
+
+function HUDManager:_drop_in_input_callback(binding_str)
+	if self._waiting_legend then
+		self._waiting_legend:on_input(binding_str)
 	end
 end
 
@@ -611,15 +621,21 @@ function HUDManager:_update_name_labels(t, dt)
 	local cam_pos = managers.viewport:get_current_camera_position()
 	local cam_rot = managers.viewport:get_current_camera_rotation()
 	mrotation.y(cam_rot, nl_cam_forward)
+	local to_remove = {}
 	local panel
 	for _, data in ipairs(self._hud.name_labels) do
 		local label_panel = data.panel
 		panel = panel or label_panel:parent()
 		local pos
 		if data.movement then
-			pos = data.movement:m_pos()
-			mvector3.set(nl_w_pos, pos)
-			mvector3.set_z(nl_w_pos, mvector3.z(data.movement:m_head_pos()) + 30)
+			if not alive(data.movement._unit) then
+				label_panel:set_visible(false)
+				to_remove[data.id] = true
+			else
+				pos = data.movement:m_pos()
+				mvector3.set(nl_w_pos, pos)
+				mvector3.set_z(nl_w_pos, mvector3.z(data.movement:m_head_pos()) + 30)
+			end
 		elseif data.vehicle then
 			if not alive(data.vehicle) then
 				return
@@ -628,38 +644,43 @@ function HUDManager:_update_name_labels(t, dt)
 			mvector3.set(nl_w_pos, pos)
 			mvector3.set_z(nl_w_pos, pos.z + data.vehicle:vehicle_driving().hud_label_offset)
 		end
-		mvector3.set(nl_pos, self._workspace:world_to_screen(cam, nl_w_pos))
-		mvector3.set(nl_dir, nl_w_pos)
-		mvector3.subtract(nl_dir, cam_pos)
-		mvector3.set(nl_dir_normalized, nl_dir)
-		mvector3.normalize(nl_dir_normalized)
-		local dot = mvector3.dot(nl_cam_forward, nl_dir_normalized)
-		if dot < 0 or panel:outside(mvector3.x(nl_pos), mvector3.y(nl_pos)) then
-			if label_panel:visible() then
-				label_panel:set_visible(false)
-			end
-		else
-			label_panel:set_alpha(in_steelsight and math.clamp((1 - dot) * 100, 0, 1) or 1)
-			label_panel:set_visible(true)
-			if mvector3.distance_sq(cam_pos, nl_w_pos) < 250000 then
-				label_panel:set_visible(true)
+		if pos then
+			mvector3.set(nl_pos, self._workspace:world_to_screen(cam, nl_w_pos))
+			mvector3.set(nl_dir, nl_w_pos)
+			mvector3.subtract(nl_dir, cam_pos)
+			mvector3.set(nl_dir_normalized, nl_dir)
+			mvector3.normalize(nl_dir_normalized)
+			local dot = mvector3.dot(nl_cam_forward, nl_dir_normalized)
+			if dot < 0 or panel:outside(mvector3.x(nl_pos), mvector3.y(nl_pos)) then
+				if label_panel:visible() then
+					label_panel:set_visible(false)
+				end
 			else
-				if 0.925 < dot then
+				label_panel:set_alpha(in_steelsight and math.clamp((1 - dot) * 100, 0, 1) or 1)
+				label_panel:set_visible(true)
+				if mvector3.distance_sq(cam_pos, nl_w_pos) < 250000 then
+					label_panel:set_visible(true)
 				else
+					if 0.925 < dot then
+					else
+					end
 				end
 			end
-		end
-		if data.movement then
-			if data.movement.current_state_name and data.movement:current_state_name() == "driving" then
-				label_panel:set_visible(false)
-			elseif data.movement.vehicle_seat and data.movement.vehicle_seat.occupant ~= nil then
-				label_panel:set_visible(false)
+			if data.movement then
+				if data.movement.current_state_name and data.movement:current_state_name() == "driving" then
+					label_panel:set_visible(false)
+				elseif data.movement.vehicle_seat and data.movement.vehicle_seat.occupant ~= nil then
+					label_panel:set_visible(false)
+				end
+			end
+			local offset = data.panel:child("cheater"):h() / 2
+			if label_panel:visible() then
+				label_panel:set_center(nl_pos.x, nl_pos.y - offset)
 			end
 		end
-		local offset = data.panel:child("cheater"):h() / 2
-		if label_panel:visible() then
-			label_panel:set_center(nl_pos.x, nl_pos.y - offset)
-		end
+	end
+	for id, _ in pairs(to_remove) do
+		self:_remove_name_label(id)
 	end
 end
 

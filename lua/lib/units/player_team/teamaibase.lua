@@ -26,6 +26,7 @@ function TeamAIBase:arrest_settings()
 end
 
 function TeamAIBase:pre_destroy(unit)
+	self:remove_upgrades()
 	self:unregister()
 	UnitBase.pre_destroy(self, unit)
 	unit:brain():pre_destroy(unit)
@@ -34,9 +35,55 @@ function TeamAIBase:pre_destroy(unit)
 	unit:character_damage():pre_destroy()
 end
 
+function TeamAIBase:set_loadout(loadout)
+	if self._loadout then
+		self:remove_upgrades()
+	end
+	local aquire = function(item)
+		local definition = tweak_data.upgrades.crew_skill_definitions[item] or {
+			upgrades = item and {
+				{category = "team", upgrade = item}
+			} or {}
+		}
+		for _, v in pairs(definition.upgrades) do
+			managers.player:aquire_incremental_upgrade({
+				category = v.category,
+				upgrade = v.upgrade
+			})
+		end
+	end
+	aquire("crew_active")
+	aquire(loadout.ability)
+	aquire(loadout.skill)
+	self._loadout = loadout
+end
+
+function TeamAIBase:remove_upgrades()
+	if self._loadout then
+		local unaquire = function(item)
+			local definition = tweak_data.upgrades.crew_skill_definitions[item] or {
+				upgrades = item and {
+					{category = "team", upgrade = item}
+				} or {}
+			}
+			for _, v in pairs(definition.upgrades) do
+				managers.player:unaquire_incremental_upgrade({
+					category = v.category,
+					upgrade = v.upgrade
+				})
+			end
+		end
+		unaquire("crew_active")
+		unaquire(self._loadout.ability)
+		unaquire(self._loadout.skill)
+		self._loadout = nil
+	end
+end
+
 function TeamAIBase:save(data)
 	data.base = {
-		tweak_table = self._tweak_table
+		tweak_table = self._tweak_table,
+		loadout = managers.criminals:get_loadout_string_for(self._tweak_table)
 	}
 end
 

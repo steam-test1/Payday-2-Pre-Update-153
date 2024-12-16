@@ -12,6 +12,7 @@ BaseNetworkHandler._gamestate_filter = {
 		ingame_incapacitated = true,
 		ingame_waiting_for_players = true,
 		ingame_waiting_for_respawn = true,
+		ingame_waiting_for_spawn_allowed = true,
 		ingame_access_camera = true,
 		ingame_driving = true,
 		ingame_parachuting = true,
@@ -28,6 +29,7 @@ BaseNetworkHandler._gamestate_filter = {
 		ingame_electrified = true,
 		ingame_incapacitated = true,
 		ingame_waiting_for_respawn = true,
+		ingame_waiting_for_spawn_allowed = true,
 		ingame_access_camera = true,
 		ingame_driving = true,
 		ingame_parachuting = true,
@@ -49,6 +51,7 @@ BaseNetworkHandler._gamestate_filter = {
 	any_end_game = {gameoverscreen = true, victoryscreen = true},
 	waiting_for_players = {ingame_waiting_for_players = true},
 	waiting_for_respawn = {ingame_waiting_for_respawn = true},
+	waiting_for_spawn_allowed = {ingame_waiting_for_spawn_allowed = true},
 	menu = {menu_main = true},
 	player_slot = {
 		menu_main = true,

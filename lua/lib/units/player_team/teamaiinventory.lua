@@ -1,4 +1,6 @@
 TeamAIInventory = TeamAIInventory or class(CopInventory)
+TeamAIInventory.add_unit_by_factory_name = HuskPlayerInventory.add_unit_by_factory_name
+TeamAIInventory.add_unit_by_factory_blueprint = HuskPlayerInventory.add_unit_by_factory_blueprint
 
 function TeamAIInventory:preload_mask()
 	local character_name = managers.criminals:character_name_by_unit(self._unit)
@@ -33,6 +35,42 @@ function TeamAIInventory:add_unit_by_name(new_unit_name, equip)
 	new_unit:base():setup(setup_data)
 	self:add_unit(new_unit, equip)
 	new_unit:set_enabled(false)
+end
+
+function TeamAIInventory:add_unit(new_unit, equip)
+	TeamAIInventory.super.add_unit(self, new_unit, equip)
+	if new_unit:base().set_user_is_team_ai then
+		print("Set as team ai")
+		new_unit:base():set_user_is_team_ai(true)
+	end
+	self:_ensure_weapon_visibility(new_unit)
+end
+
+function TeamAIInventory:_ensure_weapon_visibility(override_weapon, override)
+	local show_gun = override or not self._unit:movement():cool()
+	local weapon = override_weapon or self:equipped_unit()
+	weapon:set_enabled(show_gun)
+	weapon:set_visible(show_gun)
+	local base = weapon:base()
+	if base and base.set_visibility_state then
+		local our_stage = show_gun and self._unit:base()._lod_stage or show_gun
+		base:set_visibility_state(show_gun)
+	end
+end
+
+function TeamAIInventory:equip_selection(selection_index, instant)
+	local res = TeamAIInventory.super.equip_selection(self, selection_index, instant)
+	self:_ensure_weapon_visibility()
+	return res
+end
+
+function TeamAIInventory:synch_equipped_weapon(weap_index, blueprint_string, cosmetics_string)
+	local weapon_name = self._get_weapon_name_from_sync_index(weap_index)
+	if type(weapon_name) == "string" then
+		self:add_unit_by_factory_name(weapon_name, true, true, blueprint_string, cosmetics_string or self:cosmetics_string_from_peer(peer, weapon_name))
+		return
+	end
+	self:add_unit_by_name(weapon_name, true, true)
 end
 
 function TeamAIInventory:_unload_mask()

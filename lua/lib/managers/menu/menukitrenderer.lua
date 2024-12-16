@@ -29,6 +29,7 @@ function MenuKitRenderer:show_node(node)
 		to_upper = true
 	}
 	MenuKitRenderer.super.super.show_node(self, node, parameters)
+	self:_update_slots_info()
 end
 
 function MenuKitRenderer:open(...)
@@ -38,6 +39,27 @@ function MenuKitRenderer:open(...)
 	MenuKitRenderer.super.open(self, ...)
 	if self._player_slots then
 		for _, slot in ipairs(self._player_slots) do
+		end
+	end
+end
+
+function MenuKitRenderer:_update_slots_info()
+	print("MenuKitRenderer:_update_slots_info")
+	local kit_menu = managers.menu:get_menu("kit_menu")
+	if kit_menu then
+		local id = managers.network:session():local_peer():id()
+		local criminal_name = managers.network:session():local_peer():character()
+		kit_menu.renderer:set_slot_outfit(id, criminal_name, managers.blackmarket:outfit_string())
+	end
+	for peer_id, peer in pairs(managers.network:session():peers()) do
+		if not peer:loading() and peer:is_streaming_complete() then
+			if peer:waiting_for_player_ready() then
+				self:set_slot_ready(peer, peer_id)
+			else
+				self:set_slot_not_ready(peer, peer_id)
+			end
+		else
+			self:set_slot_joining(peer, peer_id)
 		end
 	end
 end

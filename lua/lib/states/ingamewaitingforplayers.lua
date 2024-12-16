@@ -246,6 +246,7 @@ function IngameWaitingForPlayersState:at_enter()
 	managers.hud:load_hud(self.GUI_FULLSCREEN, false, true, false, {}, nil, nil, true)
 	managers.hud:show(self.GUI_FULLSCREEN)
 	managers.hud._hud_mission_briefing:reload()
+	managers.hud._hud_mission_briefing:show()
 	if not managers.hud:exists(self.PLAYER_HUD) then
 		managers.hud:load_hud(self.PLAYER_HUD, false, false, true, {})
 	end

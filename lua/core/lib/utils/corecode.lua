@@ -171,7 +171,7 @@ function add_prints(class_name, ignore_list)
 end
 
 function tag_print(tag, ...)
-	tag = "[" .. tag .. "]"
+	tag = string.sub(tag, 1, 1) == "[" and tag or "[" .. tag .. "]"
 	local do_things = function(tag, ...)
 		local str = ""
 		local need_front = true

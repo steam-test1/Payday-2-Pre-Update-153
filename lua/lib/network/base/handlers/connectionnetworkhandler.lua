@@ -152,6 +152,25 @@ function ConnectionNetworkHandler:set_dropin()
 	end
 end
 
+function ConnectionNetworkHandler:set_waiting(...)
+	print("ConnectionNetworkHandler:set_waiting", ...)
+	if not self._verify_gamestate(self._gamestate_filter.waiting_for_players) then
+		return
+	end
+	game_state_machine:change_state_by_name("ingame_waiting_for_spawn_allowed")
+end
+
+function ConnectionNetworkHandler:kick_to_briefing(...)
+	print("ConnectionNetworkHandler:kick_to_briefing", ...)
+	if not self._verify_gamestate(self._gamestate_filter.waiting_for_spawn_allowed) then
+		return
+	end
+	managers.network:session():local_peer():set_waiting_for_player_ready(false)
+	managers.network:session():chk_send_local_player_ready()
+	managers.network:session():on_set_member_ready(managers.network:session():local_peer():id(), false, true, false)
+	game_state_machine:change_state_by_name("ingame_waiting_for_players", {sync_data = true})
+end
+
 function ConnectionNetworkHandler:spawn_dropin_penalty(dead, bleed_out, health, used_deployable, used_cable_ties, used_body_bags)
 	if not self._verify_gamestate(self._gamestate_filter.any_ingame_playing) then
 		return

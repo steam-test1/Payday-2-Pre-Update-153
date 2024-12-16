@@ -563,6 +563,34 @@ function MenuSceneManager:_set_up_templates()
 			specular_multiplier = 0
 		})
 	}
+	self._scene_templates.crew_management = {}
+	self._scene_templates.crew_management.use_character_grab = false
+	self._scene_templates.crew_management.camera_pos = offset:rotate_with(Rotation(90))
+	self._scene_templates.crew_management.target_pos = target_pos
+	self._scene_templates.crew_management.character_pos = c_ref:position() + Vector3(0, 500, 0)
+	self._scene_templates.crew_management.character_visible = false
+	self._scene_templates.crew_management.lobby_characters_visible = false
+	self._scene_templates.crew_management.henchmen_characters_visible = true
+	self._scene_templates.crew_management.fov = 40
+	self._scene_templates.crew_management.lights = {
+		self:_create_light({
+			far_range = 300,
+			color = Vector3(0.86, 0.57, 0.31) * 3,
+			position = Vector3(56, 100, -10)
+		}),
+		self:_create_light({
+			far_range = 3000,
+			color = Vector3(1, 2.5, 4.5) * 3,
+			position = Vector3(-1000, -300, 800),
+			specular_multiplier = 6
+		}),
+		self:_create_light({
+			far_range = 800,
+			color = Vector3(1, 1, 1) * 0.35,
+			position = Vector3(300, 100, 0),
+			specular_multiplier = 0
+		})
+	}
 end
 
 function MenuSceneManager:_set_up_environments()
@@ -741,6 +769,7 @@ function MenuSceneManager:_setup_bg()
 		end
 	end
 	self:_setup_lobby_characters()
+	self:_setup_henchmen_characters()
 end
 
 function MenuSceneManager:_set_player_character_unit(unit_name)
@@ -892,6 +921,34 @@ function MenuSceneManager:_select_character_pose(unit)
 	self:_set_character_unit_pose(pose, unit)
 end
 
+function MenuSceneManager:_select_henchmen_pose(unit, weapon_id, index)
+	local delays = {
+		0,
+		0.8,
+		0.2,
+		0.5
+	}
+	local animation_delay = delays[index] or index * 0.2
+	local state = unit:play_redirect(Idstring("idle_menu"))
+	if not weapon_id then
+		unit:anim_state_machine():set_parameter(state, "cvc_var1", 1)
+		unit:anim_state_machine():set_animation_time_all_segments(animation_delay)
+		return
+	end
+	local category = tweak_data.weapon[weapon_id].categories[1]
+	local lobby_poses = self._lobby_poses[weapon_id]
+	lobby_poses = lobby_poses or self._lobby_poses[category]
+	lobby_poses = lobby_poses or self._lobby_poses.generic
+	local pose
+	if type(lobby_poses[1]) == "string" then
+		pose = lobby_poses[math.random(#lobby_poses)]
+	else
+		pose = lobby_poses[index][math.random(#lobby_poses[index])]
+	end
+	unit:anim_state_machine():set_parameter(state, pose, 1)
+	unit:anim_state_machine():set_animation_time_all_segments(animation_delay)
+end
+
 function MenuSceneManager:_set_character_equipment()
 	local equipped_mask = managers.blackmarket:equipped_mask()
 	if equipped_mask.mask_id then
@@ -932,6 +989,148 @@ end
 
 function MenuSceneManager:get_scene_template_data(scene_template)
 	return self._scene_templates[scene_template]
+end
+
+function MenuSceneManager:_setup_henchmen_characters()
+	if self._henchmen_characters then
+		for _, unit in ipairs(self._henchmen_characters) do
+			self:_delete_character_mask(unit)
+			World:delete_unit(unit)
+		end
+	end
+	self._henchmen_characters = {}
+	local masks = {
+		"dallas",
+		"dallas",
+		"dallas"
+	}
+	for i = 1, 3 do
+		local pos, rot = self:get_henchmen_positioning(i)
+		local unit_name = tweak_data.blackmarket.characters.locked.menu_unit
+		local unit = World:spawn_unit(Idstring(unit_name), pos, rot)
+		self:_init_character(unit, i)
+		self:set_character_mask(tweak_data.blackmarket.masks[masks[i]].unit, unit, nil, masks[i])
+		table.insert(self._henchmen_characters, unit)
+		self._character_visibilities[unit:key()] = false
+		self:_chk_character_visibility(unit)
+	end
+end
+
+function MenuSceneManager:get_henchmen_positioning(index)
+	local offset = Vector3(0, -200, -130)
+	local rotation = {
+		-65,
+		-79,
+		-89
+	}
+	local mvec = Vector3()
+	local math_up = math.UP
+	local pos = Vector3()
+	local rot = Rotation()
+	mrotation.set_yaw_pitch_roll(rot, rotation[math.min(index, #rotation)], 0, 0)
+	mvector3.set(pos, offset)
+	mvector3.rotate_with(pos, rot)
+	mvector3.set(mvec, pos)
+	mvector3.negate(mvec)
+	mvector3.set_z(mvec, 0)
+	mvector3.set(mvec, mvec + Vector3(100, 150, 0))
+	mrotation.set_look_at(rot, mvec, math_up)
+	mvector3.set_x(pos, 50 + -80 * index)
+	mvector3.set_z(pos, -135)
+	return pos, rot
+end
+
+function MenuSceneManager:set_henchmen_visible(visible, i)
+	if i then
+		local unit = self._henchmen_characters[i]
+		if alive(unit) then
+			self._character_visibilities[unit:key()] = visible
+			self:_chk_character_visibility(unit)
+		end
+	else
+		for i, _ in ipairs(self._henchmen_characters) do
+			self:set_henchmen_visible(visible, i)
+		end
+	end
+end
+
+function MenuSceneManager:set_henchmen_loadout(index, character, loadout)
+	self._picked_character_position = self._picked_character_position or {}
+	loadout = loadout or managers.blackmarket:henchman_loadout(index)
+	character = character or managers.blackmarket:preferred_henchmen(index)
+	if not character then
+		local preferred = managers.blackmarket:preferred_henchmen()
+		local characters = CriminalsManager.character_names()
+		local player_character = managers.blackmarket:get_preferred_characters_list()[1]
+		local available = {}
+		for i, name in ipairs(characters) do
+			if player_character ~= name then
+				local found_current = table.get_key(self._picked_character_position, name) or 999
+				if not table.contains(preferred, name) and index <= found_current then
+					local new_name = CriminalsManager.convert_old_to_new_character_workname(name)
+					local char_tweak = tweak_data.blackmarket.characters.locked[new_name] or tweak_data.blackmarket.characters[new_name]
+					if not char_tweak.dlc or managers.dlc:is_dlc_unlocked(char_tweak.dlc) then
+						table.insert(available, name)
+					end
+				end
+			end
+		end
+		if #available < 1 then
+			available = CriminalsManager.character_names()
+		end
+		character = available[math.random(#available)] or "russian"
+	end
+	self._picked_character_position[index] = character
+	local character_id = managers.blackmarket:get_character_id_by_character_name(character)
+	local unit = self._henchmen_characters[index]
+	self:_delete_character_weapon(unit, "all")
+	local unit_name = tweak_data.blackmarket.characters[character_id].menu_unit
+	if not alive(unit) or Idstring(unit_name) ~= unit:name() then
+		local pos = unit:position()
+		local rot = unit:rotation()
+		if alive(unit) then
+			self:_delete_character_mask(unit)
+			World:delete_unit(unit)
+		end
+		unit = World:spawn_unit(Idstring(unit_name), pos, rot)
+		self:_init_character(unit, index)
+		self._henchmen_characters[index] = unit
+	end
+	local sequence = managers.blackmarket:character_sequence_by_character_name(character)
+	unit:damage():run_sequence_simple(sequence)
+	local mask = loadout.mask
+	local mask_blueprint = loadout.mask_blueprint
+	local crafted_mask = managers.blackmarket:get_crafted_category_slot("masks", loadout.mask_slot)
+	if crafted_mask then
+		mask = crafted_mask.mask_id
+		mask_blueprint = crafted_mask.blueprint
+	end
+	self:set_character_mask_by_id(mask, mask_blueprint, unit, nil, character)
+	local mask_data = self._mask_units[unit:key()]
+	if mask_data then
+		self:update_mask_offset(mask_data)
+	end
+	local weapon_id
+	local crafted_primary = managers.blackmarket:get_crafted_category_slot("primaries", loadout.primary_slot)
+	if crafted_primary then
+		local primary = crafted_primary.factory_id
+		local primary_id = crafted_primary.weapon_id
+		local primary_blueprint = crafted_primary.blueprint
+		local primary_cosmetics = crafted_primary.cosmetics
+		self:set_character_equipped_weapon(unit, primary, primary_blueprint, "primary", primary_cosmetics)
+		weapon_id = primary_id
+	else
+		local primary = tweak_data.character[character].weapon.weapons_of_choice.primary
+		primary = string.gsub(primary, "_npc", "")
+		local blueprint = managers.weapon_factory:get_default_blueprint_by_factory_id(primary)
+		self:set_character_equipped_weapon(unit, primary, blueprint, "primary", nil)
+		weapon_id = managers.weapon_factory:get_weapon_id_by_factory_id(primary)
+	end
+	self:_select_henchmen_pose(unit, weapon_id, index)
+	local pos, rot = self:get_henchmen_positioning(index)
+	unit:set_position(pos)
+	unit:set_rotation(rot)
+	self:set_henchmen_visible(true, index)
 end
 
 function MenuSceneManager:_setup_lobby_characters()
@@ -1344,6 +1543,14 @@ function MenuSceneManager:_check_character_mask_sequence(character_unit, mask_id
 	end
 end
 
+function MenuSceneManager:_is_lobby_character(char_unit)
+	return table.contains(self._lobby_characters, char_unit)
+end
+
+function MenuSceneManager:_is_henchmen_character(char_unit)
+	return table.contains(self._henchmen_characters, char_unit)
+end
+
 function MenuSceneManager:_chk_character_visibility(char_unit)
 	local char_key = char_unit:key()
 	if not self._character_visibilities[char_key] then
@@ -1364,18 +1571,27 @@ function MenuSceneManager:_chk_character_visibility(char_unit)
 		self:_set_character_and_outfit_visibility(char_unit, false)
 		return
 	end
+	local scene_template = self._current_scene_template ~= "" and self._scene_templates[self._current_scene_template]
 	if char_unit == self._character_unit then
+		local visible = false
 		if self._character_unit_need_pose then
 			self:_set_character_and_outfit_visibility(char_unit, false)
 			return
 		end
-		if self._current_scene_template ~= "" and not self._scene_templates[self._current_scene_template].character_visible then
+		if scene_template and not scene_template.character_visible then
 			self:_set_character_and_outfit_visibility(char_unit, false)
 			return
 		end
-	elseif self._current_scene_template ~= "" and not self._scene_templates[self._current_scene_template].lobby_characters_visible then
-		self:_set_character_and_outfit_visibility(char_unit, false)
-		return
+	elseif scene_template then
+		if self:_is_henchmen_character(char_unit) then
+			if not scene_template.henchmen_characters_visible then
+				self:_set_character_and_outfit_visibility(char_unit, false)
+				return
+			end
+		elseif not scene_template.lobby_characters_visible then
+			self:_set_character_and_outfit_visibility(char_unit, false)
+			return
+		end
 	end
 	self:_set_character_and_outfit_visibility(char_unit, true)
 end
@@ -1762,6 +1978,11 @@ function MenuSceneManager:set_scene_template(template, data, custom_name, skip_t
 		self:_chk_character_visibility(self._character_unit)
 		if self._lobby_characters then
 			for _, unit in pairs(self._lobby_characters) do
+				self:_chk_character_visibility(unit)
+			end
+		end
+		if self._henchmen_characters then
+			for _, unit in pairs(self._henchmen_characters) do
 				self:_chk_character_visibility(unit)
 			end
 		end

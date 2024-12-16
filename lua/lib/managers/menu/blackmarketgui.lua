@@ -2376,6 +2376,14 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				name = "bm_menu_btn_skin",
 				callback = callback(self, self, "edit_weapon_skin_callback")
 			},
+			w_unequip = {
+				prio = 1,
+				btn = "BTN_A",
+				pc_btn = nil,
+				name = "bm_menu_btn_unequip_weapon",
+				callback = function()
+				end
+			},
 			ew_unlock = {
 				prio = 1,
 				btn = "BTN_A",
@@ -2865,6 +2873,29 @@ function BlackMarketGui:_setup(is_start_page, component_data)
 				pc_btn = "menu_preview_item",
 				name = "bm_menu_btn_preview_grenade",
 				callback = callback(self, self, "preview_grenade_callback")
+			},
+			custom_select = {
+				prio = 1,
+				btn = "BTN_A",
+				pc_btn = nil,
+				name = "bm_menu_btn_select",
+				callback = function()
+				end
+			},
+			custom_unselect = {
+				prio = 1,
+				btn = "BTN_A",
+				pc_btn = nil,
+				name = "bm_menu_btn_unselect",
+				callback = function()
+				end
+			},
+			ci_unlock = {
+				prio = 1,
+				btn = "BTN_A",
+				pc_btn = nil,
+				name = "bm_menu_btn_unlock_crew_item",
+				callback = callback(self, self, "buy_crew_item_callback")
 			}
 		}
 		for btn, data in pairs(BTNS) do
@@ -12522,6 +12553,7 @@ function BlackMarketGui:close()
 	if not managers.menu_component._menuscene_info_gui then
 		managers.menu:active_menu().renderer.ws:show()
 	end
+	managers.blackmarket:verfify_crew_loadout()
 end
 
 function BlackMarketGui:_pre_reload()
@@ -12705,4 +12737,44 @@ function BlackMarketGui.blur_panel(panel)
 		halign = "scale",
 		valign = "scale"
 	})
+end
+
+function BlackMarketGui:buy_crew_item_callback(data)
+	local cost = managers.blackmarket:crew_item_cost(data.name)
+	local macros = {
+		item = data.name_localized,
+		cost = cost
+	}
+	if cost <= managers.custom_safehouse:coins() then
+		local dialog_data = {}
+		if data.category == "ability" then
+			dialog_data.title = managers.localization:text("dialog_crew_ability_unlock_title", macros)
+			dialog_data.text = managers.localization:text("dialog_crew_ability_unlock_text", macros)
+		else
+			dialog_data.title = managers.localization:text("dialog_crew_boost_unlock_title", macros)
+			dialog_data.text = managers.localization:text("dialog_crew_boost_unlock_text", macros)
+		end
+		local yes_button = {}
+		yes_button.text = managers.localization:text("dialog_yes")
+		yes_button.callback_func = callback(self, self, "_confirm_buy_crew_item_callback", data)
+		local no_button = {}
+		no_button.text = managers.localization:text("dialog_cancel")
+		no_button.cancel_button = true
+		dialog_data.button_list = {yes_button, no_button}
+		managers.system_menu:show(dialog_data)
+	else
+		local dialog_data = {}
+		dialog_data.title = managers.localization:text("dialog_crew_item_cant_afford_title", macros)
+		dialog_data.text = managers.localization:text("dialog_crew_item_cant_afford_text", macros)
+		local ok_button = {}
+		ok_button.text = managers.localization:text("dialog_ok")
+		dialog_data.button_list = {ok_button}
+		managers.system_menu:show(dialog_data)
+	end
+end
+
+function BlackMarketGui:_confirm_buy_crew_item_callback(data)
+	managers.menu_component:post_event("item_sell")
+	managers.blackmarket:buy_crew_item(data.name)
+	self:reload()
 end

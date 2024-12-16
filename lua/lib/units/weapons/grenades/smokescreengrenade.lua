@@ -7,6 +7,11 @@ function SmokeScreenGrenade:_setup_server_data(...)
 	end
 end
 
+function SmokeScreenGrenade:set_thrower_unit(unit)
+	SmokeScreenGrenade.super.set_thrower_unit(self, unit)
+	self._has_dodge_bonus = self._thrower_unit ~= managers.player:player_unit() and self._thrower_unit:base():upgrade_value("player", "sicario_multiplier")
+end
+
 function SmokeScreenGrenade:_detonate(tag, unit, body, other_unit, other_body, position, normal, collision_velocity, velocity, other_velocity, new_velocity, direction, damage, ...)
 	local pos = self._unit:position()
 	local normal = math.UP
@@ -14,8 +19,7 @@ function SmokeScreenGrenade:_detonate(tag, unit, body, other_unit, other_body, p
 	if Network:is_server() then
 		managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "base", GrenadeBase.EVENT_IDS.detonate)
 	end
-	local has_dodge_bonus = self._thrower_unit ~= managers.player:player_unit() and self._thrower_unit:base():upgrade_value("player", "sicario_multiplier")
-	managers.player:spawn_smoke_screen(pos, normal, self._unit, has_dodge_bonus)
+	managers.player:spawn_smoke_screen(pos, normal, self._unit, self._has_dodge_bonus)
 	managers.groupai:state():propagate_alert({
 		"explosion",
 		pos,

@@ -53,6 +53,22 @@ function SentryGunBase:is_owner()
 	return self._owner_id and self._owner_id == managers.network:session():local_peer():id()
 end
 
+function SentryGunBase:is_category(...)
+	local arg = {
+		...
+	}
+	local categories = self:weapon_tweak_data().categories
+	if not categories then
+		return false
+	end
+	for i = 1, #arg do
+		if table.contains(categories, arg[i]) then
+			return true
+		end
+	end
+	return false
+end
+
 function SentryGunBase:post_init()
 	if self._difficulty_sequences then
 		local difficulty = Global.game_settings and Global.game_settings.difficulty or "normal"

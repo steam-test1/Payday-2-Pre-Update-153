@@ -28,6 +28,72 @@ local fit_texture = function(bitmap, target_w, target_h)
 	local dh = texture_height / sh
 	bitmap:set_size(math.round(dw * target_w), math.round(dh * target_h))
 end
+local select_anim = function(object, size, instant)
+	local current_width = object:w()
+	local current_height = object:h()
+	local end_width = size[1]
+	local end_height = size[2]
+	local cx, cy = object:center()
+	if instant then
+		object:set_size(end_width, end_height)
+		object:set_center(cx, cy)
+	else
+		over(0.2, function(p)
+			object:set_size(math.lerp(current_width, end_width, p), math.lerp(current_height, end_height, p))
+			object:set_center(cx, cy)
+		end)
+	end
+end
+local unselect_anim = function(object, size, instant)
+	local current_width = object:w()
+	local current_height = object:h()
+	local end_width = size[1] * 0.8
+	local end_height = size[2] * 0.8
+	local cx, cy = object:center()
+	if instant then
+		object:set_size(end_width, end_height)
+		object:set_center(cx, cy)
+	else
+		over(0.2, function(p)
+			object:set_size(math.lerp(current_width, end_width, p), math.lerp(current_height, end_height, p))
+			object:set_center(cx, cy)
+		end)
+	end
+end
+
+local function select_anim_text(object, font_size, instant)
+	local current_size = object:font_size()
+	local end_font_size = font_size
+	local cx, cy = object:center()
+	if instant then
+		object:set_size(end_width, end_height)
+		make_fine_text(object)
+		object:set_center(cx, cy)
+	else
+		over(0.2, function(p)
+			object:set_font_size(math.lerp(current_size, end_font_size, p))
+			make_fine_text(object)
+			object:set_center(cx, cy)
+		end)
+	end
+end
+
+local function unselect_anim_text(object, font_size, instant)
+	local current_size = object:font_size()
+	local end_font_size = font_size * 0.8
+	local cx, cy = object:center()
+	if instant then
+		object:set_font_size(end_font_size)
+		make_fine_text(object)
+		object:set_center(cx, cy)
+	else
+		over(0.2, function(p)
+			object:set_font_size(math.lerp(current_size, end_font_size, p))
+			make_fine_text(object)
+			object:set_center(cx, cy)
+		end)
+	end
+end
 
 function CrewManagementGui:init(ws, fullscreen_ws, node)
 	managers.menu_component:close_contract_gui()
@@ -148,10 +214,12 @@ function CrewManagementGui:init(ws, fullscreen_ws, node)
 		h = 70,
 		w = 0
 	})
+	local char_images = {}
 	for i = 1, CriminalsManager.MAX_NR_TEAM_AI do
 		local character = managers.blackmarket:preferred_henchmen(i)
 		local texture = character and managers.blackmarket:get_character_icon(character) or "guis/textures/pd2/dice_icon"
-		self:_add_bitmap_panel_row(char_panel, {texture = texture}, 70, 64)
+		local _, img = self:_add_bitmap_panel_row(char_panel, {texture = texture}, 70, 64)
+		table.insert(char_images, img)
 	end
 	char_panel:set_center_x(cc_panel:w() / 2)
 	char_panel:set_top(15)
@@ -166,8 +234,18 @@ function CrewManagementGui:init(ws, fullscreen_ws, node)
 			2
 		}
 	})
-	char_btn._select_panel:set_visible(false)
-	char_btn._selected_changed = CrewManagementGuiLoadoutItem._selected_changed
+	local char_panel_size = {
+		char_images[1]:size()
+	}
+	
+	function char_btn:_selected_changed(state, instant)
+		CrewManagementGuiButton._selected_changed(self, state, instant)
+		for _, img in pairs(char_images) do
+			img:animate(state and select_anim or unselect_anim, char_panel_size, instant)
+		end
+	end
+	
+	char_btn:_selected_changed(false, true)
 	do
 		local v = cc_panel
 		BoxGuiObject:new(v, {
@@ -316,14 +394,18 @@ end
 function CrewManagementGui:create_mask_button(panel, index)
 	local loadout = managers.blackmarket:henchman_loadout(index)
 	local texture = managers.blackmarket:get_mask_icon(loadout.mask)
-	return CrewManagementGuiLoadoutItem:new(self, panel, texture and {texture = texture}, callback(self, self, "open_mask_category_menu", index))
+	local text = managers.blackmarket:get_mask_name_by_category_slot("masks", loadout.mask_slot)
+	local cat_text = managers.localization:to_upper_text("bm_menu_masks")
+	return CrewManagementGuiLoadoutItem:new(self, panel, texture and {texture = texture}, text, cat_text, callback(self, self, "open_mask_category_menu", index))
 end
 
 function CrewManagementGui:create_weapon_button(panel, index)
 	local loadout = managers.blackmarket:henchman_loadout(index)
 	local data = managers.blackmarket:get_crafted_category_slot("primaries", loadout.primary_slot) or {}
 	local texture, rarity = managers.blackmarket:get_weapon_icon_path(data.weapon_id, data.cosmetics)
-	local item = CrewManagementGuiLoadoutItem:new(self, panel, texture and {texture = texture, layer = 1} or managers.localization:to_upper_text("menu_crew_defualt"), callback(self, self, "open_weapon_menu", {"primaries", index}))
+	local text = loadout.primary_slot and managers.blackmarket:get_weapon_name_by_category_slot("primaries", loadout.primary_slot) or ""
+	local cat_text = managers.localization:to_upper_text("bm_menu_primaries")
+	local item = CrewManagementGuiLoadoutItem:new(self, panel, texture and {texture = texture, layer = 1} or managers.localization:to_upper_text("menu_crew_defualt"), text, cat_text, callback(self, self, "open_weapon_menu", {"primaries", index}))
 	if rarity then
 		local rare_item = item._panel:bitmap({
 			texture = rarity,
@@ -339,21 +421,31 @@ end
 function CrewManagementGui:create_ability_button(panel, index)
 	local loadout = managers.blackmarket:henchman_loadout(index)
 	local data = tweak_data.upgrades.crew_ability_definitions[loadout.ability]
-	local texture, texture_rect
+	local cat_text = managers.localization:to_upper_text("bm_menu_ability")
+	local texture, texture_rect, text
 	if data then
 		texture, texture_rect = tweak_data.hud_icons:get_icon_data(data.icon)
+		text = managers.localization:text(data.name_id)
+	else
+		texture = "guis/textures/pd2/add_icon"
+		text = managers.localization:to_upper_text("menu_loadout_empty")
 	end
-	return CrewManagementGuiLoadoutItem:new(self, panel, texture and {texture = texture, texture_rect = texture_rect}, callback(self, self, "open_ability_menu", index))
+	return CrewManagementGuiLoadoutItem:new(self, panel, texture and {texture = texture, texture_rect = texture_rect}, text, cat_text, callback(self, self, "open_ability_menu", index))
 end
 
 function CrewManagementGui:create_skill_button(panel, index)
 	local loadout = managers.blackmarket:henchman_loadout(index)
 	local data = tweak_data.upgrades.crew_skill_definitions[loadout.skill]
-	local texture, texture_rect
+	local cat_text = managers.localization:to_upper_text("bm_menu_skill")
+	local texture, texture_rect, text
 	if data then
 		texture, texture_rect = tweak_data.hud_icons:get_icon_data(data.icon)
+		text = managers.localization:text(data.name_id)
+	else
+		texture = "guis/textures/pd2/add_icon"
+		text = managers.localization:to_upper_text("menu_loadout_empty")
 	end
-	return CrewManagementGuiLoadoutItem:new(self, panel, texture and {texture = texture, texture_rect = texture_rect}, callback(self, self, "open_skill_menu", {"skill", index}))
+	return CrewManagementGuiLoadoutItem:new(self, panel, texture and {texture = texture, texture_rect = texture_rect}, text, cat_text, callback(self, self, "open_skill_menu", {"skill", index}))
 end
 
 function CrewManagementGui:close()
@@ -394,6 +486,15 @@ function CrewManagementGui:show_help_dialog()
 	managers.system_menu:show(dialog_data)
 end
 
+local function adapt_text_width(text_item, target_w)
+	target_w = target_w or text_item:w()
+	make_fine_text(text_item)
+	if target_w < text_item:w() then
+		text_item:set_font_size(text_item:font_size() * (target_w / text_item:w()))
+		make_fine_text(text_item)
+	end
+end
+
 CrewManagementGuiButton = CrewManagementGuiButton or class()
 
 function CrewManagementGuiButton:init(parent, func, no_navigation)
@@ -405,6 +506,7 @@ function CrewManagementGuiButton:init(parent, func, no_navigation)
 end
 
 function CrewManagementGuiButton:trigger(...)
+	managers.menu_component:post_event("menu_enter")
 	if self._func then
 		self._func(...)
 	end
@@ -420,6 +522,7 @@ function CrewManagementGuiButton:set_selected(state)
 	end
 	self._selected = state
 	local _ = self._selected_changed and self:_selected_changed(state)
+	local _ = state and managers.menu_component:post_event("highlight")
 end
 
 function CrewManagementGuiButton:select_instead(item)
@@ -444,11 +547,43 @@ function CrewManagementGuiButton:set_enabled(state)
 	end
 end
 
+function CrewManagementGuiButton:_selected_changed(state)
+	local _ = self._select_panel and self._select_panel:set_visible(state)
+end
+
 CrewManagementGuiLoadoutItem = CrewManagementGuiLoadoutItem or class(CrewManagementGuiButton)
 
-function CrewManagementGuiLoadoutItem:init(parent, panel, texture, func, w, h)
+function CrewManagementGuiLoadoutItem:init(parent, panel, texture, select_text, unselect_text, func, w, h)
 	CrewManagementGuiLoadoutItem.super.init(self, parent, func)
 	self._panel, self._item = parent:_add_bitmap_panel(panel, texture, w, h)
+	if type(texture) == "table" then
+		self._anim_full_size = {
+			self._item:size()
+		}
+		self._select_anim = select_anim
+		self._unselect_anim = unselect_anim
+	else
+		self._anim_full_size = self._item:font_size()
+		self._select_anim = select_anim_text
+		self._unselect_anim = unselect_anim_text
+	end
+	self._category_text = self._panel:text({
+		text = unselect_text,
+		font = small_font,
+		font_size = small_font_size,
+		x = 4,
+		y = 2,
+		color = tweak_data.screen_colors.button_stage_3:with_alpha(0.25)
+	})
+	self._item_text = self._panel:text({
+		text = select_text,
+		font = small_font,
+		font_size = small_font_size,
+		x = 4,
+		y = 2
+	})
+	adapt_text_width(self._item_text, self._panel:w() - 8)
+	adapt_text_width(self._category_text, self._panel:w() - 8)
 	self._select_panel = BoxGuiObject:new(self._panel, {
 		sides = {
 			2,
@@ -457,11 +592,14 @@ function CrewManagementGuiLoadoutItem:init(parent, panel, texture, func, w, h)
 			2
 		}
 	})
-	self._select_panel:set_visible(false)
+	self:_selected_changed(false, true)
 end
 
-function CrewManagementGuiButton:_selected_changed(state)
-	local _ = self._select_panel and self._select_panel:set_visible(state)
+function CrewManagementGuiLoadoutItem:_selected_changed(state, instant)
+	self._item:animate(state and self._select_anim or self._unselect_anim, self._anim_full_size, instant)
+	self._category_text:set_visible(not state)
+	self._item_text:set_visible(state)
+	self._select_panel:set_visible(state)
 end
 
 CrewManagementGuiTextButton = CrewManagementGuiTextButton or class(CrewManagementGuiButton)
@@ -504,14 +642,20 @@ function CrewManagementGui:mouse_pressed(button, x, y)
 end
 
 function CrewManagementGui:mouse_moved(o, x, y)
+	local hover_icon
 	for k, v in pairs(self._buttons_no_nav or {}) do
-		v:set_selected(v:inside(x, y))
+		local inside = v:inside(x, y)
+		v:set_selected(inside)
+		hover_icon = hover_icon or inside
 	end
 	for k, v in pairs(self._buttons) do
 		if v:inside(x, y) then
 			self:select(v)
-			break
+			return true, "link"
 		end
+	end
+	if hover_icon then
+		return true, "link"
 	end
 end
 
@@ -886,7 +1030,7 @@ end
 
 function CrewManagementGui:buy_new_weapon(data, gui)
 	local item_allowed = function(weapon_data)
-		return managers.blackmarket:is_weapon_category_allowed_for_crew(weapon_data.category)
+		return managers.blackmarket:is_weapon_category_allowed_for_crew(weapon_data.categories[1])
 	end
 	gui:open_weapon_buy_menu(data, item_allowed)
 end

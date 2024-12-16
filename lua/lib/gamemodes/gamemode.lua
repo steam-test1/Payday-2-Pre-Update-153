@@ -25,6 +25,7 @@ Gamemode.STATES = {
 	ingame_standard = "ingame_standard",
 	ingame_waiting_for_players = "ingame_waiting_for_players",
 	ingame_waiting_for_respawn = "ingame_waiting_for_respawn",
+	ingame_waiting_for_spawn_allowed = "ingame_waiting_for_spawn_allowed",
 	victoryscreen = "victoryscreen",
 	gameoverscreen = "gameoverscreen",
 	disconnected = "disconnected",

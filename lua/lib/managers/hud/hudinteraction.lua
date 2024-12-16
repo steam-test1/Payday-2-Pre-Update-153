@@ -78,7 +78,7 @@ function HUDInteraction:set_interaction_bar_width(current, total)
 	if not self._interact_circle then
 		return
 	end
-	self._interact_circle:set_current(current / total)
+	self._interact_circle:set_current(math.clamp(current / total, 0, 1))
 end
 
 function HUDInteraction:hide_interaction_bar(complete)

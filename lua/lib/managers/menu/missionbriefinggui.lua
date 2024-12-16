@@ -2973,6 +2973,13 @@ function MissionBriefingGui:init(saferect_ws, fullrect_ws, node)
 	self._lobby_mutators_text:set_top(tweak_data.menu.pd2_large_font_size)
 	local mutators_active = managers.mutators:are_mutators_enabled() and managers.mutators:allow_mutators_in_level(managers.job:current_level_id())
 	self._lobby_mutators_text:set_visible(mutators_active)
+	local local_peer = managers.network:session():local_peer()
+	for peer_id, peer in pairs(managers.network:session():peers()) do
+		if peer ~= local_peer then
+			local outfit = managers.blackmarket:unpack_outfit_from_string(peer:profile("outfit_string"))
+			self:set_slot_outfit(peer_id, peer:character(), outfit)
+		end
+	end
 	self._enabled = true
 	self:flash_ready()
 end

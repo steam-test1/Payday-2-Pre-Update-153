@@ -545,34 +545,56 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 		})
 		self._briefing_len_panel:set_position(contact_text:left(), contact_text:bottom() + 10)
 	end
+	self._tabs = {}
+	self._pages = {}
+	self._active_page = nil
+	local tabs_panel = self._contract_panel:panel({
+		w = contact_w,
+		h = contact_h,
+		x = text_w + 20,
+		y = 10
+	})
+	tabs_panel:set_top((self._briefing_len_panel and self._briefing_len_panel:bottom() or contact_text:bottom()) + 10)
+	tabs_panel:set_visible(false)
+	local pages_panel = self._contract_panel:panel({})
+	pages_panel:set_visible(false)
+	
+	local function add_tab(text_id)
+		local prev_tab = self._tabs[#self._tabs]
+		local tab_item = MenuGuiSmallTabItem:new(#self._tabs + 1, text_id, nil, self, 0, tabs_panel)
+		table.insert(self._tabs, tab_item)
+		if prev_tab then
+			tab_item._page_panel:set_left(prev_tab:next_page_position())
+		end
+		if #self._tabs == 1 then
+			tab_item:set_active(true)
+			self._active_page = 1
+			tabs_panel:set_visible(true)
+			pages_panel:set_visible(true)
+			tabs_panel:set_h(tab_item._page_panel:bottom())
+			pages_panel:set_size(contact_w, contact_h - tabs_panel:h())
+			pages_panel:set_lefttop(tabs_panel:left(), tabs_panel:bottom() - 2)
+			BoxGuiObject:new(pages_panel, {
+				sides = {
+					1,
+					1,
+					2,
+					1
+				}
+			})
+			managers.menu:active_menu().input:set_force_input(true)
+		end
+		local page_panel = pages_panel:panel({})
+		page_panel:set_visible(tab_item:is_active())
+		table.insert(self._pages, page_panel)
+		return page_panel
+	end
+	
 	if job_data.mutators then
 		managers.mutators:set_crimenet_lobby_data(job_data.mutators)
-		local mutators_panel = self._contract_panel:panel({
-			w = contact_w,
-			h = contact_h,
-			x = text_w + 20,
-			y = 10
-		})
-		mutators_panel:set_top((self._briefing_len_panel and self._briefing_len_panel:bottom() or contact_text:bottom()) + 10)
-		BoxGuiObject:new(mutators_panel, {
-			sides = {
-				1,
-				1,
-				1,
-				1
-			}
-		})
+		local mutators_panel = add_tab("menu_cn_mutators_active")
 		self._mutators_scroll = ScrollablePanel:new(mutators_panel, "mutators_scroll", {padding = 0})
-		local mutators_title = self._mutators_scroll:canvas():text({
-			name = "mutators_title",
-			font = tweak_data.menu.pd2_medium_font,
-			font_size = tweak_data.menu.pd2_medium_font_size,
-			text = managers.localization:to_upper_text("menu_cn_mutators_active"),
-			x = 10,
-			y = 10,
-			h = tweak_data.menu.pd2_medium_font_size
-		})
-		local _y = mutators_title:bottom() + 5
+		local _y = 5
 		local mutators_list = {}
 		local last_item
 		for mutator_id, mutator_data in pairs(job_data.mutators) do
@@ -600,6 +622,81 @@ function CrimeNetContractGui:init(ws, fullscreen_ws, node)
 		last_item:set_h(last_item:h() + 10)
 		self._mutators_scroll:update_canvas_size()
 		managers.mutators:set_crimenet_lobby_data(nil)
+	end
+	if job_data.server == true then
+		local content_panel = add_tab("menu_cn_game_settings")
+		local _y = 7
+		local add_back = true
+		
+		local function add_line(left_text, right_text)
+			if right_text == nil or left_text == nil then
+				return
+			end
+			if add_back then
+				content_panel:rect({
+					x = 8,
+					y = _y,
+					h = tweak_data.menu.pd2_small_font_size,
+					w = content_panel:w() - 18,
+					color = Color.black:with_alpha(0.7),
+					layer = -1
+				})
+			end
+			add_back = not add_back
+			left_text = managers.localization:to_upper_text(left_text)
+			right_text = type(right_text) == "number" and tostring(right_text) or managers.localization:to_upper_text(right_text)
+			local left = content_panel:text({
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				text = left_text,
+				align = "left",
+				x = 10,
+				y = _y,
+				h = tweak_data.menu.pd2_small_font_size,
+				w = content_panel:w() - 20,
+				color = Color(0.8, 0.8, 0.8)
+			})
+			local right = content_panel:text({
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				text = right_text .. " ",
+				align = "right",
+				x = 10,
+				y = _y,
+				h = tweak_data.menu.pd2_small_font_size,
+				w = content_panel:w() - 20,
+				color = Color(0.5, 0.5, 0.5)
+			})
+			_y = math.max(left:bottom(), right:bottom()) + 2
+		end
+		
+		local server_data = job_data.server_data
+		local tactics = {
+			[-1] = "menu_any",
+			[1] = "menu_plan_loud",
+			[2] = "menu_plan_stealth"
+		}
+		local kick = {
+			[1] = "menu_kick_server",
+			[2] = "menu_kick_vote",
+			[0] = "menu_kick_disabled"
+		}
+		local drop_in = {
+			[0] = "menu_off",
+			[1] = "menu_drop_in_on",
+			[2] = "menu_drop_in_prompt",
+			[3] = "menu_drop_in_stealth_prompt"
+		}
+		local permission = {
+			"menu_public_game",
+			"menu_friends_only_game",
+			"menu_private_game"
+		}
+		add_line("menu_preferred_plan", tactics[server_data.job_plan])
+		add_line("menu_kicking_allowed_option", kick[server_data.kick_option])
+		add_line("menu_permission", permission[server_data.permission])
+		add_line("menu_reputation_permission", server_data.min_level or 0)
+		add_line("menu_toggle_drop_in", drop_in[server_data.drop_in])
 	end
 	local days_multiplier = 0
 	for i = 1, #narrative_chains do
@@ -1444,6 +1541,19 @@ function CrimeNetContractGui:toggle_post_event()
 	end
 end
 
+function CrimeNetContractGui:set_active_page(index)
+	if self._active_page then
+		self._tabs[self._active_page]:set_active(false)
+		self._pages[self._active_page]:set_visible(false)
+		self._active_page = nil
+	end
+	if self._tabs[index] then
+		self._tabs[index]:set_active(true)
+		self._pages[index]:set_visible(true)
+		self._active_page = index
+	end
+end
+
 function CrimeNetContractGui:update(t, dt)
 	if self._wait_t then
 		if t > self._wait_t then
@@ -1494,6 +1604,13 @@ function CrimeNetContractGui:mouse_moved(o, x, y)
 			self._button_potential_rewards_highlight = false
 		end
 	end
+	if self._active_page then
+		for k, tab_item in pairs(self._tabs) do
+			if not tab_item:is_active() and tab_item:inside(x, y) then
+				return true, "link"
+			end
+		end
+	end
 	if x > self._contract_panel:left() + 270 and y > self._contract_panel:bottom() - 140 and x < self._contract_panel:right() and y < self._contract_panel:bottom() then
 		return false
 	end
@@ -1506,6 +1623,13 @@ function CrimeNetContractGui:mouse_pressed(o, button, x, y)
 	end
 	if alive(self._potential_rewards_title) and self._potential_rewards_title:visible() and self._potential_rewards_title:inside(x, y) then
 		self:_toggle_potential_rewards()
+	end
+	if self._active_page and button == Idstring("0") then
+		for k, tab_item in pairs(self._tabs) do
+			if not tab_item:is_active() and tab_item:inside(x, y) then
+				self:set_active_page(tab_item:index())
+			end
+		end
 	end
 end
 
@@ -1550,6 +1674,20 @@ function CrimeNetContractGui:special_btn_pressed(button)
 	elseif button == Idstring("menu_toggle_filters") then
 	end
 	return false
+end
+
+function CrimeNetContractGui:previous_page()
+	if self._active_page and self._active_page > 1 then
+		self:set_active_page(self._active_page - 1)
+		return true
+	end
+end
+
+function CrimeNetContractGui:next_page()
+	if self._active_page and #self._tabs > self._active_page then
+		self:set_active_page(self._active_page + 1)
+		return true
+	end
 end
 
 function CrimeNetContractGui:set_difficulty_id(difficulty_id)
@@ -1599,4 +1737,5 @@ function CrimeNetContractGui:close()
 		self._counting_sound = false
 	end
 	managers.briefing:stop_event(true)
+	managers.menu:active_menu().input:set_force_input(false)
 end

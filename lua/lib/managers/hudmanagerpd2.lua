@@ -21,6 +21,7 @@ require("lib/managers/hud/HUDHitConfirm")
 require("lib/managers/hud/HUDHitDirection")
 require("lib/managers/hud/HUDPlayerDowned")
 require("lib/managers/hud/HUDPlayerCustody")
+require("lib/managers/hud/HUDWaitingLegend")
 require("lib/managers/hud/HUDStageEndCrimeSpreeScreen")
 HUDManager.disabled = {}
 HUDManager.disabled[Idstring("guis/player_hud"):key()] = true
@@ -136,6 +137,75 @@ end
 function HUDManager:recreate_weapon_firemode(i)
 	if self._teammate_panels[i] then
 		self._teammate_panels[i]:recreate_weapon_firemode()
+	end
+end
+
+function HUDManager:get_waiting_index(peer_id)
+	self._waiting_index = self._waiting_index or {}
+	if self._waiting_index[peer_id] then
+		return self._waiting_index[peer_id]
+	end
+	
+	local function set_index(i)
+		self._waiting_index[peer_id] = i
+		return i
+	end
+	
+	local function allowed_index(i)
+		return i and not table.contains(self._waiting_index, i)
+	end
+	
+	local peer = managers.network:session():peer(peer_id)
+	local data = peer and managers.criminals:character_data_by_name(peer:character())
+	if data and allowed_index(data.panel_id) then
+		return set_index(data.panel_id)
+	end
+	for i, data in ipairs(self._hud.teammate_panels_data) do
+		if not data.taken and i ~= HUDManager.PLAYER_PANEL and allowed_index(i) then
+			return set_index(i)
+		end
+	end
+	for i, panel in ipairs(self._teammate_panels) do
+		if panel._ai and allowed_index(i) then
+			return set_index(i)
+		end
+	end
+	return nil
+end
+
+function HUDManager:add_waiting(peer_id, override_index)
+	if not Network:is_server() then
+		return
+	end
+	local peer = managers.network:session():peer(peer_id)
+	if override_index then
+		self._waiting_index[peer_id] = override_index
+	end
+	local index = self:get_waiting_index(peer_id)
+	local panel = self._teammate_panels[index]
+	if panel and peer then
+		panel:set_waiting(true, peer)
+		local _ = not self._waiting_legend:is_set() and self._waiting_legend:show_on(panel, peer)
+	end
+end
+
+function HUDManager:remove_waiting(peer_id)
+	if not Network:is_server() then
+		return
+	end
+	local index = self:get_waiting_index(peer_id)
+	self._waiting_index[peer_id] = nil
+	local _ = self._teammate_panels[index] and self._teammate_panels[index]:set_waiting(false)
+	if self._waiting_legend:peer() and peer_id == self._waiting_legend:peer():id() then
+		self._waiting_legend:turn_off()
+		for id, index in pairs(self._waiting_index) do
+			local panel = self._teammate_panels[index]
+			local peer = managers.network:session():peer(id)
+			if panel then
+				self._waiting_legend:show_on(panel, peer)
+				break
+			end
+		end
 	end
 end
 
@@ -419,6 +489,7 @@ function HUDManager:_setup_player_info_hud_pd2()
 	self:_create_custody_hud()
 	self:_create_hud_chat()
 	self:_create_assault_corner()
+	self:_create_waiting_legend(hud)
 end
 
 function HUDManager:_create_ammo_test()
@@ -560,6 +631,10 @@ function HUDManager:add_teammate_panel(character_name, player_name, ai, peer_id)
 		return i
 	end
 	
+	local index = self._waiting_index[peer_id]
+	if index and not self._hud.teammate_panels_data[index].taken then
+		add_panel(index)
+	end
 	if self._waiting_index and peer_id then
 		self._waiting_index[peer_id] = nil
 	end
@@ -627,6 +702,12 @@ function HUDManager:_create_teammates_panel(hud)
 		local x = math.floor((pw + small_gap) * (i - 1) + (i == HUDManager.PLAYER_PANEL and player_gap or 0))
 		teammate._panel:set_x(math.floor(x))
 		table.insert(self._teammate_panels, teammate)
+	end
+end
+
+function HUDManager:_create_waiting_legend(hud)
+	if Network:is_server() then
+		self._waiting_legend = HUDWaitingLegend:new(hud)
 	end
 end
 

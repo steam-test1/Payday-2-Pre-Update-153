@@ -995,6 +995,14 @@ function PlayerManager:on_killshot(killed_unit, variant, headshot, weapon_id)
 		local multiplier = self:upgrade_value("player", "kill_change_regenerate_speed", 0)
 		damage_ext:change_regenerate_speed(amount * multiplier, tweak_data.upgrades.kill_change_regenerate_speed_percentage)
 	end
+	local gain_throwable_per_kill = managers.player:upgrade_value("team", "crew_throwable_regen", 0)
+	if gain_throwable_per_kill ~= 0 then
+		self._throw_regen_kills = (self._throw_regen_kills or 0) + 1
+		if gain_throwable_per_kill < self._throw_regen_kills then
+			managers.player:add_grenade_amount(1, true)
+			self._throw_regen_kills = 0
+		end
+	end
 	if self._on_killshot_t and t < self._on_killshot_t then
 		return
 	end
@@ -1337,6 +1345,29 @@ function PlayerManager:upgrade_value(category, upgrade, default)
 	if value ~= false then
 	end
 	return value or default or 0 or false
+end
+
+function PlayerManager:crew_ability_upgrade_value(upgrade, default)
+	if not self._global.upgrades.team or not self._global.upgrades.team[upgrade] then
+		return default or 0
+	end
+	local ai_level = self:upgrade_value("team", "crew_active", 0)
+	local level = self._global.upgrades.team[upgrade]
+	local value = tweak_data.upgrades.values.team[upgrade][level]
+	print(level, value, ai_level)
+	return value and value[ai_level] or default
+end
+
+function PlayerManager:start_custom_cooldown(category, upgrade, cooldown)
+	self["_cooldown_" .. category .. "_" .. upgrade] = Application:time() + cooldown
+end
+
+function PlayerManager:is_custom_cooldown_not_active(category, upgrade)
+	return self:has_category_upgrade(category, upgrade) and not self:has_active_ability_cooldown(category .. "_" .. upgrade)
+end
+
+function PlayerManager:get_custom_cooldown_left(category, upgrade)
+	return self:get_ability_cooldown_left(category .. "_" .. upgrade)
 end
 
 function PlayerManager:consumable_upgrade_value(upgrade, default)
@@ -1783,6 +1814,7 @@ end
 
 function PlayerManager:mod_movement_penalty(movement_penalty)
 	local skill_mods = self:upgrade_value("player", "passive_armor_movement_penalty_multiplier", 1)
+	skill_mods = skill_mods * self:upgrade_value("team", "crew_reduce_speed_penalty", 1)
 	if skill_mods < 1 and movement_penalty < 1 then
 		local penalty = 1 - movement_penalty
 		penalty = penalty * skill_mods
@@ -1830,6 +1862,7 @@ function PlayerManager:body_armor_skill_addend(override_armor)
 		local max_health = (PlayerDamage._HEALTH_INIT + self:health_skill_addend()) * health_multiplier
 		addend = addend + max_health * self:upgrade_value("player", "armor_increase", 1)
 	end
+	addend = addend + self:upgrade_value("team", "crew_add_armor", 0)
 	return addend
 end
 
@@ -1860,6 +1893,7 @@ function PlayerManager:skill_dodge_chance(running, crouching, on_zipline, overri
 	local detection_risk_add_dodge_chance = managers.player:upgrade_value("player", "detection_risk_add_dodge_chance")
 	chance = chance + self:get_value_from_risk_upgrade(detection_risk_add_dodge_chance, detection_risk)
 	chance = chance + self:upgrade_value("player", tostring(override_armor or managers.blackmarket:equipped_armor(true, true)) .. "_dodge_addend", 0)
+	chance = chance + self:upgrade_value("team", "crew_add_dodge", 0)
 	return chance
 end
 
@@ -1871,6 +1905,12 @@ function PlayerManager:stamina_multiplier()
 	multiplier = multiplier + self:get_hostage_bonus_multiplier("stamina") - 1
 	multiplier = managers.crime_spree:modify_value("PlayerManager:GetStaminaMultiplier", multiplier)
 	return multiplier
+end
+
+function PlayerManager:stamina_addend()
+	local addend = 0
+	addend = addend + self:upgrade_value("team", "crew_add_stamina", 0)
+	return addend
 end
 
 function PlayerManager:critical_hit_chance()
@@ -1930,6 +1970,14 @@ function PlayerManager:health_regen()
 	return health_regen
 end
 
+function PlayerManager:fixed_health_regen(health_ratio)
+	local health_regen = 0
+	if not health_ratio or not self:is_damage_health_ratio_active(health_ratio) then
+		health_regen = health_regen + self:upgrade_value("team", "crew_health_regen", 0)
+	end
+	return health_regen
+end
+
 function PlayerManager:max_health()
 	local base_health = PlayerDamage._HEALTH_INIT
 	local health = (base_health + self:health_skill_addend()) * self:health_skill_multiplier()
@@ -1970,6 +2018,7 @@ end
 
 function PlayerManager:health_skill_addend()
 	local addend = 0
+	addend = addend + self:upgrade_value("team", "crew_add_health", 0)
 	if table.contains(self._global.kit.equipment_slots, "thick_skin") then
 		addend = addend + self:upgrade_value("player", "thick_skin", 0)
 	end
@@ -3942,6 +3991,7 @@ function PlayerManager:soft_reset()
 	}
 	self._global.synced_grenades = {}
 	self:clear_carry(true)
+	self._throw_regen_kills = nil
 end
 
 function PlayerManager:on_peer_synch_request(peer)
@@ -4355,4 +4405,14 @@ end
 
 function PlayerManager:_dodge_replenish_armor()
 	self:player_unit():character_damage():_regenerate_armor()
+end
+
+function PlayerManager:crew_add_concealment(new_value)
+	for k, v in pairs(managers.network:session():all_peers()) do
+		local unit = v:unit()
+		print(unit)
+		if unit then
+			unit:base():update_concealment()
+		end
+	end
 end

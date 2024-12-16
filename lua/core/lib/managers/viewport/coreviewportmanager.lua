@@ -55,8 +55,10 @@ function ViewportManager:end_frame(t, dt)
 end
 
 function ViewportManager:destroy()
-	for _, svp in pairs(self:_all_ao()) do
+	local _, svp = next(self:_all_ao())
+	while svp do
 		svp:destroy()
+		_, svp = next(self:_all_ao())
 	end
 	self._env_manager:destroy()
 end

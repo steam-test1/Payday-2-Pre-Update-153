@@ -11,11 +11,13 @@ function UnitNetworkHandler:set_unit(unit, character_name, outfit_string, outfit
 		return
 	end
 	if peer_id == 0 then
+		local loadout = managers.blackmarket:unpack_henchman_loadout_string(outfit_string)
+		managers.blackmarket:verfify_recived_crew_loadout(loadout, true)
 		local crim_data = managers.criminals:character_data_by_name(character_name)
 		if not crim_data or not crim_data.ai then
-			managers.criminals:add_character(character_name, unit, peer_id, true)
+			managers.criminals:add_character(character_name, unit, peer_id, true, loadout)
 		else
-			managers.criminals:set_unit(character_name, unit)
+			managers.criminals:set_unit(character_name, unit, loadout)
 		end
 		unit:movement():set_character_anim_variables()
 		return

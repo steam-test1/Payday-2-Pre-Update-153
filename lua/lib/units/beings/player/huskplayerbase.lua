@@ -64,6 +64,12 @@ function HuskPlayerBase:set_upgrade_value(category, upgrade, level)
 	end
 end
 
+function HuskPlayerBase:update_concealment()
+	local con_mul, index = managers.blackmarket:get_concealment_of_peer(managers.network:session():peer_by_unit(self._unit))
+	self:set_suspicion_multiplier("equipment", 1 / con_mul)
+	self:set_detection_multiplier("equipment", 1 / con_mul)
+end
+
 function HuskPlayerBase:set_temporary_upgrade_owned(category, upgrade, level, index)
 	local upgrade_values = managers.player:upgrade_value_by_level(category, upgrade, level)
 	if type(upgrade_values) ~= "table" then

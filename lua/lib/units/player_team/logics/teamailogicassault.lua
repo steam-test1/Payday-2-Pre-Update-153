@@ -169,7 +169,11 @@ end
 
 function TeamAILogicAssault.mark_enemy(data, criminal, to_mark, play_sound, play_action)
 	if play_sound then
-		criminal:sound():say(to_mark:base():char_tweak().priority_shout .. "x_any", true)
+		local callout = not criminal:brain()._last_mark_shout or TimerManager:game():time() - criminal:brain()._last_mark_shout > tweak_data.sound.criminal_sound.ai_callout_cooldown
+		if callout then
+			criminal:sound():say(to_mark:base():char_tweak().priority_shout .. "x_any", true)
+			criminal:brain()._last_mark_shout = TimerManager:game():time()
+		end
 	end
 	if play_action and not criminal:movement():chk_action_forbidden("action") then
 		local new_action = {

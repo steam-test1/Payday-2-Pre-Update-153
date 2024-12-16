@@ -349,6 +349,12 @@ function BaseInteractionExt:interact_start(player, data)
 	return self:interact(player)
 end
 
+BaseInteractionExt.crew_interact_blacklist = {
+	corpse_alarm_pager = true,
+	intimidate = true,
+	hostage_convert = true
+}
+
 function BaseInteractionExt:_timer_value()
 	return self._tweak_data.timer
 end
@@ -359,6 +365,9 @@ function BaseInteractionExt:_get_timer()
 		return modified_timer
 	end
 	local multiplier = 1
+	if not self.crew_interact_blacklist[self.tweak_data] then
+		multiplier = multiplier * managers.player:crew_ability_upgrade_value("crew_interact", 1)
+	end
 	if self._tweak_data.upgrade_timer_multiplier then
 		multiplier = multiplier * managers.player:upgrade_value(self._tweak_data.upgrade_timer_multiplier.category, self._tweak_data.upgrade_timer_multiplier.upgrade, 1)
 	end

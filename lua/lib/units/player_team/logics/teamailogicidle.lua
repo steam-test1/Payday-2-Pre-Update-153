@@ -735,6 +735,9 @@ function TeamAILogicIdle._check_should_relocate(data, my_data, objective)
 end
 
 function TeamAILogicIdle._ignore_shield(unit, attention)
+	if managers.player:has_category_upgrade("team", "crew_ai_ap_ammo") then
+		return false
+	end
 	if not TeamAILogicIdle._shield_check then
 		TeamAILogicIdle._shield_check = managers.slot:get_mask("enemy_shield_check")
 	end

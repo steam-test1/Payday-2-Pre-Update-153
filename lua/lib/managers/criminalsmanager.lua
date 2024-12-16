@@ -1,5 +1,5 @@
 CriminalsManager = CriminalsManager or class()
-CriminalsManager.MAX_NR_TEAM_AI = 2
+CriminalsManager.MAX_NR_TEAM_AI = 3
 CriminalsManager.MAX_NR_CRIMINALS = 4
 CriminalsManager.EVENTS = {
 	"on_criminal_added",
@@ -9,6 +9,11 @@ CriminalsManager.EVENTS = {
 function CriminalsManager:init()
 	self._listener_holder = EventListenerHolder:new()
 	self:_create_characters()
+	self._loadout_map = {}
+	self._loadout_slots = {}
+	for i = 1, CriminalsManager.MAX_NR_TEAM_AI do
+		self._loadout_slots[i] = {}
+	end
 end
 
 function CriminalsManager:_create_characters()
@@ -168,10 +173,13 @@ function CriminalsManager:_remove(id)
 	data.peer_id = 0
 	data.data = {}
 	self:event_listener():call("on_criminal_removed", data)
+	if Network:is_server() then
+		call_on_next_update(callback(self, self, "_reassign_loadouts"), "CriminalsManager:_reassign_loadouts")
+	end
 end
 
-function CriminalsManager:add_character(name, unit, peer_id, ai)
-	print("[CriminalsManager:add_character]", name, unit, peer_id, ai)
+function CriminalsManager:add_character(name, unit, peer_id, ai, ai_loadout)
+	print("[CriminalsManager]:add_character", name, unit, peer_id, ai)
 	for id, data in pairs(self._characters) do
 		if data.name == name then
 			if data.taken then
@@ -184,8 +192,15 @@ function CriminalsManager:add_character(name, unit, peer_id, ai)
 			data.unit = unit
 			data.peer_id = peer_id
 			data.data.ai = ai or false
-			data.data.mask_id = data.static_data.ai_mask_id
-			data.data.mask_blueprint = nil
+			if ai_loadout then
+				unit:base():set_loadout(ai_loadout)
+			end
+			data.data.mask_id = managers.blackmarket:get_real_mask_id(ai_loadout and ai_loadout.mask or data.static_data.ai_mask_id, nil, name)
+			if Network:is_server() and ai_loadout then
+				local crafted = managers.blackmarket:get_crafted_category_slot("masks", ai_loadout and ai_loadout.mask_slot)
+				data.data.mask_blueprint = crafted and crafted.blueprint
+			end
+			data.data.mask_blueprint = data.data.mask_blueprint or ai_loadout and ai_loadout.mask_blueprint
 			data.data.mask_obj = managers.blackmarket:mask_unit_name_by_mask_id(data.data.mask_id, nil, name)
 			if not ai and unit then
 				local mask_id = managers.network:session():peer(peer_id):mask_id()
@@ -221,8 +236,8 @@ function CriminalsManager:add_character(name, unit, peer_id, ai)
 	end
 end
 
-function CriminalsManager:set_unit(name, unit)
-	print("[CriminalsManager:set_unit] name", name, "unit", unit)
+function CriminalsManager:set_unit(name, unit, ai_loadout)
+	print("[CriminalsManager]:set_unit", name, unit)
 	Application:stack_dump()
 	for id, data in pairs(self._characters) do
 		if data.name == name then
@@ -234,8 +249,12 @@ function CriminalsManager:set_unit(name, unit)
 			data.unit = unit
 			managers.hud:remove_mugshot_by_character_name(data.name)
 			data.data.mugshot_id = managers.hud:add_mugshot_by_unit(unit)
-			data.data.mask_id = data.static_data.ai_mask_id
-			data.data.mask_blueprint = nil
+			data.data.mask_id = managers.blackmarket:get_real_mask_id(ai_loadout and ai_loadout.mask or data.static_data.ai_mask_id, nil, name)
+			if Network:is_server() and ai_loadout then
+				local crafted = managers.blackmarket:get_crafted_category_slot("masks", ai_loadout and ai_loadout.mask_slot)
+				data.data.mask_blueprint = crafted and crafted.blueprint
+			end
+			data.data.mask_blueprint = data.data.mask_blueprint or ai_loadout and ai_loadout.mask_blueprint
 			data.data.mask_obj = managers.blackmarket:mask_unit_name_by_mask_id(data.data.mask_id, nil, name)
 			if not data.data.ai then
 				local peer = managers.network:session():peer(data.peer_id)
@@ -256,6 +275,16 @@ function CriminalsManager:set_unit(name, unit)
 			end
 			unit:sound():set_voice(data.static_data.voice)
 			break
+		end
+	end
+	if ai_loadout then
+		local vis = unit:inventory()._mask_visibility
+		unit:base():set_loadout(ai_loadout)
+		unit:inventory():preload_mask()
+		unit:inventory():set_mask_visibility(not vis)
+		unit:inventory():set_mask_visibility(vis)
+		if Network:is_server() then
+			unit:movement():add_weapons()
 		end
 	end
 end
@@ -398,6 +427,17 @@ function CriminalsManager:character_peer_id_by_unit(unit)
 end
 
 function CriminalsManager:get_free_character_name()
+	local preferred = managers.blackmarket:preferred_henchmen()
+	for _, name in ipairs(preferred) do
+		local data = table.find_value(self._characters, function(val)
+			return val.name == name
+		end)
+		print(inspect(data))
+		if data and not data.taken then
+			print("chosen", name)
+			return name
+		end
+	end
 	local available = {}
 	for id, data in pairs(self._characters) do
 		local taken = data.taken
@@ -567,4 +607,73 @@ function CriminalsManager:save_current_character_names()
 			index = index + 1
 		end
 	end
+end
+
+function CriminalsManager:_reserve_loadout_for(char)
+	print("[CriminalsManager]._reserve_loadout_for", char)
+	local char_index = char
+	if type(char) == "string" then
+		for id, data in pairs(self._characters) do
+			if data.name == char then
+				char_index = id
+				break
+			end
+		end
+	end
+	local my_char = self._characters[char_index]
+	local slot = self._loadout_map[my_char.name]
+	slot = slot and self._loadout_slots[slot]
+	if slot and slot.char_index == char_index then
+		self._loadout_slots[self._loadout_map[my_char.name]].char_index = nil
+	end
+	for i = 1, managers.criminals.MAX_NR_TEAM_AI do
+		local data = self._loadout_slots[i]
+		local char_data = data and self._characters[data.char_index]
+		if not (char_data and char_data.data.ai and char_data.taken) or data.char_index == char_index then
+			local slot = self._loadout_slots[i]
+			slot.char_index = char_index
+			self._loadout_map[self._characters[char_index].name] = i
+			return managers.blackmarket:henchman_loadout(i, true)
+		end
+	end
+	debug_pause("Failed to reserve loadout!")
+	return managers.blackmarket:henchman_loadout(1, true)
+end
+
+function CriminalsManager:_reassign_loadouts()
+	print("[CriminalsManager]:_reassign_loadouts")
+	local current_taken = {}
+	local remove_from_index = 1
+	for i = 1, managers.criminals.MAX_NR_TEAM_AI do
+		local data = self._loadout_slots[i]
+		local char_data = data and self._characters[data.char_index]
+		current_taken[i] = char_data and char_data.data.ai and char_data.taken and char_data or false
+		remove_from_index = current_taken[i] and remove_from_index + 1 or remove_from_index
+	end
+	local to_reassign = {}
+	for i = remove_from_index, managers.criminals.MAX_NR_TEAM_AI do
+		local data = current_taken[i]
+		if data then
+			table.insert(to_reassign, data)
+			local index = self._loadout_map[data.name]
+			if index then
+				self._loadout_slots[index] = {}
+			end
+			self._loadout_map[data.name] = nil
+		end
+	end
+	for k, v in pairs(to_reassign) do
+		local loadout = self:_reserve_loadout_for(v.name)
+		self:set_unit(v.name, v.unit, loadout)
+		managers.network:session():send_to_peers_synched("set_unit", v.unit, v.name, managers.blackmarket:henchman_loadout_string_from_loadout(loadout), 0, 0, tweak_data.levels:get_default_team_ID("player"))
+	end
+end
+
+function CriminalsManager:get_loadout_string_for(char_name)
+	return managers.blackmarket:henchman_loadout_string(self:get_loadout_for(char_name))
+end
+
+function CriminalsManager:get_loadout_for(char_name)
+	local index = self._loadout_map[char_name] or 1
+	return managers.blackmarket:henchman_loadout(index, true)
 end
