@@ -38,6 +38,9 @@ require("lib/managers/menu/CrimeSpreeRewardsMenuComponent")
 require("lib/managers/menu/CrimeSpreeModifierDetailsPage")
 require("lib/managers/menu/CrimeSpreeRewardsDetailsPage")
 require("lib/managers/menu/CrimeSpreeModifiersMenuComponent")
+require("lib/utils/gui/GUIObjectWrapper")
+require("lib/utils/gui/FineText")
+require("lib/managers/menu/CrimeSpreeForcedModifiersMenuComponent")
 require("lib/managers/menu/CrimeSpreeGageAssetsItem")
 require("lib/managers/menu/CrimeSpreeMissionEndOptions")
 require("lib/managers/menu/StageEndScreenTabCrimeSpree")
@@ -233,6 +236,13 @@ function MenuComponentManager:init()
 		create = callback(self, self, "create_crime_spree_modifiers_gui"),
 		close = callback(self, self, "close_crime_spree_modifiers_gui")
 	}
+	self._active_components.crime_spree_forced_modifiers = {
+		create = callback(self, self, "create_crime_spree_forced_modifiers_gui"),
+		close = callback(self, self, "close_crime_spree_forced_modifiers_gui")
+	}
+	self._active_components.crime_spree_forced_modifiers_dummy = {
+		create = callback(self, self, "check_crime_spree_forced_modifiers")
+	}
 	self._active_components.crime_spree_rewards = {
 		create = callback(self, self, "create_crime_spree_rewards_gui"),
 		close = callback(self, self, "close_crime_spree_rewards_gui")
@@ -417,8 +427,10 @@ function MenuComponentManager:set_active_components(components, node)
 		return
 	end
 	local to_close = {}
-	for component, _ in pairs(self._active_components) do
-		to_close[component] = true
+	for component, callbacks in pairs(self._active_components) do
+		if callbacks.close then
+			to_close[component] = true
+		end
 	end
 	for _, component in ipairs(components) do
 		if self._active_components[component] then
@@ -3770,7 +3782,9 @@ end
 function MenuComponentManager:close()
 	print("[MenuComponentManager:close]")
 	for _, component in pairs(self._active_components) do
-		component:close()
+		if component.close then
+			component:close()
+		end
 	end
 	self:close_friends_gui()
 	self:close_profile_gui()
@@ -4079,6 +4093,32 @@ end
 
 function MenuComponentManager:crime_spree_modifiers()
 	return self._crime_spree_modifiers
+end
+
+function MenuComponentManager:check_crime_spree_forced_modifiers(node)
+	managers.crime_spree:check_forced_modifiers()
+end
+
+function MenuComponentManager:create_crime_spree_forced_modifiers_gui(node)
+	print("[Debug] MenuComponentManager:create_crime_spree_forced_modifiers_gui")
+	if not node then
+		return
+	end
+	print("[Debug] Pass!")
+	self._crime_spree_forced_modifiers = self._crime_spree_forced_modifiers or CrimeSpreeForcedModifiersMenuComponent:new(self._ws, self._fullscreen_ws, node)
+	self:register_component("crime_spree_forced_modifiers", self._crime_spree_forced_modifiers)
+end
+
+function MenuComponentManager:close_crime_spree_forced_modifiers_gui(node)
+	if self._crime_spree_forced_modifiers then
+		self._crime_spree_forced_modifiers:close()
+		self._crime_spree_forced_modifiers = nil
+		self:unregister_component("crime_spree_forced_modifiers")
+	end
+end
+
+function MenuComponentManager:crime_spree_forced_modifiers()
+	return self._crime_spree_forced_modifiers
 end
 
 function MenuComponentManager:create_crime_spree_rewards_gui(node)

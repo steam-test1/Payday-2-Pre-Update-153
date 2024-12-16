@@ -496,3 +496,23 @@ function BlackMarketTweakData:_init_deployables(tweak_data)
 	self.deployables.bodybags_bag.name_id = "bm_equipment_bodybags_bag"
 	self:_add_desc_from_name_macro(self.deployables)
 end
+
+function BlackMarketTweakData:get_mask_icon(mask_id)
+	local guis_catalog = "guis/"
+	local bundle_folder = tweak_data.blackmarket.masks[mask_id] and tweak_data.blackmarket.masks[mask_id].texture_bundle_folder
+	if bundle_folder then
+		guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+	end
+	return guis_catalog .. "textures/pd2/blackmarket/icons/masks/" .. tostring(mask_id)
+end
+
+function BlackMarketTweakData:get_character_icon(character)
+	local character_name = CriminalsManager.convert_old_to_new_character_workname(character)
+	local guis_catalog = "guis/"
+	local character_table = tweak_data.blackmarket.characters[character] or tweak_data.blackmarket.characters.locked[character_name]
+	local bundle_folder = character_table and character_table.texture_bundle_folder
+	if bundle_folder then
+		guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
+	end
+	return guis_catalog .. "textures/pd2/blackmarket/icons/characters/" .. character_name
+end

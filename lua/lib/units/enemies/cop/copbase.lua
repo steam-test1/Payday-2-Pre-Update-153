@@ -44,6 +44,7 @@ function CopBase:init(unit)
 	self._foot_obj_map.right = self._unit:get_object(Idstring("RightToeBase"))
 	self._foot_obj_map.left = self._unit:get_object(Idstring("LeftToeBase"))
 	self._is_in_original_material = true
+	self._buffs = {}
 end
 
 function CopBase:post_init()
@@ -75,6 +76,11 @@ function CopBase:_chk_spawn_gear()
 		self._headwear_unit = World:spawn_unit(Idstring("units/payday2/characters/ene_acc_spook_santa_hat/ene_acc_spook_santa_hat"), Vector3(), Rotation())
 		self._unit:link(align_obj_name, self._headwear_unit, self._headwear_unit:orientation_object():name())
 	end
+end
+
+function CopBase:has_tag(tag)
+	local tags = self:char_tweak().tags
+	return tags and table.contains(tags, tag)
 end
 
 function CopBase:default_weapon_name()
@@ -177,6 +183,12 @@ function CopBase:save(data)
 	elseif self._unit:interaction() and self._unit:interaction().tweak_data == "hostage_convert" then
 		data.is_hostage_convert = true
 	end
+	data.buffs = {}
+	for name, buff_list in pairs(self._buffs) do
+		data.buffs[name] = {
+			_total = buff_list._total
+		}
+	end
 end
 
 function CopBase:load(data)
@@ -185,6 +197,7 @@ function CopBase:load(data)
 	elseif data.is_hostage_convert then
 		self._unit:interaction():set_tweak_data("hostage_convert")
 	end
+	self._buffs = data.buffs
 end
 
 function CopBase:swap_material_config(material_applied_clbk)
@@ -241,4 +254,64 @@ function CopBase:pre_destroy(unit)
 	self._ext_movement:pre_destroy()
 	self._unit:inventory():pre_destroy()
 	UnitBase.pre_destroy(self, unit)
+end
+
+function CopBase:_refresh_buff_total(name)
+	local buff_list = self._buffs[name]
+	local sum = 0
+	for _, buff in pairs(buff_list.buffs) do
+		sum = sum + buff
+	end
+	buff_list._total = sum
+	if Network:is_server() then
+		managers.network:session():send_to_peers_synched("sync_enemy_buff", self._unit, name, math.round(buff_list._total * 1000))
+	end
+end
+
+function CopBase:_sync_buff_total(name, total)
+	self._buffs[name] = self._buffs[name] or {}
+	self._buffs[name]._total = total * 0.001
+end
+
+function CopBase:add_buff(name, value)
+	if not Network:is_server() then
+		return
+	end
+	local buff_list = self._buffs[name]
+	if not buff_list then
+		buff_list = {
+			_next_id = 1,
+			buffs = {}
+		}
+		self._buffs[name] = buff_list
+	end
+	local buff_list = self._buffs[name]
+	local id = buff_list._next_id
+	buff_list.buffs[id] = value
+	buff_list._next_id = id + 1
+	self:_refresh_buff_total(name)
+	return id
+end
+
+function CopBase:remove_buff_by_id(name, id)
+	if not Network:is_server() then
+		return
+	end
+	local buff_list = self._buffs[name]
+	if not buff_list then
+		return
+	end
+	buff_list.buffs[id] = nil
+	self:_refresh_buff_total(name)
+end
+
+function CopBase:get_total_buff(name)
+	local buff_list = self._buffs[name]
+	if not buff_list then
+		return 0
+	end
+	if buff_list and buff_list._total then
+		return buff_list._total
+	end
+	return 0
 end

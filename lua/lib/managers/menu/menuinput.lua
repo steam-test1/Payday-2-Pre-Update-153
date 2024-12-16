@@ -46,6 +46,10 @@ function MenuInput:back(...)
 	MenuInput.super.back(self, ...)
 end
 
+function MenuInput:force_back(queue, skip_nodes)
+	self._logic:navigate_back(queue == true or false, type(skip_nodes) == "number" and skip_nodes or false)
+end
+
 function MenuInput:set_back_enabled(enabled)
 	self._back_disabled = not enabled
 end
@@ -268,7 +272,7 @@ function MenuInput:input_multi_choice(item, controller, mouse_click)
 			self:set_axis_x_timer(slider_delay_pressed)
 		end
 	end
-	if (controller:get_input_pressed("confirm") or mouse_click) and item:next() then
+	if controller:get_input_pressed("confirm") and item:next() then
 		self:post_event("selection_next")
 		self._logic:trigger_item(true, item)
 	end
@@ -346,7 +350,7 @@ function MenuInput:mouse_pressed(o, button, x, y)
 			for _, row_item in pairs(node_gui.row_items) do
 				if row_item.item:parameters().pd2_corner then
 					if row_item.gui_text:inside(x, y) then
-						local item = self._logic:selected_item()
+						local item = row_item.item
 						if item then
 							self._item_input_action_map[item.TYPE](item, self._controller, true)
 							return node_gui.mouse_pressed and node_gui:mouse_pressed(button, x, y)
@@ -375,7 +379,7 @@ function MenuInput:mouse_pressed(o, button, x, y)
 						end
 					end
 				elseif row_item.type == "kitslot" then
-					local item = self._logic:selected_item()
+					local item = row_item.item
 					if row_item.arrow_right:inside(x, y) then
 						item:next()
 						self._logic:trigger_item(true, item)
@@ -416,12 +420,11 @@ function MenuInput:mouse_pressed(o, button, x, y)
 						end
 					end
 				elseif row_item.type == "chat" then
-					local item = self._logic:selected_item()
 					if row_item.chat_input:inside(x, y) then
 						row_item.chat_input:script().set_focus(true)
 					end
 				else
-					local item = self._logic:selected_item()
+					local item = row_item.item
 					if item then
 						self._item_input_action_map[item.TYPE](item, self._controller, true)
 						return node_gui.mouse_pressed and node_gui:mouse_pressed(button, x, y)
@@ -499,6 +502,15 @@ function MenuInput:mouse_double_click(o, button, x, y)
 		return
 	end
 	return managers.menu:active_menu().renderer:mouse_double_click(o, button, x, y)
+end
+
+local print_timers = {}
+
+local function upd_print(id, t, ...)
+	if not print_timers[id] or t > print_timers[id] then
+		print(...)
+		print_timers[id] = t + 0.5
+	end
 end
 
 function MenuInput:update(t, dt)

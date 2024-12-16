@@ -1648,7 +1648,7 @@ function HUDStageEndScreen:coin_up(new_coins, alpha_multi)
 		local size = tweak_data.menu.pd2_massive_font_size
 		local ding_size = size * (1 + ding_scale)
 		wait(0.1)
-		o:set_text(tostring(new_coins))
+		o:set_text(managers.experience:cash_string(new_coins))
 	end
 	
 	local function text_ding_func(o)
@@ -1718,7 +1718,7 @@ function HUDStageEndScreen:coin_up(new_coins, alpha_multi)
 	})
 	ding_text:animate(text_ding_func)
 	self._coins_text:stop()
-	self._coins_text:animate(level_text_func, 1, tostring(math.floor(new_coins)))
+	self._coins_text:animate(level_text_func, 1, managers.experience:cash_string(math.floor(new_coins)))
 end
 
 function HUDStageEndScreen:safehouse_currency_fade_in(t, dt)

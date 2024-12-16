@@ -104,6 +104,9 @@ function MenuMainState:at_enter(old_state)
 			end
 		end
 		managers.tango:attempt_announce_tango_weapon()
+		if managers.crime_spree:was_cleared() then
+			managers.crime_spree:show_cleared_dialog()
+		end
 	end
 	if Global.savefile_manager.backup_save_enabled then
 		managers.savefile:save_progress("local_hdd")

@@ -3067,3 +3067,21 @@ function UnitNetworkHandler:sync_special_character_material(character_unit, mate
 		end
 	end
 end
+
+function UnitNetworkHandler:sync_enemy_buff(enemy_unit, buff_category, buff_total, sender)
+	if not (alive(enemy_unit) and self._verify_gamestate(self._gamestate_filter.any_ingame)) or not self._verify_sender(sender) then
+		return
+	end
+	enemy_unit:base():_sync_buff_total(buff_category, buff_total)
+end
+
+function UnitNetworkHandler:sync_tear_gas_grenade_properties(grenade, radius, damage, duration)
+	grenade:base():set_properties({
+		radius = radius,
+		damage = damage * 0.1
+	})
+end
+
+function UnitNetworkHandler:sync_tear_gas_grenade_detonate(grenade)
+	grenade:base():detonate()
+end

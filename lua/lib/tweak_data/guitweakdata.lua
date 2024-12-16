@@ -4708,7 +4708,12 @@ function GuiTweakData:init()
 		"category",
 		"bonus"
 	}
-	self.new_heists = {limit = 3}
+	self.new_heists = {limit = 4}
+	table.insert(self.new_heists, {
+		name_id = "menu_nh_crime_spree_update",
+		texture_path = "guis/textures/pd2/new_heists/crime_spree_update",
+		url = "http://store.steampowered.com/news/?appids=218620"
+	})
 	table.insert(self.new_heists, {
 		name_id = "menu_nh_ultimate_edition",
 		texture_path = "guis/textures/pd2/new_heists/ultimate_edition",

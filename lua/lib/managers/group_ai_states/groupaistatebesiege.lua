@@ -361,6 +361,9 @@ end
 function GroupAIStateBesiege:assault_phase_end_time()
 	local task_data = self._task_data.assault
 	local end_t = task_data and task_data.phase_end_t
+	if end_t and task_data.phase == "sustain" then
+		end_t = managers.crime_spree:modify_value("GroupAIStateBesiege:SustainEndTime", end_t)
+	end
 	return end_t
 end
 
@@ -414,11 +417,13 @@ function GroupAIStateBesiege:_upd_assault_task()
 			task_data.phase_end_t = t + self._tweak_data.assault.fade_duration
 		elseif t > task_data.phase_end_t or self._drama_data.zone == "high" then
 			local sustain_duration = math.lerp(self:_get_difficulty_dependent_value(self._tweak_data.assault.sustain_duration_min), self:_get_difficulty_dependent_value(self._tweak_data.assault.sustain_duration_max), math.random()) * self:_get_balancing_multiplier(self._tweak_data.assault.sustain_duration_balance_mul)
+			managers.crime_spree:run_func("OnEnterSustainPhase", sustain_duration)
 			task_data.phase = "sustain"
 			task_data.phase_end_t = t + sustain_duration
 		end
 	elseif task_data.phase == "sustain" then
 		local end_t = self:assault_phase_end_time()
+		task_spawn_allowance = managers.crime_spree:modify_value("GroupAIStateBesiege:SustainSpawnAllowance", task_spawn_allowance, force_pool)
 		if task_spawn_allowance <= 0 then
 			task_data.phase = "fade"
 			task_data.phase_end_t = t + self._tweak_data.assault.fade_duration
@@ -1077,6 +1082,7 @@ function GroupAIStateBesiege:_upd_group_spawning()
 				if self._t > sp_data.delay_t then
 					local units = category.unit_types[current_unit_type]
 					produce_data.name = units[math.random(#units)]
+					produce_data.name = managers.crime_spree:modify_value("GroupAIStateBesiege:SpawningUnit", produce_data.name)
 					local spawned_unit = sp_data.mission_element:produce(produce_data)
 					local u_key = spawned_unit:key()
 					local objective

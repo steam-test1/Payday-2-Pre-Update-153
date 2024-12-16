@@ -280,7 +280,8 @@ function CopActionShoot:update(t)
 		else
 			local spread = self._spread
 			local falloff, i_range = self:_get_shoot_falloff(target_dis, self._falloff)
-			local dmg_mul = falloff.dmg_mul
+			local dmg_buff = self._unit:base():get_total_buff("base_damage")
+			local dmg_mul = (1 + dmg_buff) * falloff.dmg_mul
 			local new_target_pos = self._shoot_history and self:_get_unit_shoot_pos(t, target_pos, target_dis, self._w_usage_tweak, falloff, i_range, autotarget)
 			if new_target_pos then
 				target_pos = new_target_pos
@@ -360,7 +361,8 @@ function CopActionShoot:update(t)
 			end
 			if not melee then
 				local falloff, i_range = self:_get_shoot_falloff(target_dis, self._falloff)
-				local dmg_mul = falloff.dmg_mul
+				local dmg_buff = self._unit:base():get_total_buff("base_damage")
+				local dmg_mul = (1 + dmg_buff) * falloff.dmg_mul
 				local firemode
 				if self._automatic_weap then
 					local random_mode = math.random()
@@ -725,6 +727,7 @@ function CopActionShoot:anim_clbk_melee_strike()
 	local is_weapon = melee_weapon == "weapon"
 	local damage = is_weapon and self._w_usage_tweak.melee_dmg or tweak_data.weapon.npc_melee[melee_weapon].damage
 	local dmg_mul = is_weapon and 1 or self._common_data.char_tweak.melee_weapon_dmg_multiplier or 1
+	dmg_mul = dmg_mul * 1 + self._unit:base():get_total_buff("base_damage")
 	damage = damage * dmg_mul
 	local action_data = {
 		variant = "melee",

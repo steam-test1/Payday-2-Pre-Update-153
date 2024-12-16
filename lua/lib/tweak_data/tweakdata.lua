@@ -1968,6 +1968,7 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.rocket_frag = {}
 	self.projectiles.rocket_frag.launch_speed = 2500
 	self.projectiles.rocket_frag.adjust_z = 0
+	self.projectiles.rocket_frag.push_at_body_index = 0
 	self.projectiles.west_arrow = {}
 	self.projectiles.west_arrow.damage = 100
 	self.projectiles.west_arrow.launch_speed = 2000
@@ -2116,6 +2117,7 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.rocket_ray_frag.damage = 500
 	self.projectiles.rocket_ray_frag.projectile_trail = true
 	self.projectiles.rocket_ray_frag.adjust_z = 0
+	self.projectiles.rocket_ray_frag.push_at_body_index = 0
 	self.projectiles.smoke_screen_grenade = {}
 	self.projectiles.smoke_screen_grenade.damage = 0
 	self.projectiles.smoke_screen_grenade.curve_pow = 0.1

@@ -269,6 +269,13 @@ function MenuManager:back(queue, skip_nodes)
 	end
 end
 
+function MenuManager:force_back(queue, skip_nodes)
+	local active_menu = self._open_menus[#self._open_menus]
+	if active_menu then
+		active_menu.input:force_back(queue, skip_nodes)
+	end
+end
+
 function MenuManager:close_menu(menu_name)
 	self:post_event("menu_exit")
 	if Global.game_settings.single_player and menu_name == "menu_pause" then
@@ -1999,6 +2006,22 @@ function MenuCallbackHandler:abort_mission_visible()
 	return true
 end
 
+function MenuCallbackHandler:level_is_not_stealth_only(item)
+	if self._temp_job_data then
+		local stealth_only_days = 0
+		for _, lc_data in pairs(self._temp_job_data.chain) do
+			local level = tweak_data.levels[lc_data.level_id]
+			if level and level.ghost_required then
+				stealth_only_days = stealth_only_days + 1
+			end
+		end
+		if stealth_only_days == table.size(self._temp_job_data.chain) then
+			return false
+		end
+	end
+	return true
+end
+
 function MenuCallbackHandler:is_custom_safehouse_unlocked()
 	return managers.custom_safehouse:unlocked()
 end
@@ -2268,8 +2291,7 @@ function MenuCallbackHandler:toggle_push_to_talk(item)
 end
 
 function MenuCallbackHandler:toggle_team_AI(item)
-	Global.game_settings.team_ai = item:value() ~= 0
-	Global.game_settings.team_ai_option = item:value()
+	Global.game_settings.team_ai = item:value() == "on"
 	managers.groupai:state():on_criminal_team_AI_enabled_state_changed()
 end
 
@@ -2482,6 +2504,7 @@ function MenuCallbackHandler:open_contract_node(item)
 	local job_tweak = tweak_data.narrative:job_data(item:parameters().id)
 	local is_professional = job_tweak and job_tweak.professional or false
 	local is_competitive = job_tweak and job_tweak.competitive or false
+	self._temp_job_data = job_tweak
 	managers.menu:open_node(Global.game_settings.single_player and "crimenet_contract_singleplayer" or "crimenet_contract_host", {
 		{
 			job_id = item:parameters().id,

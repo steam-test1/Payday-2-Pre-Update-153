@@ -354,6 +354,9 @@ function MenuRenderer:mouse_released(o, button, x, y)
 end
 
 function MenuRenderer:mouse_clicked(o, button, x, y)
+	if self:active_node_gui() and self:active_node_gui().mouse_clicked and self:active_node_gui():mouse_clicked(button, x, y) then
+		return true
+	end
 	if managers.menu_component:mouse_clicked(o, button, x, y) then
 		return true
 	end

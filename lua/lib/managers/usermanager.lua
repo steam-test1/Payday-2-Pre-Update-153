@@ -97,7 +97,7 @@ function GenericUserManager:setup_setting_map()
 	self:setup_setting(44, "net_use_compression", true)
 	self:setup_setting(45, "net_forwarding", true)
 	self:setup_setting(46, "flush_gpu_command_queue", true)
-	self:setup_setting(47, "use_thq_weapon_parts", false)
+	self:setup_setting(47, "use_thq_weapon_parts", true)
 	self:setup_setting(48, "video_ao", "aob")
 	self:setup_setting(49, "parallax_mapping", true)
 	self:setup_setting(50, "video_aa", "fxaa")
@@ -210,9 +210,11 @@ function GenericUserManager:reset_video_setting_map()
 		"fov_standard",
 		"fov_zoom",
 		"light_adaption",
+		"use_thq_weapon_parts",
 		"video_ao",
 		"parallax_mapping",
-		"video_aa"
+		"video_aa",
+		"corpse_limit"
 	}
 	for _, name in pairs(settings) do
 		self:set_setting(name, self:get_default_setting(name))

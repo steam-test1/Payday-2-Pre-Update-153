@@ -642,6 +642,7 @@ function UseInteractionExt:interact(player)
 		managers.mission:call_global_event(self._global_event, player)
 	end
 	self:set_active(false)
+	return true
 end
 
 function UseInteractionExt:sync_interacted(peer, player, status, skip_alive_check)
@@ -2139,11 +2140,11 @@ function MissionElementInteractionExt:_at_interact_interupt(player, complete)
 end
 
 function MissionElementInteractionExt:interact(player, ...)
-	MissionElementInteractionExt.super.interact(self, player, ...)
-	if Network:is_server() then
+	local res = MissionElementInteractionExt.super.interact(self, player, ...)
+	if res and Network:is_server() then
 		self._mission_element:on_interacted(player)
 	end
-	return true
+	return res
 end
 
 function MissionElementInteractionExt:sync_interacted(peer, player, ...)

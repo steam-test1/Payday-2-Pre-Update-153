@@ -7,10 +7,12 @@ function AIRemoveUnitElement:init(unit)
 	self._hed.use_instigator = false
 	self._hed.true_death = false
 	self._hed.force_ragdoll = false
+	self._hed.backup_so = nil
 	table.insert(self._save_values, "elements")
 	table.insert(self._save_values, "use_instigator")
 	table.insert(self._save_values, "true_death")
 	table.insert(self._save_values, "force_ragdoll")
+	table.insert(self._save_values, "backup_so")
 end
 
 function AIRemoveUnitElement:draw_links(t, dt, selected_unit, all_units)
@@ -34,16 +36,38 @@ function AIRemoveUnitElement:update_selected(t, dt, selected_unit, all_units)
 			})
 		end
 	end
+	if self._hed.backup_so then
+		local unit = all_units[self._hed.backup_so]
+		local draw = not selected_unit or unit == selected_unit or self._unit == selected_unit
+		if draw then
+			self:_draw_link({
+				from_unit = self._unit,
+				to_unit = unit,
+				r = 0,
+				g = 0,
+				b = 0.75
+			})
+		end
+	end
 end
 
 function AIRemoveUnitElement:add_element()
 	local ray = managers.editor:unit_by_raycast({mask = 10, ray_type = "editor"})
-	if ray and ray.unit and (string.find(ray.unit:name():s(), "ai_spawn_enemy", 1, true) or string.find(ray.unit:name():s(), "ai_spawn_civilian", 1, true)) then
-		local id = ray.unit:unit_data().unit_id
-		if table.contains(self._hed.elements, id) then
-			table.delete(self._hed.elements, id)
-		else
-			table.insert(self._hed.elements, id)
+	if ray and ray.unit then
+		if string.find(ray.unit:name():s(), "ai_spawn_enemy", 1, true) or string.find(ray.unit:name():s(), "ai_spawn_civilian", 1, true) then
+			local id = ray.unit:unit_data().unit_id
+			if table.contains(self._hed.elements, id) then
+				table.delete(self._hed.elements, id)
+			else
+				table.insert(self._hed.elements, id)
+			end
+		elseif string.find(ray.unit:name():s(), "point_special_objective", 1, true) then
+			local id = ray.unit:unit_data().unit_id
+			if self._hed.backup_so == id then
+				self._hed.backup_so = nil
+			else
+				self._hed.backup_so = id
+			end
 		end
 	end
 end

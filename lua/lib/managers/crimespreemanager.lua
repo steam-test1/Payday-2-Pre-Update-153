@@ -15,6 +15,18 @@ require("lib/modifiers/ModifierShieldReflect")
 require("lib/modifiers/ModifierSkulldozers")
 require("lib/modifiers/ModifierHealSpeed")
 require("lib/modifiers/ModifierMoreMedics")
+require("lib/modifiers/ModifierAssaultExtender")
+require("lib/modifiers/ModifierCloakerArrest")
+require("lib/modifiers/ModifierCloakerTearGas")
+require("lib/modifiers/ModifierDozerMedic")
+require("lib/modifiers/ModifierDozerMinigun")
+require("lib/modifiers/ModifierDozerRage")
+require("lib/modifiers/ModifierHeavySniper")
+require("lib/modifiers/ModifierMedicAdrenaline")
+require("lib/modifiers/ModifierMedicDeathwish")
+require("lib/modifiers/ModifierMedicRage")
+require("lib/modifiers/ModifierShieldPhalanx")
+require("lib/modifiers/ModifierTaserOvercharge")
 require("lib/modifiers/boosts/GageModifier")
 require("lib/modifiers/boosts/GageModifierMaxHealth")
 require("lib/modifiers/boosts/GageModifierMaxArmor")
@@ -35,6 +47,7 @@ require("lib/modifiers/boosts/GageModifierPassivePanic")
 require("lib/modifiers/boosts/GageModifierMeleeInvincibility")
 require("lib/modifiers/boosts/GageModifierLifeSteal")
 CrimeSpreeManager = CrimeSpreeManager or class()
+CrimeSpreeManager.CS_VERSION = 2
 
 function CrimeSpreeManager:init()
 	self:_setup()
@@ -134,39 +147,50 @@ function CrimeSpreeManager:save(data)
 	for _, mission in pairs(self._global.available_missions or {}) do
 		table.insert(available_missions, mission.id)
 	end
-	data.in_progress = self._global.in_progress or false
-	data.spree_level = self._global.spree_level or 0
-	data.reward_level = self._global.reward_level or 0
-	data.missions = available_missions
-	data.randomization_cost = self._global.randomization_cost or false
-	data.start_data = self._global.start_data or nil
-	data.failure = self._global.failure_data or nil
-	data.highest_level = self._global.highest_level or 0
-	data.modifiers = self._global.modifiers or false
-	data.refund_allowed = self._global.refund_allowed
-	data.unshown_rewards = self._global.unshown_rewards or {}
-	data.winning_streak = self._global.winning_streak or 0
+	local save_data = {
+		in_progress = self._global.in_progress or false,
+		spree_level = self._global.spree_level or 0,
+		reward_level = self._global.reward_level or 0,
+		missions = available_missions,
+		randomization_cost = self._global.randomization_cost or false,
+		start_data = self._global.start_data or nil,
+		failure = self._global.failure_data or nil,
+		highest_level = self._global.highest_level or 0,
+		modifiers = self._global.modifiers or false,
+		refund_allowed = self._global.refund_allowed,
+		unshown_rewards = self._global.unshown_rewards or {},
+		winning_streak = self._global.winning_streak or 0,
+		cs_version = CrimeSpreeManager.CS_VERSION
+	}
+	data.crime_spree = save_data
 end
 
 function CrimeSpreeManager:load(data, version)
-	self._global.in_progress = data.in_progress or false
-	self._global.spree_level = data.spree_level or 0
-	self._global.reward_level = data.reward_level or 0
-	self._global.randomization_cost = data.randomization_cost or false
-	self._global.start_data = data.start_data or nil
-	self._global.failure_data = data.failure or nil
-	self._global.highest_level = data.highest_level or 0
-	self._global.modifiers = data.modifiers or {}
-	self._global.refund_allowed = data.refund_allowed
-	self._global.unshown_rewards = data.unshown_rewards or {}
-	self._global.winning_streak = data.winning_streak or 0
-	self._global.available_missions = {}
-	for _, id in pairs(data.missions or {}) do
-		local mission = self:get_mission(id)
-		if mission then
-			table.insert(self._global.available_missions, mission)
+	local save_data = data.crime_spree or {}
+	save_data.highest_level = save_data.highest_level or data.highest_level
+	if save_data.cs_version == CrimeSpreeManager.CS_VERSION then
+		self._global.in_progress = save_data.in_progress or false
+		self._global.spree_level = save_data.spree_level or 0
+		self._global.reward_level = save_data.reward_level or 0
+		self._global.randomization_cost = save_data.randomization_cost or false
+		self._global.start_data = save_data.start_data or nil
+		self._global.failure_data = save_data.failure or nil
+		self._global.modifiers = save_data.modifiers or {}
+		self._global.refund_allowed = save_data.refund_allowed
+		self._global.unshown_rewards = save_data.unshown_rewards or {}
+		self._global.winning_streak = save_data.winning_streak or 0
+		self._global.available_missions = {}
+		for _, id in pairs(save_data.missions or {}) do
+			local mission = self:get_mission(id)
+			if mission then
+				table.insert(self._global.available_missions, mission)
+			end
 		end
+	else
+		self:reset_crime_spree()
+		self._global.cleared = true
 	end
+	self._global.highest_level = save_data.highest_level or 0
 end
 
 function CrimeSpreeManager:sync_save(data)
@@ -316,6 +340,15 @@ function CrimeSpreeManager:current_played_mission()
 	end
 end
 
+function CrimeSpreeManager:was_cleared()
+	return not not self._global.cleared
+end
+
+function CrimeSpreeManager:show_cleared_dialog()
+	self._global.cleared = nil
+	managers.menu:show_crime_spree_cleared_dialog()
+end
+
 function CrimeSpreeManager:has_failed()
 	return self._global.failure_data ~= nil
 end
@@ -355,10 +388,13 @@ function CrimeSpreeManager:active_modifier_classes()
 	return self._modifiers or {}
 end
 
-function CrimeSpreeManager:modifiers_to_select(table_name)
+function CrimeSpreeManager:modifiers_to_select(table_name, add_repeating)
 	local modifiers_table = tweak_data.crime_spree.modifiers[table_name]
 	local base_number = self:server_spree_level() / tweak_data.crime_spree.modifier_levels[table_name]
 	local active_number = 0
+	if not add_repeating then
+		base_number = math.min(base_number, #modifiers_table)
+	end
 	for _, modifier_data in ipairs(self:active_modifiers()) do
 		local contains = false
 		for _, modifier in ipairs(modifiers_table) do
@@ -442,33 +478,12 @@ function CrimeSpreeManager:get_mission(mission_id)
 	end
 end
 
-function CrimeSpreeManager:_get_random_mission(missions_table, stealth)
-	local mission
-	while true do
-		mission = table.random(missions_table)
-		if not mission.level.dlc or managers.dlc:is_dlc_unlocked(mission.level.dlc) then
-			if stealth then
-				local level_tweak = tweak_data.levels[mission.level.level_id]
-				if level_tweak and level_tweak.ghost_bonus then
-					break
-				end
-			else
-				break
-			end
-		end
-	end
-	return mission
-end
-
 function CrimeSpreeManager:get_random_missions(prev_missions)
-	local stealthable = math.random(3)
-	local short = self:_get_random_mission(tweak_data.crime_spree.missions.short, stealthable == 1)
-	local med = self:_get_random_mission(tweak_data.crime_spree.missions.medium, stealthable == 2)
-	local long = self:_get_random_mission(tweak_data.crime_spree.missions.long, stealthable == 3)
+	local mission_lists = tweak_data.crime_spree.missions
 	return {
-		short,
-		med,
-		long
+		table.random(mission_lists[1]),
+		table.random(mission_lists[2]),
+		table.random(mission_lists[3])
 	}
 end
 
@@ -492,15 +507,29 @@ function CrimeSpreeManager:starting_level()
 	return self._starting_level or 0
 end
 
+function CrimeSpreeManager:check_forced_modifiers()
+	if not self:_is_active() then
+		return
+	end
+	local count = self:modifiers_to_select("forced", true)
+	if 0 < count then
+		self:_add_frame_callback(callback(managers.menu, managers.menu, "open_node", "crime_spree_forced_modifiers"))
+	end
+end
+
+function CrimeSpreeManager:get_forced_modifiers()
+	return self:_get_modifiers("forced", self:modifiers_to_select("forced", true), true)
+end
+
 function CrimeSpreeManager:get_loud_modifiers()
-	return self:_get_modifiers("loud")
+	return self:_get_modifiers("loud", tweak_data.crime_spree.max_modifiers_displayed)
 end
 
 function CrimeSpreeManager:get_stealth_modifiers()
-	return self:_get_modifiers("stealth")
+	return self:_get_modifiers("stealth", tweak_data.crime_spree.max_modifiers_displayed)
 end
 
-function CrimeSpreeManager:_get_modifiers(table_name)
+function CrimeSpreeManager:_get_modifiers(table_name, max_count, add_repeating)
 	local modifiers = {}
 	local modifiers_table = tweak_data.crime_spree.modifiers[table_name]
 	local repeating_modifiers_table = tweak_data.crime_spree.repeating_modifiers[table_name]
@@ -508,34 +537,31 @@ function CrimeSpreeManager:_get_modifiers(table_name)
 		Application:error("Can not get modifiers from table as there is no starting modifier: ", table_name)
 		return {}
 	end
-	if self:server_spree_level() < modifiers_table[1].level then
-		return {}
-	end
 	for _, modifier in ipairs(modifiers_table) do
-		if modifier.level <= self:server_spree_level() then
-			local contains = false
-			for _, modifier_data in ipairs(self:active_modifiers()) do
-				if modifier_data.id == modifier.id then
-					contains = true
-					break
-				end
+		local contains = false
+		for _, modifier_data in ipairs(self:active_modifiers()) do
+			if modifier_data.id == modifier.id then
+				contains = true
+				break
 			end
-			if not contains then
-				table.insert(modifiers, modifier)
-				if #modifiers >= tweak_data.crime_spree.max_modifiers_displayed then
-					break
-				end
+		end
+		if not contains then
+			table.insert(modifiers, modifier)
+			if max_count <= #modifiers then
+				break
 			end
 		end
 	end
-	local diff = tweak_data.crime_spree.max_modifiers_displayed - #modifiers
-	if 0 < diff then
-		for i = 1, diff do
-			local idx = i % #repeating_modifiers_table + 1
-			local mod_data = repeating_modifiers_table[idx]
-			local new_mod = deep_clone(mod_data)
-			new_mod.id = new_mod.id .. tostring(math.floor(self:server_spree_level() / new_mod.level) * i)
-			table.insert(modifiers, new_mod)
+	if add_repeating then
+		local diff = max_count - #modifiers
+		if 0 < diff then
+			for i = 1, diff do
+				local idx = i % #repeating_modifiers_table + 1
+				local mod_data = repeating_modifiers_table[idx]
+				local new_mod = deep_clone(mod_data)
+				new_mod.id = new_mod.id .. tostring(math.floor(self:server_spree_level() / new_mod.level) * i)
+				table.insert(modifiers, new_mod)
+			end
 		end
 	end
 	return modifiers
@@ -1139,6 +1165,9 @@ function CrimeSpreeManager:on_left_lobby()
 end
 
 function CrimeSpreeManager:on_peer_finished_loading(peer)
+	if not self:_is_active() then
+		return
+	end
 	local missions_gui = managers.menu_component:crime_spree_missions_gui()
 	self:_send_crime_spree_level_to_peers()
 	if self:_is_host() then

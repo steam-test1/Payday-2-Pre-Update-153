@@ -1684,7 +1684,7 @@ function NavFieldBuilder:_expand_room_borders(expanding_side, room, expandable_s
 		end
 	end
 	for dir_str, _ in pairs(expandable_sides_map) do
-		if expansion[dir_str].unsorted then
+		if expansion[dir_str].unsorted and table.size(expansion[dir_str].unsorted) > 0 then
 			local expand_seg = expansion[dir_str].unsorted[1]
 			local res_expansion, expansion_blocked = self:_expansion_check_obstacles(dir_str, dir_vec_map[dir_str], expand_seg, room.inclination)
 			expansion[dir_str] = res_expansion
@@ -1992,11 +1992,13 @@ function NavFieldBuilder:_expansion_check_obstacles(dir_str, dir_vec, exp_space,
 			if not obstacle_found then
 				local front_air_pos = air_pos + dir_vec * grid_size
 				local front_ground_ray = self:_sphere_ray(front_air_pos + self._up_vec, front_air_pos + self._down_vec, gnd_ray_rad)
-				local climb_vec = front_ground_ray.position - back_ground_ray.position
-				local inclination = climb_vec.z / self._grid_size
-				local abs_inc_diff = math.abs(inclination_init - inclination)
-				if 0.5 < abs_inc_diff then
-					obstacle_found = "stairs"
+				if front_ground_ray then
+					local climb_vec = front_ground_ray.position - back_ground_ray.position
+					local inclination = climb_vec.z / self._grid_size
+					local abs_inc_diff = math.abs(inclination_init - inclination)
+					if 0.5 < abs_inc_diff then
+						obstacle_found = "stairs"
+					end
 				end
 			end
 			obstacle_found = obstacle_found or "spaces"

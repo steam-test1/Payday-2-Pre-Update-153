@@ -622,14 +622,15 @@ function PlayerDamage:_check_update_max_health()
 	self._current_max_health = self._current_max_health or self:_max_health()
 	if self._current_max_health ~= max_health then
 		local ratio = max_health / self._current_max_health
-		self._health = Application:digest_value(math.clamp(self:get_real_health() * ratio, 0, max_health), true)
-		print("[PlayerDamage] new max health", self._current_max_health, "->", max_health)
+		local health = math.clamp(self:get_real_health() * ratio, 0, max_health)
+		self._health = Application:digest_value(health, true)
 		self._current_max_health = max_health
 		self:update_armor_stored_health()
 	end
 end
 
 function PlayerDamage:change_health(change_of_health)
+	self:_check_update_max_health()
 	return self:set_health(self:get_real_health() + change_of_health)
 end
 
@@ -659,12 +660,12 @@ function PlayerDamage:_check_update_max_armor()
 		local ratio = max_armor / self._current_max_armor
 		self._current_armor_fill = self._current_armor_fill * ratio
 		self._armor = Application:digest_value(math.clamp(self:get_real_armor() * ratio, 0, max_armor), true)
-		print("[PlayerDamage] new max armor", self._current_max_armor, "->", max_armor)
 		self._current_max_armor = max_armor
 	end
 end
 
 function PlayerDamage:change_armor(change)
+	self:_check_update_max_armor()
 	self:set_armor(self:get_real_armor() + change)
 end
 
@@ -1917,6 +1918,9 @@ function PlayerDamage:_stop_tinnitus()
 end
 
 function PlayerDamage:_chk_can_take_dmg()
+	if not self._unit:inventory():mask_visibility() then
+		return false
+	end
 	local can_take_damage = self._can_take_dmg_timer <= 0
 	can_take_damage = managers.crime_spree:modify_value("PlayerDamage:CheckCanTakeDamage", can_take_damage)
 	return can_take_damage

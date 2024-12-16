@@ -191,6 +191,7 @@ function TeamAIMovement:_switch_to_not_cool_clbk_func()
 			end
 			self:set_stance_by_code(2)
 			self._unit:brain():on_cool_state_changed(false)
+			self._unit:inventory():set_visibility_state(true)
 		else
 			managers.enemy:add_delayed_clbk(self._switch_to_not_cool_clbk_id, callback(self, self, "_switch_to_not_cool_clbk_func"), TimerManager:game():time() + 1)
 		end

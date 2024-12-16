@@ -13,10 +13,13 @@ function ElementAIRemove:on_executed(instigator)
 		if alive(instigator) then
 			if self._values.force_ragdoll and instigator:movement() then
 				if instigator:character_damage().damage_mission then
+					local backup_so = self._values.backup_so and self:get_mission_element(self._values.backup_so)
+					print("backup_so: ", self._values.backup_so, backup_so)
 					instigator:character_damage():damage_mission({
 						damage = 1000,
 						col_ray = {},
-						forced = true
+						forced = true,
+						backup_so = backup_so
 					})
 				end
 				if instigator:movement()._active_actions and instigator:movement()._active_actions[1] and instigator:movement()._active_actions[1]:type() == "hurt" then
@@ -24,10 +27,12 @@ function ElementAIRemove:on_executed(instigator)
 				end
 			elseif self._values.true_death then
 				if instigator:character_damage().damage_mission then
+					local backup_so = self._values.backup_so and self:get_mission_element(self._values.backup_so)
 					instigator:character_damage():damage_mission({
 						damage = 1000,
 						col_ray = {},
-						forced = true
+						forced = true,
+						backup_so = backup_so
 					})
 				end
 			else

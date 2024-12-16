@@ -2910,8 +2910,8 @@ function SkillTreeTweakData:init()
 			{
 				upgrades = {
 					"player_perk_armor_regen_timer_multiplier_2",
-					"akimbo_recoil_index_addend_2",
-					"akimbo_extra_ammo_multiplier_1"
+					"akimbo_recoil_index_addend_4",
+					"akimbo_extra_ammo_multiplier_3"
 				},
 				cost = 400,
 				icon_xy = {7, 2},

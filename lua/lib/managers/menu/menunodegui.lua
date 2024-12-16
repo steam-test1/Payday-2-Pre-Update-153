@@ -1231,13 +1231,17 @@ function MenuNodeGui:_setup_level_size(row_item)
 	row_item.level_text:set_shape(padding, 66, w, row_item.gui_level_panel:w())
 end
 
+function MenuNodeGui:_set_help_text(text_id, localize)
+	local active_menu = managers.menu:active_menu()
+	if active_menu then
+		active_menu.renderer:set_bottom_text(text_id, localize)
+	end
+end
+
 function MenuNodeGui:_highlight_row_item(row_item, mouse_over)
 	if row_item then
 		row_item.highlighted = true
-		local active_menu = managers.menu:active_menu()
-		if active_menu then
-			active_menu.renderer:set_bottom_text(row_item.item:parameters().help_id, row_item.item:parameters().localize_help ~= false)
-		end
+		self:_set_help_text(row_item.item:parameters().help_id, row_item.item:parameters().localize_help ~= false)
 		self:_align_marker(row_item)
 		row_item.color = row_item.item:enabled() and (row_item.hightlight_color or self.row_item_hightlight_color) or row_item.disabled_color
 		if row_item.type == "NOTHING" then

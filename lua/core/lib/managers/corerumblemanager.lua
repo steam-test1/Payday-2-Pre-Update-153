@@ -101,6 +101,7 @@ function RumbleManager:play(name, controller_wrapper, multiplier_data, custom_da
 		local custom_attack = custom_data and custom_data.attack
 		local custom_sustain = custom_data and custom_data.sustain
 		local custom_release = custom_data and custom_data.release
+		local custom_engine = custom_data and custom_data.engine
 		for _, controller in pairs(rumble_controllers) do
 			if self._last_played_ids[controller:key()] then
 				local redundant_rumble = self._last_played_ids[controller:key()][name]
@@ -132,7 +133,7 @@ function RumbleManager:play(name, controller_wrapper, multiplier_data, custom_da
 				}))
 			else
 				rumble_id[1] = controller:rumble({
-					engine = effect.engine,
+					engine = custom_engine or effect.engine,
 					timer = timer,
 					peak = (custom_peak or effect.peak or 1) * multiplier,
 					attack = custom_attack or effect.attack,

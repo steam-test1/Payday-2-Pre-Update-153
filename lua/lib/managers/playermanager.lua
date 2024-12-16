@@ -508,7 +508,6 @@ function PlayerManager:update(t, dt)
 		self._is_local_close_to_hostage = alive(local_player) and managers.groupai and managers.groupai:state():is_a_hostage_within(local_player:movement():m_pos(), tweak_data.upgrades.hostage_near_player_radius)
 		self._hostage_close_to_local_t = t + tweak_data.upgrades.hostage_near_player_check_t
 	end
-	self:_update_hostage_skills()
 	self:_update_damage_dealt(t, dt)
 	if #self._global.synced_cocaine_stacks >= 4 then
 		local amount = 0
@@ -1718,25 +1717,6 @@ function PlayerManager:get_skill_money_multiplier(whisper_mode)
 		bag_skill_mulitplier = bag_skill_mulitplier * multiplier
 	end
 	return cash_skill_mulitplier, bag_skill_mulitplier
-end
-
-function PlayerManager:update_hostage_skills()
-	self._hostage_skills_update = true
-end
-
-function PlayerManager:_update_hostage_skills()
-	if self._hostage_skills_update then
-		if self:get_hostage_bonus_multiplier("health") ~= 1 then
-			local player_unit = self:player_unit()
-			if alive(player_unit) then
-				local damage_ext = player_unit:character_damage()
-				if damage_ext then
-					damage_ext:change_health(0)
-				end
-			end
-		end
-		self._hostage_skills_update = nil
-	end
 end
 
 function PlayerManager:get_hostage_bonus_multiplier(category)
@@ -3829,12 +3809,10 @@ end
 
 function PlayerManager:count_up_player_minions()
 	self._local_player_minions = math.min(self._local_player_minions + 1, self:upgrade_value("player", "convert_enemies_max_minions", 0))
-	self:update_hostage_skills()
 end
 
 function PlayerManager:count_down_player_minions()
 	self._local_player_minions = math.max(self._local_player_minions - 1, 0)
-	self:update_hostage_skills()
 end
 
 function PlayerManager:reset_minions()

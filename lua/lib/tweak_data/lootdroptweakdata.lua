@@ -1347,7 +1347,6 @@ function LootDropTweakData:init(tweak_data)
 	end
 	for _, gv_data in pairs(self.global_values) do
 		if not gv_data.ignore_ulti then
-			gv_data.desc_id = "menu_l_global_value_ue"
 			gv_data.unlock_id = "bm_global_value_ue_unlock"
 		end
 	end

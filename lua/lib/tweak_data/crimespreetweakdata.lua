@@ -10,7 +10,7 @@ function CrimeSpreeTweakData:init(tweak_data)
 		40
 	}
 	self.allow_highscore_continue = true
-	self.initial_cost = 6
+	self.initial_cost = 0
 	self.cost_per_level = 0.5
 	self.randomization_cost = 6
 	self.randomization_multiplier = 2
@@ -33,14 +33,7 @@ function CrimeSpreeTweakData:init_missions(tweak_data)
 	local debug_med_add = 7
 	local debug_long_add = 10
 	self.missions = {
-		short = {
-			{
-				id = "biker_2",
-				add = 3,
-				icon = "csm_biker_2",
-				level = tweak_data.narrative.stages.chew,
-				stage_id = "chew"
-			},
+		{
 			{
 				id = "bb_cash",
 				add = debug_short_add,
@@ -63,60 +56,11 @@ function CrimeSpreeTweakData:init_missions(tweak_data)
 				stage_id = "kosugi"
 			},
 			{
-				id = "arm_cro",
-				add = debug_short_add,
-				icon = "csm_crossroads",
-				level = tweak_data.narrative.stages.arm_cro,
-				stage_id = "arm_cro"
-			},
-			{
-				id = "arm_und",
-				add = debug_short_add,
-				icon = "csm_overpass",
-				level = tweak_data.narrative.stages.arm_und,
-				stage_id = "cage"
-			},
-			{
-				id = "arm_hcm",
-				add = debug_short_add,
-				icon = "csm_downtown",
-				level = tweak_data.narrative.stages.arm_hcm,
-				stage_id = "arm_hcm"
-			},
-			{
-				id = "arm_par",
-				add = debug_short_add,
-				icon = "csm_park",
-				level = tweak_data.narrative.stages.arm_par,
-				stage_id = "arm_par"
-			},
-			{
-				id = "arm_fac",
-				add = debug_short_add,
-				icon = "csm_harbor",
-				level = tweak_data.narrative.stages.arm_fac,
-				stage_id = "arm_fac"
-			},
-			{
 				id = "dark",
 				add = debug_short_add,
 				icon = "csm_murky",
 				level = tweak_data.narrative.stages.dark,
 				stage_id = "dark"
-			},
-			{
-				id = "help",
-				add = debug_short_add,
-				icon = "csm_prison",
-				level = tweak_data.narrative.stages.help,
-				stage_id = "help"
-			},
-			{
-				id = "fs_1",
-				add = 4,
-				icon = "csm_fs_1",
-				level = tweak_data.narrative.stages.firestarter_1,
-				stage_id = "firestarter_1"
 			},
 			{
 				id = "fs_2",
@@ -147,27 +91,11 @@ function CrimeSpreeTweakData:init_missions(tweak_data)
 				stage_id = "election_day_2"
 			},
 			{
-				id = "nail",
-				add = debug_short_add,
-				icon = "csm_labrats",
-				level = tweak_data.narrative.stages.nail,
-				stage_id = "nail"
-			}
-		},
-		medium = {
-			{
 				id = "crojob1",
 				add = 8,
 				icon = "csm_docks",
 				level = tweak_data.narrative.stages.crojob1,
 				stage_id = "crojob1"
-			},
-			{
-				id = "bo_1_d",
-				add = debug_med_add,
-				icon = "csm_bigoil_1",
-				level = tweak_data.narrative.stages.welcome_to_the_jungle_1_d,
-				stage_id = "welcome_to_the_jungle_1_d"
 			},
 			{
 				id = "framing_frame_3",
@@ -182,6 +110,106 @@ function CrimeSpreeTweakData:init_missions(tweak_data)
 				icon = "csm_train_forest",
 				level = tweak_data.narrative.stages.arm_for,
 				stage_id = "arm_for"
+			},
+			{
+				id = "friend",
+				add = 8,
+				icon = "csm_friend",
+				level = tweak_data.narrative.stages.friend,
+				stage_id = "friend"
+			},
+			{
+				id = "big",
+				add = 13,
+				icon = "csm_big",
+				level = tweak_data.narrative.stages.big,
+				stage_id = "big"
+			},
+			{
+				id = "mus",
+				add = debug_long_add,
+				icon = "csm_diamond",
+				level = tweak_data.narrative.stages.mus,
+				stage_id = "mus"
+			},
+			{
+				id = "roberts",
+				add = debug_long_add,
+				icon = "csm_go",
+				level = tweak_data.narrative.stages.roberts,
+				stage_id = "roberts"
+			},
+			{
+				id = "red2",
+				add = debug_long_add,
+				icon = "csm_fwb",
+				level = tweak_data.narrative.stages.red2,
+				stage_id = "red2"
+			}
+		},
+		{
+			{
+				id = "arm_cro",
+				add = debug_short_add,
+				icon = "csm_crossroads",
+				level = tweak_data.narrative.stages.arm_cro,
+				stage_id = "arm_cro"
+			},
+			{
+				id = "help",
+				add = debug_short_add,
+				icon = "csm_prison",
+				level = tweak_data.narrative.stages.help,
+				stage_id = "help"
+			},
+			{
+				id = "arm_und",
+				add = debug_short_add,
+				icon = "csm_overpass",
+				level = tweak_data.narrative.stages.arm_und,
+				stage_id = "cage"
+			},
+			{
+				id = "arm_hcm",
+				add = debug_short_add,
+				icon = "csm_downtown",
+				level = tweak_data.narrative.stages.arm_hcm,
+				stage_id = "arm_hcm"
+			},
+			{
+				id = "arm_par",
+				add = debug_short_add,
+				icon = "csm_park",
+				level = tweak_data.narrative.stages.arm_par,
+				stage_id = "arm_par"
+			},
+			{
+				id = "arm_fac",
+				add = debug_short_add,
+				icon = "csm_harbor",
+				level = tweak_data.narrative.stages.arm_fac,
+				stage_id = "arm_fac"
+			},
+			{
+				id = "biker_2",
+				add = 3,
+				icon = "csm_biker_2",
+				level = tweak_data.narrative.stages.chew,
+				stage_id = "chew"
+			},
+			{
+				id = "fs_1",
+				add = 4,
+				icon = "csm_fs_1",
+				level = tweak_data.narrative.stages.firestarter_1,
+				stage_id = "firestarter_1"
+			},
+			{
+				id = "nail",
+				add = debug_short_add,
+				icon = "csm_labrats",
+				level = tweak_data.narrative.stages.nail,
+				stage_id = "nail"
 			},
 			{
 				id = "watchdogs_1_d",
@@ -205,13 +233,6 @@ function CrimeSpreeTweakData:init_missions(tweak_data)
 				stage_id = "moon"
 			},
 			{
-				id = "friend",
-				add = 8,
-				icon = "csm_friend",
-				level = tweak_data.narrative.stages.friend,
-				stage_id = "friend"
-			},
-			{
 				id = "spa",
 				add = 8,
 				icon = "csm_brooklyn",
@@ -226,6 +247,15 @@ function CrimeSpreeTweakData:init_missions(tweak_data)
 				stage_id = "cane"
 			},
 			{
+				id = "mia_2",
+				add = 8,
+				icon = "csm_miami_2",
+				level = tweak_data.narrative.stages.mia_2,
+				stage_id = "mia_2"
+			}
+		},
+		{
+			{
 				id = "pbr2",
 				add = 9,
 				icon = "csm_sky",
@@ -233,21 +263,12 @@ function CrimeSpreeTweakData:init_missions(tweak_data)
 				stage_id = "pbr2"
 			},
 			{
-				id = "mia_2",
-				add = 8,
-				icon = "csm_miami_2",
-				level = tweak_data.narrative.stages.mia_2,
-				stage_id = "mia_2"
-			},
-			{
 				id = "pal",
 				add = 9,
 				icon = "csm_counterfeit",
 				level = tweak_data.narrative.stages.pal,
 				stage_id = "pal"
-			}
-		},
-		long = {
+			},
 			{
 				id = "flat",
 				add = 12,
@@ -277,13 +298,6 @@ function CrimeSpreeTweakData:init_missions(tweak_data)
 				stage_id = "hox_1"
 			},
 			{
-				id = "big",
-				add = 13,
-				icon = "csm_big",
-				level = tweak_data.narrative.stages.big,
-				stage_id = "big"
-			},
-			{
 				id = "bo_2",
 				add = 14,
 				icon = "csm_bigoil_2",
@@ -298,13 +312,6 @@ function CrimeSpreeTweakData:init_missions(tweak_data)
 				stage_id = "mia_1"
 			},
 			{
-				id = "mus",
-				add = debug_long_add,
-				icon = "csm_diamond",
-				level = tweak_data.narrative.stages.mus,
-				stage_id = "mus"
-			},
-			{
 				id = "cook_off",
 				add = 13,
 				icon = "csm_rats_1",
@@ -317,13 +324,6 @@ function CrimeSpreeTweakData:init_missions(tweak_data)
 				icon = "csm_mountain",
 				level = tweak_data.narrative.stages.pbr,
 				stage_id = "pbr"
-			},
-			{
-				id = "roberts",
-				add = debug_long_add,
-				icon = "csm_go",
-				level = tweak_data.narrative.stages.roberts,
-				stage_id = "roberts"
 			},
 			{
 				id = "glace",
@@ -368,195 +368,200 @@ function CrimeSpreeTweakData:init_modifiers(tweak_data)
 	local health_increase = 25
 	local damage_increase = 25
 	self.max_modifiers_displayed = 3
-	self.modifier_levels = {loud = 10, stealth = 26}
+	self.modifier_levels = {
+		forced = 50,
+		loud = 20,
+		stealth = 26
+	}
 	self.modifiers = {
-		loud = {
+		forced = {
 			{
 				id = "damage_health_1",
 				class = "ModifierEnemyHealthAndDamage",
 				icon = "crime_spree_health",
-				level = 10,
+				level = 50,
 				data = {
 					health = {20, "add"},
-					damage = {30, "add"}
+					damage = {15, "add"}
 				}
+			}
+		},
+		loud = {
+			{
+				id = "shield_reflect",
+				class = "ModifierShieldReflect",
+				icon = "crime_spree_shield_reflect",
+				data = {}
 			},
 			{
 				id = "cloaker_smoke",
 				class = "ModifierCloakerKick",
 				icon = "crime_spree_cloaker_smoke",
-				level = 10,
 				data = {
 					effect = {"smoke", "none"}
-				}
-			},
-			{
-				id = "shield_reflect",
-				class = "ModifierShieldReflect",
-				icon = "crime_spree_shield_reflect",
-				level = 10,
-				data = {}
-			},
-			{
-				id = "damage_health_2",
-				class = "ModifierEnemyHealthAndDamage",
-				icon = "crime_spree_health",
-				level = 20,
-				data = {
-					health = {20, "add"},
-					damage = {30, "add"}
-				}
-			},
-			{
-				id = "medic_1",
-				class = "ModifierMoreMedics",
-				icon = "crime_spree_more_medics",
-				level = 30,
-				data = {
-					inc = {2, "add"}
-				}
-			},
-			{
-				id = "damage_health_3",
-				class = "ModifierEnemyHealthAndDamage",
-				icon = "crime_spree_health",
-				level = 40,
-				data = {
-					health = {20, "add"},
-					damage = {30, "add"}
-				}
-			},
-			{
-				id = "no_hurt",
-				class = "ModifierNoHurtAnims",
-				icon = "crime_spree_no_hurt",
-				level = 50,
-				data = {}
-			},
-			{
-				id = "dozer_1",
-				class = "ModifierMoreDozers",
-				icon = "crime_spree_more_dozers",
-				level = 60,
-				data = {
-					inc = {2, "add"}
-				}
-			},
-			{
-				id = "damage_health_4",
-				class = "ModifierEnemyHealthAndDamage",
-				icon = "crime_spree_health",
-				level = 70,
-				data = {
-					health = {20, "add"},
-					damage = {30, "add"}
-				}
-			},
-			{
-				id = "heavies",
-				class = "ModifierHeavies",
-				icon = "crime_spree_heavies",
-				level = 80,
-				data = {}
-			},
-			{
-				id = "damage_health_5",
-				class = "ModifierEnemyHealthAndDamage",
-				icon = "crime_spree_health",
-				level = 90,
-				data = {
-					health = {20, "add"},
-					damage = {30, "add"}
 				}
 			},
 			{
 				id = "medic_heal_1",
 				class = "ModifierHealSpeed",
 				icon = "crime_spree_medic_speed",
-				level = 100,
 				data = {
 					speed = {20, "add"}
 				}
 			},
 			{
-				id = "dozer_immunity",
-				class = "ModifierExplosionImmunity",
-				icon = "crime_spree_dozer_explosion",
-				level = 110,
+				id = "no_hurt",
+				class = "ModifierNoHurtAnims",
+				icon = "crime_spree_no_hurt",
 				data = {}
 			},
 			{
-				id = "damage_health_6",
-				class = "ModifierEnemyHealthAndDamage",
-				icon = "crime_spree_health",
-				level = 120,
+				id = "taser_overcharge",
+				class = "ModifierTaserOvercharge",
+				icon = "crime_spree_taser_overcharge",
 				data = {
-					health = {20, "add"},
-					damage = {30, "add"}
+					speed = {50, "add"}
 				}
 			},
 			{
-				id = "dozer_2",
-				class = "ModifierMoreDozers",
-				icon = "crime_spree_more_dozers",
-				level = 130,
-				data = {
-					inc = {2, "add"}
-				}
-			},
-			{
-				id = "damage_health_7",
-				class = "ModifierEnemyHealthAndDamage",
-				icon = "crime_spree_health",
-				level = 140,
-				data = {
-					health = {20, "add"},
-					damage = {30, "add"}
-				}
-			},
-			{
-				id = "dozer_lmg",
-				class = "ModifierSkulldozers",
-				icon = "crime_spree_dozer_lmg",
-				level = 150,
+				id = "heavies",
+				class = "ModifierHeavies",
+				icon = "crime_spree_heavies",
 				data = {}
 			},
 			{
-				id = "medic_2",
+				id = "medic_1",
 				class = "ModifierMoreMedics",
 				icon = "crime_spree_more_medics",
-				level = 160,
 				data = {
 					inc = {2, "add"}
 				}
 			},
 			{
-				id = "damage_health_8",
-				class = "ModifierEnemyHealthAndDamage",
-				icon = "crime_spree_health",
-				level = 170,
+				id = "heavy_sniper",
+				class = "ModifierHeavySniper",
+				icon = "crime_spree_heavy_sniper",
 				data = {
-					health = {20, "add"},
-					damage = {30, "add"}
+					spawn_chance = {5, "add"}
+				}
+			},
+			{
+				id = "dozer_rage",
+				class = "ModifierDozerRage",
+				icon = "crime_spree_dozer_rage",
+				data = {
+					damage = {100, "add"}
+				}
+			},
+			{
+				id = "cloaker_tear_gas",
+				class = "ModifierCloakerTearGas",
+				icon = "crime_spree_cloaker_tear_gas",
+				data = {
+					diameter = {4, "none"},
+					damage = {30, "none"},
+					duration = {10, "none"}
+				}
+			},
+			{
+				id = "dozer_1",
+				class = "ModifierMoreDozers",
+				icon = "crime_spree_more_dozers",
+				data = {
+					inc = {2, "add"}
 				}
 			},
 			{
 				id = "medic_heal_2",
 				class = "ModifierHealSpeed",
 				icon = "crime_spree_medic_speed",
-				level = 180,
 				data = {
 					speed = {20, "add"}
 				}
 			},
 			{
-				id = "damage_health_9",
-				class = "ModifierEnemyHealthAndDamage",
-				icon = "crime_spree_health",
-				level = 190,
+				id = "dozer_lmg",
+				class = "ModifierSkulldozers",
+				icon = "crime_spree_dozer_lmg",
+				data = {}
+			},
+			{
+				id = "medic_adrenaline",
+				class = "ModifierMedicAdrenaline",
+				icon = "crime_spree_medic_adrenaline",
 				data = {
-					health = {20, "add"},
-					damage = {30, "add"}
+					damage = {100, "add"}
+				}
+			},
+			{
+				id = "shield_phalanx",
+				class = "ModifierShieldPhalanx",
+				icon = "crime_spree_shield_phalanx",
+				data = {}
+			},
+			{
+				id = "dozer_2",
+				class = "ModifierMoreDozers",
+				icon = "crime_spree_more_dozers",
+				data = {
+					inc = {2, "add"}
+				}
+			},
+			{
+				id = "medic_deathwish",
+				class = "ModifierMedicDeathwish",
+				icon = "crime_spree_medic_deathwish",
+				data = {}
+			},
+			{
+				id = "dozer_minigun",
+				class = "ModifierDozerMinigun",
+				icon = "crime_spree_dozer_minigun",
+				data = {}
+			},
+			{
+				id = "medic_2",
+				class = "ModifierMoreMedics",
+				icon = "crime_spree_more_medics",
+				data = {
+					inc = {2, "add"}
+				}
+			},
+			{
+				id = "dozer_immunity",
+				class = "ModifierExplosionImmunity",
+				icon = "crime_spree_dozer_explosion",
+				data = {}
+			},
+			{
+				id = "dozer_medic",
+				class = "ModifierDozerMedic",
+				icon = "crime_spree_dozer_medic",
+				data = {}
+			},
+			{
+				id = "assault_extender",
+				class = "ModifierAssaultExtender",
+				icon = "crime_spree_assault_extender",
+				data = {
+					duration = {50, "add"},
+					spawn_pool = {50, "add"},
+					deduction = {4, "add"},
+					max_hostages = {8, "none"}
+				}
+			},
+			{
+				id = "cloaker_arrest",
+				class = "ModifierCloakerArrest",
+				icon = "crime_spree_cloaker_arrest",
+				data = {}
+			},
+			{
+				id = "medic_rage",
+				class = "ModifierMedicRage",
+				icon = "crime_spree_medic_rage",
+				data = {
+					damage = {20, "add"}
 				}
 			}
 		},
@@ -645,7 +650,7 @@ function CrimeSpreeTweakData:init_modifiers(tweak_data)
 		}
 	}
 	self.repeating_modifiers = {
-		loud = {
+		forced = {
 			{
 				id = "damage_health_rpt_",
 				class = "ModifierEnemyHealthAndDamage",
@@ -653,18 +658,7 @@ function CrimeSpreeTweakData:init_modifiers(tweak_data)
 				level = 5,
 				data = {
 					health = {20, "add"},
-					damage = {30, "add"}
-				}
-			}
-		},
-		stealth = {
-			{
-				id = "conceal_rpt_",
-				class = "ModifierLessConcealment",
-				icon = "crime_spree_concealment",
-				level = 13,
-				data = {
-					conceal = {3, "add"}
+					damage = {15, "add"}
 				}
 			}
 		}
@@ -740,6 +734,46 @@ function CrimeSpreeTweakData:init_rewards(tweak_data)
 		{
 			type = "armor",
 			id = "cvc_navy_blue"
+		},
+		{
+			type = "armor",
+			id = "drm_tree_stump"
+		},
+		{
+			type = "armor",
+			id = "drm_gray_raider"
+		},
+		{
+			type = "armor",
+			id = "drm_desert_twilight"
+		},
+		{
+			type = "armor",
+			id = "drm_navy_breeze"
+		},
+		{
+			type = "armor",
+			id = "drm_woodland_tech"
+		},
+		{
+			type = "armor",
+			id = "drm_khaki_eclipse"
+		},
+		{
+			type = "armor",
+			id = "drm_desert_tech"
+		},
+		{
+			type = "armor",
+			id = "drm_misted_grey"
+		},
+		{
+			type = "armor",
+			id = "drm_khaki_regular"
+		},
+		{
+			type = "armor",
+			id = "drm_somber_woodland"
 		}
 	}
 end

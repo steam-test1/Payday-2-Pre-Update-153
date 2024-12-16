@@ -15,5 +15,6 @@ end
 function TankCopDamage:seq_clbk_vizor_shatter()
 	if not self._unit:character_damage():dead() then
 		self._unit:sound():say("visor_lost")
+		managers.crime_spree:run_func("OnTankVisorShatter", self._unit)
 	end
 end

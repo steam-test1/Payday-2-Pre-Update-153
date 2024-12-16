@@ -553,7 +553,7 @@ function CrimeSpreeMissionButton:update_info_text(mission_data)
 	mission_data = mission_data or self._mission_data
 	local text = ""
 	local spacer = " "
-	local category = self:_get_mission_category(mission_data.id)
+	local category = self:_get_mission_category(mission_data)
 	if category then
 		local timer_text = managers.localization:get_default_macro("BTN_SPREE_" .. utf8.to_upper(category))
 		text = text .. timer_text
@@ -634,15 +634,14 @@ function CrimeSpreeMissionButton:_move_random_texts(speed, dt)
 	end
 end
 
-function CrimeSpreeMissionButton:_get_mission_category(mission_id)
-	for category, tbl in pairs(tweak_data.crime_spree.missions) do
-		for idx, data in pairs(tbl) do
-			if data.id == mission_id then
-				return category
-			end
-		end
+function CrimeSpreeMissionButton:_get_mission_category(mission)
+	if mission.add <= 5 then
+		return "short"
+	elseif mission.add <= 7 then
+		return "medium"
+	else
+		return "long"
 	end
-	return nil
 end
 
 function CrimeSpreeMissionButton:mission_id()

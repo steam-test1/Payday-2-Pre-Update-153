@@ -102,26 +102,24 @@ require("lib/utils/dev/api/TestAPI")
 script_data = script_data or {}
 game_state_machine = game_state_machine or nil
 Setup = Setup or class(CoreSetup.CoreSetup)
-local next_update_funcs = next_update_funcs or {}
+_next_update_funcs = _next_update_funcs or {}
 local next_update_funcs_busy
 
 function call_on_next_update(func, optional_key)
-	local map = next_update_funcs_busy or next_update_funcs
 	if not optional_key then
-		table.insert(map, func)
+		table.insert(_next_update_funcs, func)
 	else
 		local key = optional_key == true and func or optional_key
-		map[key] = func
+		_next_update_funcs[key] = func
 	end
 end
 
 function call_next_update_functions()
-	next_update_funcs_busy = {}
-	for _, func in pairs(next_update_funcs) do
+	local current = _next_update_funcs
+	_next_update_funcs = {}
+	for _, func in pairs(current) do
 		func()
 	end
-	next_update_funcs = next_update_funcs_busy
-	next_update_funcs_busy = nil
 end
 
 function Setup:init_category_print()

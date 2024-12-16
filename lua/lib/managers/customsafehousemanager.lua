@@ -478,14 +478,12 @@ end
 
 function CustomSafehouseManager:on_achievement_awarded(id)
 	if self:can_progress_trophies(id) then
-		print("CustomSafehouseManager:on_achievement_awarded", id)
 		self:update_progress("achievement_id", id)
 	end
 end
 
 function CustomSafehouseManager:on_achievement_progressed(progress_id, amount)
 	if self:can_progress_trophies(progress_id) then
-		print("CustomSafehouseManager:on_achievement_progressed", progress_id, amount)
 		self:update_progress("progress_id", progress_id, amount)
 	end
 end

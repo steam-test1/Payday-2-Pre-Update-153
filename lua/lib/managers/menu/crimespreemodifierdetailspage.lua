@@ -62,25 +62,23 @@ function CrimeSpreeModifierDetailsPage:init(...)
 		next_modifiers_h = suspend_desc_text:bottom() + padding
 	end
 	self._next_panel = self:panel():panel({h = next_modifiers_h})
-	local name_id = managers.crime_spree:in_progress() and "menu_cs_next_modifiers" or "menu_cs_not_in_progress"
+	local name_id = managers.crime_spree:in_progress() and "menu_cs_next_modifiers_drm" or "menu_cs_not_in_progress"
 	local name_color = managers.crime_spree:in_progress() and tweak_data.screen_colors.text or tweak_data.screen_colors.important_1
 	local params = {
+		forced = managers.crime_spree:next_modifier_level("forced") - managers.crime_spree:server_spree_level(),
 		loud = managers.crime_spree:next_modifier_level("loud") - managers.crime_spree:server_spree_level(),
 		stealth = managers.crime_spree:next_modifier_level("stealth") - managers.crime_spree:server_spree_level()
 	}
-	local y = padding * 0.5
 	self._next_text = self._next_panel:text({
 		text = managers.localization:to_upper_text(name_id, params),
-		valign = "bottom",
-		vertical = "bottom",
+		vertical = "center",
 		align = "left",
 		halign = "left",
 		layer = 1,
 		x = padding,
-		y = -padding,
 		color = name_color,
-		font = tweak_data.menu.pd2_small_font,
-		font_size = tweak_data.menu.pd2_small_font_size,
+		font = tweak_data.menu.pd2_tiny_font,
+		font_size = tweak_data.menu.pd2_tiny_font_size,
 		h = next_modifiers_h
 	})
 	self._next_text:set_visible(not warning_title)
@@ -146,10 +144,11 @@ function CrimeSpreeModifierDetailsPage:update(t, dt)
 	end
 	if self._cached_server_level ~= managers.crime_spree:server_spree_level() then
 		local params = {
+			forced = managers.crime_spree:next_modifier_level("forced") - managers.crime_spree:server_spree_level(),
 			loud = managers.crime_spree:next_modifier_level("loud") - managers.crime_spree:server_spree_level(),
 			stealth = managers.crime_spree:next_modifier_level("stealth") - managers.crime_spree:server_spree_level()
 		}
-		self._next_text:set_text(managers.localization:text("menu_cs_next_modifiers", params))
+		self._next_text:set_text(managers.localization:text("menu_cs_next_modifiers_drm", params))
 		self._cached_server_level = managers.crime_spree:server_spree_level()
 	end
 end

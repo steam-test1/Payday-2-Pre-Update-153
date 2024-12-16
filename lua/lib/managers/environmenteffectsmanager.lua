@@ -211,8 +211,12 @@ function LightningEffect:_set_original_values()
 	if alive(self._sky_material) then
 		self._sky_material:set_variable(Idstring("color0"), self._original_color0)
 	end
-	Global._global_light:set_color(self._original_light_color)
-	Underlay:set_time(Idstring("sun_horizontal"), self._original_sun_horizontal)
+	if self._original_light_color then
+		Global._global_light:set_color(self._original_light_color)
+	end
+	if self._original_sun_horizontal then
+		Underlay:set_time(Idstring("sun_horizontal"), self._original_sun_horizontal)
+	end
 end
 
 function LightningEffect:_make_lightning()

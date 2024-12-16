@@ -7925,7 +7925,7 @@ function BlackMarketGui:populate_melee_weapons(data)
 	local global_value
 	for id, d in pairs(Global.blackmarket_manager.melee_weapons) do
 		global_value = tweak_data.blackmarket.melee_weapons[id].dlc or tweak_data.blackmarket.melee_weapons[id].global_value or "normal"
-		if d.unlocked or d.equipped or not tweak_data:get_raw_value("lootdrop", "global_values", global_value, "hide_unavailable") then
+		if d.unlocked or d.equipped or tweak_data:get_raw_value("lootdrop", "global_values", global_value, "hide_unavailable") and not managers.dlc:is_dlc_unlocked(global_value) then
 			table.insert(sort_data, {id, d})
 		end
 	end
@@ -8596,17 +8596,15 @@ function BlackMarketGui:populate_armor_skins(data)
 		data[index] = new_data
 	end
 	local max_armors = data.override_slots[1] * data.override_slots[2]
-	for i = 1, max_armors do
-		if not data[i] then
-			new_data = {}
-			new_data.name = "empty"
-			new_data.name_localized = ""
-			new_data.category = "armors"
-			new_data.slot = i
-			new_data.unlocked = true
-			new_data.equipped = false
-			data[i] = new_data
-		end
+	for i = #data % data.override_slots[2], data.override_slots[2] - 1 do
+		new_data = {}
+		new_data.name = "empty"
+		new_data.name_localized = ""
+		new_data.category = "armors"
+		new_data.slot = #data
+		new_data.unlocked = true
+		new_data.equipped = false
+		table.insert(data, new_data)
 	end
 end
 

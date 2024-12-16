@@ -841,12 +841,12 @@ function PS4DLCManager:init()
 				verified = false,
 				verified_for_TheBigScore = false
 			},
-			wild = {
+			born = {
 				product_id = "PD2DLCBIKERHST16",
 				verified = false,
 				verified_for_TheBigScore = false
 			},
-			born = {
+			wild = {
 				product_id = "PD2DLCBIKERCHA17",
 				verified = false,
 				verified_for_TheBigScore = false

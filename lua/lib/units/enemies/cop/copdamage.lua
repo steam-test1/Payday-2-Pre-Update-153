@@ -1412,6 +1412,12 @@ function CopDamage:damage_mission(attack_data)
 	if self._dead or (self._invulnerable or self._immortal) and not attack_data.forced then
 		return
 	end
+	if self.immortal and self.is_escort then
+		if attack_data.backup_so then
+			attack_data.backup_so:on_executed(self._unit)
+		end
+		return
+	end
 	local result
 	local damage_percent = self._HEALTH_GRANULARITY
 	attack_data.damage = self._health

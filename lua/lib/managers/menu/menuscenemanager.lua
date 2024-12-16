@@ -1377,7 +1377,7 @@ end
 function MenuSceneManager:set_character_mask_by_id(mask_id, blueprint, unit, peer_id, character_name)
 	mask_id = managers.blackmarket:get_real_mask_id(mask_id, peer_id, character_name)
 	local unit_name = managers.blackmarket:mask_unit_name_by_mask_id(mask_id, peer_id, character_name)
-	self:set_character_mask(unit_name, unit, character_name, mask_id, callback(self, self, "clbk_mask_loaded", blueprint))
+	self:set_character_mask(unit_name, unit, peer_id, mask_id, callback(self, self, "clbk_mask_loaded", blueprint))
 	local owner_unit = unit or self._character_unit
 	self:_check_character_mask_sequence(owner_unit, mask_id, peer_id, character_name)
 end
@@ -1390,7 +1390,6 @@ function MenuSceneManager:clbk_mask_loaded(blueprint, mask_unit)
 end
 
 function MenuSceneManager:set_character_mask(mask_name_str, unit, peer_id_or_char, mask_id, ready_clbk)
-	print(mask_name_str, unit, peer_id_or_char, mask_id, ready_clbk)
 	local character_name = type(peer_id_or_char) == "string" and peer_id_or_char
 	local peer_id = type(peer_id_or_char) == "number" and peer_id_or_char
 	unit = unit or self._character_unit

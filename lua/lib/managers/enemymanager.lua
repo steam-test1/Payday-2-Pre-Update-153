@@ -557,6 +557,7 @@ function EnemyManager:on_enemy_died(dead_unit, damage_info)
 	self:_destroy_unit_gfx_lod_data(u_key)
 	u_data.u_id = dead_unit:id()
 	Network:detach_unit(dead_unit)
+	managers.crime_spree:run_func("OnEnemyDied", dead_unit, damage_info)
 end
 
 function EnemyManager:on_enemy_destroyed(enemy)
@@ -952,7 +953,7 @@ function EnemyManager:get_nearby_medic(unit)
 	end
 	local enemies = World:find_units_quick(unit, "sphere", unit:position(), tweak_data.medic.radius, managers.slot:get_mask("enemies"))
 	for _, enemy in ipairs(enemies) do
-		if enemy:base()._tweak_table == "medic" then
+		if enemy:base():has_tag("medic") then
 			return enemy
 		end
 	end

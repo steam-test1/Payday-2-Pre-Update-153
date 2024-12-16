@@ -155,9 +155,19 @@ function CrimeSpreeResultTabItem:_create_timeline(total_w)
 		y = self._cs_panel:h() * 0.5
 	})
 	local start_level = self:success() and managers.crime_spree:mission_start_spree_level() or managers.crime_spree:spree_level()
-	local loud = managers.crime_spree:next_modifier_level("loud", start_level)
-	local loud2 = managers.crime_spree:next_modifier_level("loud", start_level, 1)
-	local stealth = managers.crime_spree:next_modifier_level("stealth", start_level)
+	local modifier_levels = {}
+	local max_step = 0
+	for _, step in pairs(tweak_data.crime_spree.modifier_levels) do
+		if step > max_step then
+			max_step = step
+		end
+	end
+	for category, step in pairs(tweak_data.crime_spree.modifier_levels) do
+		local count = managers.crime_spree:modifiers_to_select(category)
+		for i = 0, math.min(count, math.floor(max_step / step) - 1) do
+			table.insert(modifier_levels, managers.crime_spree:next_modifier_level(category, start_level, i))
+		end
+	end
 	local timeline_w = self._timeline_panel:w() * total_w - padding * 2
 	local timeline_h = 24
 	local timeline_x = self._timeline_panel:w() * (1 - total_w) + padding
@@ -165,7 +175,12 @@ function CrimeSpreeResultTabItem:_create_timeline(total_w)
 	local edge_padding = 48
 	local timeline_zero = timeline_x + edge_padding
 	local timeline_max = timeline_x + timeline_w - edge_padding
-	local end_val = math.max(managers.crime_spree:spree_level(), loud2, stealth)
+	local end_val = managers.crime_spree:spree_level()
+	for _, level in ipairs(modifier_levels) do
+		if level > end_val then
+			end_val = level
+		end
+	end
 	local real_w = timeline_max - timeline_zero
 	local bg_rect = self._timeline_panel:rect({
 		x = timeline_x,
@@ -282,20 +297,18 @@ function CrimeSpreeResultTabItem:_create_timeline(total_w)
 		return {ticket, marker}
 	end
 	
-	local marker_loud_1 = add_modifier_marker(loud, managers.experience:cash_string(loud, ""))
-	local marker_loud_2 = add_modifier_marker(loud2, managers.experience:cash_string(loud2, ""))
-	local marker_stealth_1 = add_modifier_marker(stealth, managers.experience:cash_string(stealth, ""))
+	local markers = {}
+	for _, level in ipairs(modifier_levels) do
+		local marker = add_modifier_marker(level, managers.experience:cash_string(level, ""))
+		table.insert(markers, {level, marker})
+	end
 	self._timeline = {
 		width = real_w,
 		end_val = end_val,
 		bar = fg_rect,
 		level_ticket = current_level_ticket,
 		level_text = current_level,
-		markers = {
-			{loud, marker_loud_1},
-			{loud2, marker_loud_2},
-			{stealth, marker_stealth_1}
-		}
+		markers = markers
 	}
 end
 

@@ -54,7 +54,10 @@ function MenuItemMultiChoice:_show_options(callback_handler)
 			end
 		end
 		if show then
+			option:parameters().exclude = nil
 			table.insert(self._options, option)
+		else
+			option:parameters().exclude = true
 		end
 	end
 	if selected_value then

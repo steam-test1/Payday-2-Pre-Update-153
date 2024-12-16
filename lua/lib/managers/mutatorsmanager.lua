@@ -43,13 +43,13 @@ function MutatorsManager:init()
 	end
 	if activate then
 		for id, data in pairs(Global.mutators.active_on_load) do
-			print("[Mutators] Attempting to activate mutator: ", id)
+			cat_print("jamwil", "[Mutators] Attempting to activate mutator: ", id)
 			local mutator = self:get_mutator_from_id(id)
 			if mutator then
 				table.insert(self:active_mutators(), {mutator = mutator})
-				print("[Mutators] Activated mutator: ", id)
+				cat_print("jamwil", "[Mutators] Activated mutator: ", id)
 			else
-				print("[Mutators] No mutator with id: ", id)
+				cat_print("jamwil", "[Mutators] No mutator with id: ", id)
 			end
 			for key, value in pairs(data) do
 				if Network:is_client() then
@@ -66,7 +66,7 @@ function MutatorsManager:init()
 		return a.load_priority > b.load_priority
 	end)
 	for _, mutator in pairs(setup_mutators) do
-		print("[Mutators] Setting up active mutator: ", mutator:id())
+		cat_print("jamwil", "[Mutators] Setting up active mutator: ", mutator:id())
 		mutator:setup(self)
 	end
 end
@@ -92,21 +92,21 @@ function MutatorsManager:save(data)
 end
 
 function MutatorsManager:load(data, version)
-	print("[Mutators] Begin loading...")
+	cat_print("jamwil", "[Mutators] Begin loading...")
 	local state = data.Mutators or {}
 	for id, values in pairs(state.save_values or {}) do
-		print("[Mutators] Loading KVs for mutator: ", id)
+		cat_print("jamwil", "[Mutators] Loading KVs for mutator: ", id)
 		local mutator = self:get_mutator_from_id(id)
 		if mutator then
 			for key, value in pairs(values) do
-				print("           >: ", key, value)
+				cat_print("jamwil", "           >: ", key, value)
 				mutator:set_value(key, value)
 			end
 		else
-			print("[Mutators]            > no mutator")
+			cat_print("jamwil", "[Mutators]            > no mutator")
 		end
 	end
-	print("[Mutators] Loading finished!")
+	cat_print("jamwil", "[Mutators] Loading finished!")
 end
 
 function MutatorsManager:can_mutators_be_active()

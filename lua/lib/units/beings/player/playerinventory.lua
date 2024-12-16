@@ -507,6 +507,10 @@ function PlayerInventory:_clbk_weapon_add(data)
 	end
 end
 
+function PlayerInventory:mask_visibility()
+	return self._mask_visibility or false
+end
+
 function PlayerInventory:set_mask_visibility(state)
 	self._mask_visibility = state
 	if self._unit == managers.player:player_unit() then
@@ -644,7 +648,8 @@ end
 
 function PlayerInventory:set_visibility_state(state)
 	for i, sel_data in pairs(self._available_selections) do
-		sel_data.unit:base():set_visibility_state(state)
+		local enabled = sel_data.unit:enabled()
+		sel_data.unit:base():set_visibility_state(enabled and state)
 	end
 	if alive(self._shield_unit) then
 		self._shield_unit:set_visible(state)

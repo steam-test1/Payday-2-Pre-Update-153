@@ -81,11 +81,15 @@ end
 
 function BlackMarketManager:_setup_armor_skins()
 	local armor_skins = {}
-	Global.blackmarket_manager.armor_skins = armor_skins
 	for id, skin in pairs(tweak_data.economy.armor_skins) do
-		armor_skins[id] = {unlocked = false}
+		if Global.blackmarket_manager and Global.blackmarket_manager.armor_skins and Global.blackmarket_manager.armor_skins[id] then
+			armor_skins[id] = Global.blackmarket_manager.armor_skins[id]
+		else
+			armor_skins[id] = {unlocked = false}
+		end
 	end
 	armor_skins[self._defaults.armor_skin].unlocked = true
+	Global.blackmarket_manager.armor_skins = armor_skins
 end
 
 function BlackMarketManager:_setup_grenades()
@@ -2929,23 +2933,11 @@ function BlackMarketManager:player_loadout_data(show_all_icons)
 end
 
 function BlackMarketManager:get_mask_icon(mask_id)
-	local guis_catalog = "guis/"
-	local bundle_folder = tweak_data.blackmarket.masks[mask_id] and tweak_data.blackmarket.masks[mask_id].texture_bundle_folder
-	if bundle_folder then
-		guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
-	end
-	return guis_catalog .. "textures/pd2/blackmarket/icons/masks/" .. tostring(mask_id)
+	return tweak_data.blackmarket:get_mask_icon(mask_id)
 end
 
 function BlackMarketManager:get_character_icon(character)
-	local character_name = CriminalsManager.convert_old_to_new_character_workname(character)
-	local guis_catalog = "guis/"
-	local character_table = tweak_data.blackmarket.characters[character] or tweak_data.blackmarket.characters.locked[character_name]
-	local bundle_folder = character_table and character_table.texture_bundle_folder
-	if bundle_folder then
-		guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
-	end
-	return guis_catalog .. "textures/pd2/blackmarket/icons/characters/" .. character_name
+	return tweak_data.blackmarket:get_character_icon(character)
 end
 
 function BlackMarketManager:equip_previous_weapon(category)
@@ -5660,6 +5652,7 @@ function BlackMarketManager:load(data)
 		end
 		self._global.equipped_van_skin = self._global.equipped_van_skin or tweak_data.van.default_skin_id
 		self._global.inventory = self._global.inventory or {}
+		self._global.inventory.normal = self._global.inventory.normal or {}
 		self._global.new_tradable_items = self._global.new_tradable_items or {}
 		self._global.inventory_tradable = self._global.inventory_tradable or {}
 		self._global.tradable_items_received = self._global.tradable_items_received or {}
@@ -5667,6 +5660,7 @@ function BlackMarketManager:load(data)
 		self._global.tradable_dlcs = self._global.tradable_dlcs or {}
 		self._global.armor_skins = self._global.armor_skins or default_global.armor_skins or {}
 		self._global.equipped_armor_skin = self._global.equipped_armor_skin or self._defaults.armor_skin
+		self:_setup_armor_skins()
 		self:_remove_unowned_armor_skin()
 		self._global.crafted_items = self._global.crafted_items or {}
 		if not self._global.unlocked_mask_slots then
@@ -5995,6 +5989,7 @@ function BlackMarketManager:_cleanup_blackmarket()
 								end
 								if default_mod then
 									table.insert(invalid_parts, {
+										refund = false,
 										slot = slot,
 										global_value = "normal",
 										default_mod = default_mod,
@@ -6002,6 +5997,7 @@ function BlackMarketManager:_cleanup_blackmarket()
 									})
 								else
 									table.insert(invalid_parts, {
+										refund = true,
 										slot = slot,
 										global_value = item.global_values[part_id] or "normal",
 										part_id = part_id
@@ -6026,16 +6022,20 @@ function BlackMarketManager:_cleanup_blackmarket()
 					end
 					if default_mod then
 						table.insert(invalid_parts, {
+							refund = false,
 							slot = slot,
 							global_value = "normal",
 							default_mod = default_mod,
-							part_id = part_id
+							part_id = part_id,
+							reason = "duplicate part (default)"
 						})
 					else
 						table.insert(invalid_parts, {
+							refund = true,
 							slot = slot,
 							global_value = item.global_values[part_id] or "normal",
-							part_id = part_id
+							part_id = part_id,
+							reason = "duplicate part"
 						})
 					end
 				end
@@ -6082,13 +6082,15 @@ function BlackMarketManager:_cleanup_blackmarket()
 		end
 		for _, data in ipairs(invalid_parts) do
 			if crafted_category[data.slot] then
-				Application:error("BlackMarketManager:_cleanup_blackmarket() Removing invalid Weapon part", "slot", data.slot, "part_id", data.part_id, "inspect", inspect(crafted_category[data.slot]), inspect(data))
+				Application:error("BlackMarketManager:_cleanup_blackmarket() Removing invalid Weapon part", data.reason, "slot", data.slot, "part_id", data.part_id, "inspect", inspect(crafted_category[data.slot]), inspect(data))
 				if data.default_mod then
 					self:buy_and_modify_weapon(category, data.slot, data.global_value, data.default_mod, true, true)
 				else
 					self:remove_weapon_part(category, data.slot, data.global_value, data.part_id)
 				end
-				managers.money:refund_weapon_part(crafted_category[data.slot].weapon_id, data.part_id, data.global_value)
+				if data.refund ~= false then
+					managers.money:refund_weapon_part(crafted_category[data.slot].weapon_id, data.part_id, data.global_value)
+				end
 			else
 				Application:error("BlackMarketManager:_cleanup_blackmarket() No crafted item in slot", "category", category, "slot", data.slot)
 			end

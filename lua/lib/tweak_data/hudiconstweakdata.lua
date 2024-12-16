@@ -2087,6 +2087,114 @@ function HudIconsTweakData:init()
 			crime_spree_atlas_size
 		}
 	}
+	self.crime_spree_assault_extender = {
+		texture = "guis/dlcs/drm/textures/pd2/crime_spree/modifiers_atlas_2",
+		texture_rect = {
+			crime_spree_atlas_size * 0,
+			crime_spree_atlas_size * 2,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_cloaker_arrest = {
+		texture = "guis/dlcs/drm/textures/pd2/crime_spree/modifiers_atlas_2",
+		texture_rect = {
+			crime_spree_atlas_size * 1,
+			crime_spree_atlas_size * 0,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_cloaker_tear_gas = {
+		texture = "guis/dlcs/drm/textures/pd2/crime_spree/modifiers_atlas_2",
+		texture_rect = {
+			crime_spree_atlas_size * 1,
+			crime_spree_atlas_size * 2,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_dozer_medic = {
+		texture = "guis/dlcs/drm/textures/pd2/crime_spree/modifiers_atlas_2",
+		texture_rect = {
+			crime_spree_atlas_size * 0,
+			crime_spree_atlas_size * 1,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_dozer_minigun = {
+		texture = "guis/dlcs/drm/textures/pd2/crime_spree/modifiers_atlas_2",
+		texture_rect = {
+			crime_spree_atlas_size * 3,
+			crime_spree_atlas_size * 1,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_dozer_rage = {
+		texture = "guis/dlcs/drm/textures/pd2/crime_spree/modifiers_atlas_2",
+		texture_rect = {
+			crime_spree_atlas_size * 2,
+			crime_spree_atlas_size * 2,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_heavy_sniper = {
+		texture = "guis/dlcs/drm/textures/pd2/crime_spree/modifiers_atlas_2",
+		texture_rect = {
+			crime_spree_atlas_size * 3,
+			crime_spree_atlas_size * 2,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_medic_adrenaline = {
+		texture = "guis/dlcs/drm/textures/pd2/crime_spree/modifiers_atlas_2",
+		texture_rect = {
+			crime_spree_atlas_size * 3,
+			crime_spree_atlas_size * 0,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_medic_deathwish = {
+		texture = "guis/dlcs/drm/textures/pd2/crime_spree/modifiers_atlas_2",
+		texture_rect = {
+			crime_spree_atlas_size * 1,
+			crime_spree_atlas_size * 1,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_medic_rage = {
+		texture = "guis/dlcs/drm/textures/pd2/crime_spree/modifiers_atlas_2",
+		texture_rect = {
+			crime_spree_atlas_size * 2,
+			crime_spree_atlas_size * 0,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_shield_phalanx = {
+		texture = "guis/dlcs/drm/textures/pd2/crime_spree/modifiers_atlas_2",
+		texture_rect = {
+			crime_spree_atlas_size * 0,
+			crime_spree_atlas_size * 0,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
+	self.crime_spree_taser_overcharge = {
+		texture = "guis/dlcs/drm/textures/pd2/crime_spree/modifiers_atlas_2",
+		texture_rect = {
+			crime_spree_atlas_size * 2,
+			crime_spree_atlas_size * 1,
+			crime_spree_atlas_size,
+			crime_spree_atlas_size
+		}
+	}
 	local csm_w = 280
 	local csm_h = 140
 	self.csm_biker_1 = {
@@ -2754,4 +2862,20 @@ function HudIconsTweakData:get_icon_data(icon_id, default_rect)
 		48
 	}
 	return icon, texture_rect
+end
+
+function HudIconsTweakData:get_icon_or(icon_id, default_data)
+	local icon_data = self[icon_id]
+	if not icon_data then
+		return default_data
+	end
+	return icon_data.texture, icon_data.texture_rect
+end
+
+function HudIconsTweakData:get_texture(texture_path)
+	local icon_data = self[texture]
+	if not icon_data then
+		return texture_path
+	end
+	return icon_data.texture, icon_data.texture_rect
 end

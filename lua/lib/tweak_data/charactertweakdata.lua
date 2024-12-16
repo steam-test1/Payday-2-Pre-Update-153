@@ -275,6 +275,7 @@ end
 
 function CharacterTweakData:_init_medic(presets)
 	self.medic = deep_clone(presets.base)
+	self.medic.tags = {"medic"}
 	self.medic.experience = {}
 	self.medic.weapon = presets.weapon.normal
 	self.medic.detection = presets.detection.normal
@@ -362,7 +363,10 @@ function CharacterTweakData:_init_heavy_swat(presets)
 	self.heavy_swat.no_arrest = true
 	self.heavy_swat.chatter = presets.enemy_chatter.swat
 	self.heavy_swat.steal_loot = true
+	self.heavy_swat_sniper = deep_clone(self.heavy_swat)
+	self.heavy_swat_sniper.weapon = presets.weapon.sniper
 	table.insert(self._enemy_list, "heavy_swat")
+	table.insert(self._enemy_list, "heavy_swat_sniper")
 end
 
 function CharacterTweakData:_init_fbi_swat(presets)
@@ -1543,8 +1547,150 @@ function CharacterTweakData:_init_tank(presets)
 	self.tank_hw.use_animation_on_fire_damage = false
 	self.tank_hw.flammable = true
 	self.tank_hw.can_be_tased = false
+	self.tank_medic = deep_clone(self.tank)
+	self.tank_medic.tags = {"medic"}
+	self.tank_mini = deep_clone(self.tank)
+	self.tank_mini.weapon.mini = {}
+	self.tank_mini.move_speed = {
+		stand = {
+			walk = {
+				ntl = {
+					fwd = 72,
+					strafe = 60,
+					bwd = 56
+				},
+				hos = {
+					fwd = 72,
+					strafe = 60,
+					bwd = 56
+				},
+				cbt = {
+					fwd = 72,
+					strafe = 60,
+					bwd = 56
+				}
+			},
+			run = {
+				hos = {
+					fwd = 72,
+					strafe = 70,
+					bwd = 56
+				},
+				cbt = {
+					fwd = 72,
+					strafe = 50,
+					bwd = 60
+				}
+			}
+		},
+		crouch = {
+			walk = {
+				hos = {
+					fwd = 72,
+					strafe = 60,
+					bwd = 56
+				},
+				cbt = {
+					fwd = 72,
+					strafe = 60,
+					bwd = 56
+				}
+			},
+			run = {
+				hos = {
+					fwd = 72,
+					strafe = 65,
+					bwd = 56
+				},
+				cbt = {
+					fwd = 72,
+					strafe = 50,
+					bwd = 60
+				}
+			}
+		}
+	}
+	self.tank_mini.weapon.mini.aim_delay = {0.1, 0.2}
+	self.tank_mini.weapon.mini.focus_delay = 4
+	self.tank_mini.weapon.mini.focus_dis = 800
+	self.tank_mini.weapon.mini.spread = 20
+	self.tank_mini.weapon.mini.miss_dis = 40
+	self.tank_mini.weapon.mini.RELOAD_SPEED = 0
+	self.tank_mini.weapon.mini.melee_speed = 1
+	self.tank_mini.weapon.mini.melee_dmg = 25
+	self.tank_mini.weapon.mini.melee_retry_delay = {1, 2}
+	self.tank_mini.weapon.mini.range = {
+		close = 1000,
+		optimal = 2500,
+		far = 5000
+	}
+	self.tank_mini.weapon.mini.autofire_rounds = {20, 40}
+	self.tank_mini.weapon.mini.FALLOFF = {
+		{
+			r = 100,
+			acc = {0.9, 0.9},
+			dmg_mul = 10,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				0,
+				0,
+				1
+			}
+		},
+		{
+			r = 500,
+			acc = {0.9, 0.9},
+			dmg_mul = 3,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				1,
+				2,
+				8
+			}
+		},
+		{
+			r = 1000,
+			acc = {0.4, 0.6},
+			dmg_mul = 2,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				3,
+				6,
+				6
+			}
+		},
+		{
+			r = 2000,
+			acc = {0.2, 0.5},
+			dmg_mul = 2,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				2,
+				2,
+				1
+			}
+		},
+		{
+			r = 3000,
+			acc = {0.1, 0.35},
+			dmg_mul = 2,
+			recoil = {1, 1.2},
+			mode = {
+				4,
+				2,
+				1,
+				0
+			}
+		}
+	}
 	table.insert(self._enemy_list, "tank")
 	table.insert(self._enemy_list, "tank_hw")
+	table.insert(self._enemy_list, "tank_medic")
+	table.insert(self._enemy_list, "tank_mini")
 end
 
 function CharacterTweakData:_init_spooc(presets)
@@ -3534,6 +3680,84 @@ function CharacterTweakData:_presets(tweak_data)
 			}
 		}
 	}
+	presets.weapon.normal.mini = {}
+	presets.weapon.normal.mini.aim_delay = {0.1, 0.2}
+	presets.weapon.normal.mini.focus_delay = 4
+	presets.weapon.normal.mini.focus_dis = 800
+	presets.weapon.normal.mini.spread = 20
+	presets.weapon.normal.mini.miss_dis = 40
+	presets.weapon.normal.mini.RELOAD_SPEED = 0.5
+	presets.weapon.normal.mini.melee_speed = 1
+	presets.weapon.normal.mini.melee_dmg = 25
+	presets.weapon.normal.mini.melee_retry_delay = {1, 2}
+	presets.weapon.normal.mini.range = {
+		close = 1000,
+		optimal = 2500,
+		far = 5000
+	}
+	presets.weapon.normal.mini.autofire_rounds = {20, 40}
+	presets.weapon.normal.mini.FALLOFF = {
+		{
+			r = 100,
+			acc = {0.6, 0.9},
+			dmg_mul = 5,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				0,
+				0,
+				1
+			}
+		},
+		{
+			r = 500,
+			acc = {0.5, 0.7},
+			dmg_mul = 4,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				1,
+				2,
+				8
+			}
+		},
+		{
+			r = 1000,
+			acc = {0.4, 0.6},
+			dmg_mul = 3.5,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				3,
+				6,
+				6
+			}
+		},
+		{
+			r = 2000,
+			acc = {0.2, 0.5},
+			dmg_mul = 3,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				2,
+				2,
+				1
+			}
+		},
+		{
+			r = 3000,
+			acc = {0.1, 0.35},
+			dmg_mul = 3,
+			recoil = {1, 1.2},
+			mode = {
+				4,
+				2,
+				1,
+				0
+			}
+		}
+	}
 	presets.weapon.normal.ak47 = presets.weapon.normal.m4
 	presets.weapon.normal.mossberg = presets.weapon.normal.r870
 	presets.weapon.good = {
@@ -4140,6 +4364,84 @@ function CharacterTweakData:_presets(tweak_data)
 			}
 		}
 	}
+	presets.weapon.good.mini = {}
+	presets.weapon.good.mini.aim_delay = {0.1, 0.2}
+	presets.weapon.good.mini.focus_delay = 4
+	presets.weapon.good.mini.focus_dis = 800
+	presets.weapon.good.mini.spread = 20
+	presets.weapon.good.mini.miss_dis = 40
+	presets.weapon.good.mini.RELOAD_SPEED = 0.5
+	presets.weapon.good.mini.melee_speed = 1
+	presets.weapon.good.mini.melee_dmg = 25
+	presets.weapon.good.mini.melee_retry_delay = {1, 2}
+	presets.weapon.good.mini.range = {
+		close = 1000,
+		optimal = 2500,
+		far = 5000
+	}
+	presets.weapon.good.mini.autofire_rounds = {20, 40}
+	presets.weapon.good.mini.FALLOFF = {
+		{
+			r = 100,
+			acc = {0.6, 0.9},
+			dmg_mul = 5,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				0,
+				0,
+				1
+			}
+		},
+		{
+			r = 500,
+			acc = {0.5, 0.7},
+			dmg_mul = 4,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				1,
+				2,
+				8
+			}
+		},
+		{
+			r = 1000,
+			acc = {0.4, 0.6},
+			dmg_mul = 3.5,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				3,
+				6,
+				6
+			}
+		},
+		{
+			r = 2000,
+			acc = {0.2, 0.5},
+			dmg_mul = 3,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				2,
+				2,
+				1
+			}
+		},
+		{
+			r = 3000,
+			acc = {0.1, 0.35},
+			dmg_mul = 3,
+			recoil = {1, 1.2},
+			mode = {
+				4,
+				2,
+				1,
+				0
+			}
+		}
+	}
 	presets.weapon.good.ak47 = presets.weapon.good.m4
 	presets.weapon.good.mossberg = presets.weapon.good.r870
 	presets.weapon.expert = {
@@ -4730,6 +5032,84 @@ function CharacterTweakData:_presets(tweak_data)
 				1,
 				0,
 				0,
+				0
+			}
+		}
+	}
+	presets.weapon.expert.mini = {}
+	presets.weapon.expert.mini.aim_delay = {0.1, 0.2}
+	presets.weapon.expert.mini.focus_delay = 4
+	presets.weapon.expert.mini.focus_dis = 800
+	presets.weapon.expert.mini.spread = 20
+	presets.weapon.expert.mini.miss_dis = 40
+	presets.weapon.expert.mini.RELOAD_SPEED = 0.5
+	presets.weapon.expert.mini.melee_speed = 1
+	presets.weapon.expert.mini.melee_dmg = 25
+	presets.weapon.expert.mini.melee_retry_delay = {1, 2}
+	presets.weapon.expert.mini.range = {
+		close = 1000,
+		optimal = 2500,
+		far = 5000
+	}
+	presets.weapon.expert.mini.autofire_rounds = {20, 40}
+	presets.weapon.expert.mini.FALLOFF = {
+		{
+			r = 100,
+			acc = {0.6, 0.9},
+			dmg_mul = 5,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				0,
+				0,
+				1
+			}
+		},
+		{
+			r = 500,
+			acc = {0.5, 0.7},
+			dmg_mul = 4,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				1,
+				2,
+				8
+			}
+		},
+		{
+			r = 1000,
+			acc = {0.4, 0.6},
+			dmg_mul = 3.5,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				3,
+				6,
+				6
+			}
+		},
+		{
+			r = 2000,
+			acc = {0.2, 0.5},
+			dmg_mul = 3,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				2,
+				2,
+				1
+			}
+		},
+		{
+			r = 3000,
+			acc = {0.1, 0.35},
+			dmg_mul = 3,
+			recoil = {1, 1.2},
+			mode = {
+				4,
+				2,
+				1,
 				0
 			}
 		}
@@ -5372,6 +5752,84 @@ function CharacterTweakData:_presets(tweak_data)
 			}
 		}
 	}
+	presets.weapon.deathwish.mini = {}
+	presets.weapon.deathwish.mini.aim_delay = {0.1, 0.2}
+	presets.weapon.deathwish.mini.focus_delay = 4
+	presets.weapon.deathwish.mini.focus_dis = 800
+	presets.weapon.deathwish.mini.spread = 20
+	presets.weapon.deathwish.mini.miss_dis = 40
+	presets.weapon.deathwish.mini.RELOAD_SPEED = 0.5
+	presets.weapon.deathwish.mini.melee_speed = 1
+	presets.weapon.deathwish.mini.melee_dmg = 25
+	presets.weapon.deathwish.mini.melee_retry_delay = {1, 2}
+	presets.weapon.deathwish.mini.range = {
+		close = 1000,
+		optimal = 2500,
+		far = 5000
+	}
+	presets.weapon.deathwish.mini.autofire_rounds = {20, 40}
+	presets.weapon.deathwish.mini.FALLOFF = {
+		{
+			r = 100,
+			acc = {0.6, 0.9},
+			dmg_mul = 5,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				0,
+				0,
+				1
+			}
+		},
+		{
+			r = 500,
+			acc = {0.5, 0.7},
+			dmg_mul = 4,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				1,
+				2,
+				8
+			}
+		},
+		{
+			r = 1000,
+			acc = {0.4, 0.6},
+			dmg_mul = 3.5,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				3,
+				6,
+				6
+			}
+		},
+		{
+			r = 2000,
+			acc = {0.2, 0.5},
+			dmg_mul = 3,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				2,
+				2,
+				1
+			}
+		},
+		{
+			r = 3000,
+			acc = {0.1, 0.35},
+			dmg_mul = 3,
+			recoil = {1, 1.2},
+			mode = {
+				4,
+				2,
+				1,
+				0
+			}
+		}
+	}
 	presets.weapon.deathwish.ak47 = presets.weapon.deathwish.m4
 	presets.weapon.deathwish.mossberg = presets.weapon.deathwish.r870
 	presets.weapon.easywish = {
@@ -5949,6 +6407,84 @@ function CharacterTweakData:_presets(tweak_data)
 				4,
 				1,
 				0,
+				0
+			}
+		}
+	}
+	presets.weapon.easywish.mini = {}
+	presets.weapon.easywish.mini.aim_delay = {0.1, 0.2}
+	presets.weapon.easywish.mini.focus_delay = 4
+	presets.weapon.easywish.mini.focus_dis = 800
+	presets.weapon.easywish.mini.spread = 20
+	presets.weapon.easywish.mini.miss_dis = 40
+	presets.weapon.easywish.mini.RELOAD_SPEED = 0.5
+	presets.weapon.easywish.mini.melee_speed = 1
+	presets.weapon.easywish.mini.melee_dmg = 25
+	presets.weapon.easywish.mini.melee_retry_delay = {1, 2}
+	presets.weapon.easywish.mini.range = {
+		close = 1000,
+		optimal = 2500,
+		far = 5000
+	}
+	presets.weapon.easywish.mini.autofire_rounds = {20, 40}
+	presets.weapon.easywish.mini.FALLOFF = {
+		{
+			r = 100,
+			acc = {0.6, 0.9},
+			dmg_mul = 5,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				0,
+				0,
+				1
+			}
+		},
+		{
+			r = 500,
+			acc = {0.5, 0.7},
+			dmg_mul = 4,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				1,
+				2,
+				8
+			}
+		},
+		{
+			r = 1000,
+			acc = {0.4, 0.6},
+			dmg_mul = 3.5,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				3,
+				6,
+				6
+			}
+		},
+		{
+			r = 2000,
+			acc = {0.2, 0.5},
+			dmg_mul = 3,
+			recoil = {0.45, 0.8},
+			mode = {
+				1,
+				2,
+				2,
+				1
+			}
+		},
+		{
+			r = 3000,
+			acc = {0.1, 0.35},
+			dmg_mul = 3,
+			recoil = {1, 1.2},
+			mode = {
+				4,
+				2,
+				1,
 				0
 			}
 		}
@@ -7051,7 +7587,8 @@ function CharacterTweakData:_create_table_structure()
 		"ak47_ass",
 		"x_c45",
 		"sg417",
-		"svdsil_snp"
+		"svdsil_snp",
+		"mini"
 	}
 	self.weap_unit_names = {
 		Idstring("units/payday2/weapons/wpn_npc_beretta92/wpn_npc_beretta92"),
@@ -7080,7 +7617,8 @@ function CharacterTweakData:_create_table_structure()
 		Idstring("units/pd2_dlc_mad/weapons/wpn_npc_ak47/wpn_npc_ak47"),
 		Idstring("units/payday2/weapons/wpn_npc_c45/wpn_npc_x_c45"),
 		Idstring("units/pd2_dlc_chico/weapons/wpn_npc_sg417/wpn_npc_sg417"),
-		Idstring("units/pd2_dlc_spa/weapons/wpn_npc_svd_silenced/wpn_npc_svd_silenced")
+		Idstring("units/pd2_dlc_spa/weapons/wpn_npc_svd_silenced/wpn_npc_svd_silenced"),
+		Idstring("units/pd2_dlc_drm/weapons/wpn_npc_mini/wpn_npc_mini")
 	}
 end
 
@@ -8245,6 +8783,8 @@ function CharacterTweakData:_set_easy_wish()
 	}
 	self.tank.weapon.ak47.aim_delay = {0, 0}
 	self.tank.weapon.ak47.focus_delay = 0
+	self.tank.weapon.mini.aim_delay = {0, 0}
+	self.tank.weapon.mini.focus_delay = 0
 	self.shield.weapon.mp9.aim_delay = {0, 0}
 	self.shield.weapon.mp9.focus_delay = 0
 	self.shield.weapon.c45.aim_delay = {0, 0}
@@ -8602,8 +9142,72 @@ function CharacterTweakData:_set_overkill_290()
 			}
 		}
 	}
+	self.tank.weapon.mini.FALLOFF = {
+		{
+			r = 100,
+			acc = {0.7, 0.9},
+			dmg_mul = 5,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				0,
+				0,
+				1
+			}
+		},
+		{
+			r = 500,
+			acc = {0.5, 0.75},
+			dmg_mul = 5,
+			recoil = {0.5, 0.8},
+			mode = {
+				0,
+				0,
+				0,
+				6
+			}
+		},
+		{
+			r = 1000,
+			acc = {0.3, 0.6},
+			dmg_mul = 5,
+			recoil = {1, 1},
+			mode = {
+				0,
+				0,
+				2,
+				6
+			}
+		},
+		{
+			r = 2000,
+			acc = {0.25, 0.55},
+			dmg_mul = 5,
+			recoil = {1, 1},
+			mode = {
+				0,
+				0,
+				2,
+				6
+			}
+		},
+		{
+			r = 3000,
+			acc = {0.15, 0.5},
+			dmg_mul = 5,
+			recoil = {1, 2},
+			mode = {
+				0,
+				0,
+				2,
+				6
+			}
+		}
+	}
 	self.tank.weapon.ak47.aim_delay = {0, 0}
 	self.tank.weapon.ak47.focus_delay = 0
+	self.tank.weapon.mini.aim_delay = {0, 0}
+	self.tank.weapon.mini.focus_delay = 0
 	self.shield.weapon.mp9.aim_delay = {0, 0}
 	self.shield.weapon.mp9.focus_delay = 0
 	self.shield.weapon.mp9.FALLOFF = {
@@ -9147,6 +9751,70 @@ function CharacterTweakData:_set_sm_wish()
 			}
 		}
 	}
+	self.tank.weapon.mini.FALLOFF = {
+		{
+			r = 100,
+			acc = {0.8, 0.95},
+			dmg_mul = 5,
+			recoil = {0.4, 0.7},
+			mode = {
+				0,
+				0,
+				0,
+				1
+			}
+		},
+		{
+			r = 500,
+			acc = {0.6, 0.75},
+			dmg_mul = 4,
+			recoil = {0.5, 0.8},
+			mode = {
+				0,
+				0,
+				0,
+				6
+			}
+		},
+		{
+			r = 1000,
+			acc = {0.4, 0.7},
+			dmg_mul = 3,
+			recoil = {1, 1},
+			mode = {
+				0,
+				0,
+				2,
+				6
+			}
+		},
+		{
+			r = 2000,
+			acc = {0.4, 0.55},
+			dmg_mul = 3,
+			recoil = {1, 1},
+			mode = {
+				0,
+				0,
+				2,
+				6
+			}
+		},
+		{
+			r = 3000,
+			acc = {0.15, 0.5},
+			dmg_mul = 3,
+			recoil = {1, 2},
+			mode = {
+				0,
+				0,
+				2,
+				6
+			}
+		}
+	}
+	self.tank.weapon.mini.aim_delay = {0, 0}
+	self.tank.weapon.mini.focus_delay = 0
 	self.tank.weapon.ak47.aim_delay = {0, 0}
 	self.tank.weapon.ak47.focus_delay = 0
 	self.shield.weapon.mp9.aim_delay = {0, 0}
@@ -9384,8 +10052,8 @@ function CharacterTweakData:_multiply_all_hp(hp_mul, hs_mul)
 	self.medic.HEALTH_INIT = self.medic.HEALTH_INIT * hp_mul
 	self.bolivian.HEALTH_INIT = self.bolivian.HEALTH_INIT * hp_mul
 	self.bolivian_indoors.HEALTH_INIT = self.bolivian_indoors.HEALTH_INIT * hp_mul
-	self.drug_lord_boss.HEALTH_INIT = self.bolivian_indoors.HEALTH_INIT * hp_mul
-	self.drug_lord_boss_stealth.HEALTH_INIT = self.bolivian_indoors.HEALTH_INIT * hp_mul
+	self.drug_lord_boss.HEALTH_INIT = self.drug_lord_boss.HEALTH_INIT * hp_mul
+	self.drug_lord_boss_stealth.HEALTH_INIT = self.drug_lord_boss_stealth.HEALTH_INIT * hp_mul
 	if self.security.headshot_dmg_mul then
 		self.security.headshot_dmg_mul = self.security.headshot_dmg_mul * hs_mul
 	end
@@ -9932,6 +10600,14 @@ function CharacterTweakData:character_map()
 		run = {
 			path = "units/pd2_dlc_run/characters/",
 			list = {"npc_matt"}
+		},
+		drm = {
+			path = "units/pd2_dlc_drm/characters/",
+			list = {
+				"ene_bulldozer_medic",
+				"ene_bulldozer_minigun",
+				"ene_zeal_swat_heavy_sniper"
+			}
 		}
 	}
 	return char_map

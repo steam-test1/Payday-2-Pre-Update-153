@@ -403,6 +403,20 @@ function table.unpack_map(map)
 	return unpack(table.map_to_list(map))
 end
 
+function table.set(...)
+	return table.list_to_set({
+		...
+	})
+end
+
+function table.list_to_set(list)
+	local rtn = {}
+	for _, v in pairs(list) do
+		rtn[v] = true
+	end
+	return rtn
+end
+
 function table.map_to_list(map)
 	local list = {}
 	for k, v in pairs(map) do

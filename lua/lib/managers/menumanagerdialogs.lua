@@ -1958,3 +1958,13 @@ function MenuManager:show_inventory_load_fail_dialog()
 	dialog_data.button_list = {ok_button}
 	managers.system_menu:show(dialog_data)
 end
+
+function MenuManager:show_crime_spree_cleared_dialog()
+	local dialog_data = {}
+	dialog_data.title = managers.localization:text("dialog_crime_spree_cleared_title")
+	dialog_data.text = managers.localization:text("dialog_crime_spree_cleared_text")
+	local ok_button = {}
+	ok_button.text = managers.localization:text("dialog_ok")
+	dialog_data.button_list = {ok_button}
+	managers.system_menu:show(dialog_data)
+end
