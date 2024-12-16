@@ -3811,8 +3811,8 @@ function HuskPlayerMovement:on_exit_zipline()
 end
 
 function HuskPlayerMovement:zipline_unit()
-	if self._sequenced_events[1] and self._sequenced_events[1].zipline_unit then
-		return self._sequenced_events[1].zipline_unit
+	if self._zipline and self._zipline.zipline_unit then
+		return self._zipline.zipline_unit
 	end
 end
 
@@ -3844,6 +3844,9 @@ function HuskPlayerMovement:sync_action_jump(pos, jump_vec)
 end
 
 function HuskPlayerMovement:_cleanup_previous_state(previous_state)
+	if self._tase_effect then
+		World:effect_manager():fade_kill(self._tase_effect)
+	end
 	if alive(self._parachute_unit) then
 		local position = self._parachute_unit:position()
 		local rotation = self._parachute_unit:rotation()

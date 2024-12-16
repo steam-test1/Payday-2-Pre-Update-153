@@ -447,7 +447,7 @@ function MutatorHydra:split_enemy(cop_damage, attack_data)
 		local parent_unit = cop_damage._unit
 		local spawn_selector = self.enemy_list[parent_unit:name():key()]
 		if spawn_selector then
-			math.randomseed = os.time()
+			math.randomseed(os.time())
 			math.random()
 			math.random()
 			math.random()

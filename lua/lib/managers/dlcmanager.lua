@@ -851,7 +851,42 @@ function PS4DLCManager:init()
 				verified = false,
 				verified_for_TheBigScore = false
 			},
-			rota = {verified = true, verified_for_TheBigScore = true}
+			rota = {verified = true, verified_for_TheBigScore = true},
+			pim = {
+				product_id = "00000",
+				verified = true,
+				verified_for_TheBigScore = true
+			},
+			tango = {
+				product_id = "00000",
+				verified = true,
+				verified_for_TheBigScore = true
+			},
+			friend = {
+				product_id = "00000",
+				verified = true,
+				verified_for_TheBigScore = true
+			},
+			chico = {
+				product_id = "00000",
+				verified = true,
+				verified_for_TheBigScore = true
+			},
+			spa = {
+				product_id = "00000",
+				verified = true,
+				verified_for_TheBigScore = true
+			},
+			grv = {
+				product_id = "00000",
+				verified = true,
+				verified_for_TheBigScore = true
+			},
+			pn2 = {
+				product_id = "00000",
+				verified = true,
+				verified_for_TheBigScore = true
+			}
 		}
 		self:_verify_dlcs()
 	end

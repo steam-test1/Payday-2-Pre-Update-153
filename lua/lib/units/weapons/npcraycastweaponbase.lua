@@ -123,7 +123,7 @@ function NPCRaycastWeaponBase:trigger_held(...)
 	if self._next_fire_allowed <= Application:time() then
 		fired = self:fire(...)
 		if fired then
-			self._next_fire_allowed = self._next_fire_allowed + tweak_data.weapon[self._name_id].auto.fire_rate
+			self._next_fire_allowed = self._next_fire_allowed + (tweak_data.weapon[self._name_id].auto.fire_rate or 1)
 		end
 	end
 	return fired

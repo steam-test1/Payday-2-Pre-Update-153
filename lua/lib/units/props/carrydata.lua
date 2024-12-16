@@ -28,16 +28,28 @@ function CarryData:trigger_load(instigator)
 end
 
 function CarryData:update(unit, t, dt)
-	if not Network:is_server() then
-		return
+	if Network:is_server() then
+		self:_update_explode_t(unit, t, dt)
+		self:_update_unlink_check(unit, t, dt)
+		self:_update_throw_link(unit, t, dt)
+	else
 	end
+end
+
+function CarryData:_update_explode_t(unit, t, dt)
 	if self._explode_t and t > self._explode_t then
 		self._explode_t = nil
 		self:_explode()
 	end
+end
+
+function CarryData:_update_unlink_check(unit, t, dt)
 	if alive(self._linked_to) and self._linked_to.character_damage and self._linked_to:character_damage():dead() then
 		self:unlink()
 	end
+end
+
+function CarryData:_update_throw_link(unit, t, dt)
 	if not self._linked_to then
 		local bag_object = self._unit:get_object(Idstring("g_bag")) or self._unit:get_object(Idstring("g_canvasbag")) or self._unit:get_object(Idstring("g_g")) or self._unit:get_object(Idstring("g_goat")) or self._unit:get_object(Idstring("g_bodybag"))
 		if bag_object then

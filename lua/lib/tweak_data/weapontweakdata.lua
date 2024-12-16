@@ -790,7 +790,7 @@ function WeaponTweakData:_init_data_mini_npc()
 	self.mini_npc.DAMAGE = 2
 	self.mini_npc.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
 	self.mini_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556_lmg"
-	self.mini_npc.CLIP_AMMO_MAX = 500
+	self.mini_npc.CLIP_AMMO_MAX = 1000
 	self.mini_npc.NR_CLIPS_MAX = 2
 	self.mini_npc.auto.fire_rate = 0.02
 	self.mini_npc.hold = "rifle"
@@ -14429,8 +14429,7 @@ function WeaponTweakData:_create_table_structure()
 	self.m14_sniper_npc = {
 		usage = "is_rifle",
 		sounds = {},
-		use_data = {},
-		auto = {}
+		use_data = {}
 	}
 	self.r870_npc = {
 		usage = "is_shotgun_pump",

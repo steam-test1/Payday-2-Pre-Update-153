@@ -1613,7 +1613,7 @@ function CharacterTweakData:_init_tank(presets)
 	self.tank_mini.weapon.mini.focus_dis = 800
 	self.tank_mini.weapon.mini.spread = 20
 	self.tank_mini.weapon.mini.miss_dis = 40
-	self.tank_mini.weapon.mini.RELOAD_SPEED = 0
+	self.tank_mini.weapon.mini.RELOAD_SPEED = 1
 	self.tank_mini.weapon.mini.melee_speed = 1
 	self.tank_mini.weapon.mini.melee_dmg = 25
 	self.tank_mini.weapon.mini.melee_retry_delay = {1, 2}
@@ -1635,7 +1635,7 @@ function CharacterTweakData:_init_tank(presets)
 				0,
 				1
 			},
-			autofire_rounds = {150, 200}
+			autofire_rounds = {500, 700}
 		},
 		{
 			r = 500,
@@ -1648,7 +1648,7 @@ function CharacterTweakData:_init_tank(presets)
 				0,
 				1
 			},
-			autofire_rounds = {120, 160}
+			autofire_rounds = {500, 500}
 		},
 		{
 			r = 1000,
@@ -1661,7 +1661,7 @@ function CharacterTweakData:_init_tank(presets)
 				0,
 				1
 			},
-			autofire_rounds = {100, 140}
+			autofire_rounds = {300, 500}
 		},
 		{
 			r = 2000,
@@ -1674,7 +1674,7 @@ function CharacterTweakData:_init_tank(presets)
 				0,
 				1
 			},
-			autofire_rounds = {60, 100}
+			autofire_rounds = {100, 300}
 		},
 		{
 			r = 3000,
@@ -1687,7 +1687,7 @@ function CharacterTweakData:_init_tank(presets)
 				0,
 				1
 			},
-			autofire_rounds = {40, 80}
+			autofire_rounds = {40, 100}
 		}
 	}
 	table.insert(self._enemy_list, "tank")
