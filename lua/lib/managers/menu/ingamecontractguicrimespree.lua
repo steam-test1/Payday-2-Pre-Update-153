@@ -13,6 +13,9 @@ function IngameContractGuiCrimeSpree:init(ws, node)
 	local job_data = managers.job:current_job_data()
 	local job_chain = managers.job:current_job_chain_data()
 	local mission = managers.crime_spree:get_mission(managers.crime_spree:current_played_mission())
+	if not mission then
+		return
+	end
 	local contract_text = self._panel:text({
 		layer = 1,
 		rotation = 360,
@@ -89,7 +92,7 @@ function IngameContractGuiCrimeSpree:init(ws, node)
 		x = padding,
 		y = modifiers_title:bottom() + padding
 	})
-	CrimeSpreeModifierDetailsPage.add_modifiers_panel(self, self._modifiers_panel, managers.crime_spree:server_active_modifiers())
+	CrimeSpreeModifierDetailsPage.add_modifiers_panel(self, self._modifiers_panel, managers.crime_spree:server_active_modifiers(), false)
 	self._text_panel = text_panel
 	self:_rec_round_object(self._panel)
 	self._sides = BoxGuiObject:new(self._panel, {

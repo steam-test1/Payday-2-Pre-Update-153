@@ -178,7 +178,6 @@ function MenuItemMultiChoice:setup_gui(node, row_item)
 	row_item.gui_text = node._text_item_part(node, row_item, row_item.gui_panel, right_align, row_item.align)
 	row_item.gui_text:set_wrap(true)
 	row_item.gui_text:set_word_wrap(true)
-	local choice_text_align = row_item.align == "left" and "right" or row_item.align == "right" and "left" or row_item.align
 	row_item.choice_panel = row_item.gui_panel:panel({
 		w = node.item_panel:w()
 	})
@@ -186,7 +185,6 @@ function MenuItemMultiChoice:setup_gui(node, row_item)
 		font_size = row_item.font_size,
 		x = 0,
 		y = 0,
-		align = "center",
 		vertical = "center",
 		font = row_item.font,
 		color = node.row_item_hightlight_color,
@@ -239,6 +237,27 @@ function MenuItemMultiChoice:setup_gui(node, row_item)
 	return true
 end
 
+local scroll_text = function(text, clone)
+	while true do
+		local t = 0
+		local dt
+		local speed = 40
+		local delay = 2
+		local margin = 40
+		text:set_x(0)
+		clone:set_x(text:right() + margin)
+		while t < delay do
+			dt = coroutine.yield()
+			t = t + dt
+		end
+		while 0 < clone:x() do
+			dt = coroutine.yield()
+			text:move(-speed * dt, 0)
+			clone:move(-speed * dt, 0)
+		end
+	end
+end
+
 function MenuItemMultiChoice:reload(row_item, node)
 	if not row_item then
 		return
@@ -249,6 +268,31 @@ function MenuItemMultiChoice:reload(row_item, node)
 		row_item.option_text = self:selected_option():parameters().text_id
 	end
 	row_item.choice_text:set_text(utf8.to_upper(row_item.option_text))
+	local panel_width = row_item.choice_panel:width()
+	local x, y, text_width, text_height = row_item.choice_text:text_rect()
+	row_item.choice_text:set_size(text_width, text_height)
+	if row_item.choice_text_clone then
+		row_item.choice_panel:remove(row_item.choice_text_clone)
+		row_item.choice_text_clone = nil
+	end
+	row_item.choice_text:stop()
+	if panel_width > text_width then
+		row_item.choice_text:set_x(math.round((panel_width - text_width) * 0.5))
+	else
+		row_item.choice_text_clone = row_item.choice_panel:text({
+			text = row_item.choice_text:text(),
+			vertical = row_item.choice_text:vertical(),
+			font = row_item.font,
+			font_size = row_item.font_size,
+			color = row_item.choice_text:color(),
+			layer = row_item.choice_text:layer(),
+			blend_mode = node.row_item_blend_mode,
+			render_template = row_item.choice_text:render_template(),
+			width = row_item.choice_text:width(),
+			height = row_item.choice_text:height()
+		})
+		row_item.choice_text:animate(scroll_text, row_item.choice_text_clone)
+	end
 	if self:selected_option():parameters().stencil_image then
 		managers.menu:active_menu().renderer:set_stencil_image(self:selected_option():parameters().stencil_image)
 	end

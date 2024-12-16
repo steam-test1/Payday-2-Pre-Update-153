@@ -151,6 +151,7 @@ function BlackMarketTweakData:_init_projectiles(tweak_data)
 	self.projectiles.launcher_incendiary_arbiter.no_cheat_count = true
 	self.projectiles.launcher_incendiary_arbiter.impact_detonation = true
 	self.projectiles.launcher_incendiary_arbiter.time_cheat = 0.2
+	self.projectiles.launcher_incendiary_arbiter.adjust_z = 0
 	self.projectiles.rocket_ray_frag = {}
 	self.projectiles.rocket_ray_frag.name_id = "bm_rocket_frag"
 	self.projectiles.rocket_ray_frag.unit = "units/pd2_dlc_friend/weapons/wpn_third_ray_fired_rocket/wpn_third_ray_fired_rocket"

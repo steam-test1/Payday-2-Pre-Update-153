@@ -31,9 +31,6 @@ function CrimeSpreeDetailsMenuComponent:_setup(is_start_page, component_data)
 	self._safe_panel = self._ws:panel():panel({
 		layer = self._init_layer
 	})
-	if self:_is_in_game() then
-		self:_add_page_right_title()
-	end
 	local is_host = Network:is_server() or Global.game_settings.single_player
 	if not is_host and managers.crime_spree:in_progress() then
 		self:_add_page_subtitle()
@@ -54,7 +51,6 @@ function CrimeSpreeDetailsMenuComponent:close()
 end
 
 function CrimeSpreeDetailsMenuComponent:_start_page_data()
-	local clip = #managers.crime_spree:server_active_modifiers() >= tweak_data.crime_spree.gui.modifiers_before_scroll
 	local data = {}
 	local topic_id = "cn_crime_spree_level"
 	local topic_params = {
@@ -63,23 +59,13 @@ function CrimeSpreeDetailsMenuComponent:_start_page_data()
 	if not managers.crime_spree:in_progress() then
 		topic_id = "cn_crime_spree"
 	end
-	if self:_is_in_game() then
-		data.right_topic_id = "cn_crime_spree_level"
-		data.right_topic_params = topic_params
-		data.right_topic_range_color = {
-			from = utf8.len(managers.localization:text("cn_crime_spree_level_no_num")),
-			to = utf8.len(managers.localization:text(data.right_topic_id, data.right_topic_params)),
-			color = tweak_data.screen_colors.crime_spree_risk
-		}
-	else
-		data.topic_id = topic_id
-		data.topic_params = topic_params
-		data.topic_range_color = {
-			from = utf8.len(managers.localization:text("cn_crime_spree_level_no_num")),
-			to = utf8.len(managers.localization:text(data.topic_id, data.topic_params)),
-			color = tweak_data.screen_colors.crime_spree_risk
-		}
-	end
+	data.topic_id = topic_id
+	data.topic_params = topic_params
+	data.topic_range_color = {
+		from = utf8.len(managers.localization:text("cn_crime_spree_level_no_num")),
+		to = utf8.len(managers.localization:text(data.topic_id, data.topic_params)),
+		color = tweak_data.screen_colors.crime_spree_risk
+	}
 	data.subtopic_id = "cn_crime_spree_my_level"
 	data.subtopic_params = {
 		level = managers.experience:cash_string(managers.crime_spree:spree_level(), "")
@@ -167,12 +153,7 @@ function CrimeSpreeDetailsMenuComponent:_add_page_subtitle()
 		if self._data.subtopic_range_color then
 			self._subtitle_text:set_range_color(self._data.subtopic_range_color.from, self._data.subtopic_range_color.to, self._data.subtopic_range_color.color)
 		end
-		if self:_is_in_game() then
-			self._subtitle_text:set_top(self._right_title_text:bottom() - padding)
-			self._subtitle_text:set_world_right(self._safe_panel:world_right())
-		else
-			self._subtitle_text:set_top(self._title_text:bottom() - padding)
-		end
+		self._subtitle_text:set_top(self._title_text:bottom() - padding)
 	end
 end
 
@@ -349,8 +330,7 @@ CrimeSpreeDetailsPage = CrimeSpreeDetailsPage or class(CustomSafehouseGuiPage)
 
 function CrimeSpreeDetailsPage:init(...)
 	CrimeSpreeDetailsPage.super.init(self, ...)
-	local clip = #managers.crime_spree:server_active_modifiers() >= tweak_data.crime_spree.gui.modifiers_before_scroll
-	local w = self:info_panel():w() + padding + (clip and padding or 3)
+	local w = self:info_panel():w() + padding + 3
 	self:info_panel():grow(-w, 0)
 	self:panel():grow(w, 0)
 end

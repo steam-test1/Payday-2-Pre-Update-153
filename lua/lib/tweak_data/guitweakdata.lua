@@ -1729,6 +1729,32 @@ function GuiTweakData:init()
 			pulse_level = 10,
 			pulse_color = Color(255, 255, 0, 255) / 255,
 			mutators_color = Color(255, 255, 0, 255) / 255
+		},
+		{
+			id = "crime_spree",
+			name_id = "cn_crime_spree",
+			desc_id = "cn_crime_spree_help_start",
+			menu_node = "crimenet_crime_spree_contract_host",
+			mp_only = true,
+			x = 675,
+			y = 810,
+			icon = "guis/textures/pd2/crimenet_marker_crimespree",
+			pulse = true,
+			pulse_level = 10,
+			pulse_color = Color(255, 255, 255, 0) / 255
+		},
+		{
+			id = "crime_spree",
+			name_id = "cn_crime_spree",
+			desc_id = "cn_crime_spree_help_start",
+			menu_node = "crimenet_crime_spree_contract_singleplayer",
+			sp_only = true,
+			x = 675,
+			y = 810,
+			icon = "guis/textures/pd2/crimenet_marker_crimespree",
+			pulse = true,
+			pulse_level = 10,
+			pulse_color = Color(255, 255, 255, 0) / 255
 		}
 	}
 	if SystemInfo:platform() == Idstring("WIN32") then

@@ -1917,44 +1917,17 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 		if bundle_folder then
 			guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
 		end
-		if outfit.melee_weapon == "weapon" then
-			if primary_texture and secondary_texture then
-				local primary = player_slot.panel:bitmap({
-					texture = primary_texture,
-					w = w * 0.75,
-					h = h * 0.75,
-					rotation = math.random(2) - 21.5,
-					alpha = 0.8
-				})
-				aspect = primary:texture_width() / math.max(1, primary:texture_height())
-				primary:set_w(primary:h() * aspect)
-				local secondary = player_slot.panel:bitmap({
-					texture = secondary_texture,
-					w = w * 0.75,
-					h = h * 0.75,
-					rotation = math.random(2) - 21.5,
-					alpha = 0.8
-				})
-				aspect = secondary:texture_width() / math.max(1, secondary:texture_height())
-				secondary:set_w(secondary:h() * aspect)
-				primary:set_center_x(x - primary:w() * 0.25)
-				primary:set_center_y(y * 9)
-				secondary:set_center_x(x + secondary:w() * 0.25)
-				secondary:set_center_y(y * 9)
-			end
-		else
-			local melee_weapon_bitmap = player_slot.panel:bitmap({
-				texture = guis_catalog .. "textures/pd2/blackmarket/icons/melee_weapons/" .. outfit.melee_weapon,
-				w = w,
-				h = h,
-				rotation = math.random(2) - 1.5,
-				alpha = 0.8
-			})
-			aspect = melee_weapon_bitmap:texture_width() / math.max(1, melee_weapon_bitmap:texture_height())
-			melee_weapon_bitmap:set_w(melee_weapon_bitmap:h() * aspect)
-			melee_weapon_bitmap:set_center_x(x)
-			melee_weapon_bitmap:set_center_y(y * 9)
-		end
+		local melee_weapon_bitmap = player_slot.panel:bitmap({
+			texture = guis_catalog .. "textures/pd2/blackmarket/icons/melee_weapons/" .. outfit.melee_weapon,
+			w = w,
+			h = h,
+			rotation = math.random(2) - 1.5,
+			alpha = 0.8
+		})
+		aspect = melee_weapon_bitmap:texture_width() / math.max(1, melee_weapon_bitmap:texture_height())
+		melee_weapon_bitmap:set_w(melee_weapon_bitmap:h() * aspect)
+		melee_weapon_bitmap:set_center_x(x)
+		melee_weapon_bitmap:set_center_y(y * 9)
 	end
 	if outfit.grenade then
 		repeat
@@ -2026,6 +1999,18 @@ function TeamLoadoutItem:set_slot_outfit(slot, criminal_name, outfit)
 			deployable_text:set_rightbottom(player_slot.panel:w(), player_slot.panel:h())
 			deployable_text:set_position(math.round(deployable_text:x()) - 16, math.round(deployable_text:y()) - 5)
 		end
+	else
+		local deployable_bitmap = player_slot.panel:bitmap({
+			texture = "guis/textures/pd2/none_icon",
+			w = w,
+			h = h,
+			rotation = math.random(2) - 1.5,
+			alpha = 0.8
+		})
+		aspect = deployable_bitmap:texture_width() / math.max(1, deployable_bitmap:texture_height())
+		deployable_bitmap:set_w(deployable_bitmap:h() * aspect)
+		deployable_bitmap:set_center_x(x)
+		deployable_bitmap:set_center_y(y * 15)
 	end
 	player_slot.box = BoxGuiObject:new(player_slot.panel, {
 		sides = {

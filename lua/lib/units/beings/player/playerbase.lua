@@ -19,7 +19,9 @@ function PlayerBase:init(unit)
 	self._unit:set_extension_update_enabled(Idstring("base"), false)
 	self._stats_screen_visible = false
 	managers.game_play_central:restart_portal_effects()
-	self:_chk_set_unit_upgrades()
+	if Network:is_client() then
+		self:sync_unit_upgrades()
+	end
 	managers.job:set_memory("mad_3", true)
 end
 
@@ -71,7 +73,29 @@ function PlayerBase:setup_hud_offset(peer)
 	self._suspicion_settings.hud_offset = managers.blackmarket:get_suspicion_offset_of_peer(peer or managers.network:session():local_peer(), tweak_data.player.SUSPICION_OFFSET_LERP or 0.75)
 end
 
-function PlayerBase:_chk_set_unit_upgrades()
+function PlayerBase:save(data)
+	data.upgrades = {}
+	data.temporary_upgrades = {}
+	local pm = managers.player
+	local net_sesh = managers.network:session()
+	for category, upgrades in pairs(pm._global.upgrades) do
+		for upgrade, level in pairs(upgrades) do
+			if pm:is_upgrade_synced(category, upgrade) then
+				if category == "temporary" then
+					local index = pm:temporary_upgrade_index(category, upgrade)
+					data.emporary_upgrades[category] = data.temporary_upgrades[category] or {}
+					data.temporary_upgrades[category][upgrade] = {index = index, level = level}
+				else
+					data.upgrades[category] = data.upgrades[category] or {}
+					data.upgrades[category][upgrade] = level
+				end
+			end
+		end
+	end
+	data.concealment_modifier = managers.blackmarket:_get_concealment_from_local_player()
+end
+
+function PlayerBase:sync_unit_upgrades()
 	local sus_multiplier = 1
 	local det_multiplier = 1
 	if managers.player:has_category_upgrade("player", "suspicion_multiplier") then
@@ -79,18 +103,15 @@ function PlayerBase:_chk_set_unit_upgrades()
 		self:set_suspicion_multiplier("suspicion_multiplier", mul)
 	end
 	managers.environment_controller:set_flashbang_multiplier(managers.player:upgrade_value("player", "flashbang_multiplier"))
-	local is_client = Network:is_client()
-	if is_client then
-		local pm = managers.player
-		local net_sesh = managers.network:session()
-		for category, upgrades in pairs(pm._global.upgrades) do
-			for upgrade, level in pairs(upgrades) do
-				if pm:is_upgrade_synced(category, upgrade) then
-					if category == "temporary" then
-						net_sesh:send_to_host("sync_temporary_upgrade_owned", category, upgrade, level, pm:temporary_upgrade_index(category, upgrade))
-					else
-						net_sesh:send_to_host("sync_upgrade", category, upgrade, level)
-					end
+	local pm = managers.player
+	local net_sesh = managers.network:session()
+	for category, upgrades in pairs(pm._global.upgrades) do
+		for upgrade, level in pairs(upgrades) do
+			if pm:is_upgrade_synced(category, upgrade) then
+				if category == "temporary" then
+					net_sesh:send_to_peers_synched("sync_temporary_upgrade_owned", category, upgrade, level, pm:temporary_upgrade_index(category, upgrade))
+				else
+					net_sesh:send_to_peers_synched("sync_upgrade", category, upgrade, level)
 				end
 			end
 		end

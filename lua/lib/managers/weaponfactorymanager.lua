@@ -585,7 +585,8 @@ function WeaponFactoryManager:_add_part(p_unit, factory_id, part_id, forbidden, 
 			is_streaming = true,
 			link_to_unit = link_to_unit,
 			a_obj = Idstring(part.a_obj),
-			parent = part.parent
+			parent = part.parent,
+			reload_objects = part.reload_objects
 		}
 		managers.dyn_resource:load(ids_unit, ids_unit_name, "packages/dyn_resources", callback(self, self, "clbk_part_unit_loaded", async_task_data))
 	else
@@ -597,7 +598,8 @@ function WeaponFactoryManager:_add_part(p_unit, factory_id, part_id, forbidden, 
 			unit = unit,
 			animations = part.animations,
 			name = ids_unit_name,
-			package = package
+			package = package,
+			reload_objects = part.reload_objects
 		}
 	end
 end

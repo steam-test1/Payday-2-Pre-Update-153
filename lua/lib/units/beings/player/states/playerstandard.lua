@@ -541,10 +541,10 @@ function PlayerStandard:_get_input(t, dt, paused)
 			end
 			i = i + 1
 		end
-		if self._input then
-			for i = 1, #self._input do
-				self._input[i]:update(t, dt, self._controller, input, self._ext_movement:current_state_name())
-			end
+	end
+	if self._input then
+		for i = 1, #self._input do
+			self._input[i]:update(t, dt, self._controller, input, self._ext_movement:current_state_name())
 		end
 	end
 	return input
@@ -1385,7 +1385,7 @@ function PlayerStandard:_check_action_use_ability(t, input)
 		return
 	end
 	local equipped_ability = managers.blackmarket:equipped_grenade()
-	if not managers.player:has_inactivate_temporary_upgrade("temporary", equipped_ability) then
+	if managers.player:has_activate_temporary_upgrade("temporary", equipped_ability) then
 		return
 	end
 	if managers.player:has_active_ability_cooldown(equipped_ability) and t < managers.player:get_ability_cooldown(equipped_ability) then

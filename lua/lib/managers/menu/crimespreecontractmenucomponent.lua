@@ -7,7 +7,7 @@ function CrimeSpreeContractMenuComponent:init(ws, fullscreen_ws, node)
 	self._init_layer = self._ws:panel():layer()
 	self._data = node:parameters().menu_component_data or {}
 	self._buttons = {}
-	self._hosting = not self._data.server
+	self._hosting = not self._data.server or self._data.id == "crime_spree"
 	self:_setup()
 end
 
@@ -199,26 +199,28 @@ function CrimeSpreeContractMenuComponent:_setup_new_crime_spree(text_w, text_h)
 		table.insert(self._buttons, btn)
 	end
 	if not self:_is_host() then
-		local grow_size = 48 + padding
+		local grow_size = 24 + padding
 		starting_text:set_y(starting_text:y() - grow_size)
 		self._levels_panel:set_y(self._levels_panel:y() - grow_size)
 		self._levels_panel:grow(0, grow_size)
-		for _, btn in ipairs(self._buttons) do
-			btn:panel():set_y(btn:panel():y() + grow_size)
-		end
 		local btn = CrimeSpreeStartingLevelItem:new(self._levels_panel, {
 			x = 0,
-			y = 0,
+			y = CrimeSpreeStartingLevelItem.size.h + padding * 2,
 			w = self._levels_panel:w(),
 			h = grow_size,
 			level = -1,
 			highest_level = 1,
 			num_items = 1,
 			text = "",
-			cost_text = managers.localization:text("menu_cs_continue_without_starting")
+			cost_text = managers.localization:to_upper_text("menu_cs_continue_without_starting")
 		})
 		btn:set_callback(callback(self, self, "set_active_starting_level", btn))
-		table.insert(self._buttons, 1, btn)
+		btn._cost_text:set_center_y(btn._panel:h() * 0.5)
+		local insert_pos = 1
+		if managers.custom_safehouse:coins() >= tweak_data.crime_spree.initial_cost then
+			insert_pos = #self._buttons
+		end
+		table.insert(self._buttons, insert_pos, btn)
 	end
 	local default_btn = self._buttons[1]
 	if default_btn:can_activate() then
@@ -288,9 +290,9 @@ function CrimeSpreeContractMenuComponent:_setup_continue_host(text_w, text_h)
 		x = padding,
 		y = self._desc_text:bottom() + padding + tweak_data.menu.pd2_medium_font_size,
 		w = text_w,
-		h = self._contract_panel:h() - text_h - padding * 3 - tweak_data.menu.pd2_medium_font_size
+		h = self._contract_panel:h() - text_h - padding * 2 - tweak_data.menu.pd2_medium_font_size
 	})
-	CrimeSpreeModifierDetailsPage.add_modifiers_panel(self, self._modifiers_panel, managers.crime_spree:active_modifiers())
+	CrimeSpreeModifierDetailsPage.add_modifiers_panel(self, self._modifiers_panel, managers.crime_spree:active_modifiers(), false)
 	local text = self._contract_panel:text({
 		text = managers.localization:to_upper_text("cn_crime_spree_modifiers"),
 		align = "left",
@@ -461,7 +463,9 @@ function CrimeSpreeContractMenuComponent:special_btn_pressed(button)
 		if new_index < 1 then
 			new_index = #self._buttons
 		end
-		self:set_active_starting_level(self._buttons[new_index])
+		if self._buttons[new_index] then
+			self:set_active_starting_level(self._buttons[new_index])
+		end
 	end
 end
 
@@ -593,13 +597,23 @@ function CrimeSpreeStartingLevelItem:init(parent, data)
 		self._active_bg:set_color(tweak_data.screen_colors.important_1)
 		self._cost_text:set_color(tweak_data.screen_colors.important_1)
 	end
+	self._outline_panel = self._panel:panel({})
+	BoxGuiObject:new(self._outline_panel, {
+		sides = {
+			2,
+			2,
+			2,
+			2
+		}
+	})
 	self:refresh()
 end
 
 function CrimeSpreeStartingLevelItem:refresh()
 	self._bg:set_visible(not self:is_selected())
-	self._highlight:set_visible(self:is_selected())
+	self._highlight:set_visible(not self:is_active() and self:is_selected())
 	self._active_bg:set_visible(self:is_active())
+	self._outline_panel:set_visible(self:is_active())
 	if managers.custom_safehouse:coins() < self._start_cost then
 		self._level_bg:set_color(tweak_data.screen_colors.important_1)
 		self._highlight:set_alpha(self:is_selected() and 0.6 or 0.2)
@@ -641,7 +655,7 @@ function MenuCrimeNetCrimeSpreeContractInitiator:modify_node(original_node, data
 	if Global.game_settings.single_player then
 		node:item("toggle_ai"):set_value(Global.game_settings.team_ai and "on" or "off")
 	elseif data.smart_matchmaking then
-	elseif not data.server then
+	elseif data.id == "crime_spree" then
 		node:item("lobby_kicking_option"):set_value(Global.game_settings.kick_option)
 		node:item("lobby_permission"):set_value(Global.game_settings.permission)
 		node:item("lobby_reputation_permission"):set_value(Global.game_settings.reputation_permission)

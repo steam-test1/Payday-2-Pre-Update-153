@@ -94,7 +94,6 @@ require("lib/managers/CustomSafehouseManager")
 require("lib/managers/MutatorsManager")
 require("lib/managers/TangoManager")
 require("lib/managers/CrimeSpreeManager")
-require("lib/managers/CommunityChallengesManager")
 require("lib/utils/StatisticsGenerator")
 require("lib/utils/Bitwise")
 require("lib/utils/WeightedSelector")
@@ -162,7 +161,11 @@ end
 function Setup:load_packages()
 	PackageManager:set_resource_loaded_clbk(Idstring("unit"), nil)
 	TextureCache:set_streaming_enabled(true)
-	TextureCache:set_LOD_streaming_enabled(true)
+	if SystemInfo:platform() == Idstring("PS4") or SystemInfo:platform() == Idstring("XB1") then
+		TextureCache:set_LOD_streaming_enabled(false)
+	else
+		TextureCache:set_LOD_streaming_enabled(true)
+	end
 	if not Application:editor() then
 		PackageManager:set_streaming_enabled(true)
 	end
@@ -236,7 +239,6 @@ function Setup:init_managers(managers)
 	managers.butler_mirroring = ButlerMirroringManager:new()
 	managers.tango = TangoManager:new()
 	managers.crime_spree = CrimeSpreeManager:new()
-	managers.community_challenges = CommunityChallengesManager:new()
 	game_state_machine = GameStateMachine:new()
 end
 
@@ -439,7 +441,6 @@ function Setup:update(t, dt)
 	managers.vehicle:update(t, dt)
 	managers.mutators:update(t, dt)
 	managers.crime_spree:update(t, dt)
-	managers.community_challenges:update(t, dt)
 	game_state_machine:update(t, dt)
 	if self._main_thread_loading_screen_gui_visible then
 		self._main_thread_loading_screen_gui_script:update(-1, dt)

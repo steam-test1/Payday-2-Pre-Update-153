@@ -7439,7 +7439,8 @@ function BlackMarketGui:populate_weapon_category(category, data)
 			table.insert(new_data, "i_stop_move")
 		else
 			local has_mods = managers.weapon_factory:has_weapon_more_than_default_parts(crafted.factory_id)
-			if has_mods and new_data.unlocked then
+			local can_mod = true
+			if can_mod and has_mods and new_data.unlocked then
 				table.insert(new_data, "w_mod")
 			end
 			if has_mods and new_data.unlocked and managers.workshop and managers.workshop:enabled() and not table.contains(managers.blackmarket:skin_editor():get_excluded_weapons(), new_data.name) then
@@ -7973,38 +7974,6 @@ function BlackMarketGui:populate_melee_weapons(data)
 			new_data.dlc_locked = tweak_data.lootdrop.global_values[new_data.global_value].unlock_id or "bm_menu_dlc_locked"
 		end
 		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/melee_weapons/" .. tostring(new_data.name)
-		if melee_weapon_id == "weapon" then
-			new_data.extra_bitmaps = {}
-			new_data.extra_bitmaps_shape = {}
-			local primary = managers.blackmarket:equipped_primary()
-			local primary_id = primary.weapon_id
-			guis_catalog = "guis/"
-			local bundle_folder = tweak_data.weapon[primary_id] and tweak_data.weapon[primary_id].texture_bundle_folder
-			if bundle_folder then
-				guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
-			end
-			table.insert(new_data.extra_bitmaps, guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. tostring(primary_id))
-			table.insert(new_data.extra_bitmaps_shape, {
-				x = 0,
-				y = -0.1,
-				w = 0.75,
-				h = 0.75
-			})
-			local secondary = managers.blackmarket:equipped_secondary()
-			local secondary_id = secondary.weapon_id
-			guis_catalog = "guis/"
-			local bundle_folder = tweak_data.weapon[secondary_id] and tweak_data.weapon[secondary_id].texture_bundle_folder
-			if bundle_folder then
-				guis_catalog = guis_catalog .. "dlcs/" .. tostring(bundle_folder) .. "/"
-			end
-			table.insert(new_data.extra_bitmaps, guis_catalog .. "textures/pd2/blackmarket/icons/weapons/" .. tostring(secondary_id))
-			table.insert(new_data.extra_bitmaps_shape, {
-				x = 0,
-				y = 0.1,
-				w = 0.75,
-				h = 0.75
-			})
-		end
 		if managers.blackmarket:got_new_drop("normal", "melee_weapons", melee_weapon_id) then
 			new_data.mini_icons = new_data.mini_icons or {}
 			table.insert(new_data.mini_icons, {
@@ -8221,7 +8190,8 @@ function BlackMarketGui:populate_masks(data)
 				if i ~= 1 and new_data.equipped then
 					table.insert(new_data, "m_move")
 				end
-				if not crafted.modded and managers.blackmarket:can_modify_mask(i) and i ~= 1 then
+				local can_mod_mask = true
+				if can_mod_mask and not crafted.modded and managers.blackmarket:can_modify_mask(i) and i ~= 1 then
 					table.insert(new_data, "m_mod")
 				end
 				table.insert(new_data, "m_preview")
@@ -8702,7 +8672,8 @@ function BlackMarketGui:populate_masks_new(data)
 					if index ~= 1 and new_data.equipped then
 						table.insert(new_data, "m_move")
 					end
-					if not crafted.modded and managers.blackmarket:can_modify_mask(index) and index ~= 1 then
+					local can_mod_mask = true
+					if can_mod_mask and not crafted.modded and managers.blackmarket:can_modify_mask(index) and index ~= 1 then
 						table.insert(new_data, "m_mod")
 					end
 					table.insert(new_data, "m_preview")
@@ -9067,7 +9038,8 @@ function BlackMarketGui:populate_weapon_category_new(data)
 					table.insert(new_data, "i_stop_move")
 				else
 					local has_mods = managers.weapon_factory:has_weapon_more_than_default_parts(crafted.factory_id)
-					if data.allow_modify ~= false and has_mods and active then
+					local can_mod = true
+					if can_mod and data.allow_modify ~= false and has_mods and active then
 						table.insert(new_data, "w_mod")
 					end
 					if data.allow_skinning ~= false and has_mods and active and managers.workshop and managers.workshop:enabled() and not table.contains(managers.blackmarket:skin_editor():get_excluded_weapons(), new_data.name) then
@@ -9248,30 +9220,6 @@ function BlackMarketGui:populate_melee_weapons_new(data)
 			new_data.dlc_locked = tweak_data.lootdrop.global_values[new_data.global_value].unlock_id or "bm_menu_dlc_locked"
 		end
 		new_data.bitmap_texture = guis_catalog .. "textures/pd2/blackmarket/icons/melee_weapons/" .. tostring(new_data.name)
-		if melee_weapon_id == "weapon" then
-			new_data.extra_bitmaps = {}
-			new_data.extra_bitmaps_shape = {}
-			local primary = managers.blackmarket:equipped_primary()
-			local primary_id = primary.weapon_id
-			local icon_texture_path, icon_rarity_path = managers.blackmarket:get_weapon_icon_path(primary_id, primary.cosmetics)
-			table.insert(new_data.extra_bitmaps, icon_texture_path)
-			table.insert(new_data.extra_bitmaps_shape, {
-				x = 0,
-				y = -0.2,
-				w = 0.75,
-				h = 0.75
-			})
-			local secondary = managers.blackmarket:equipped_secondary()
-			local secondary_id = secondary.weapon_id
-			local icon_texture_path, icon_rarity_path = managers.blackmarket:get_weapon_icon_path(secondary_id, secondary.cosmetics)
-			table.insert(new_data.extra_bitmaps, icon_texture_path)
-			table.insert(new_data.extra_bitmaps_shape, {
-				x = 0,
-				y = 0.2,
-				w = 0.75,
-				h = 0.75
-			})
-		end
 		if managers.blackmarket:got_new_drop("normal", "melee_weapons", melee_weapon_id) then
 			new_data.mini_icons = new_data.mini_icons or {}
 			table.insert(new_data.mini_icons, {
@@ -11344,6 +11292,10 @@ function BlackMarketGui:_confirm_purchase_weapon_mod_callback(data)
 end
 
 function BlackMarketGui:choose_weapon_buy_callback(data)
+	self:open_weapon_buy_menu(data)
+end
+
+function BlackMarketGui:open_weapon_buy_menu(data, check_allowed_item_func)
 	local blackmarket_items = managers.blackmarket:get_weapon_category(data.category) or {}
 	local new_node_data = {}
 	local weapon_tweak = tweak_data.weapon
@@ -11352,8 +11304,10 @@ function BlackMarketGui:choose_weapon_buy_callback(data)
 	for _, item in ipairs(blackmarket_items) do
 		local weapon_data = tweak_data.weapon[item.weapon_id]
 		local category = tweak_data.gui.buy_weapon_category_groups[weapon_data.category] or weapon_data.category
-		item_categories[category] = item_categories[category] or {}
-		table.insert(item_categories[category], item)
+		if not check_allowed_item_func or check_allowed_item_func(weapon_data) then
+			item_categories[category] = item_categories[category] or {}
+			table.insert(item_categories[category], item)
+		end
 	end
 	local sorted_categories = {}
 	for category, items in pairs(item_categories) do

@@ -905,37 +905,6 @@ function TweakData:init()
 			value = "color_madplanet"
 		}
 	}
-	self.community_challenges_stage_multiplier = 1.5
-	self.community_challenges = {
-		{
-			statistic_id = "type_kills_law",
-			text_id = "menu_community_challenges_kills",
-			base_target = 400000
-		},
-		{
-			statistic_id = "sb17_challenge_5",
-			text_id = "menu_community_challenges_hours_played",
-			base_target = 20000,
-			display_multiplier = 0.016666668
-		},
-		{
-			statistic_id = "sb17_challenge_7",
-			text_id = "menu_community_challenges_money_earned",
-			base_target = 180000,
-			additional_zeroes = 6
-		},
-		{
-			statistic_id = "sb17_challenge_6",
-			text_id = "menu_community_challenges_hours_played_team",
-			base_target = 10000,
-			display_multiplier = 0.016666668
-		},
-		{
-			statistic_id = "sb17_challenge_4",
-			text_id = "menu_community_challenges_swing_dancing",
-			base_target = 500
-		}
-	}
 	self.overlay_effects = {}
 	self.overlay_effects.spectator = {
 		blend_mode = "normal",
@@ -5444,7 +5413,7 @@ Play the full version soon to get your full PAYDAY!]],
 		dot_length = 6.1,
 		dot_tick_period = 0.5
 	}
-	self.projectiles.launcher_incendiary_arbiter.range = 75
+	self.projectiles.launcher_incendiary_arbiter.range = 350
 	self.projectiles.launcher_incendiary_arbiter.init_timer = 2.5
 	self.projectiles.launcher_incendiary_arbiter.mass_look_up_modifier = 1
 	self.projectiles.launcher_incendiary_arbiter.sound_event = "gl_explode"

@@ -12,6 +12,7 @@ end
 function CrimeSpreeModifiersMenuComponent:close()
 	self._ws:panel():remove(self._panel)
 	self._ws:panel():remove(self._text_header)
+	self._ws:panel():remove(self._number_header)
 	self._fullscreen_ws:panel():remove(self._fullscreen_panel)
 end
 
@@ -45,6 +46,11 @@ function CrimeSpreeModifiersMenuComponent:_setup()
 	self._panel:set_h(CrimeSpreeModifierButton.size.h + padding * 3 + tweak_data.menu.pd2_large_font_size)
 	self._panel:set_center_x(parent:center_x())
 	self._panel:set_center_y(parent:center_y())
+	self._panel:rect({
+		color = Color.black,
+		alpha = 0.4,
+		layer = -1
+	})
 	self._text_header = self._ws:panel():text({
 		text = managers.localization:to_upper_text("menu_cs_modifiers_" .. tostring(modifiers_name)),
 		align = "left",
@@ -58,6 +64,21 @@ function CrimeSpreeModifiersMenuComponent:_setup()
 	self._text_header:set_size(self._panel:w(), h)
 	self._text_header:set_left(self._panel:left())
 	self._text_header:set_bottom(self._panel:top())
+	self._current_num = 1
+	self._num_to_select = self:modifiers_to_select()
+	self._number_header = self._ws:panel():text({
+		text = 1 < self._num_to_select and tostring(self._current_num) .. " / " .. managers.experience:cash_string(self._num_to_select, "") or "",
+		align = "right",
+		vertical = "top",
+		font_size = tweak_data.menu.pd2_large_font_size,
+		font = tweak_data.menu.pd2_large_font,
+		color = tweak_data.screen_colors.text,
+		layer = 51
+	})
+	local x, y, w, h = self._text_header:text_rect()
+	self._number_header:set_size(self._panel:w(), h)
+	self._number_header:set_left(self._panel:left())
+	self._number_header:set_bottom(self._panel:top())
 	self._modifiers_panel = self._panel:panel({
 		w = self._panel:w(),
 		h = self._panel:h() - tweak_data.menu.pd2_large_font_size - padding * 2
@@ -75,7 +96,15 @@ function CrimeSpreeModifiersMenuComponent:_setup()
 	local finalize_btn = CrimeSpreeButton:new(self._button_panel)
 	finalize_btn:set_text(managers.localization:to_upper_text("menu_cs_select_modifier"))
 	finalize_btn:set_callback(callback(self, self, "_on_finalize_modifier"))
+	finalize_btn:shrink_wrap_button(0, 0)
 	table.insert(self._buttons, finalize_btn)
+	local back_btn = CrimeSpreeButton:new(self._button_panel)
+	back_btn:set_text(managers.localization:to_upper_text("menu_back"))
+	back_btn:set_callback(callback(self, self, "_on_back"))
+	back_btn:shrink_wrap_button(0, 0)
+	table.insert(self._buttons, back_btn)
+	back_btn:panel():set_right(self._button_panel:w() - padding * 2)
+	finalize_btn:panel():set_right(back_btn:panel():left() - padding * 3)
 	for i, modifier in ipairs(modifiers) do
 		local btn = self._buttons[i]
 		if 1 < i then
@@ -87,6 +116,9 @@ function CrimeSpreeModifiersMenuComponent:_setup()
 		btn:set_link("down", finalize_btn)
 	end
 	finalize_btn:set_link("up", self._buttons[1])
+	finalize_btn:set_link("right", back_btn)
+	back_btn:set_link("up", self._buttons[1])
+	back_btn:set_link("left", finalize_btn)
 	BoxGuiObject:new(self._panel, {
 		sides = {
 			1,
@@ -98,6 +130,12 @@ function CrimeSpreeModifiersMenuComponent:_setup()
 	if not managers.menu:is_pc_controller() then
 		self:_move_selection("up")
 	end
+end
+
+function CrimeSpreeModifiersMenuComponent:modifiers_to_select()
+	local loud = managers.crime_spree:modifiers_to_select("loud")
+	local stealth = managers.crime_spree:modifiers_to_select("stealth")
+	return loud + stealth
 end
 
 function CrimeSpreeModifiersMenuComponent:get_modifers()
@@ -118,8 +156,10 @@ function CrimeSpreeModifiersMenuComponent:_on_select_modifier(item)
 		self._selected_modifier:set_active(false)
 	end
 	self._selected_modifier = item
-	self._selected_modifier:set_active(true)
-	managers.menu_component:post_event("menu_enter")
+	if self._selected_modifier then
+		self._selected_modifier:set_active(true)
+		managers.menu_component:post_event("menu_enter")
+	end
 end
 
 function CrimeSpreeModifiersMenuComponent:_on_finalize_modifier()
@@ -128,10 +168,29 @@ function CrimeSpreeModifiersMenuComponent:_on_finalize_modifier()
 		return
 	end
 	managers.crime_spree:select_modifier(self._selected_modifier:data().id)
-	MenuCallbackHandler:save_progress()
-	managers.menu:back(false)
-	managers.menu:active_menu().logic:refresh_node("crime_spree_lobby")
 	managers.menu_component:post_event("item_buy")
+	MenuCallbackHandler:save_progress()
+	if self:modifiers_to_select() > 0 then
+		local modifiers, modifiers_name = self:get_modifers()
+		self._text_header:set_text(managers.localization:to_upper_text("menu_cs_modifiers_" .. tostring(modifiers_name)))
+		self._current_num = self._current_num + 1
+		self._number_header:set_text(managers.experience:cash_string(self._current_num, "") .. " / " .. managers.experience:cash_string(self._num_to_select, ""))
+		for idx, modifier in ipairs(modifiers) do
+			self._buttons[idx]:set_modifier(modifier)
+			self._buttons[idx]:set_active(false)
+		end
+		self:_on_select_modifier(nil)
+		if not managers.menu:is_pc_controller() then
+			self:_move_selection("up")
+		end
+	else
+		managers.menu:back(false)
+		managers.menu:active_menu().logic:refresh_node("crime_spree_lobby")
+	end
+end
+
+function CrimeSpreeModifiersMenuComponent:_on_back()
+	managers.menu:back(true)
 end
 
 function CrimeSpreeModifiersMenuComponent:update(t, dt)
@@ -231,8 +290,8 @@ function CrimeSpreeModifierButton:init(parent, idx, data)
 		y = self._image:center_y()
 	}
 	local texture, rect = tweak_data.hud_icons:get_icon_data(self._data.icon)
-	local image = self._image:bitmap({
-		name = "chat_blur",
+	self._modifier_image = self._image:bitmap({
+		name = "icon",
 		texture = texture,
 		texture_rect = rect,
 		layer = 10,
@@ -253,11 +312,6 @@ function CrimeSpreeModifierButton:init(parent, idx, data)
 		color = tweak_data.screen_colors.text,
 		wrap = true,
 		wrap_word = true
-	})
-	self._bg = self._panel:rect({
-		color = Color.black,
-		alpha = 0.4,
-		layer = -1
 	})
 	self._highlight = self._panel:rect({
 		color = tweak_data.screen_colors.button_stage_3,
@@ -286,9 +340,17 @@ function CrimeSpreeModifierButton:init(parent, idx, data)
 	self:refresh()
 end
 
+function CrimeSpreeModifierButton:set_modifier(data)
+	self._data = data
+	local modifier_class = _G[self._data.class]
+	local texture, rect = tweak_data.hud_icons:get_icon_data(self._data.icon)
+	self._modifier_image:set_image(texture)
+	self._modifier_image:set_texture_rect(unpack(rect))
+	self._desc:set_text(modifier_class:get_description(self._data.id))
+end
+
 function CrimeSpreeModifierButton:refresh()
-	self._bg:set_visible(not self:is_selected())
-	self._highlight:set_visible(self:is_selected())
+	self._highlight:set_visible(self:is_selected() or self:is_active())
 	self._active_outline:set_visible(self:is_active())
 end
 
@@ -334,7 +396,7 @@ end
 CrimeSpreeButton = CrimeSpreeButton or class(MenuGuiItem)
 CrimeSpreeButton._type = "CrimeSpreeButton"
 
-function CrimeSpreeButton:init(parent)
+function CrimeSpreeButton:init(parent, font, font_size)
 	self._w = 0.35
 	self._color = tweak_data.screen_colors.button_stage_3
 	self._selected_color = tweak_data.screen_colors.button_stage_2
@@ -342,7 +404,7 @@ function CrimeSpreeButton:init(parent)
 	self._panel = parent:panel({
 		x = parent:w() * (1 - self._w) - padding,
 		w = parent:w() * self._w,
-		h = tweak_data.menu.pd2_medium_font_size,
+		h = font_size or tweak_data.menu.pd2_medium_font_size,
 		layer = 1000
 	})
 	self._panel:set_bottom(parent:h())
@@ -354,15 +416,17 @@ function CrimeSpreeButton:init(parent)
 		x = 0,
 		y = 0,
 		color = self._color,
-		font = tweak_data.menu.pd2_medium_font,
-		font_size = tweak_data.menu.pd2_medium_font_size,
+		font = font or tweak_data.menu.pd2_medium_font,
+		font_size = font_size or tweak_data.menu.pd2_medium_font_size,
 		blend_mode = "add"
 	})
 	self._highlight = self._panel:rect({
 		color = self._color,
-		alpha = 0.3,
+		alpha = 0.2,
 		blend_mode = "add",
-		layer = 10
+		layer = 10,
+		valign = "scale",
+		halign = "scale"
 	})
 	self:refresh()
 end
@@ -371,6 +435,10 @@ function CrimeSpreeButton:refresh()
 	self._highlight:set_visible(self:is_selected())
 	self._highlight:set_color(self:is_selected() and self._selected_color or self._color)
 	self._text:set_color(self:is_selected() and self._selected_color or self._color)
+end
+
+function CrimeSpreeButton:panel()
+	return self._panel
 end
 
 function CrimeSpreeButton:inside(x, y)
@@ -403,4 +471,9 @@ function CrimeSpreeButton:set_link(dir, item)
 end
 
 function CrimeSpreeButton:update(t, dt)
+end
+
+function CrimeSpreeButton:shrink_wrap_button(w_padding, h_padding)
+	local _, _, w, h = self._text:text_rect()
+	self._panel:set_size(w + (w_padding or 0), h + (h_padding or 0))
 end

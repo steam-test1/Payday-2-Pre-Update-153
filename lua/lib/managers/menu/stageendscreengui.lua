@@ -453,7 +453,7 @@ function StageEndScreenGui:init(saferect_ws, fullrect_ws, statistics_data)
 	})
 	self._panel:set_right(self._safe_workspace:panel():w())
 	if managers.crime_spree:_is_active() then
-		self._panel:set_bottom(self._safe_workspace:panel():h() - CrimeSpreeMissionsMenuComponent.button_size.h - padding)
+		self._panel:set_bottom(self._safe_workspace:panel():h() - (CrimeSpreeMissionsMenuComponent.get_height() + padding))
 	else
 		self._panel:set_bottom(self._safe_workspace:panel():h())
 	end
@@ -502,7 +502,7 @@ function StageEndScreenGui:init(saferect_ws, fullrect_ws, statistics_data)
 		MenuBackdropGUI.animate_bg_text(self, big_text)
 	end
 	do
-		local text = managers.menu:is_pc_controller() and "<" or managers.localization:get_default_macro("BTN_BOTTOM_L")
+		local text = managers.menu:is_pc_controller() and "" or managers.localization:get_default_macro("BTN_BOTTOM_L")
 		local color = managers.menu:is_pc_controller() and tweak_data.screen_colors.button_stage_3 or Color.white
 		local prev_page = self._panel:text({
 			name = "prev_page",
@@ -576,7 +576,7 @@ function StageEndScreenGui:init(saferect_ws, fullrect_ws, statistics_data)
 	end
 	local scroll_w = self._panel:w() - self._scroll_panel:x()
 	do
-		local text = managers.menu:is_pc_controller() and ">" or managers.localization:get_default_macro("BTN_BOTTOM_R")
+		local text = managers.menu:is_pc_controller() and "" or managers.localization:get_default_macro("BTN_BOTTOM_R")
 		local color = managers.menu:is_pc_controller() and tweak_data.screen_colors.button_stage_3 or Color.white
 		local next_page = self._panel:text({
 			name = "tab_text_" .. tostring(#self._items + 1),
@@ -924,11 +924,7 @@ function StageEndScreenGui:mouse_moved(x, y)
 end
 
 function StageEndScreenGui:input_focus()
-	if managers.crime_spree:_is_active() then
-		return nil
-	else
-		return self._enabled
-	end
+	return self._enabled and true or nil
 end
 
 function StageEndScreenGui:scroll_up()

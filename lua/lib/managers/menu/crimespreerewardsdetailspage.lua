@@ -37,46 +37,28 @@ function CrimeSpreeRewardsDetailsPage:init(...)
 				w = w,
 				x = count * w
 			})
-			local rotation = math.rand(-10, 10)
-			local scale = 0.5
-			local texture, rect, coords = tweak_data.hud_icons:get_icon_data(data.icon or "downcard_overkill_deck")
-			local upcard = panel:bitmap({
-				name = "upcard",
-				texture = texture,
-				w = math.round(0.7111111 * panel:h() * scale),
-				h = panel:h() * scale,
-				layer = 20,
-				halign = "scale",
-				valign = "scale"
-			})
-			upcard:set_center_x(panel:w() * 0.5)
-			upcard:set_center_y(panel:h() * 0.35)
-			upcard:set_rotation(rotation)
-			if coords then
-				local tl = Vector3(coords[1][1], coords[1][2], 0)
-				local tr = Vector3(coords[2][1], coords[2][2], 0)
-				local bl = Vector3(coords[3][1], coords[3][2], 0)
-				local br = Vector3(coords[4][1], coords[4][2], 0)
-				upcard:set_texture_coordinates(tl, tr, bl, br)
-			else
-				upcard:set_texture_rect(unpack(rect))
+			local card_layer = 50
+			local num_cards = math.clamp(math.floor(amount / (data.card_inc or 1)), 1, data.max_cards)
+			local upcard = self:create_card(panel, data.icon, card_layer, 10, 0, 1 < num_cards)
+			for i = 1, num_cards - 1 do
+				self:create_card(panel, data.icon, card_layer - i * 2, 10, 6, true)
 			end
 			local reward_name = panel:text({
 				name = "reward" .. tostring(i),
-				text = managers.localization:text(data.name_id or ""),
+				text = managers.localization:to_upper_text(data.name_id or ""),
 				w = panel:w(),
 				h = 32,
 				align = "center",
 				vertical = "center",
-				font_size = tweak_data.menu.pd2_medium_font_size,
-				font = tweak_data.menu.pd2_medium_font,
-				color = Color.white,
+				font_size = tweak_data.menu.pd2_small_font_size * 0.8,
+				font = tweak_data.menu.pd2_small_font,
+				color = Color.white:with_alpha(0.4),
 				layer = 11,
 				wrap = true,
 				word_wrap = true,
 				blend_mode = "add"
 			})
-			reward_name:set_top(upcard:bottom() + padding)
+			reward_name:set_top(upcard:bottom() + padding * 2)
 			local x, y, w, h = reward_name:text_rect()
 			reward_name:set_h(h)
 			local reward_amount = panel:text({
@@ -113,48 +95,49 @@ function CrimeSpreeRewardsDetailsPage:init(...)
 	end
 	if warning_title then
 		local level_layer = 50
-		local level_panel = self:panel():panel({
-			h = tweak_data.menu.pd2_large_font_size,
-			layer = level_layer
-		})
-		level_panel:set_center_y(self:panel():h() * 0.4)
-		level_panel:rect({
-			color = tweak_data.screen_colors.important_1,
-			alpha = 0.4
+		local level_panel = self:panel():panel({layer = level_layer})
+		level_panel:bitmap({
+			name = "background",
+			texture = "guis/textures/pd2/cs_warning_background",
+			color = Color.white,
+			layer = 10,
+			w = level_panel:w(),
+			h = 128
 		})
 		local suspend_text = level_panel:text({
 			text = warning_title and managers.localization:to_upper_text(warning_title) or "",
-			align = "center",
-			vertical = "center",
+			align = "left",
+			vertical = "left",
 			font_size = tweak_data.menu.pd2_medium_font_size,
 			font = tweak_data.menu.pd2_medium_font,
 			color = Color.white,
-			layer = 10,
+			layer = 20,
 			wrap = true,
-			word_wrap = true,
-			blend_mode = "add"
+			word_wrap = true
 		})
-		suspend_text:set_center_y(level_panel:h() * 0.5)
+		self:make_fine_text(suspend_text)
+		suspend_text:set_top(padding * 2)
+		suspend_text:set_left(padding * 4)
 		local w_multi = 0.75
-		local suspend_desc_text = self:panel():text({
+		local suspend_desc_text = level_panel:text({
 			text = warning_text and managers.localization:text(warning_text) or "",
 			x = self:panel():w() * ((1 - w_multi) * 0.5),
 			w = self:panel():w() * w_multi,
-			align = "center",
+			align = "left",
 			vertical = "top",
 			font_size = tweak_data.menu.pd2_small_font_size,
 			font = tweak_data.menu.pd2_small_font,
 			color = Color.white,
-			layer = level_layer + 1,
+			layer = 20,
 			wrap = true,
-			word_wrap = true,
-			blend_mode = "add"
+			word_wrap = true
 		})
-		suspend_desc_text:set_top(level_panel:bottom() + padding)
-		self:panel():rect({
+		self:make_fine_text(suspend_desc_text)
+		suspend_desc_text:set_top(suspend_text:bottom())
+		suspend_desc_text:set_left(padding * 4)
+		level_panel:rect({
 			color = Color.black,
-			alpha = 0.6,
-			layer = level_layer - 10
+			alpha = 0.75
 		})
 		outline_panel:set_layer(level_layer + 10)
 	end
@@ -165,4 +148,47 @@ function CrimeSpreeRewardsDetailsPage:make_fine_text(text)
 	text:set_size(w, h)
 	text:set_position(math.round(text:x()), math.round(text:y()))
 	return x, y, w, h
+end
+
+function CrimeSpreeRewardsDetailsPage:create_card(panel, icon, layer, rotation_amt, wiggle_amt, outline)
+	local rotation = math.rand(-rotation_amt, rotation_amt)
+	local wiggle_x = math.rand(-wiggle_amt, wiggle_amt)
+	local wiggle_y = math.rand(-wiggle_amt, wiggle_amt)
+	local scale = 0.35
+	local upcard = self:_create_card(panel, icon, scale, layer, rotation, wiggle_x, wiggle_y)
+	if outline then
+		local outline_card
+		local color = Color.black:with_alpha(0.4)
+		outline_card = self:_create_card(panel, icon, scale, layer - 1, rotation, wiggle_x + 1, wiggle_y + 1)
+		outline_card:set_color(color)
+		outline_card = self:_create_card(panel, icon, scale, layer - 1, rotation, wiggle_x - 1, wiggle_y - 1)
+		outline_card:set_color(color)
+	end
+	return upcard
+end
+
+function CrimeSpreeRewardsDetailsPage:_create_card(panel, icon, scale, layer, rotation, wiggle_x, wiggle_y)
+	local texture, rect, coords = tweak_data.hud_icons:get_icon_data(icon or "downcard_overkill_deck")
+	local upcard = panel:bitmap({
+		name = "upcard",
+		texture = texture,
+		w = math.round(0.7111111 * panel:h() * scale),
+		h = panel:h() * scale,
+		layer = layer or 20,
+		halign = "scale",
+		valign = "scale"
+	})
+	upcard:set_center_x(panel:w() * 0.5 + wiggle_x)
+	upcard:set_center_y(panel:h() * 0.3 + wiggle_y)
+	upcard:set_rotation(rotation)
+	if coords then
+		local tl = Vector3(coords[1][1], coords[1][2], 0)
+		local tr = Vector3(coords[2][1], coords[2][2], 0)
+		local bl = Vector3(coords[3][1], coords[3][2], 0)
+		local br = Vector3(coords[4][1], coords[4][2], 0)
+		upcard:set_texture_coordinates(tl, tr, bl, br)
+	else
+		upcard:set_texture_rect(unpack(rect))
+	end
+	return upcard
 end

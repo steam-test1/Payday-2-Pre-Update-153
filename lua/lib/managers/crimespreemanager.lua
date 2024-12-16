@@ -97,6 +97,32 @@ function CrimeSpreeManager:_setup_modifiers()
 	end
 end
 
+function CrimeSpreeManager:get_modifier_stack_data(modifier_type)
+	local stack_data = {}
+	local modifiers = self:_is_active() and self:server_active_modifiers() or self:active_modifiers()
+	for _, active_data in ipairs(modifiers) do
+		local modifier = self:get_modifier(active_data.id)
+		if modifier and modifier.class == modifier_type then
+			for key, value_data in pairs(modifier.data) do
+				local value = value_data[1]
+				local stack_method = value_data[2]
+				if stack_method == "none" then
+					stack_data[key] = value
+				elseif stack_method == "add" then
+					stack_data[key] = (stack_data[key] or 0) + value
+				elseif stack_method == "sub" then
+					stack_data[key] = (stack_data[key] or 0) - value
+				elseif stack_method == "min" then
+					stack_data[key] = math.min(stack_data[key] or math.huge, value)
+				elseif stack_method == "max" then
+					stack_data[key] = math.max(stack_data[key] or -math.huge, value)
+				end
+			end
+		end
+	end
+	return stack_data
+end
+
 function CrimeSpreeManager:clear()
 	Global.crime_spree = nil
 	self._global = nil
@@ -779,6 +805,10 @@ function CrimeSpreeManager:can_select_mission(mission_id)
 end
 
 function CrimeSpreeManager:select_mission(mission_id)
+	if mission_id == false then
+		self._global.current_mission = nil
+		return
+	end
 	local mission_data = self:get_mission(mission_id)
 	if mission_data then
 		self._global.current_mission = mission_data.id

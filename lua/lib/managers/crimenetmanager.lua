@@ -2169,6 +2169,8 @@ function CrimeNetGui:add_special_contracts(no_casino, no_quickplay)
 		if managers.custom_safehouse:unlocked() and special_contract.id == "challenge" or not managers.custom_safehouse:unlocked() and special_contract.id == "safehouse" then
 			skip = true
 		end
+		skip = skip or special_contract.sp_only and not Global.game_settings.single_player
+		skip = skip or special_contract.mp_only and Global.game_settings.single_player
 		if not skip then
 			self:add_special_contract(special_contract, no_casino, no_quickplay)
 		end
@@ -2177,8 +2179,11 @@ end
 
 function CrimeNetGui:add_special_contract(special_contract, no_casino, no_quickplay)
 	local id = special_contract.id
-	if id and not self._jobs[id] and (not special_contract.unlock or special_contract.unlock and managers.experience:current_level() >= tweak_data:get_value(special_contract.id, special_contract.unlock)) and (special_contract.id ~= "casino" or not no_casino) and (special_contract.id ~= "quickplay" or not no_quickplay) then
-		local gui_data = self:_create_job_gui(special_contract, "special")
+	local allow = id and not self._jobs[id] and (not special_contract.unlock or special_contract.unlock and managers.experience:current_level() >= tweak_data:get_value(special_contract.id, special_contract.unlock)) and (special_contract.id ~= "casino" or not no_casino) and (special_contract.id ~= "quickplay" or not no_quickplay) and (special_contract.id ~= "crime_spree" or managers.crime_spree:unlocked())
+	if allow then
+		local type = "special"
+		type = id == "crime_spree" and "crime_spree" or type
+		local gui_data = self:_create_job_gui(special_contract, type)
 		gui_data.server = true
 		gui_data.special_node = special_contract.menu_node
 		gui_data.dlc = special_contract.dlc
@@ -2198,6 +2203,12 @@ function CrimeNetGui:add_special_contract(special_contract, no_casino, no_quickp
 			gui_data.side_panel:child("contact_name"):set_color(tweak_data.screen_colors.mutators_color_text)
 			gui_data.side_panel:child("info_name"):set_color(tweak_data.screen_colors.mutators_color_text)
 			gui_data.marker_panel:child("marker_dot"):set_color(tweak_data.screen_colors.mutators_color_text)
+		end
+		if special_contract.id == "crime_spree" then
+			gui_data.side_panel:child("job_name"):set_color(tweak_data.screen_colors.crime_spree_risk)
+			gui_data.side_panel:child("contact_name"):set_color(tweak_data.screen_colors.crime_spree_risk)
+			gui_data.side_panel:child("info_name"):set_color(tweak_data.screen_colors.crime_spree_risk)
+			gui_data.marker_panel:child("marker_dot"):set_color(tweak_data.screen_colors.crime_spree_risk)
 		end
 		self._jobs[id] = gui_data
 		table.insert(self._special_contracts_id, id)
@@ -2223,8 +2234,9 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 	local level_id = data.level_id
 	local level_data = tweak_data.levels[level_id]
 	local narrative_data = data.job_id and tweak_data.narrative:job_data(data.job_id)
-	local is_special = type == "special"
+	local is_special = type == "special" or type == "crime_spree"
 	local is_server = type == "server"
+	local is_crime_spree = type == "crime_spree"
 	local is_professional = narrative_data and narrative_data.professional
 	local got_job = data.job_id and true or false
 	local x = fixed_x
@@ -2435,6 +2447,10 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 	if is_special then
 		job_string = data.name_id and managers.localization:to_upper_text(data.name_id) or ""
 		info_string = data.desc_id and managers.localization:to_upper_text(data.desc_id) or ""
+		if is_crime_spree then
+			info_string = managers.crime_spree:in_progress() and "cn_crime_spree_help_continue" or "cn_crime_spree_help_start"
+			info_string = managers.localization:to_upper_text(info_string) or ""
+		end
 	end
 	local job_plan_icon
 	if is_server and data.job_plan and data.job_plan ~= -1 then
@@ -2496,10 +2512,24 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		contact_name:set_color(tweak_data.screen_colors.mutators_color_text)
 		info_name:set_color(tweak_data.screen_colors.mutators_color_text)
 	end
-	if data.is_crime_spree then
+	if is_crime_spree or data.is_crime_spree then
 		job_name:set_color(tweak_data.screen_colors.crime_spree_risk)
 		contact_name:set_color(tweak_data.screen_colors.crime_spree_risk)
 		info_name:set_color(tweak_data.screen_colors.crime_spree_risk)
+		if is_crime_spree then
+			stars_panel:text({
+				name = "spree_level",
+				text = managers.localization:to_upper_text("menu_cs_level", {
+					level = managers.experience:cash_string(managers.crime_spree:spree_level(), "")
+				}),
+				vertical = "center",
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size,
+				color = tweak_data.screen_colors.crime_spree_risk,
+				blend_mode = "normal",
+				layer = 0
+			})
+		end
 	end
 	stars_panel:set_w(star_size * math.min(11, #stars_panel:children()))
 	stars_panel:set_h(star_size)
@@ -2911,7 +2941,7 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 		crime_spree_mission = data.crime_spree_mission,
 		color_lerp = data.color_lerp
 	}
-	if data.is_crime_spree then
+	if is_crime_spree or data.is_crime_spree then
 		stars_panel:set_visible(false)
 		local spree_panel = side_panel:panel({
 			name = "spree_panel",
@@ -2920,19 +2950,22 @@ function CrimeNetGui:_create_job_gui(data, type, fixed_x, fixed_y, fixed_locatio
 			h = tweak_data.menu.pd2_small_font_size
 		})
 		spree_panel:set_bottom(side_panel:h())
-		local spree_level = spree_panel:text({
-			text = managers.experience:cash_string(tonumber(data.crime_spree), "") .. managers.localization:get_default_macro("BTN_SPREE_TICKET"),
-			valign = "center",
-			vertical = "center",
-			align = "left",
-			halign = "left",
-			layer = 1,
-			x = 0,
-			y = 0,
-			color = tweak_data.screen_colors.crime_spree_risk,
-			font = tweak_data.menu.pd2_small_font,
-			font_size = tweak_data.menu.pd2_small_font_size
-		})
+		local level = is_crime_spree and managers.crime_spree:spree_level() or tonumber(data.crime_spree)
+		if level >= 0 then
+			local spree_level = spree_panel:text({
+				text = managers.experience:cash_string(level or 0, "") .. managers.localization:get_default_macro("BTN_SPREE_TICKET"),
+				valign = "center",
+				vertical = "center",
+				align = "left",
+				halign = "left",
+				layer = 1,
+				x = 0,
+				y = 0,
+				color = tweak_data.screen_colors.crime_spree_risk,
+				font = tweak_data.menu.pd2_small_font,
+				font_size = tweak_data.menu.pd2_small_font_size
+			})
+		end
 	end
 	self:update_job_gui(job, 3)
 	return job
@@ -3648,6 +3681,7 @@ function CrimeNetGui:update_job_gui(job, inside)
 			local difficulty_name = job.side_panel:child("difficulty_name")
 			local heat_name = job.side_panel:child("heat_name")
 			local stars_panel = job.side_panel:child("stars_panel")
+			local spree_panel = job.side_panel:child("spree_panel")
 			local base_h = math.round(host_name:h() + job_name:h() + stars_panel:h())
 			local expand_h = math.round(base_h + info_name:h() + difficulty_name:h() + heat_name:h() + math.max(contact_name:h() - job_name:h(), 0))
 			local start_x = 0
@@ -3724,6 +3758,9 @@ function CrimeNetGui:update_job_gui(job, inside)
 				if not pushout_met then
 					x = math.step(x, inside and max_x or 0, max_x * dt * 4)
 					stars_panel:set_alpha(1 - x / math.min(max_x, 1))
+					if alive(spree_panel) then
+						spree_panel:set_top(job_name:bottom() - 2 + x / max_x * tweak_data.menu.pd2_small_font_size)
+					end
 					if job.text_on_right then
 						job_name:set_left(math.round(math.min(x, contact_name:w())))
 						contact_name:set_left(math.round(math.min(x - contact_name:w(), 0)))

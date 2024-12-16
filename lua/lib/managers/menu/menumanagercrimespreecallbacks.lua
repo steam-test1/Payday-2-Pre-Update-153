@@ -52,6 +52,11 @@ function MenuCallbackHandler:not_show_crime_spree_claim_rewards()
 	return not (managers.crime_spree:reward_level() > 0)
 end
 
+function MenuCallbackHandler:return_to_crime_spree_lobby_visible()
+	local state = game_state_machine:current_state_name()
+	return state == "victoryscreen" or state == "gameoverscreen"
+end
+
 function MenuCallbackHandler:accept_crime_spree_contract(item, node)
 	if Global.game_settings.single_player then
 		self:_accept_crime_spree_contract_sp(item, node)
@@ -320,6 +325,11 @@ end
 function MenuCallbackHandler:_dialog_crime_spree_continue_yes()
 	managers.crime_spree:continue_crime_spree()
 	managers.menu:active_menu().logic:refresh_node("main")
+	if managers.menu_component:crime_spree_mission_end_gui() then
+		local node = managers.menu_component:crime_spree_mission_end_gui()._node
+		managers.menu_component:close_crime_spree_mission_end_gui(node)
+		managers.menu_component:create_crime_spree_mission_end_gui(node)
+	end
 	managers.menu_component:create_crime_spree_missions_gui(managers.menu:active_menu().logic:selected_node())
 	managers.menu_component:refresh_crime_spree_details_gui()
 	WalletGuiObject.refresh()

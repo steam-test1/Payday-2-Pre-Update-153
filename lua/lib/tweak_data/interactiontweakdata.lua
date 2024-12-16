@@ -414,6 +414,8 @@ function InteractionTweakData:init(tweak_data)
 	self.cant_pick_lock.start_active = false
 	self.cant_pick_lock.interact_distance = 80
 	self.lockpick_int_off = deep_clone(self.cant_pick_lock)
+	self.no_interact = deep_clone(self.cant_pick_lock)
+	self.no_interact.interact_distance = 0
 	self.hospital_veil_container = {}
 	self.hospital_veil_container.icon = "equipment_vialOK"
 	self.hospital_veil_container.text_id = "debug_interact_hospital_veil_container"

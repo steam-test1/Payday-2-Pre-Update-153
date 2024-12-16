@@ -632,4 +632,22 @@ function TweakData:_init_pd2()
 			32
 		}
 	}
+	self.hud_icons.smoke_screen_grenade = {
+		texture = "guis/textures/pd2/equipment_02",
+		texture_rect = {
+			32,
+			32,
+			32,
+			32
+		}
+	}
+	self.hud_icons.none_icon = {
+		texture = "guis/textures/pd2/equipment_02",
+		texture_rect = {
+			64,
+			32,
+			32,
+			32
+		}
+	}
 end

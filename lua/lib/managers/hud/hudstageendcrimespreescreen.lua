@@ -32,7 +32,7 @@ function HUDStageEndCrimeSpreeScreen:init(hud, workspace)
 		name = "stage_text",
 		text = self._stage_name,
 		h = title_font_size,
-		align = "left",
+		align = "right",
 		vertical = "center",
 		font_size = title_font_size,
 		font = title_font,
@@ -52,6 +52,7 @@ function HUDStageEndCrimeSpreeScreen:init(hud, workspace)
 	bg_text:set_world_center_y(self._foreground_layer_safe:child("stage_text"):world_center_y())
 	bg_text:set_world_x(self._foreground_layer_safe:child("stage_text"):world_x())
 	bg_text:move(-13, 9)
+	bg_text:set_visible(false)
 	self._backdrop:animate_bg_text(bg_text)
 end
 

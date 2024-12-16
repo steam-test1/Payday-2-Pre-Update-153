@@ -290,7 +290,8 @@ end
 
 function NetworkPeer:verify_grenade(value)
 	local grenade_id = self:grenade_id()
-	local max_amount = grenade_id and tweak_data.blackmarket.projectiles[grenade_id] and tweak_data.blackmarket.projectiles[grenade_id].max_amount or tweak_data.equipments.max_amount.grenades
+	local tweak_entry = grenade_id and tweak_data.blackmarket.projectiles[grenade_id]
+	local max_amount = tweak_entry and tweak_entry.max_amount or tweak_data.equipments.max_amount.grenades
 	max_amount = managers.crime_spree:modify_value("PlayerManager:GetThrowablesMaxAmount", max_amount)
 	if self._grenades and max_amount < self._grenades + value then
 		if Network:is_server() then
@@ -1546,6 +1547,9 @@ function NetworkPeer:spawn_unit(spawn_point_id, is_drop_in, spawn_as)
 	local team_id = tweak_data.levels:get_default_team_ID("player")
 	self:set_unit(unit, character_name, team_id)
 	managers.network:session():send_to_peers_synched("set_unit", unit, character_name, self:profile().outfit_string, self:outfit_version(), self._id, team_id)
+	if is_local_peer then
+		unit:base():sync_unit_upgrades()
+	end
 	if is_drop_in then
 		managers.groupai:state():set_dropin_hostages_killed(unit, hostages_killed, respawn_penalty)
 		self:set_used_deployable(used_deployable)

@@ -174,9 +174,8 @@ function MenuSceneManager:_setup_gui()
 		h = self._main_panel:h() - 64
 	})
 	self._character_grab = self._main_panel:panel({
-		x = self._main_panel:w() * 0.5 - 275,
 		w = 550,
-		h = self._main_panel:h()
+		h = self._main_panel:h() - 64
 	})
 	self._character_grab2 = self._main_panel:panel({
 		x = self._main_panel:w() * 0.25,
@@ -197,7 +196,7 @@ function MenuSceneManager:_set_up_templates()
 	self._scene_templates.standard.character_visible = true
 	self._scene_templates.standard.camera_pos = ref:position()
 	self._scene_templates.standard.target_pos = target_pos
-	self._scene_templates.standard.character_pos = c_ref:position() + Vector3(50, 0, 0)
+	self._scene_templates.standard.character_pos = c_ref:position()
 	local l_pos = self._scene_templates.standard.camera_pos
 	local rot = Rotation(self._scene_templates.standard.target_pos - l_pos, math.UP)
 	local l1_pos = l_pos + rot:x() * -200 + rot:y() * 200
@@ -779,7 +778,7 @@ function MenuSceneManager:_set_character_unit(unit_name, unit, pos_override)
 		World:delete_unit(unit)
 	end
 	local a = self._bg_unit:get_object(Idstring("a_reference"))
-	unit = World:spawn_unit(Idstring(unit_name), pos_override or pos or a:position(), rot or a:rotation() * Rotation(-30, 0, 0))
+	unit = World:spawn_unit(Idstring(unit_name), pos_override or pos or a:position(), rot or a:rotation())
 	self._character_yaw = (rot or a:rotation()):yaw()
 	self._character_pitch = (rot or a:rotation()):pitch()
 	self:_set_character_unit_pose("husk_rifle1", unit)

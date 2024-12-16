@@ -710,7 +710,8 @@ function CrewManagementGui:open_weapon_category_menu(category, henchman_index)
 	new_node_data.hide_detection_panel = true
 	new_node_data.custom_callback = {
 		w_equip = callback(self, self, "select_weapon", henchman_index),
-		w_unequip = callback(self, self, "select_weapon", henchman_index)
+		w_unequip = callback(self, self, "select_weapon", henchman_index),
+		ew_buy = callback(self, self, "buy_new_weapon")
 	}
 	new_node_data.topic_id = "bm_menu_" .. category
 	new_node_data.topic_params = {
@@ -880,6 +881,13 @@ function CrewManagementGui:select_weapon(index, data, gui)
 		print(loadout.primary_slot)
 	end
 	gui:reload()
+end
+
+function CrewManagementGui:buy_new_weapon(data, gui)
+	local item_allowed = function(weapon_data)
+		return managers.blackmarket:is_weapon_category_allowed_for_crew(weapon_data.category)
+	end
+	gui:open_weapon_buy_menu(data, item_allowed)
 end
 
 function CrewManagementGui:select_mask(index, data, gui)

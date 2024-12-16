@@ -78,3 +78,16 @@ function CoroutineManager:is_running(name)
 	end
 	return false
 end
+
+function CoroutineManager:remove_coroutine(name)
+	if self._buffer[name] then
+		self._buffer[name] = nil
+	end
+	local size = #self._coroutines
+	for i = 1, size do
+		if self._coroutines[i][name] then
+			self._coroutines[i][name] = nil
+			return
+		end
+	end
+end

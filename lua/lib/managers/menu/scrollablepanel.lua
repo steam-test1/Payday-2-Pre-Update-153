@@ -25,43 +25,47 @@ function ScrollablePanel:init(parent_panel, name, data)
 		w = self._scroll_panel:w(),
 		h = self._scroll_panel:h()
 	})
-	local scroll_up_indicator_shade = self:panel():panel({
-		name = "scroll_up_indicator_shade",
-		layer = layer,
-		x = self:padding(),
-		y = self:padding(),
-		w = self:canvas():w(),
-		halign = "right",
-		valign = "top",
-		alpha = 0
-	})
-	BoxGuiObject:new(scroll_up_indicator_shade, {
-		sides = {
-			0,
-			0,
-			2,
-			0
-		}
-	}):set_aligns("scale", "scale")
-	local scroll_down_indicator_shade = self:panel():panel({
-		name = "scroll_down_indicator_shade",
-		layer = layer,
-		x = self:padding(),
-		y = self:padding(),
-		w = self:canvas():w(),
-		h = self:panel():h() - self:padding() * 2,
-		halign = "right",
-		valign = "bottom",
-		alpha = 0
-	})
-	BoxGuiObject:new(scroll_down_indicator_shade, {
-		sides = {
-			0,
-			0,
-			0,
-			2
-		}
-	}):set_aligns("scale", "scale")
+	if data.ignore_up_indicator == nil or not data.ignore_up_indicator then
+		local scroll_up_indicator_shade = self:panel():panel({
+			name = "scroll_up_indicator_shade",
+			layer = layer,
+			x = self:padding(),
+			y = self:padding(),
+			w = self:canvas():w(),
+			halign = "right",
+			valign = "top",
+			alpha = 0
+		})
+		BoxGuiObject:new(scroll_up_indicator_shade, {
+			sides = {
+				0,
+				0,
+				2,
+				0
+			}
+		}):set_aligns("scale", "scale")
+	end
+	if data.ignore_down_indicator == nil or not data.ignore_down_indicator then
+		local scroll_down_indicator_shade = self:panel():panel({
+			name = "scroll_down_indicator_shade",
+			layer = layer,
+			x = self:padding(),
+			y = self:padding(),
+			w = self:canvas():w(),
+			h = self:panel():h() - self:padding() * 2,
+			halign = "right",
+			valign = "bottom",
+			alpha = 0
+		})
+		BoxGuiObject:new(scroll_down_indicator_shade, {
+			sides = {
+				0,
+				0,
+				0,
+				2
+			}
+		}):set_aligns("scale", "scale")
+	end
 	local texture, rect = tweak_data.hud_icons:get_icon_data("scrollbar_arrow")
 	local scroll_up_indicator_arrow = self:panel():bitmap({
 		name = "scroll_up_indicator_arrow",
@@ -88,6 +92,10 @@ function ScrollablePanel:init(parent_panel, name, data)
 	})
 	scroll_down_indicator_arrow:set_bottom(self:panel():bottom() - self:padding() - 6)
 	scroll_down_indicator_arrow:set_right(self:panel():right() - self:scrollbar_padding())
+	if data.left_scrollbar then
+		scroll_up_indicator_arrow:set_left(self:panel():left() + 2)
+		scroll_down_indicator_arrow:set_left(self:panel():left() + 2)
+	end
 	local bar_h = scroll_down_indicator_arrow:top() - scroll_up_indicator_arrow:bottom()
 	self._scroll_bar = self:panel():panel({
 		name = "scroll_bar",

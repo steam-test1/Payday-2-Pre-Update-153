@@ -62,6 +62,9 @@ function LobbyCharacterData:init(panel, peer)
 	})
 	self._spree_text = spree_text
 	self:update_character()
+	if Global.game_settings.single_player then
+		self._panel:set_visible(false)
+	end
 end
 
 function LobbyCharacterData:destroy()

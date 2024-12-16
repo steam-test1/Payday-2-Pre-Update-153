@@ -22,6 +22,7 @@ function MultiProfileManager:save_current()
 	profile.deployable = blm:equipped_deployable()
 	profile.deployable_secondary = blm:equipped_deployable(2)
 	profile.armor = blm:equipped_armor()
+	profile.armor_skin = blm:equipped_armor_skin()
 	profile.skillset = skt.selected_skill_switch
 	profile.perk_deck = Application:digest_value(skt.specializations.current_specialization, false)
 	profile.mask = blm:equipped_mask_slot()
@@ -49,6 +50,7 @@ function MultiProfileManager:load_current()
 		name = profile.deployable_secondary
 	})
 	blm:equip_armor(profile.armor)
+	blm:set_equipped_armor_skin(profile.armor_skin)
 	blm:equip_mask(profile.mask)
 	local mcm = managers.menu_component
 	if mcm._player_inventory_gui then

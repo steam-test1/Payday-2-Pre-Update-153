@@ -631,8 +631,6 @@ function ExperienceManager:get_xp_by_params(params)
 	local heat_xp_mul = ignore_heat and 1 or math.max(managers.job:get_job_heat_multipliers(job_id), 0)
 	job_heat_dissect = math.round(total_xp * heat_xp_mul - total_xp)
 	total_xp = total_xp + job_heat_dissect
-	local bonus_community_challenges_dissect = total_contract_xp * managers.community_challenges:get_active_experience_bonus()
-	total_xp = total_xp + bonus_community_challenges_dissect
 	local bonus_mutators_dissect = total_xp * managers.mutators:get_experience_reduction() * -1
 	total_xp = total_xp + bonus_mutators_dissect
 	local dissection_table = {
@@ -651,7 +649,6 @@ function ExperienceManager:get_xp_by_params(params)
 		bonus_gage_assignment = math.round(gage_assignment_dissect),
 		bonus_mission_xp = math.round(mission_xp_dissect),
 		bonus_mutators = math.round(bonus_mutators_dissect),
-		bonus_community_challenges = math.round(bonus_community_challenges_dissect),
 		stage_xp = math.round(stage_xp_dissect),
 		job_xp = math.round(job_xp_dissect),
 		base = math.round(base_xp),

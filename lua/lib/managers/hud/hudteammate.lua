@@ -1319,16 +1319,16 @@ function HUDTeammate:set_grenades_amount(data)
 	if not PlayerBase.USE_GRENADES then
 		return
 	end
-	if data.ability then
+	if data.has_cooldown then
 		self:set_ability_cooldown(data)
-	else
-		local teammate_panel = self._panel:child("player")
-		local grenades_panel = self._player_panel:child("grenades_panel")
-		local amount = grenades_panel:child("amount")
-		grenades_panel:child("grenades"):set_visible(data.amount ~= 0)
-		self:_set_amount_string(amount, data.amount)
-		amount:set_visible(data.amount ~= 0)
+		return
 	end
+	local teammate_panel = self._panel:child("player")
+	local grenades_panel = self._player_panel:child("grenades_panel")
+	local amount = grenades_panel:child("amount")
+	grenades_panel:child("grenades"):set_visible(data.amount ~= 0)
+	self:_set_amount_string(amount, data.amount)
+	amount:set_visible(data.amount ~= 0)
 end
 
 function HUDTeammate:set_carry_info(carry_id, value)

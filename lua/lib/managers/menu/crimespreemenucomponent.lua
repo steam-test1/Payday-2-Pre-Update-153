@@ -51,9 +51,6 @@ function CrimeSpreeMenuComponent:_setup()
 end
 
 function CrimeSpreeMenuComponent:can_show_crime_spree()
-	if not managers.menu:is_pc_controller() then
-		return false
-	end
 	if not managers.crime_spree:unlocked() then
 		return false
 	end
@@ -218,7 +215,7 @@ function CrimeSpreeStartButton:set_button(btn)
 end
 
 function CrimeSpreeStartButton:set_text(text)
-	local prefix = not managers.menu:is_pc_controller() and self._btn and managers.localization:get_default_macro(self._btn) or ""
+	local prefix = text ~= "" and (not managers.menu:is_pc_controller() and self._btn and managers.localization:get_default_macro(self._btn) or "") or ""
 	self._text:set_text(prefix .. text)
 end
 

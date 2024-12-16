@@ -533,7 +533,7 @@ function HUDManager:add_teammate_panel(character_name, player_name, ai, peer_id)
 				self:set_teammate_grenades(i, {
 					icon = icon,
 					amount = Application:digest_value(peer_grenades.amount, false),
-					ability = tweak_data.blackmarket.projectiles[peer_grenades.grenade].ability
+					has_cooldown = not not tweak_data.blackmarket.projectiles[peer_grenades.grenade].base_cooldown
 				})
 			end
 		end

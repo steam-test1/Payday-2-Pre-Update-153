@@ -19,116 +19,16 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_glock_18_npc()
 	self:_init_data_ak47_npc()
 	self:_init_data_g36_npc()
-	self:_init_data_g17_npc()
 	self:_init_data_mp9_npc()
-	self:_init_data_olympic_npc()
-	self:_init_data_m16_npc()
-	self:_init_data_aug_npc()
-	self:_init_data_ak74_npc()
-	self:_init_data_ak5_npc()
-	self:_init_data_p90_npc()
-	self:_init_data_amcar_npc()
-	self:_init_data_mac10_npc()
-	self:_init_data_akmsu_npc()
-	self:_init_data_akm_npc()
-	self:_init_data_akm_gold_npc()
-	self:_init_data_deagle_npc()
-	self:_init_data_serbu_npc()
 	self:_init_data_saiga_npc()
-	self:_init_data_huntsman_npc()
-	self:_init_data_saw_npc()
 	self:_init_data_sentry_gun_npc()
 	self:_init_data_swat_van_turret_module_npc()
 	self:_init_data_ceiling_turret_module_npc()
-	self:_init_data_usp_npc()
-	self:_init_data_g22c_npc()
-	self:_init_data_judge_npc()
-	self:_init_data_m45_npc()
 	self:_init_data_s552_npc()
-	self:_init_data_ppk_npc()
-	self:_init_data_mp7_npc()
 	self:_init_data_scar_npc()
-	self:_init_data_p226_npc()
 	self:_init_data_hk21_npc()
 	self:_init_data_m249_npc()
-	self:_init_data_rpk_npc()
-	self:_init_data_m95_npc()
-	self:_init_data_msr_npc()
-	self:_init_data_r93_npc()
-	self:_init_data_fal_npc()
-	self:_init_data_ben_npc()
-	self:_init_data_striker_npc()
-	self:_init_data_ksg_npc()
-	self:_init_data_gre_m79_npc()
-	self:_init_data_g3_npc()
-	self:_init_data_galil_npc()
-	self:_init_data_famas_npc()
-	self:_init_data_scorpion_npc()
-	self:_init_data_tec9_npc()
-	self:_init_data_uzi_npc()
-	self:_init_data_jowi_npc()
-	self:_init_data_x_1911_npc()
-	self:_init_data_x_b92fs_npc()
-	self:_init_data_x_deagle_npc()
-	self:_init_data_g26_npc()
-	self:_init_data_spas12_npc()
-	self:_init_data_mg42_npc()
-	self:_init_data_c96_npc()
-	self:_init_data_sterling_npc()
-	self:_init_data_mosin_npc()
-	self:_init_data_m1928_npc()
-	self:_init_data_l85a2_npc()
-	self:_init_data_hs2000_npc()
-	self:_init_data_vhs_npc()
-	self:_init_data_m134_npc()
-	self:_init_data_rpg7_npc()
-	self:_init_data_cobray_npc()
-	self:_init_data_b682_npc()
-	self:_init_data_x_g22c_npc()
-	self:_init_data_x_g17_npc()
-	self:_init_data_x_usp_npc()
-	self:_init_data_flamethrower_mk2_npc()
-	self:_init_data_m32_npc()
-	self:_init_data_aa12_npc()
-	self:_init_data_peacemaker_npc()
-	self:_init_data_winchester1874_npc()
-	self:_init_data_plainsrider_npc()
-	self:_init_data_mateba_npc()
-	self:_init_data_asval_npc()
-	self:_init_data_sub2000_npc()
-	self:_init_data_wa2000_npc()
-	self:_init_data_polymer_npc()
-	self:_init_data_hunter_npc()
-	self:_init_data_baka_npc()
-	self:_init_data_arblast_npc()
-	self:_init_data_frankish_npc()
-	self:_init_data_long_npc()
-	self:_init_data_par_npc()
-	self:_init_data_sparrow_npc()
-	self:_init_data_model70_npc()
-	self:_init_data_m37_npc()
-	self:_init_data_china_npc()
-	self:_init_data_sr2_npc()
-	self:_init_data_x_sr2_npc()
-	self:_init_data_pl14_npc()
-	self:_init_data_x_mp5_npc()
-	self:_init_data_x_akmsu_npc()
-	self:_init_data_tecci_npc()
-	self:_init_data_hajk_npc()
-	self:_init_data_boot_npc()
-	self:_init_data_packrat_npc()
-	self:_init_data_schakal_npc()
-	self:_init_data_desertfox_npc()
-	self:_init_data_x_packrat_npc()
-	self:_init_data_rota_npc()
-	self:_init_data_arbiter_npc()
 	self:_init_data_contraband_npc()
-	self:_init_data_ray_npc()
-	self:_init_data_tti_npc()
-	self:_init_data_siltstone_npc()
-	self:_init_data_flint_npc()
-	self:_init_data_coal_npc()
-	self:_init_data_lemming_npc()
 	self:_init_data_m4_crew()
 	self:_init_data_m14_crew()
 	self:_init_data_c45_crew()
@@ -138,7 +38,6 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_r870_crew()
 	self:_init_data_mossberg_crew()
 	self:_init_data_mp5_crew()
-	self:_init_data_mac11_crew()
 	self:_init_data_glock_18_crew()
 	self:_init_data_ak47_crew()
 	self:_init_data_g36_crew()
@@ -160,7 +59,6 @@ function WeaponTweakData:init(tweak_data)
 	self:_init_data_saiga_crew()
 	self:_init_data_huntsman_crew()
 	self:_init_data_saw_crew()
-	self:_init_data_sentry_gun_crew()
 	self:_init_data_usp_crew()
 	self:_init_data_g22c_crew()
 	self:_init_data_judge_crew()
@@ -414,8 +312,6 @@ function WeaponTweakData:_init_data_beretta92_npc()
 	self.beretta92_npc.hold = "pistol"
 	self.beretta92_npc.alert_size = 300
 	self.beretta92_npc.suppression = 0.3
-	self.beretta92_primary_npc = deep_clone(self.beretta92_npc)
-	self.beretta92_primary_npc.use_data.selection_index = 2
 end
 
 function WeaponTweakData:_init_data_glock_18_npc()
@@ -432,8 +328,6 @@ function WeaponTweakData:_init_data_glock_18_npc()
 	self.glock_18_npc.auto.fire_rate = 0.092
 	self.glock_18_npc.alert_size = 2500
 	self.glock_18_npc.suppression = 0.45
-	self.glock_18c_primary_npc = deep_clone(self.glock_18_npc)
-	self.glock_18c_primary_npc.use_data.selection_index = 2
 end
 
 function WeaponTweakData:_init_data_raging_bull_npc()
@@ -448,8 +342,6 @@ function WeaponTweakData:_init_data_raging_bull_npc()
 	self.raging_bull_npc.hold = "pistol"
 	self.raging_bull_npc.alert_size = 5000
 	self.raging_bull_npc.suppression = 1.8
-	self.raging_bull_primary_npc = deep_clone(self.raging_bull_npc)
-	self.raging_bull_primary_npc.use_data.selection_index = 2
 end
 
 function WeaponTweakData:_init_data_m4_npc()
@@ -464,10 +356,7 @@ function WeaponTweakData:_init_data_m4_npc()
 	self.m4_npc.hold = "rifle"
 	self.m4_npc.alert_size = 5000
 	self.m4_npc.suppression = 1
-	self.m4_secondary_npc = deep_clone(self.m4_npc)
-	self.m4_secondary_npc.use_data.selection_index = 1
 	self.ak47_ass_npc = deep_clone(self.m4_npc)
-	self.sg417_npc = deep_clone(self.m4_npc)
 end
 
 function WeaponTweakData:_init_data_ak47_npc()
@@ -594,20 +483,6 @@ function WeaponTweakData:_init_data_g36_npc()
 	self.g36_npc.suppression = 1
 end
 
-function WeaponTweakData:_init_data_g17_npc()
-	self.g17_npc.sounds.prefix = "g17_npc"
-	self.g17_npc.use_data.selection_index = 1
-	self.g17_npc.DAMAGE = 1
-	self.g17_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.g17_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.g17_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.g17_npc.CLIP_AMMO_MAX = 17
-	self.g17_npc.NR_CLIPS_MAX = 5
-	self.g17_npc.hold = "pistol"
-	self.g17_npc.alert_size = 2500
-	self.g17_npc.suppression = 1
-end
-
 function WeaponTweakData:_init_data_mp9_npc()
 	self.mp9_npc.sounds.prefix = "mp9_npc"
 	self.mp9_npc.use_data.selection_index = 1
@@ -624,202 +499,6 @@ function WeaponTweakData:_init_data_mp9_npc()
 	self.sr2_smg_npc = deep_clone(self.mp9_npc)
 end
 
-function WeaponTweakData:_init_data_olympic_npc()
-	self.olympic_npc.sounds.prefix = "m4_olympic_npc"
-	self.olympic_npc.use_data.selection_index = 1
-	self.olympic_npc.DAMAGE = 1.5
-	self.olympic_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.olympic_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.olympic_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.olympic_npc.CLIP_AMMO_MAX = 25
-	self.olympic_npc.NR_CLIPS_MAX = 5
-	self.olympic_npc.auto.fire_rate = 0.115
-	self.olympic_npc.hold = "rifle"
-	self.olympic_npc.alert_size = 1000
-	self.olympic_npc.suppression = 1
-	self.olympic_primary_npc = deep_clone(self.olympic_npc)
-	self.olympic_primary_npc.use_data.selection_index = 2
-end
-
-function WeaponTweakData:_init_data_m16_npc()
-	self.m16_npc.sounds.prefix = "m16_npc"
-	self.m16_npc.use_data.selection_index = 2
-	self.m16_npc.DAMAGE = 1.5
-	self.m16_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.m16_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.m16_npc.CLIP_AMMO_MAX = 30
-	self.m16_npc.NR_CLIPS_MAX = 8
-	self.m16_npc.auto.fire_rate = 0.215
-	self.m16_npc.hold = "rifle"
-	self.m16_npc.alert_size = 5000
-	self.m16_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_aug_npc()
-	self.aug_npc.sounds.prefix = "aug_npc"
-	self.aug_npc.use_data.selection_index = 2
-	self.aug_npc.DAMAGE = 2
-	self.aug_npc.muzzleflash = "effects/payday2/particles/weapons/556_auto"
-	self.aug_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.aug_npc.CLIP_AMMO_MAX = 30
-	self.aug_npc.NR_CLIPS_MAX = 5
-	self.aug_npc.auto.fire_rate = 0.185
-	self.aug_npc.hold = "rifle"
-	self.aug_npc.alert_size = 5000
-	self.aug_npc.suppression = 1
-	self.aug_secondary_npc = deep_clone(self.aug_npc)
-	self.aug_secondary_npc.use_data.selection_index = 1
-end
-
-function WeaponTweakData:_init_data_ak74_npc()
-	self.ak74_npc.sounds.prefix = "ak74_npc"
-	self.ak74_npc.use_data.selection_index = 2
-	self.ak74_npc.DAMAGE = 2
-	self.ak74_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.ak74_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.ak74_npc.CLIP_AMMO_MAX = 30
-	self.ak74_npc.NR_CLIPS_MAX = 5
-	self.ak74_npc.auto.fire_rate = 0.19
-	self.ak74_npc.hold = "rifle"
-	self.ak74_npc.alert_size = 5000
-	self.ak74_npc.suppression = 1
-	self.ak74_secondary_npc = deep_clone(self.ak74_npc)
-	self.ak74_secondary_npc.use_data.selection_index = 1
-end
-
-function WeaponTweakData:_init_data_ak5_npc()
-	self.ak5_npc.sounds.prefix = "ak5_npc"
-	self.ak5_npc.use_data.selection_index = 2
-	self.ak5_npc.DAMAGE = 2
-	self.ak5_npc.muzzleflash = "effects/payday2/particles/weapons/556_auto"
-	self.ak5_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.ak5_npc.CLIP_AMMO_MAX = 30
-	self.ak5_npc.NR_CLIPS_MAX = 5
-	self.ak5_npc.auto.fire_rate = 0.2
-	self.ak5_npc.hold = "rifle"
-	self.ak5_npc.alert_size = 5000
-	self.ak5_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_p90_npc()
-	self.p90_npc.sounds.prefix = "p90_npc"
-	self.p90_npc.use_data.selection_index = 1
-	self.p90_npc.DAMAGE = 1
-	self.p90_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.p90_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.p90_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.p90_npc.CLIP_AMMO_MAX = 50
-	self.p90_npc.NR_CLIPS_MAX = 4
-	self.p90_npc.auto.fire_rate = 0.11
-	self.p90_npc.hold = "pistol"
-	self.p90_npc.alert_size = 1000
-	self.p90_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_amcar_npc()
-	self.amcar_npc.sounds.prefix = "amcar_npc"
-	self.amcar_npc.use_data.selection_index = 2
-	self.amcar_npc.DAMAGE = 2
-	self.amcar_npc.muzzleflash = "effects/payday2/particles/weapons/556_auto"
-	self.amcar_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.amcar_npc.CLIP_AMMO_MAX = 20
-	self.amcar_npc.NR_CLIPS_MAX = 5
-	self.amcar_npc.auto.fire_rate = 0.2
-	self.amcar_npc.hold = "rifle"
-	self.amcar_npc.alert_size = 5000
-	self.amcar_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_mac10_npc()
-	self.mac10_npc.sounds.prefix = "mac10_npc"
-	self.mac10_npc.use_data.selection_index = 1
-	self.mac10_npc.DAMAGE = 0.75
-	self.mac10_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.mac10_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.mac10_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.mac10_npc.CLIP_AMMO_MAX = 32
-	self.mac10_npc.NR_CLIPS_MAX = 5
-	self.mac10_npc.auto.fire_rate = 0.1
-	self.mac10_npc.hold = "pistol"
-	self.mac10_npc.alert_size = 1000
-	self.mac10_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_akmsu_npc()
-	self.akmsu_npc.sounds.prefix = "akmsu_npc"
-	self.akmsu_npc.use_data.selection_index = 1
-	self.akmsu_npc.DAMAGE = 3
-	self.akmsu_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.akmsu_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.akmsu_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.akmsu_npc.CLIP_AMMO_MAX = 30
-	self.akmsu_npc.NR_CLIPS_MAX = 5
-	self.akmsu_npc.auto.fire_rate = 0.1
-	self.akmsu_npc.hold = "rifle"
-	self.akmsu_npc.alert_size = 1000
-	self.akmsu_npc.suppression = 1
-	self.akmsu_primary_npc = deep_clone(self.akmsu_npc)
-	self.akmsu_primary_npc.use_data.selection_index = 2
-end
-
-function WeaponTweakData:_init_data_akm_npc()
-	self.akm_npc.sounds.prefix = "akm_npc"
-	self.akm_npc.use_data.selection_index = 2
-	self.akm_npc.DAMAGE = 3
-	self.akm_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.akm_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.akm_npc.CLIP_AMMO_MAX = 30
-	self.akm_npc.NR_CLIPS_MAX = 5
-	self.akm_npc.auto.fire_rate = 0.2
-	self.akm_npc.hold = "rifle"
-	self.akm_npc.alert_size = 5000
-	self.akm_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_akm_gold_npc()
-	self.akm_gold_npc.sounds.prefix = "akm_npc"
-	self.akm_gold_npc.use_data.selection_index = 2
-	self.akm_gold_npc.DAMAGE = 3
-	self.akm_gold_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.akm_gold_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.akm_gold_npc.CLIP_AMMO_MAX = 30
-	self.akm_gold_npc.NR_CLIPS_MAX = 5
-	self.akm_gold_npc.auto.fire_rate = 0.2
-	self.akm_gold_npc.hold = "rifle"
-	self.akm_gold_npc.alert_size = 5000
-	self.akm_gold_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_deagle_npc()
-	self.deagle_npc.sounds.prefix = "deagle_npc"
-	self.deagle_npc.use_data.selection_index = 1
-	self.deagle_npc.DAMAGE = 4
-	self.deagle_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.deagle_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.deagle_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.deagle_npc.CLIP_AMMO_MAX = 10
-	self.deagle_npc.NR_CLIPS_MAX = 5
-	self.deagle_npc.hold = "pistol"
-	self.deagle_npc.alert_size = 2500
-	self.deagle_npc.suppression = 1
-	self.deagle_primary_npc = deep_clone(self.deagle_npc)
-	self.deagle_primary_npc.use_data.selection_index = 2
-end
-
-function WeaponTweakData:_init_data_serbu_npc()
-	self.serbu_npc.sounds.prefix = "serbu_npc"
-	self.serbu_npc.use_data.selection_index = 1
-	self.serbu_npc.DAMAGE = 5
-	self.serbu_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.serbu_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug_semi"
-	self.serbu_npc.CLIP_AMMO_MAX = 6
-	self.serbu_npc.NR_CLIPS_MAX = 4
-	self.serbu_npc.hold = "rifle"
-	self.serbu_npc.alert_size = 4500
-	self.serbu_npc.suppression = 1.8
-	self.serbu_npc.is_shotgun = true
-end
-
 function WeaponTweakData:_init_data_saiga_npc()
 	self.saiga_npc.sounds.prefix = "saiga_npc"
 	self.saiga_npc.use_data.selection_index = 2
@@ -833,37 +512,6 @@ function WeaponTweakData:_init_data_saiga_npc()
 	self.saiga_npc.alert_size = 4500
 	self.saiga_npc.suppression = 1.8
 	self.saiga_npc.is_shotgun = true
-end
-
-function WeaponTweakData:_init_data_huntsman_npc()
-	self.huntsman_npc.sounds.prefix = "huntsman_npc"
-	self.huntsman_npc.use_data.selection_index = 2
-	self.huntsman_npc.DAMAGE = 12
-	self.huntsman_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.huntsman_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
-	self.huntsman_npc.CLIP_AMMO_MAX = 2
-	self.huntsman_npc.NR_CLIPS_MAX = 4
-	self.huntsman_npc.hold = "rifle"
-	self.huntsman_npc.alert_size = 4500
-	self.huntsman_npc.suppression = 1.8
-	self.huntsman_npc.is_shotgun = true
-end
-
-function WeaponTweakData:_init_data_saw_npc()
-	self.saw_npc.sounds.prefix = "saw_npc"
-	self.saw_npc.sounds.fire = "Play_npc_saw_handheld_start"
-	self.saw_npc.sounds.stop_fire = "Play_npc_saw_handheld_end"
-	self.saw_npc.use_data.selection_index = 2
-	self.saw_npc.DAMAGE = 1
-	self.saw_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.saw_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
-	self.saw_npc.CLIP_AMMO_MAX = 2
-	self.saw_npc.NR_CLIPS_MAX = 4
-	self.saw_npc.hold = "rifle"
-	self.saw_npc.alert_size = 4500
-	self.saw_npc.suppression = 1.8
-	self.saw_secondary_npc = deep_clone(self.saw_npc)
-	self.saw_secondary_npc.use_data.selection_index = 1
 end
 
 function WeaponTweakData:_init_data_sentry_gun_npc()
@@ -1069,65 +717,6 @@ function WeaponTweakData:_init_data_ceiling_turret_module_npc()
 	self.ceiling_turret_module_no_idle.CAN_GO_IDLE = false
 end
 
-function WeaponTweakData:_init_data_usp_npc()
-	self.usp_npc.sounds.prefix = "usp45_npc"
-	self.usp_npc.use_data.selection_index = 1
-	self.usp_npc.DAMAGE = 1.25
-	self.usp_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.usp_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.usp_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.usp_npc.CLIP_AMMO_MAX = 13
-	self.usp_npc.NR_CLIPS_MAX = 6
-	self.usp_npc.auto.fire_rate = 0.1
-	self.usp_npc.hold = "pistol"
-	self.usp_npc.alert_size = 1800
-	self.usp_npc.suppression = 2
-end
-
-function WeaponTweakData:_init_data_g22c_npc()
-	self.g22c_npc.sounds.prefix = "g22_npc"
-	self.g22c_npc.use_data.selection_index = 1
-	self.g22c_npc.DAMAGE = 1.25
-	self.g22c_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.g22c_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.g22c_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.g22c_npc.CLIP_AMMO_MAX = 16
-	self.g22c_npc.NR_CLIPS_MAX = 6
-	self.g22c_npc.auto.fire_rate = 0.1
-	self.g22c_npc.hold = "pistol"
-	self.g22c_npc.alert_size = 1800
-	self.g22c_npc.suppression = 2
-end
-
-function WeaponTweakData:_init_data_judge_npc()
-	self.judge_npc.sounds.prefix = "judge_npc"
-	self.judge_npc.use_data.selection_index = 1
-	self.judge_npc.DAMAGE = 4
-	self.judge_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.judge_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.judge_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
-	self.judge_npc.CLIP_AMMO_MAX = 5
-	self.judge_npc.NR_CLIPS_MAX = 5
-	self.judge_npc.hold = "pistol"
-	self.judge_npc.alert_size = 5000
-	self.judge_npc.suppression = 1.8
-end
-
-function WeaponTweakData:_init_data_m45_npc()
-	self.m45_npc.sounds.prefix = "m45_npc"
-	self.m45_npc.use_data.selection_index = 1
-	self.m45_npc.DAMAGE = 2
-	self.m45_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.m45_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.m45_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.m45_npc.CLIP_AMMO_MAX = 40
-	self.m45_npc.NR_CLIPS_MAX = 5
-	self.m45_npc.auto.fire_rate = 0.1
-	self.m45_npc.hold = "rifle"
-	self.m45_npc.alert_size = 2800
-	self.m45_npc.suppression = 1
-end
-
 function WeaponTweakData:_init_data_s552_npc()
 	self.s552_npc.sounds.prefix = "sig552_npc"
 	self.s552_npc.use_data.selection_index = 2
@@ -1140,37 +729,6 @@ function WeaponTweakData:_init_data_s552_npc()
 	self.s552_npc.hold = "rifle"
 	self.s552_npc.alert_size = 5000
 	self.s552_npc.suppression = 1
-	self.s552_secondary_npc = deep_clone(self.s552_npc)
-	self.s552_secondary_npc.use_data.selection_index = 1
-end
-
-function WeaponTweakData:_init_data_ppk_npc()
-	self.ppk_npc.sounds.prefix = "w_ppk_npc"
-	self.ppk_npc.use_data.selection_index = 1
-	self.ppk_npc.DAMAGE = 1
-	self.ppk_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.ppk_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.ppk_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.ppk_npc.CLIP_AMMO_MAX = 14
-	self.ppk_npc.NR_CLIPS_MAX = 5
-	self.ppk_npc.hold = "pistol"
-	self.ppk_npc.alert_size = 2500
-	self.ppk_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_mp7_npc()
-	self.mp7_npc.sounds.prefix = "mp7_npc"
-	self.mp7_npc.use_data.selection_index = 1
-	self.mp7_npc.DAMAGE = 2
-	self.mp7_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.mp7_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.mp7_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.mp7_npc.CLIP_AMMO_MAX = 20
-	self.mp7_npc.NR_CLIPS_MAX = 5
-	self.mp7_npc.auto.fire_rate = 0.1
-	self.mp7_npc.hold = "pistol"
-	self.mp7_npc.alert_size = 2800
-	self.mp7_npc.suppression = 1
 end
 
 function WeaponTweakData:_init_data_scar_npc()
@@ -1185,22 +743,6 @@ function WeaponTweakData:_init_data_scar_npc()
 	self.scar_npc.hold = "rifle"
 	self.scar_npc.alert_size = 5000
 	self.scar_npc.suppression = 1
-	self.scar_secondary_npc = deep_clone(self.scar_npc)
-	self.scar_secondary_npc.use_data.selection_index = 1
-end
-
-function WeaponTweakData:_init_data_p226_npc()
-	self.p226_npc.sounds.prefix = "p226r_npc"
-	self.p226_npc.use_data.selection_index = 1
-	self.p226_npc.DAMAGE = 1
-	self.p226_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.p226_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.p226_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.p226_npc.CLIP_AMMO_MAX = 12
-	self.p226_npc.NR_CLIPS_MAX = 5
-	self.p226_npc.hold = "pistol"
-	self.p226_npc.alert_size = 2500
-	self.p226_npc.suppression = 1
 end
 
 function WeaponTweakData:_init_data_hk21_npc()
@@ -1215,8 +757,6 @@ function WeaponTweakData:_init_data_hk21_npc()
 	self.hk21_npc.hold = "rifle"
 	self.hk21_npc.alert_size = 5000
 	self.hk21_npc.suppression = 1
-	self.hk21_secondary_npc = deep_clone(self.hk21_npc)
-	self.hk21_secondary_npc.use_data.selection_index = 1
 end
 
 function WeaponTweakData:_init_data_m249_npc()
@@ -1232,1078 +772,6 @@ function WeaponTweakData:_init_data_m249_npc()
 	self.m249_npc.alert_size = 5000
 	self.m249_npc.suppression = 1
 	self.rpk_lmg_npc = deep_clone(self.m249_npc)
-end
-
-function WeaponTweakData:_init_data_rpk_npc()
-	self.rpk_npc.sounds.prefix = "rpk_npc"
-	self.rpk_npc.use_data.selection_index = 2
-	self.rpk_npc.DAMAGE = 2
-	self.rpk_npc.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
-	self.rpk_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.rpk_npc.CLIP_AMMO_MAX = 100
-	self.rpk_npc.NR_CLIPS_MAX = 5
-	self.rpk_npc.auto.fire_rate = 0.15
-	self.rpk_npc.hold = "rifle"
-	self.rpk_npc.alert_size = 5000
-	self.rpk_npc.suppression = 1
-	self.rpk_secondary_npc = deep_clone(self.rpk_npc)
-	self.rpk_secondary_npc.use_data.selection_index = 1
-end
-
-function WeaponTweakData:_init_data_m95_npc()
-	self.m95_npc.sounds.prefix = "barrett_npc"
-	self.m95_npc.use_data.selection_index = 2
-	self.m95_npc.DAMAGE = 2
-	self.m95_npc.muzzleflash = "effects/payday2/particles/weapons/50cal_auto"
-	self.m95_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper_m95"
-	self.m95_npc.CLIP_AMMO_MAX = 5
-	self.m95_npc.NR_CLIPS_MAX = 5
-	self.m95_npc.auto.fire_rate = 20
-	self.m95_npc.hold = "rifle"
-	self.m95_npc.alert_size = 5000
-	self.m95_npc.suppression = 1
-	self.m95_secondary_npc = deep_clone(self.m95_npc)
-	self.m95_secondary_npc.use_data.selection_index = 1
-end
-
-function WeaponTweakData:_init_data_msr_npc()
-	self.msr_npc.sounds.prefix = "msr_npc"
-	self.msr_npc.use_data.selection_index = 2
-	self.msr_npc.DAMAGE = 2
-	self.msr_npc.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
-	self.msr_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
-	self.msr_npc.CLIP_AMMO_MAX = 10
-	self.msr_npc.NR_CLIPS_MAX = 5
-	self.msr_npc.auto.fire_rate = 20
-	self.msr_npc.hold = "rifle"
-	self.msr_npc.alert_size = 5000
-	self.msr_npc.suppression = 1
-	self.msr_secondary_npc = deep_clone(self.msr_npc)
-	self.msr_secondary_npc.use_data.selection_index = 1
-end
-
-function WeaponTweakData:_init_data_r93_npc()
-	self.r93_npc.sounds.prefix = "blazer_npc"
-	self.r93_npc.use_data.selection_index = 2
-	self.r93_npc.DAMAGE = 2
-	self.r93_npc.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
-	self.r93_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
-	self.r93_npc.CLIP_AMMO_MAX = 6
-	self.r93_npc.NR_CLIPS_MAX = 5
-	self.r93_npc.auto.fire_rate = 20
-	self.r93_npc.hold = "rifle"
-	self.r93_npc.alert_size = 5000
-	self.r93_npc.suppression = 1
-	self.r93_secondary_npc = deep_clone(self.r93_npc)
-	self.r93_secondary_npc.use_data.selection_index = 1
-end
-
-function WeaponTweakData:_init_data_fal_npc()
-	self.fal_npc.sounds.prefix = "fn_fal_npc"
-	self.fal_npc.use_data.selection_index = 2
-	self.fal_npc.DAMAGE = 2
-	self.fal_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.fal_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.fal_npc.CLIP_AMMO_MAX = 20
-	self.fal_npc.NR_CLIPS_MAX = 5
-	self.fal_npc.auto.fire_rate = 0.15
-	self.fal_npc.hold = "rifle"
-	self.fal_npc.alert_size = 5000
-	self.fal_npc.suppression = 1
-	self.fal_secondary_npc = deep_clone(self.fal_npc)
-	self.fal_secondary_npc.use_data.selection_index = 1
-end
-
-function WeaponTweakData:_init_data_ben_npc()
-	self.ben_npc.sounds.prefix = "benelli_m4_npc"
-	self.ben_npc.use_data.selection_index = 2
-	self.ben_npc.DAMAGE = 5
-	self.ben_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.ben_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
-	self.ben_npc.auto.fire_rate = 0.14
-	self.ben_npc.CLIP_AMMO_MAX = 8
-	self.ben_npc.NR_CLIPS_MAX = 4
-	self.ben_npc.hold = "rifle"
-	self.ben_npc.alert_size = 4500
-	self.ben_npc.suppression = 1.8
-	self.ben_npc.is_shotgun = true
-end
-
-function WeaponTweakData:_init_data_striker_npc()
-	self.striker_npc.sounds.prefix = "striker_npc"
-	self.striker_npc.use_data.selection_index = 1
-	self.striker_npc.DAMAGE = 5
-	self.striker_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.striker_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
-	self.striker_npc.auto.fire_rate = 0.14
-	self.striker_npc.CLIP_AMMO_MAX = 12
-	self.striker_npc.NR_CLIPS_MAX = 4
-	self.striker_npc.hold = "rifle"
-	self.striker_npc.alert_size = 4500
-	self.striker_npc.suppression = 1.8
-	self.striker_npc.is_shotgun = true
-end
-
-function WeaponTweakData:_init_data_ksg_npc()
-	self.ksg_npc.sounds.prefix = "keltec_npc"
-	self.ksg_npc.use_data.selection_index = 2
-	self.ksg_npc.DAMAGE = 5
-	self.ksg_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.ksg_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
-	self.ksg_npc.auto.fire_rate = 0.14
-	self.ksg_npc.CLIP_AMMO_MAX = 14
-	self.ksg_npc.NR_CLIPS_MAX = 4
-	self.ksg_npc.hold = "rifle"
-	self.ksg_npc.alert_size = 4500
-	self.ksg_npc.suppression = 1.8
-	self.ksg_npc.is_shotgun = true
-end
-
-function WeaponTweakData:_init_data_gre_m79_npc()
-	self.gre_m79_npc.sounds.prefix = "gl40_npc"
-	self.gre_m79_npc.use_data.selection_index = 2
-	self.gre_m79_npc.DAMAGE = 2
-	self.gre_m79_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.gre_m79_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.gre_m79_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.gre_m79_npc.no_trail = true
-	self.gre_m79_npc.CLIP_AMMO_MAX = 1
-	self.gre_m79_npc.NR_CLIPS_MAX = 4
-	self.gre_m79_npc.auto.fire_rate = 0.1
-	self.gre_m79_npc.hold = "rifle"
-	self.gre_m79_npc.alert_size = 2800
-	self.gre_m79_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_g3_npc()
-	self.g3_npc.sounds.prefix = "g3_npc"
-	self.g3_npc.use_data.selection_index = 2
-	self.g3_npc.DAMAGE = 2
-	self.g3_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.g3_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.g3_npc.CLIP_AMMO_MAX = 20
-	self.g3_npc.NR_CLIPS_MAX = 5
-	self.g3_npc.auto.fire_rate = 0.15
-	self.g3_npc.hold = "rifle"
-	self.g3_npc.alert_size = 5000
-	self.g3_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_galil_npc()
-	self.galil_npc.sounds.prefix = "galil_npc"
-	self.galil_npc.use_data.selection_index = 2
-	self.galil_npc.DAMAGE = 2
-	self.galil_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.galil_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.galil_npc.CLIP_AMMO_MAX = 30
-	self.galil_npc.NR_CLIPS_MAX = 5
-	self.galil_npc.auto.fire_rate = 0.15
-	self.galil_npc.hold = "rifle"
-	self.galil_npc.alert_size = 5000
-	self.galil_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_famas_npc()
-	self.famas_npc.sounds.prefix = "famas_npc"
-	self.famas_npc.use_data.selection_index = 2
-	self.famas_npc.DAMAGE = 2
-	self.famas_npc.muzzleflash = "effects/payday2/particles/weapons/556_auto"
-	self.famas_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.famas_npc.CLIP_AMMO_MAX = 30
-	self.famas_npc.NR_CLIPS_MAX = 5
-	self.famas_npc.auto.fire_rate = 0.15
-	self.famas_npc.hold = "rifle"
-	self.famas_npc.alert_size = 5000
-	self.famas_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_scorpion_npc()
-	self.scorpion_npc.sounds.prefix = "skorpion_npc"
-	self.scorpion_npc.use_data.selection_index = 1
-	self.scorpion_npc.DAMAGE = 2
-	self.scorpion_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.scorpion_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.scorpion_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.scorpion_npc.CLIP_AMMO_MAX = 20
-	self.scorpion_npc.NR_CLIPS_MAX = 5
-	self.scorpion_npc.auto.fire_rate = 0.1
-	self.scorpion_npc.hold = "pistol"
-	self.scorpion_npc.alert_size = 2800
-	self.scorpion_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_tec9_npc()
-	self.tec9_npc.sounds.prefix = "tec9_npc"
-	self.tec9_npc.use_data.selection_index = 1
-	self.tec9_npc.DAMAGE = 2
-	self.tec9_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.tec9_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.tec9_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.tec9_npc.CLIP_AMMO_MAX = 20
-	self.tec9_npc.NR_CLIPS_MAX = 5
-	self.tec9_npc.auto.fire_rate = 0.1
-	self.tec9_npc.hold = "pistol"
-	self.tec9_npc.alert_size = 2800
-	self.tec9_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_uzi_npc()
-	self.uzi_npc.sounds.prefix = "uzi_npc"
-	self.uzi_npc.use_data.selection_index = 1
-	self.uzi_npc.DAMAGE = 2
-	self.uzi_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.uzi_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.uzi_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.uzi_npc.CLIP_AMMO_MAX = 40
-	self.uzi_npc.NR_CLIPS_MAX = 5
-	self.uzi_npc.auto.fire_rate = 0.1
-	self.uzi_npc.hold = "pistol"
-	self.uzi_npc.alert_size = 2800
-	self.uzi_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_jowi_npc()
-	self.jowi_npc.sounds.prefix = "g17_npc"
-	self.jowi_npc.use_data.selection_index = 2
-	self.jowi_npc.DAMAGE = 1
-	self.jowi_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.jowi_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.jowi_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.jowi_npc.CLIP_AMMO_MAX = 20
-	self.jowi_npc.NR_CLIPS_MAX = 5
-	self.jowi_npc.hold = "akimbo_pistol"
-	self.jowi_npc.alert_size = 2500
-	self.jowi_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_x_1911_npc()
-	self.x_1911_npc.sounds.prefix = "c45_npc"
-	self.x_1911_npc.use_data.selection_index = 2
-	self.x_1911_npc.DAMAGE = 1
-	self.x_1911_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.x_1911_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.x_1911_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.x_1911_npc.CLIP_AMMO_MAX = 20
-	self.x_1911_npc.NR_CLIPS_MAX = 5
-	self.x_1911_npc.hold = "akimbo_pistol"
-	self.x_1911_npc.alert_size = 2500
-	self.x_1911_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_x_b92fs_npc()
-	self.x_b92fs_npc.sounds.prefix = "beretta_npc"
-	self.x_b92fs_npc.use_data.selection_index = 2
-	self.x_b92fs_npc.DAMAGE = 1
-	self.x_b92fs_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.x_b92fs_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.x_b92fs_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.x_b92fs_npc.CLIP_AMMO_MAX = 28
-	self.x_b92fs_npc.NR_CLIPS_MAX = 5
-	self.x_b92fs_npc.hold = "akimbo_pistol"
-	self.x_b92fs_npc.alert_size = 2500
-	self.x_b92fs_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_x_deagle_npc()
-	self.x_deagle_npc.sounds.prefix = "deagle_npc"
-	self.x_deagle_npc.use_data.selection_index = 2
-	self.x_deagle_npc.DAMAGE = 1
-	self.x_deagle_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.x_deagle_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.x_deagle_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.x_deagle_npc.CLIP_AMMO_MAX = 20
-	self.x_deagle_npc.NR_CLIPS_MAX = 5
-	self.x_deagle_npc.hold = "akimbo_pistol"
-	self.x_deagle_npc.alert_size = 2500
-	self.x_deagle_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_g26_npc()
-	self.g26_npc.sounds.prefix = "g17_npc"
-	self.g26_npc.use_data.selection_index = 1
-	self.g26_npc.DAMAGE = 1
-	self.g26_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.g26_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.g26_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.g26_npc.CLIP_AMMO_MAX = 10
-	self.g26_npc.NR_CLIPS_MAX = 5
-	self.g26_npc.hold = "pistol"
-	self.g26_npc.alert_size = 2500
-	self.g26_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_spas12_npc()
-	self.spas12_npc.sounds.prefix = "spas_npc"
-	self.spas12_npc.use_data.selection_index = 2
-	self.spas12_npc.DAMAGE = 5
-	self.spas12_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.spas12_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
-	self.spas12_npc.auto.fire_rate = 0.14
-	self.spas12_npc.CLIP_AMMO_MAX = 6
-	self.spas12_npc.NR_CLIPS_MAX = 4
-	self.spas12_npc.hold = "rifle"
-	self.spas12_npc.alert_size = 4500
-	self.spas12_npc.suppression = 1.8
-	self.spas12_npc.is_shotgun = true
-end
-
-function WeaponTweakData:_init_data_mg42_npc()
-	self.mg42_npc.sounds.prefix = "mg42_npc"
-	self.mg42_npc.use_data.selection_index = 2
-	self.mg42_npc.DAMAGE = 2
-	self.mg42_npc.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
-	self.mg42_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556_lmg"
-	self.mg42_npc.CLIP_AMMO_MAX = 150
-	self.mg42_npc.NR_CLIPS_MAX = 3
-	self.mg42_npc.auto.fire_rate = 0.08
-	self.mg42_npc.hold = "rifle"
-	self.mg42_npc.alert_size = 5000
-	self.mg42_npc.suppression = 1
-	self.mg42_secondary_npc = deep_clone(self.mg42_npc)
-	self.mg42_secondary_npc.use_data.selection_index = 1
-	self.mg42_secondary_npc.armor_piercing = true
-end
-
-function WeaponTweakData:_init_data_c96_npc()
-	self.c96_npc.sounds.prefix = "c96_npc"
-	self.c96_npc.use_data.selection_index = 1
-	self.c96_npc.DAMAGE = 1
-	self.c96_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.c96_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.c96_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.c96_npc.CLIP_AMMO_MAX = 10
-	self.c96_npc.NR_CLIPS_MAX = 5
-	self.c96_npc.hold = "pistol"
-	self.c96_npc.alert_size = 2500
-	self.c96_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_sterling_npc()
-	self.sterling_npc.sounds.prefix = "sterling_npc"
-	self.sterling_npc.use_data.selection_index = 1
-	self.sterling_npc.DAMAGE = 2
-	self.sterling_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.sterling_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.sterling_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.sterling_npc.CLIP_AMMO_MAX = 20
-	self.sterling_npc.NR_CLIPS_MAX = 5
-	self.sterling_npc.auto.fire_rate = 0.1
-	self.sterling_npc.hold = "pistol"
-	self.sterling_npc.alert_size = 2800
-	self.sterling_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_mosin_npc()
-	self.mosin_npc.sounds.prefix = "nagant_npc"
-	self.mosin_npc.use_data.selection_index = 2
-	self.mosin_npc.DAMAGE = 2
-	self.mosin_npc.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
-	self.mosin_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
-	self.mosin_npc.CLIP_AMMO_MAX = 5
-	self.mosin_npc.NR_CLIPS_MAX = 8
-	self.mosin_npc.auto.fire_rate = 20
-	self.mosin_npc.hold = "rifle"
-	self.mosin_npc.alert_size = 5000
-	self.mosin_npc.suppression = 1
-	self.mosin_secondary_npc = deep_clone(self.mosin_npc)
-	self.mosin_secondary_npc.use_data.selection_index = 1
-end
-
-function WeaponTweakData:_init_data_m1928_npc()
-	self.m1928_npc.sounds.prefix = "m1928_npc"
-	self.m1928_npc.use_data.selection_index = 2
-	self.m1928_npc.DAMAGE = 2
-	self.m1928_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.m1928_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.m1928_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.m1928_npc.CLIP_AMMO_MAX = 50
-	self.m1928_npc.NR_CLIPS_MAX = 3
-	self.m1928_npc.auto.fire_rate = 0.083
-	self.m1928_npc.hold = "rifle"
-	self.m1928_npc.alert_size = 5000
-	self.m1928_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_l85a2_npc()
-	self.l85a2_npc.sounds.prefix = "l85_npc"
-	self.l85a2_npc.use_data.selection_index = 2
-	self.l85a2_npc.DAMAGE = 2
-	self.l85a2_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.l85a2_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.l85a2_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.l85a2_npc.CLIP_AMMO_MAX = 30
-	self.l85a2_npc.NR_CLIPS_MAX = 5
-	self.l85a2_npc.auto.fire_rate = 0.083
-	self.l85a2_npc.hold = "rifle"
-	self.l85a2_npc.alert_size = 5000
-	self.l85a2_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_vhs_npc()
-	self.vhs_npc.sounds.prefix = "vhs_npc"
-	self.vhs_npc.use_data.selection_index = 2
-	self.vhs_npc.DAMAGE = 2
-	self.vhs_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.vhs_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.vhs_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.vhs_npc.CLIP_AMMO_MAX = 30
-	self.vhs_npc.NR_CLIPS_MAX = 5
-	self.vhs_npc.auto.fire_rate = 0.07
-	self.vhs_npc.hold = "rifle"
-	self.vhs_npc.alert_size = 5000
-	self.vhs_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_m134_npc()
-	self.m134_npc.sounds.prefix = "minigun_npc"
-	self.m134_npc.use_data.selection_index = 2
-	self.m134_npc.DAMAGE = 2
-	self.m134_npc.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
-	self.m134_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556_lmg"
-	self.m134_npc.CLIP_AMMO_MAX = 750
-	self.m134_npc.NR_CLIPS_MAX = 1
-	self.m134_npc.auto.fire_rate = 0.05
-	self.m134_npc.hold = "rifle"
-	self.m134_npc.alert_size = 5000
-	self.m134_npc.suppression = 1
-	self.m134_npc.has_fire_animation = true
-	self.m134_npc.animations = {}
-	self.m134_npc.animations.thq_align_anim = "thq"
-	self.m134_secondary_npc = deep_clone(self.m134_npc)
-	self.m134_secondary_npc.use_data.selection_index = 1
-	self.m134_secondary_npc.armor_piercing = true
-end
-
-function WeaponTweakData:_init_data_rpg7_npc()
-	self.rpg7_npc.sounds.prefix = "rpg_npc"
-	self.rpg7_npc.use_data.selection_index = 2
-	self.rpg7_npc.DAMAGE = 2
-	self.rpg7_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.rpg7_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.rpg7_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.rpg7_npc.no_trail = true
-	self.rpg7_npc.CLIP_AMMO_MAX = 1
-	self.rpg7_npc.NR_CLIPS_MAX = 4
-	self.rpg7_npc.auto.fire_rate = 0.1
-	self.rpg7_npc.hold = "rifle"
-	self.rpg7_npc.alert_size = 2800
-	self.rpg7_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_hs2000_npc()
-	self.hs2000_npc.sounds.prefix = "p226r_npc"
-	self.hs2000_npc.use_data.selection_index = 1
-	self.hs2000_npc.DAMAGE = 1
-	self.hs2000_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.hs2000_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.hs2000_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.hs2000_npc.CLIP_AMMO_MAX = 19
-	self.hs2000_npc.NR_CLIPS_MAX = 5
-	self.hs2000_npc.hold = "pistol"
-	self.hs2000_npc.alert_size = 2500
-	self.hs2000_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_cobray_npc()
-	self.cobray_npc.sounds.prefix = "cobray_npc"
-	self.cobray_npc.use_data.selection_index = 1
-	self.cobray_npc.DAMAGE = 2
-	self.cobray_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.cobray_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.cobray_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.cobray_npc.CLIP_AMMO_MAX = 32
-	self.cobray_npc.NR_CLIPS_MAX = 5
-	self.cobray_npc.auto.fire_rate = 0.05
-	self.cobray_npc.hold = "pistol"
-	self.cobray_npc.alert_size = 5000
-	self.cobray_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_b682_npc()
-	self.b682_npc.sounds.prefix = "b682_npc"
-	self.b682_npc.use_data.selection_index = 2
-	self.b682_npc.DAMAGE = 12
-	self.b682_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.b682_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
-	self.b682_npc.CLIP_AMMO_MAX = 2
-	self.b682_npc.NR_CLIPS_MAX = 4
-	self.b682_npc.hold = "rifle"
-	self.b682_npc.alert_size = 4500
-	self.b682_npc.suppression = 1.8
-	self.b682_npc.is_shotgun = true
-end
-
-function WeaponTweakData:_init_data_x_g22c_npc()
-	self.x_g22c_npc.sounds.prefix = "g22_npc"
-	self.x_g22c_npc.use_data.selection_index = 2
-	self.x_g22c_npc.DAMAGE = 1.25
-	self.x_g22c_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.x_g22c_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.x_g22c_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.x_g22c_npc.CLIP_AMMO_MAX = 32
-	self.x_g22c_npc.NR_CLIPS_MAX = 5
-	self.x_g22c_npc.hold = "akimbo_pistol"
-	self.x_g22c_npc.alert_size = 1800
-	self.x_g22c_npc.suppression = 2
-end
-
-function WeaponTweakData:_init_data_x_g17_npc()
-	self.x_g17_npc.sounds.prefix = "g22_npc"
-	self.x_g17_npc.use_data.selection_index = 2
-	self.x_g17_npc.DAMAGE = 1.25
-	self.x_g17_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.x_g17_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.x_g17_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.x_g17_npc.CLIP_AMMO_MAX = 34
-	self.x_g17_npc.NR_CLIPS_MAX = 5
-	self.x_g17_npc.hold = "akimbo_pistol"
-	self.x_g17_npc.alert_size = 1800
-	self.x_g17_npc.suppression = 2
-end
-
-function WeaponTweakData:_init_data_x_usp_npc()
-	self.x_usp_npc.sounds.prefix = "g22_npc"
-	self.x_usp_npc.use_data.selection_index = 2
-	self.x_usp_npc.DAMAGE = 1.25
-	self.x_usp_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.x_usp_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.x_usp_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.x_usp_npc.CLIP_AMMO_MAX = 26
-	self.x_usp_npc.NR_CLIPS_MAX = 5
-	self.x_usp_npc.hold = "akimbo_pistol"
-	self.x_usp_npc.alert_size = 1800
-	self.x_usp_npc.suppression = 2
-end
-
-function WeaponTweakData:_init_data_flamethrower_mk2_npc()
-	self.flamethrower_mk2_npc.sounds.prefix = "flamethrower_npc"
-	self.flamethrower_mk2_npc.sounds.fire = "flamethrower_npc_fire"
-	self.flamethrower_mk2_npc.sounds.stop_fire = "flamethrower_npc_fire_stop"
-	self.flamethrower_mk2_npc.use_data.selection_index = 2
-	self.flamethrower_mk2_npc.DAMAGE = 1
-	self.flamethrower_mk2_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.flamethrower_mk2_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.flamethrower_mk2_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.flamethrower_mk2_npc.CLIP_AMMO_MAX = 300
-	self.flamethrower_mk2_npc.NR_CLIPS_MAX = 4
-	self.flamethrower_mk2_npc.hold = "rifle"
-	self.flamethrower_mk2_npc.auto.fire_rate = 0.05
-	self.flamethrower_mk2_npc.hud_icon = "rifle"
-	self.flamethrower_mk2_npc.alert_size = 2500
-	self.flamethrower_mk2_npc.suppression = 0.45
-end
-
-function WeaponTweakData:_init_data_m32_npc()
-	self.m32_npc.sounds.prefix = "mgl_npc"
-	self.m32_npc.use_data.selection_index = 2
-	self.m32_npc.DAMAGE = 2
-	self.m32_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.m32_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.m32_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.m32_npc.no_trail = true
-	self.m32_npc.CLIP_AMMO_MAX = 6
-	self.m32_npc.NR_CLIPS_MAX = 4
-	self.m32_npc.auto.fire_rate = 0.1
-	self.m32_npc.hold = "rifle"
-	self.m32_npc.alert_size = 2800
-	self.m32_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_aa12_npc()
-	self.aa12_npc.sounds.prefix = "aa12_npc"
-	self.aa12_npc.use_data.selection_index = 2
-	self.aa12_npc.DAMAGE = 5
-	self.aa12_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.aa12_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
-	self.aa12_npc.auto.fire_rate = 0.2
-	self.aa12_npc.CLIP_AMMO_MAX = 8
-	self.aa12_npc.NR_CLIPS_MAX = 4
-	self.aa12_npc.hold = "rifle"
-	self.aa12_npc.alert_size = 4500
-	self.aa12_npc.suppression = 1.8
-	self.aa12_npc.is_shotgun = true
-end
-
-function WeaponTweakData:_init_data_peacemaker_npc()
-	self.peacemaker_npc.sounds.prefix = "pmkr45_npc"
-	self.peacemaker_npc.use_data.selection_index = 1
-	self.peacemaker_npc.DAMAGE = 4
-	self.peacemaker_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.peacemaker_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.peacemaker_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
-	self.peacemaker_npc.CLIP_AMMO_MAX = 6
-	self.peacemaker_npc.NR_CLIPS_MAX = 8
-	self.peacemaker_npc.hold = "pistol"
-	self.peacemaker_npc.alert_size = 5000
-	self.peacemaker_npc.suppression = 1.8
-end
-
-function WeaponTweakData:_init_data_winchester1874_npc()
-	self.winchester1874_npc.sounds.prefix = "m1873_npc"
-	self.winchester1874_npc.use_data.selection_index = 2
-	self.winchester1874_npc.DAMAGE = 2
-	self.winchester1874_npc.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
-	self.winchester1874_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
-	self.winchester1874_npc.CLIP_AMMO_MAX = 15
-	self.winchester1874_npc.NR_CLIPS_MAX = 8
-	self.winchester1874_npc.auto.fire_rate = 20
-	self.winchester1874_npc.hold = "rifle"
-	self.winchester1874_npc.alert_size = 5000
-	self.winchester1874_npc.suppression = 1
-	self.winchester1874_secondary_npc = deep_clone(self.winchester1874_npc)
-	self.winchester1874_secondary_npc.use_data.selection_index = 1
-end
-
-function WeaponTweakData:_init_data_plainsrider_npc()
-	self.plainsrider_npc.sounds.prefix = "bow_npc"
-	self.plainsrider_npc.use_data.selection_index = 2
-	self.plainsrider_npc.use_data.align_place = "left_hand"
-	self.plainsrider_npc.DAMAGE = 2
-	self.plainsrider_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.plainsrider_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.plainsrider_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.plainsrider_npc.no_trail = true
-	self.plainsrider_npc.CLIP_AMMO_MAX = 1
-	self.plainsrider_npc.NR_CLIPS_MAX = 4
-	self.plainsrider_npc.auto.fire_rate = 0.1
-	self.plainsrider_npc.hold = "bow"
-	self.plainsrider_npc.has_fire_animation = true
-	self.plainsrider_npc.alert_size = 2800
-	self.plainsrider_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_mateba_npc()
-	self.mateba_npc.sounds.prefix = "mateba_npc"
-	self.mateba_npc.use_data.selection_index = 1
-	self.mateba_npc.DAMAGE = 4
-	self.mateba_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.mateba_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.mateba_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
-	self.mateba_npc.CLIP_AMMO_MAX = 6
-	self.mateba_npc.NR_CLIPS_MAX = 8
-	self.mateba_npc.hold = "pistol"
-	self.mateba_npc.alert_size = 5000
-	self.mateba_npc.suppression = 1.8
-end
-
-function WeaponTweakData:_init_data_asval_npc()
-	self.asval_npc.sounds.prefix = "val_npc"
-	self.asval_npc.use_data.selection_index = 2
-	self.asval_npc.DAMAGE = 2
-	self.asval_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.asval_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.asval_npc.CLIP_AMMO_MAX = 20
-	self.asval_npc.NR_CLIPS_MAX = 5
-	self.asval_npc.auto.fire_rate = 0.19
-	self.asval_npc.hold = "rifle"
-	self.asval_npc.alert_size = 5000
-	self.asval_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_sub2000_npc()
-	self.sub2000_npc.sounds.prefix = "sub2k_npc"
-	self.sub2000_npc.use_data.selection_index = 2
-	self.sub2000_npc.DAMAGE = 4
-	self.sub2000_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.sub2000_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.sub2000_npc.CLIP_AMMO_MAX = 33
-	self.sub2000_npc.NR_CLIPS_MAX = 8
-	self.sub2000_npc.auto.fire_rate = 0.2
-	self.sub2000_npc.hold = "rifle"
-	self.sub2000_npc.alert_size = 5000
-	self.sub2000_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_wa2000_npc()
-	self.wa2000_npc.sounds.prefix = "lakner_npc"
-	self.wa2000_npc.use_data.selection_index = 2
-	self.wa2000_npc.DAMAGE = 2
-	self.wa2000_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.wa2000_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.wa2000_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.wa2000_npc.CLIP_AMMO_MAX = 10
-	self.wa2000_npc.NR_CLIPS_MAX = 5
-	self.wa2000_npc.auto.fire_rate = 0.5
-	self.wa2000_npc.hold = "rifle"
-	self.wa2000_npc.alert_size = 5000
-	self.wa2000_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_polymer_npc()
-	self.polymer_npc.sounds.prefix = "polymer_npc"
-	self.polymer_npc.use_data.selection_index = 1
-	self.polymer_npc.DAMAGE = 2
-	self.polymer_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.polymer_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.polymer_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.polymer_npc.CLIP_AMMO_MAX = 30
-	self.polymer_npc.NR_CLIPS_MAX = 5
-	self.polymer_npc.auto.fire_rate = 0.05
-	self.polymer_npc.hold = "pistol"
-	self.polymer_npc.alert_size = 5000
-	self.polymer_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_hunter_npc()
-	self.hunter_npc.sounds.prefix = "hunter_npc"
-	self.hunter_npc.use_data.selection_index = 1
-	self.hunter_npc.DAMAGE = 2
-	self.hunter_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.hunter_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.hunter_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
-	self.hunter_npc.CLIP_AMMO_MAX = 1
-	self.hunter_npc.NR_CLIPS_MAX = 5
-	self.hunter_npc.auto.fire_rate = 20
-	self.hunter_npc.hold = "pistol"
-	self.hunter_npc.alert_size = 5000
-	self.hunter_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_baka_npc()
-	self.baka_npc.sounds.prefix = "baka_npc"
-	self.baka_npc.use_data.selection_index = 1
-	self.baka_npc.DAMAGE = 2
-	self.baka_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.baka_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.baka_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.baka_npc.CLIP_AMMO_MAX = 32
-	self.baka_npc.NR_CLIPS_MAX = 5
-	self.baka_npc.auto.fire_rate = 0.05
-	self.baka_npc.hold = "pistol"
-	self.baka_npc.alert_size = 5000
-	self.baka_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_arblast_npc()
-	self.arblast_npc.sounds.prefix = "arblast_npc"
-	self.arblast_npc.use_data.selection_index = 2
-	self.arblast_npc.DAMAGE = 2
-	self.arblast_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.arblast_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.arblast_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
-	self.arblast_npc.CLIP_AMMO_MAX = 1
-	self.arblast_npc.NR_CLIPS_MAX = 5
-	self.arblast_npc.auto.fire_rate = 20
-	self.arblast_npc.hold = "rifle"
-	self.arblast_npc.alert_size = 5000
-	self.arblast_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_frankish_npc()
-	self.frankish_npc.sounds.prefix = "frankish_npc"
-	self.frankish_npc.use_data.selection_index = 2
-	self.frankish_npc.DAMAGE = 2
-	self.frankish_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.frankish_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.frankish_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
-	self.frankish_npc.CLIP_AMMO_MAX = 1
-	self.frankish_npc.NR_CLIPS_MAX = 5
-	self.frankish_npc.auto.fire_rate = 20
-	self.frankish_npc.hold = "rifle"
-	self.frankish_npc.alert_size = 5000
-	self.frankish_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_long_npc()
-	self.long_npc.sounds.prefix = "bow_npc"
-	self.long_npc.use_data.selection_index = 2
-	self.long_npc.use_data.align_place = "left_hand"
-	self.long_npc.DAMAGE = 2
-	self.long_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.long_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.long_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.long_npc.no_trail = true
-	self.long_npc.CLIP_AMMO_MAX = 1
-	self.long_npc.NR_CLIPS_MAX = 4
-	self.long_npc.auto.fire_rate = 0.1
-	self.long_npc.hold = "bow"
-	self.long_npc.has_fire_animation = true
-	self.long_npc.alert_size = 2800
-	self.long_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_par_npc()
-	self.par_npc.sounds.prefix = "svinet_npc"
-	self.par_npc.use_data.selection_index = 2
-	self.par_npc.DAMAGE = 2
-	self.par_npc.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
-	self.par_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556_lmg"
-	self.par_npc.CLIP_AMMO_MAX = 200
-	self.par_npc.NR_CLIPS_MAX = 2
-	self.par_npc.auto.fire_rate = 0.08
-	self.par_npc.hold = "rifle"
-	self.par_npc.alert_size = 5000
-	self.par_npc.suppression = 1
-	self.par_secondary_npc = deep_clone(self.par_npc)
-	self.par_secondary_npc.use_data.selection_index = 1
-	self.par_secondary_npc.armor_piercing = true
-end
-
-function WeaponTweakData:_init_data_sparrow_npc()
-	self.sparrow_npc.sounds.prefix = "sparrow_npc"
-	self.sparrow_npc.use_data.selection_index = 1
-	self.sparrow_npc.DAMAGE = 1
-	self.sparrow_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.sparrow_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.sparrow_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.sparrow_npc.CLIP_AMMO_MAX = 12
-	self.sparrow_npc.NR_CLIPS_MAX = 5
-	self.sparrow_npc.hold = "pistol"
-	self.sparrow_npc.alert_size = 2500
-	self.sparrow_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_model70_npc()
-	self.model70_npc.sounds.prefix = "model70_npc"
-	self.model70_npc.use_data.selection_index = 2
-	self.model70_npc.DAMAGE = 2
-	self.model70_npc.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
-	self.model70_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
-	self.model70_npc.CLIP_AMMO_MAX = 5
-	self.model70_npc.NR_CLIPS_MAX = 8
-	self.model70_npc.auto.fire_rate = 20
-	self.model70_npc.hold = "rifle"
-	self.model70_npc.alert_size = 5000
-	self.model70_npc.suppression = 1
-	self.model70_secondary_npc = deep_clone(self.model70_npc)
-	self.model70_secondary_npc.use_data.selection_index = 1
-end
-
-function WeaponTweakData:_init_data_m37_npc()
-	self.m37_npc.sounds.prefix = "m37_npc"
-	self.m37_npc.use_data.selection_index = 1
-	self.m37_npc.DAMAGE = 5
-	self.m37_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.m37_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_slug"
-	self.m37_npc.auto.fire_rate = 0.14
-	self.m37_npc.CLIP_AMMO_MAX = 7
-	self.m37_npc.NR_CLIPS_MAX = 6
-	self.m37_npc.hold = "rifle"
-	self.m37_npc.alert_size = 4500
-	self.m37_npc.suppression = 1.8
-	self.m37_npc.is_shotgun = true
-end
-
-function WeaponTweakData:_init_data_china_npc()
-	self.china_npc.sounds.prefix = "china_npc"
-	self.china_npc.use_data.selection_index = 1
-	self.china_npc.DAMAGE = 2
-	self.china_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.china_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.china_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.china_npc.no_trail = true
-	self.china_npc.CLIP_AMMO_MAX = 3
-	self.china_npc.NR_CLIPS_MAX = 2
-	self.china_npc.auto.fire_rate = 0.1
-	self.china_npc.hold = "rifle"
-	self.china_npc.alert_size = 2800
-	self.china_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_sr2_npc()
-	self.sr2_npc.sounds.prefix = "sr2_npc"
-	self.sr2_npc.use_data.selection_index = 1
-	self.sr2_npc.DAMAGE = 2
-	self.sr2_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.sr2_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.sr2_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.sr2_npc.CLIP_AMMO_MAX = 32
-	self.sr2_npc.NR_CLIPS_MAX = 5
-	self.sr2_npc.auto.fire_rate = 0.08
-	self.sr2_npc.hold = "pistol"
-	self.sr2_npc.alert_size = 5000
-	self.sr2_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_x_sr2_npc()
-	self.x_sr2_npc.sounds.prefix = "sr2_x_npc"
-	self.x_sr2_npc.use_data.selection_index = 2
-	self.x_sr2_npc.DAMAGE = 1.25
-	self.x_sr2_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.x_sr2_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.x_sr2_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.x_sr2_npc.CLIP_AMMO_MAX = 64
-	self.x_sr2_npc.NR_CLIPS_MAX = 5
-	self.x_sr2_npc.hold = "akimbo_pistol"
-	self.x_sr2_npc.alert_size = 1800
-	self.x_sr2_npc.suppression = 2
-end
-
-function WeaponTweakData:_init_data_pl14_npc()
-	self.pl14_npc.sounds.prefix = "pl14_npc"
-	self.pl14_npc.use_data.selection_index = 1
-	self.pl14_npc.DAMAGE = 1
-	self.pl14_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.pl14_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.pl14_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.pl14_npc.CLIP_AMMO_MAX = 12
-	self.pl14_npc.NR_CLIPS_MAX = 5
-	self.pl14_npc.hold = "pistol"
-	self.pl14_npc.alert_size = 2500
-	self.pl14_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_x_mp5_npc()
-	self.x_mp5_npc.sounds.prefix = "mp5_x_npc"
-	self.x_mp5_npc.use_data.selection_index = 2
-	self.x_mp5_npc.DAMAGE = 1.25
-	self.x_mp5_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.x_mp5_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.x_mp5_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.x_mp5_npc.CLIP_AMMO_MAX = 60
-	self.x_mp5_npc.NR_CLIPS_MAX = 5
-	self.x_mp5_npc.hold = "akimbo_pistol"
-	self.x_mp5_npc.alert_size = 1800
-	self.x_mp5_npc.suppression = 2
-end
-
-function WeaponTweakData:_init_data_x_akmsu_npc()
-	self.x_akmsu_npc.sounds.prefix = "akmsu_x_npc"
-	self.x_akmsu_npc.use_data.selection_index = 2
-	self.x_akmsu_npc.DAMAGE = 1.25
-	self.x_akmsu_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.x_akmsu_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.x_akmsu_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.x_akmsu_npc.CLIP_AMMO_MAX = 60
-	self.x_akmsu_npc.NR_CLIPS_MAX = 5
-	self.x_akmsu_npc.hold = "akimbo_pistol"
-	self.x_akmsu_npc.alert_size = 1800
-	self.x_akmsu_npc.suppression = 2
-end
-
-function WeaponTweakData:_init_data_tecci_npc()
-	self.tecci_npc.sounds.prefix = "tecci_npc"
-	self.tecci_npc.use_data.selection_index = 2
-	self.tecci_npc.DAMAGE = 2
-	self.tecci_npc.muzzleflash = "effects/payday2/particles/weapons/556_auto"
-	self.tecci_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.tecci_npc.CLIP_AMMO_MAX = 100
-	self.tecci_npc.NR_CLIPS_MAX = 5
-	self.tecci_npc.auto.fire_rate = 0.15
-	self.tecci_npc.hold = "rifle"
-	self.tecci_npc.alert_size = 5000
-	self.tecci_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_hajk_npc()
-	self.hajk_npc.sounds.prefix = "hajk_npc"
-	self.hajk_npc.use_data.selection_index = 1
-	self.hajk_npc.DAMAGE = 1.5
-	self.hajk_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.hajk_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.hajk_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.hajk_npc.CLIP_AMMO_MAX = 30
-	self.hajk_npc.NR_CLIPS_MAX = 5
-	self.hajk_npc.auto.fire_rate = 0.115
-	self.hajk_npc.hold = "rifle"
-	self.hajk_npc.alert_size = 1000
-	self.hajk_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_boot_npc()
-	self.boot_npc.sounds.prefix = "boot_npc"
-	self.boot_npc.use_data.selection_index = 2
-	self.boot_npc.DAMAGE = 1.5
-	self.boot_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.boot_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.boot_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.boot_npc.CLIP_AMMO_MAX = 7
-	self.boot_npc.NR_CLIPS_MAX = 5
-	self.boot_npc.auto.fire_rate = 0.115
-	self.boot_npc.hold = "rifle"
-	self.boot_npc.alert_size = 1000
-	self.boot_npc.suppression = 1
-	self.boot_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_packrat_npc()
-	self.packrat_npc.sounds.prefix = "packrat_npc"
-	self.packrat_npc.use_data.selection_index = 1
-	self.packrat_npc.DAMAGE = 1
-	self.packrat_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.packrat_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.packrat_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.packrat_npc.CLIP_AMMO_MAX = 15
-	self.packrat_npc.NR_CLIPS_MAX = 5
-	self.packrat_npc.hold = "pistol"
-	self.packrat_npc.alert_size = 2500
-	self.packrat_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_schakal_npc()
-	self.schakal_npc.sounds.prefix = "schakal_npc"
-	self.schakal_npc.use_data.selection_index = 1
-	self.schakal_npc.DAMAGE = 2
-	self.schakal_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.schakal_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.schakal_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.schakal_npc.CLIP_AMMO_MAX = 30
-	self.schakal_npc.NR_CLIPS_MAX = 5
-	self.schakal_npc.auto.fire_rate = 0.092
-	self.schakal_npc.hold = "rifle"
-	self.schakal_npc.alert_size = 5000
-	self.schakal_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_desertfox_npc()
-	self.desertfox_npc.sounds.prefix = "desertfox_npc"
-	self.desertfox_npc.use_data.selection_index = 2
-	self.desertfox_npc.DAMAGE = 2
-	self.desertfox_npc.muzzleflash = "effects/payday2/particles/weapons/big_762_auto"
-	self.desertfox_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_sniper"
-	self.desertfox_npc.CLIP_AMMO_MAX = 5
-	self.desertfox_npc.NR_CLIPS_MAX = 8
-	self.desertfox_npc.auto.fire_rate = 20
-	self.desertfox_npc.hold = "rifle"
-	self.desertfox_npc.alert_size = 5000
-	self.desertfox_npc.suppression = 1
-	self.desertfox_secondary_npc = deep_clone(self.desertfox_npc)
-	self.desertfox_secondary_npc.use_data.selection_index = 1
-end
-
-function WeaponTweakData:_init_data_x_packrat_npc()
-	self.x_packrat_npc.sounds.prefix = "packrat_npc"
-	self.x_packrat_npc.use_data.selection_index = 2
-	self.x_packrat_npc.DAMAGE = 1
-	self.x_packrat_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.x_packrat_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.x_packrat_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.x_packrat_npc.CLIP_AMMO_MAX = 30
-	self.x_packrat_npc.NR_CLIPS_MAX = 5
-	self.x_packrat_npc.hold = "akimbo_pistol"
-	self.x_packrat_npc.alert_size = 2500
-	self.x_packrat_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_rota_npc()
-	self.rota_npc.sounds.prefix = "rota_npc"
-	self.rota_npc.use_data.selection_index = 1
-	self.rota_npc.DAMAGE = 5
-	self.rota_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.rota_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_empty"
-	self.rota_npc.auto.fire_rate = 0.14
-	self.rota_npc.CLIP_AMMO_MAX = 6
-	self.rota_npc.NR_CLIPS_MAX = 6
-	self.rota_npc.hold = "rifle"
-	self.rota_npc.alert_size = 4500
-	self.rota_npc.suppression = 1.8
-	self.rota_npc.is_shotgun = true
-end
-
-function WeaponTweakData:_init_data_arbiter_npc()
-	self.arbiter_npc.sounds.prefix = "mgl_npc"
-	self.arbiter_npc.use_data.selection_index = 1
-	self.arbiter_npc.DAMAGE = 2
-	self.arbiter_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.arbiter_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.arbiter_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.arbiter_npc.no_trail = true
-	self.arbiter_npc.CLIP_AMMO_MAX = 5
-	self.arbiter_npc.NR_CLIPS_MAX = 4
-	self.arbiter_npc.auto.fire_rate = 0.1
-	self.arbiter_npc.hold = "rifle"
-	self.arbiter_npc.alert_size = 2800
-	self.arbiter_npc.suppression = 1
 end
 
 function WeaponTweakData:_init_data_contraband_npc()
@@ -2330,97 +798,6 @@ function WeaponTweakData:_init_data_contraband_npc()
 	self.contraband_m203_npc.hold = "rifle"
 	self.contraband_m203_npc.alert_size = 2800
 	self.contraband_m203_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_ray_npc()
-	self.ray_npc.sounds.prefix = "ray_npc"
-	self.ray_npc.use_data.selection_index = 1
-	self.ray_npc.DAMAGE = 2
-	self.ray_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.ray_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.ray_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.ray_npc.no_trail = true
-	self.ray_npc.CLIP_AMMO_MAX = 4
-	self.ray_npc.NR_CLIPS_MAX = 1
-	self.ray_npc.auto.fire_rate = 0.1
-	self.ray_npc.hold = "rifle"
-	self.ray_npc.animations = {}
-	self.ray_npc.animations.thq_align_anim = "thq"
-	self.ray_npc.alert_size = 2800
-	self.ray_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_tti_npc()
-	self.tti_npc.sounds.prefix = "tti_npc"
-	self.tti_npc.use_data.selection_index = 2
-	self.tti_npc.DAMAGE = 2
-	self.tti_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.tti_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.tti_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.tti_npc.CLIP_AMMO_MAX = 20
-	self.tti_npc.NR_CLIPS_MAX = 5
-	self.tti_npc.auto.fire_rate = 0.5
-	self.tti_npc.hold = "rifle"
-	self.tti_npc.alert_size = 5000
-	self.tti_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_siltstone_npc()
-	self.siltstone_npc.sounds.prefix = "siltstone_npc"
-	self.siltstone_npc.use_data.selection_index = 2
-	self.siltstone_npc.DAMAGE = 2
-	self.siltstone_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.siltstone_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.siltstone_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.siltstone_npc.CLIP_AMMO_MAX = 10
-	self.siltstone_npc.NR_CLIPS_MAX = 4
-	self.siltstone_npc.auto.fire_rate = 0.5
-	self.siltstone_npc.hold = "rifle"
-	self.siltstone_npc.alert_size = 5000
-	self.siltstone_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_flint_npc()
-	self.flint_npc.sounds.prefix = "flint_npc"
-	self.flint_npc.use_data.selection_index = 2
-	self.flint_npc.DAMAGE = 2
-	self.flint_npc.muzzleflash = "effects/payday2/particles/weapons/762_auto"
-	self.flint_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_556"
-	self.flint_npc.CLIP_AMMO_MAX = 35
-	self.flint_npc.NR_CLIPS_MAX = 5
-	self.flint_npc.auto.fire_rate = 0.19
-	self.flint_npc.hold = "rifle"
-	self.flint_npc.alert_size = 5000
-	self.flint_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_coal_npc()
-	self.coal_npc.sounds.prefix = "coal_npc"
-	self.coal_npc.use_data.selection_index = 1
-	self.coal_npc.DAMAGE = 2
-	self.coal_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.coal_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.coal_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.coal_npc.CLIP_AMMO_MAX = 64
-	self.coal_npc.NR_CLIPS_MAX = 5
-	self.coal_npc.auto.fire_rate = 0.092
-	self.coal_npc.hold = "rifle"
-	self.coal_npc.alert_size = 5000
-	self.coal_npc.suppression = 1
-end
-
-function WeaponTweakData:_init_data_lemming_npc()
-	self.lemming_npc.sounds.prefix = "lemming_npc"
-	self.lemming_npc.use_data.selection_index = 1
-	self.lemming_npc.DAMAGE = 1
-	self.lemming_npc.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.lemming_npc.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.lemming_npc.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.lemming_npc.CLIP_AMMO_MAX = 10
-	self.lemming_npc.NR_CLIPS_MAX = 5
-	self.lemming_npc.hold = "pistol"
-	self.lemming_npc.alert_size = 2500
-	self.lemming_npc.suppression = 1
 end
 
 function WeaponTweakData:_init_data_c45_crew()
@@ -2518,7 +895,6 @@ function WeaponTweakData:_init_data_m4_crew()
 	self.m4_secondary_crew = deep_clone(self.m4_crew)
 	self.m4_secondary_crew.use_data.selection_index = 1
 	self.ak47_ass_crew = deep_clone(self.m4_crew)
-	self.sg417_crew = deep_clone(self.m4_crew)
 end
 
 function WeaponTweakData:_init_data_ak47_crew()
@@ -2591,27 +967,6 @@ function WeaponTweakData:_init_data_mp5_crew()
 	self.mp5_crew.hold = "rifle"
 	self.mp5_crew.alert_size = 2500
 	self.mp5_crew.suppression = 1
-	self.mp5_tactical_crew = deep_clone(self.mp5_crew)
-	self.mp5_tactical_crew.has_suppressor = "suppressed_a"
-	self.ump_crew = deep_clone(self.mp5_crew)
-	self.akmsu_smg_crew = deep_clone(self.mp5_crew)
-	self.asval_smg_crew = deep_clone(self.mp5_crew)
-	self.asval_smg_crew.has_suppressor = "suppressed_a"
-end
-
-function WeaponTweakData:_init_data_mac11_crew()
-	self.mac11_crew.sounds.prefix = "mp5_npc"
-	self.mac11_crew.use_data.selection_index = 1
-	self.mac11_crew.DAMAGE = 1
-	self.mac11_crew.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.mac11_crew.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.mac11_crew.shell_ejection = "effects/payday2/particles/weapons/shells/shell_9mm"
-	self.mac11_crew.CLIP_AMMO_MAX = 40
-	self.mac11_crew.NR_CLIPS_MAX = 5
-	self.mac11_crew.auto.fire_rate = 0.06
-	self.mac11_crew.hold = "pistol"
-	self.mac11_crew.alert_size = 2500
-	self.mac11_crew.suppression = 1
 end
 
 function WeaponTweakData:_init_data_g36_crew()
@@ -2655,7 +1010,6 @@ function WeaponTweakData:_init_data_mp9_crew()
 	self.mp9_crew.hold = "pistol"
 	self.mp9_crew.alert_size = 1000
 	self.mp9_crew.suppression = 1
-	self.sr2_smg_crew = deep_clone(self.mp9_crew)
 end
 
 function WeaponTweakData:_init_data_olympic_crew()
@@ -2900,55 +1254,6 @@ function WeaponTweakData:_init_data_saw_crew()
 	self.saw_secondary_crew.use_data.selection_index = 1
 end
 
-function WeaponTweakData:_init_data_sentry_gun_crew()
-	self.sentry_gun.name_id = "debug_sentry_gun"
-	self.sentry_gun.DAMAGE = 3
-	self.sentry_gun.SUPPRESSION = 1
-	self.sentry_gun.SPREAD = 5
-	self.sentry_gun.FIRE_RANGE = 5000
-	self.sentry_gun.muzzleflash = "effects/payday2/particles/weapons/9mm_auto"
-	self.sentry_gun.muzzleflash_silenced = "effects/payday2/particles/weapons/9mm_auto_silence"
-	self.sentry_gun.auto.fire_rate = 0.15
-	self.sentry_gun.alert_size = 2500
-	self.sentry_gun.BAG_DMG_MUL = 0.25
-	self.sentry_gun.SHIELD_DMG_MUL = 0
-	self.sentry_gun.DEATH_VERIFICATION = {0.4, 0.75}
-	self.sentry_gun.DETECTION_RANGE = self.sentry_gun.FIRE_RANGE
-	self.sentry_gun.KEEP_FIRE_ANGLE = 0.8
-	self.sentry_gun.DETECTION_DELAY = {
-		{600, 0.1},
-		{
-			self.sentry_gun.DETECTION_RANGE,
-			0.5
-		}
-	}
-	self.sentry_gun.MAX_VEL_SPIN = 120
-	self.sentry_gun.MIN_VEL_SPIN = self.sentry_gun.MAX_VEL_SPIN * 0.05
-	self.sentry_gun.SLOWDOWN_ANGLE_SPIN = 30
-	self.sentry_gun.ACC_SPIN = self.sentry_gun.MAX_VEL_SPIN * 5
-	self.sentry_gun.MAX_VEL_PITCH = 100
-	self.sentry_gun.MIN_VEL_PITCH = self.sentry_gun.MAX_VEL_PITCH * 0.05
-	self.sentry_gun.SLOWDOWN_ANGLE_PITCH = 20
-	self.sentry_gun.ACC_PITCH = self.sentry_gun.MAX_VEL_PITCH * 5
-	self.sentry_gun.recoil = {}
-	self.sentry_gun.recoil.horizontal = {
-		2,
-		3,
-		0,
-		3
-	}
-	self.sentry_gun.recoil.vertical = {
-		1,
-		2,
-		0,
-		4
-	}
-	self.sentry_gun.challenges = {}
-	self.sentry_gun.challenges.group = "sentry_gun"
-	self.sentry_gun.challenges.weapon = "sentry_gun"
-	self.sentry_gun.suppression = 0.8
-end
-
 function WeaponTweakData:_init_data_usp_crew()
 	self.usp_crew.sounds.prefix = "usp45_npc"
 	self.usp_crew.use_data.selection_index = 1
@@ -3065,8 +1370,6 @@ function WeaponTweakData:_init_data_scar_crew()
 	self.scar_crew.hold = "rifle"
 	self.scar_crew.alert_size = 5000
 	self.scar_crew.suppression = 1
-	self.scar_secondary_crew = deep_clone(self.scar_crew)
-	self.scar_secondary_crew.use_data.selection_index = 1
 end
 
 function WeaponTweakData:_init_data_p226_crew()
@@ -3095,8 +1398,6 @@ function WeaponTweakData:_init_data_hk21_crew()
 	self.hk21_crew.hold = "rifle"
 	self.hk21_crew.alert_size = 5000
 	self.hk21_crew.suppression = 1
-	self.hk21_secondary_crew = deep_clone(self.hk21_crew)
-	self.hk21_secondary_crew.use_data.selection_index = 1
 end
 
 function WeaponTweakData:_init_data_m249_crew()
@@ -3111,7 +1412,6 @@ function WeaponTweakData:_init_data_m249_crew()
 	self.m249_crew.hold = "rifle"
 	self.m249_crew.alert_size = 5000
 	self.m249_crew.suppression = 1
-	self.rpk_lmg_crew = deep_clone(self.m249_crew)
 end
 
 function WeaponTweakData:_init_data_rpk_crew()
@@ -3126,8 +1426,6 @@ function WeaponTweakData:_init_data_rpk_crew()
 	self.rpk_crew.hold = "rifle"
 	self.rpk_crew.alert_size = 5000
 	self.rpk_crew.suppression = 1
-	self.rpk_secondary_crew = deep_clone(self.rpk_crew)
-	self.rpk_secondary_crew.use_data.selection_index = 1
 end
 
 function WeaponTweakData:_init_data_m95_crew()
@@ -3142,8 +1440,6 @@ function WeaponTweakData:_init_data_m95_crew()
 	self.m95_crew.hold = "rifle"
 	self.m95_crew.alert_size = 5000
 	self.m95_crew.suppression = 1
-	self.m95_secondary_crew = deep_clone(self.m95_crew)
-	self.m95_secondary_crew.use_data.selection_index = 1
 end
 
 function WeaponTweakData:_init_data_msr_crew()
@@ -3158,8 +1454,6 @@ function WeaponTweakData:_init_data_msr_crew()
 	self.msr_crew.hold = "rifle"
 	self.msr_crew.alert_size = 5000
 	self.msr_crew.suppression = 1
-	self.msr_secondary_crew = deep_clone(self.msr_crew)
-	self.msr_secondary_crew.use_data.selection_index = 1
 end
 
 function WeaponTweakData:_init_data_r93_crew()
@@ -3174,8 +1468,6 @@ function WeaponTweakData:_init_data_r93_crew()
 	self.r93_crew.hold = "rifle"
 	self.r93_crew.alert_size = 5000
 	self.r93_crew.suppression = 1
-	self.r93_secondary_crew = deep_clone(self.r93_crew)
-	self.r93_secondary_crew.use_data.selection_index = 1
 end
 
 function WeaponTweakData:_init_data_fal_crew()
@@ -3190,8 +1482,6 @@ function WeaponTweakData:_init_data_fal_crew()
 	self.fal_crew.hold = "rifle"
 	self.fal_crew.alert_size = 5000
 	self.fal_crew.suppression = 1
-	self.fal_secondary_crew = deep_clone(self.fal_crew)
-	self.fal_secondary_crew.use_data.selection_index = 1
 end
 
 function WeaponTweakData:_init_data_ben_crew()
@@ -3549,9 +1839,6 @@ function WeaponTweakData:_init_data_m134_crew()
 	self.m134_crew.has_fire_animation = true
 	self.m134_crew.animations = {}
 	self.m134_crew.animations.thq_align_anim = "thq"
-	self.m134_secondary_crew = deep_clone(self.m134_crew)
-	self.m134_secondary_crew.use_data.selection_index = 1
-	self.m134_secondary_crew.armor_piercing = true
 end
 
 function WeaponTweakData:_init_data_rpg7_crew()
@@ -15715,26 +14002,22 @@ function WeaponTweakData:_create_table_structure()
 		sounds = {},
 		use_data = {}
 	}
-	self.colt_1911_primary_npc = deep_clone(self.c45_npc)
 	self.beretta92_npc = {
 		usage = "beretta92",
 		sounds = {},
 		use_data = {}
 	}
-	self.beretta92_primary_npc = deep_clone(self.beretta92_npc)
 	self.raging_bull_npc = {
 		usage = "raging_bull",
 		sounds = {},
 		use_data = {}
 	}
-	self.raging_bull_primary_npc = deep_clone(self.raging_bull_npc)
 	self.m4_npc = {
 		usage = "m4",
 		sounds = {},
 		use_data = {},
 		auto = {}
 	}
-	self.m4_secondary_npc = deep_clone(self.m4_npc)
 	self.m14_npc = {
 		usage = "m4",
 		sounds = {},
@@ -15786,7 +14069,6 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
-	self.glock_18c_primary_npc = deep_clone(self.glock_18_npc)
 	self.ak47_npc = {
 		usage = "ak47",
 		sounds = {},
@@ -15799,97 +14081,11 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
-	self.g17_npc = {
-		usage = "c45",
-		sounds = {},
-		use_data = {}
-	}
 	self.mp9_npc = {
 		usage = "mp5",
 		sounds = {},
 		use_data = {},
 		auto = {}
-	}
-	self.olympic_npc = {
-		usage = "mp5",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.olympic_primary_npc = deep_clone(self.olympic_npc)
-	self.m16_npc = {
-		usage = "m4",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.aug_npc = {
-		usage = "m4",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.aug_secondary_npc = deep_clone(self.aug_npc)
-	self.ak74_npc = {
-		usage = "ak47",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.ak74_secondary_npc = deep_clone(self.ak74_npc)
-	self.ak5_npc = {
-		usage = "m4",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.p90_npc = {
-		usage = "mp5",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.amcar_npc = {
-		usage = "m4",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.mac10_npc = {
-		usage = "mp5",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.akmsu_npc = {
-		usage = "m4",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.akmsu_primary_npc = deep_clone(self.akmsu_npc)
-	self.akm_npc = {
-		usage = "m4",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.akm_gold_npc = {
-		usage = "m4",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.deagle_npc = {
-		usage = "raging_bull",
-		sounds = {},
-		use_data = {}
-	}
-	self.deagle_primary_npc = deep_clone(self.deagle_npc)
-	self.serbu_npc = {
-		usage = "r870",
-		sounds = {},
-		use_data = {}
 	}
 	self.saiga_npc = {
 		usage = "saiga",
@@ -15897,17 +14093,6 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
-	self.huntsman_npc = {
-		usage = "r870",
-		sounds = {},
-		use_data = {}
-	}
-	self.saw_npc = {
-		usage = "mp5",
-		sounds = {},
-		use_data = {}
-	}
-	self.saw_secondary_npc = deep_clone(self.saw_npc)
 	self.sentry_gun = {
 		sounds = {},
 		auto = {}
@@ -15920,57 +14105,14 @@ function WeaponTweakData:_create_table_structure()
 		sounds = {},
 		auto = {}
 	}
-	self.usp_npc = {
-		usage = "c45",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.g22c_npc = {
-		usage = "c45",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.judge_npc = {
-		usage = "c45",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.m45_npc = {
-		usage = "mp5",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
 	self.s552_npc = {
 		usage = "m4",
 		sounds = {},
 		use_data = {},
 		auto = {}
 	}
-	self.s552_secondary_npc = deep_clone(self.s552_npc)
-	self.ppk_npc = {
-		usage = "c45",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.mp7_npc = {
-		usage = "c45",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
 	self.scar_npc = {
 		usage = "m4",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.p226_npc = {
-		usage = "c45",
 		sounds = {},
 		use_data = {},
 		auto = {}
@@ -15987,432 +14129,6 @@ function WeaponTweakData:_create_table_structure()
 		use_data = {},
 		auto = {}
 	}
-	self.rpk_npc = {
-		usage = "ak47",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.m95_npc = {
-		usage = "rifle",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.msr_npc = {
-		usage = "rifle",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.r93_npc = {
-		usage = "rifle",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.fal_npc = {
-		usage = "ak47",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.ben_npc = {
-		usage = "r870",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.striker_npc = {
-		usage = "ak47",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.ksg_npc = {
-		usage = "r870",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.gre_m79_npc = {
-		usage = "r870",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.g3_npc = {
-		usage = "ak47",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.galil_npc = {
-		usage = "ak47",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.famas_npc = {
-		usage = "ak47",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.scorpion_npc = {
-		usage = "c45",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.tec9_npc = {
-		usage = "c45",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.uzi_npc = {
-		usage = "c45",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.jowi_npc = {
-		usage = "akimbo_pistol",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.x_1911_npc = {
-		usage = "akimbo_pistol",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.x_b92fs_npc = {
-		usage = "akimbo_pistol",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.x_deagle_npc = {
-		usage = "akimbo_pistol",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.g26_npc = {
-		usage = "c45",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.spas12_npc = {
-		usage = "r870",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.mg42_npc = {
-		usage = "ak47",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.c96_npc = {
-		usage = "c45",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.sterling_npc = {
-		usage = "mp5",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.mosin_npc = {
-		usage = "rifle",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.m1928_npc = {
-		usage = "mp5",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.l85a2_npc = {
-		usage = "ak47",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.hs2000_npc = {
-		usage = "c45",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.vhs_npc = {
-		usage = "ak47",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.m134_npc = {
-		usage = "ak47",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.rpg7_npc = {
-		usage = "rifle",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.cobray_npc = {
-		usage = "mp5",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.b682_npc = {
-		usage = "r870",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.x_g22c_npc = {
-		usage = "akimbo_pistol",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.x_g17_npc = {
-		usage = "akimbo_pistol",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.x_usp_npc = {
-		usage = "akimbo_pistol",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.flamethrower_mk2_npc = {
-		usage = "ak47",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.m32_npc = {
-		usage = "rifle",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.aa12_npc = {
-		usage = "saiga",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.peacemaker_npc = {
-		usage = "c45",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.winchester1874_npc = {
-		usage = "rifle",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.plainsrider_npc = {
-		usage = "bow",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.mateba_npc = {
-		usage = "c45",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.asval_npc = {
-		usage = "ak47",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.sub2000_npc = {
-		usage = "rifle",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.wa2000_npc = {
-		usage = "rifle",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.polymer_npc = {
-		usage = "mp5",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.hunter_npc = {
-		usage = "mp5",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.baka_npc = {
-		usage = "mp5",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.arblast_npc = {
-		usage = "rifle",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.frankish_npc = {
-		usage = "rifle",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.long_npc = {
-		usage = "bow",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.par_npc = {
-		usage = "ak47",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.sparrow_npc = {
-		usage = "c45",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.model70_npc = {
-		usage = "rifle",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.m37_npc = {
-		usage = "ak47",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.china_npc = {
-		usage = "r870",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.sr2_npc = {
-		usage = "mp5",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.x_sr2_npc = {
-		usage = "akimbo_pistol",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.pl14_npc = {
-		usage = "c45",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.x_mp5_npc = {
-		usage = "akimbo_pistol",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.x_akmsu_npc = {
-		usage = "akimbo_pistol",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.tecci_npc = {
-		usage = "m4",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.hajk_npc = {
-		usage = "m4",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.boot_npc = {
-		usage = "r870",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.packrat_npc = {
-		usage = "c45",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.schakal_npc = {
-		usage = "mp5",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.desertfox_npc = {
-		usage = "rifle",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.x_packrat_npc = {
-		usage = "akimbo_pistol",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.rota_npc = {
-		usage = "saiga",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.arbiter_npc = {
-		usage = "r870",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
 	self.contraband_npc = {
 		usage = "m4",
 		sounds = {},
@@ -16421,42 +14137,6 @@ function WeaponTweakData:_create_table_structure()
 	}
 	self.contraband_m203_npc = {
 		usage = "r870",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.ray_npc = {
-		usage = "ak47",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.tti_npc = {
-		usage = "rifle",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.siltstone_npc = {
-		usage = "rifle",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.flint_npc = {
-		usage = "ak47",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.coal_npc = {
-		usage = "mp5",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.lemming_npc = {
-		usage = "c45",
 		sounds = {},
 		use_data = {},
 		auto = {}
@@ -16514,18 +14194,6 @@ function WeaponTweakData:_create_table_structure()
 	}
 	self.mp5_crew = {
 		usage = "mp5",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.mac11_crew = {
-		usage = "mp5",
-		sounds = {},
-		use_data = {},
-		auto = {}
-	}
-	self.m79_crew = {
-		usage = "m4",
 		sounds = {},
 		use_data = {},
 		auto = {}
@@ -17209,267 +14877,10 @@ function WeaponTweakData:_precalculate_values_wip()
 end
 
 function WeaponTweakData:_precalculate_values()
-	self.m4_npc.AMMO_MAX = self.m4_npc.CLIP_AMMO_MAX * self.m4_npc.NR_CLIPS_MAX
-	self.m14_npc.AMMO_MAX = self.m14_npc.CLIP_AMMO_MAX * self.m14_npc.NR_CLIPS_MAX
-	self.m14_sniper_npc.AMMO_MAX = self.m14_sniper_npc.CLIP_AMMO_MAX * self.m14_sniper_npc.NR_CLIPS_MAX
-	self.c45_npc.AMMO_MAX = self.c45_npc.CLIP_AMMO_MAX * self.c45_npc.NR_CLIPS_MAX
-	self.x_c45_npc.AMMO_MAX = self.x_c45_npc.CLIP_AMMO_MAX * self.x_c45_npc.NR_CLIPS_MAX
-	self.beretta92_npc.AMMO_MAX = self.beretta92_npc.CLIP_AMMO_MAX * self.beretta92_npc.NR_CLIPS_MAX
-	self.raging_bull_npc.AMMO_MAX = self.raging_bull_npc.CLIP_AMMO_MAX * self.raging_bull_npc.NR_CLIPS_MAX
-	self.r870_npc.AMMO_MAX = self.r870_npc.CLIP_AMMO_MAX * self.r870_npc.NR_CLIPS_MAX
-	self.benelli_npc.AMMO_MAX = self.benelli_npc.CLIP_AMMO_MAX * self.benelli_npc.NR_CLIPS_MAX
-	self.mossberg_npc.AMMO_MAX = self.mossberg_npc.CLIP_AMMO_MAX * self.mossberg_npc.NR_CLIPS_MAX
-	self.mp5_npc.AMMO_MAX = self.mp5_npc.CLIP_AMMO_MAX * self.mp5_npc.NR_CLIPS_MAX
-	self.mp5_tactical_npc.AMMO_MAX = self.mp5_tactical_npc.CLIP_AMMO_MAX * self.mp5_tactical_npc.NR_CLIPS_MAX
-	self.ump_npc.AMMO_MAX = self.ump_npc.CLIP_AMMO_MAX * self.ump_npc.NR_CLIPS_MAX
-	self.mac11_npc.AMMO_MAX = self.mac11_npc.CLIP_AMMO_MAX * self.mac11_npc.NR_CLIPS_MAX
-	self.glock_18_npc.AMMO_MAX = self.glock_18_npc.CLIP_AMMO_MAX * self.glock_18_npc.NR_CLIPS_MAX
-	self.ak47_npc.AMMO_MAX = self.ak47_npc.CLIP_AMMO_MAX * self.ak47_npc.NR_CLIPS_MAX
-	self.g36_npc.AMMO_MAX = self.g36_npc.CLIP_AMMO_MAX * self.g36_npc.NR_CLIPS_MAX
-	self.g17_npc.AMMO_MAX = self.g17_npc.CLIP_AMMO_MAX * self.g17_npc.NR_CLIPS_MAX
-	self.mp9_npc.AMMO_MAX = self.mp9_npc.CLIP_AMMO_MAX * self.mp9_npc.NR_CLIPS_MAX
-	self.olympic_npc.AMMO_MAX = self.olympic_npc.CLIP_AMMO_MAX * self.olympic_npc.NR_CLIPS_MAX
-	self.m16_npc.AMMO_MAX = self.m16_npc.CLIP_AMMO_MAX * self.m16_npc.NR_CLIPS_MAX
-	self.aug_npc.AMMO_MAX = self.aug_npc.CLIP_AMMO_MAX * self.aug_npc.NR_CLIPS_MAX
-	self.ak74_npc.AMMO_MAX = self.ak74_npc.CLIP_AMMO_MAX * self.ak74_npc.NR_CLIPS_MAX
-	self.ak5_npc.AMMO_MAX = self.ak5_npc.CLIP_AMMO_MAX * self.ak5_npc.NR_CLIPS_MAX
-	self.p90_npc.AMMO_MAX = self.p90_npc.CLIP_AMMO_MAX * self.p90_npc.NR_CLIPS_MAX
-	self.amcar_npc.AMMO_MAX = self.amcar_npc.CLIP_AMMO_MAX * self.amcar_npc.NR_CLIPS_MAX
-	self.mac10_npc.AMMO_MAX = self.mac10_npc.CLIP_AMMO_MAX * self.mac10_npc.NR_CLIPS_MAX
-	self.akmsu_npc.AMMO_MAX = self.akmsu_npc.CLIP_AMMO_MAX * self.akmsu_npc.NR_CLIPS_MAX
-	self.akm_npc.AMMO_MAX = self.akm_npc.CLIP_AMMO_MAX * self.akm_npc.NR_CLIPS_MAX
-	self.akm_gold_npc.AMMO_MAX = self.akm_gold_npc.CLIP_AMMO_MAX * self.akm_gold_npc.NR_CLIPS_MAX
-	self.deagle_npc.AMMO_MAX = self.deagle_npc.CLIP_AMMO_MAX * self.deagle_npc.NR_CLIPS_MAX
-	self.serbu_npc.AMMO_MAX = self.serbu_npc.CLIP_AMMO_MAX * self.serbu_npc.NR_CLIPS_MAX
-	self.saiga_npc.AMMO_MAX = self.saiga_npc.CLIP_AMMO_MAX * self.saiga_npc.NR_CLIPS_MAX
-	self.huntsman_npc.AMMO_MAX = self.huntsman_npc.CLIP_AMMO_MAX * self.huntsman_npc.NR_CLIPS_MAX
-	self.saw_npc.AMMO_MAX = self.saw_npc.CLIP_AMMO_MAX * self.saw_npc.NR_CLIPS_MAX
-	self.usp_npc.AMMO_MAX = self.usp_npc.CLIP_AMMO_MAX * self.usp_npc.NR_CLIPS_MAX
-	self.g22c_npc.AMMO_MAX = self.g22c_npc.CLIP_AMMO_MAX * self.p226_npc.NR_CLIPS_MAX
-	self.judge_npc.AMMO_MAX = self.judge_npc.CLIP_AMMO_MAX * self.judge_npc.NR_CLIPS_MAX
-	self.m45_npc.AMMO_MAX = self.m45_npc.CLIP_AMMO_MAX * self.m45_npc.NR_CLIPS_MAX
-	self.s552_npc.AMMO_MAX = self.s552_npc.CLIP_AMMO_MAX * self.s552_npc.NR_CLIPS_MAX
-	self.ppk_npc.AMMO_MAX = self.ppk_npc.CLIP_AMMO_MAX * self.ppk_npc.NR_CLIPS_MAX
-	self.mp7_npc.AMMO_MAX = self.mp7_npc.CLIP_AMMO_MAX * self.mp7_npc.NR_CLIPS_MAX
-	self.scar_npc.AMMO_MAX = self.scar_npc.CLIP_AMMO_MAX * self.scar_npc.NR_CLIPS_MAX
-	self.p226_npc.AMMO_MAX = self.p226_npc.CLIP_AMMO_MAX * self.p226_npc.NR_CLIPS_MAX
-	self.hk21_npc.AMMO_MAX = self.hk21_npc.CLIP_AMMO_MAX * self.hk21_npc.NR_CLIPS_MAX
-	self.m249_npc.AMMO_MAX = self.m249_npc.CLIP_AMMO_MAX * self.m249_npc.NR_CLIPS_MAX
-	self.rpk_npc.AMMO_MAX = self.rpk_npc.CLIP_AMMO_MAX * self.rpk_npc.NR_CLIPS_MAX
-	self.m95_npc.AMMO_MAX = self.m95_npc.CLIP_AMMO_MAX * self.m95_npc.NR_CLIPS_MAX
-	self.msr_npc.AMMO_MAX = self.msr_npc.CLIP_AMMO_MAX * self.msr_npc.NR_CLIPS_MAX
-	self.r93_npc.AMMO_MAX = self.r93_npc.CLIP_AMMO_MAX * self.r93_npc.NR_CLIPS_MAX
-	self.fal_npc.AMMO_MAX = self.fal_npc.CLIP_AMMO_MAX * self.fal_npc.NR_CLIPS_MAX
-	self.ben_npc.AMMO_MAX = self.ben_npc.CLIP_AMMO_MAX * self.ben_npc.NR_CLIPS_MAX
-	self.striker_npc.AMMO_MAX = self.striker_npc.CLIP_AMMO_MAX * self.striker_npc.NR_CLIPS_MAX
-	self.ksg_npc.AMMO_MAX = self.ksg_npc.CLIP_AMMO_MAX * self.ksg_npc.NR_CLIPS_MAX
-	self.gre_m79_npc.AMMO_MAX = self.gre_m79_npc.CLIP_AMMO_MAX * self.gre_m79_npc.NR_CLIPS_MAX
-	self.g3_npc.AMMO_MAX = self.g3_npc.CLIP_AMMO_MAX * self.g3_npc.NR_CLIPS_MAX
-	self.galil_npc.AMMO_MAX = self.galil_npc.CLIP_AMMO_MAX * self.galil_npc.NR_CLIPS_MAX
-	self.famas_npc.AMMO_MAX = self.famas_npc.CLIP_AMMO_MAX * self.famas_npc.NR_CLIPS_MAX
-	self.scorpion_npc.AMMO_MAX = self.scorpion_npc.CLIP_AMMO_MAX * self.scorpion_npc.NR_CLIPS_MAX
-	self.tec9_npc.AMMO_MAX = self.tec9_npc.CLIP_AMMO_MAX * self.tec9_npc.NR_CLIPS_MAX
-	self.uzi_npc.AMMO_MAX = self.uzi_npc.CLIP_AMMO_MAX * self.uzi_npc.NR_CLIPS_MAX
-	self.jowi_npc.AMMO_MAX = self.jowi_npc.CLIP_AMMO_MAX * self.jowi_npc.NR_CLIPS_MAX
-	self.x_1911_npc.AMMO_MAX = self.x_1911_npc.CLIP_AMMO_MAX * self.x_1911_npc.NR_CLIPS_MAX
-	self.x_b92fs_npc.AMMO_MAX = self.x_b92fs_npc.CLIP_AMMO_MAX * self.x_b92fs_npc.NR_CLIPS_MAX
-	self.x_deagle_npc.AMMO_MAX = self.x_deagle_npc.CLIP_AMMO_MAX * self.x_deagle_npc.NR_CLIPS_MAX
-	self.g26_npc.AMMO_MAX = 150
-	self.spas12_npc.AMMO_MAX = self.spas12_npc.CLIP_AMMO_MAX * self.spas12_npc.NR_CLIPS_MAX
-	self.mg42_npc.AMMO_MAX = self.mg42_npc.CLIP_AMMO_MAX * self.mg42_npc.NR_CLIPS_MAX
-	self.c96_npc.AMMO_MAX = self.c96_npc.CLIP_AMMO_MAX * self.c96_npc.NR_CLIPS_MAX
-	self.sterling_npc.AMMO_MAX = self.sterling_npc.CLIP_AMMO_MAX * self.sterling_npc.NR_CLIPS_MAX
-	self.mosin_npc.AMMO_MAX = self.mosin_npc.CLIP_AMMO_MAX * self.mosin_npc.NR_CLIPS_MAX
-	self.m1928_npc.AMMO_MAX = self.m1928_npc.CLIP_AMMO_MAX * self.m1928_npc.NR_CLIPS_MAX
-	self.l85a2_npc.AMMO_MAX = self.l85a2_npc.CLIP_AMMO_MAX * self.l85a2_npc.NR_CLIPS_MAX
-	self.hs2000_npc.AMMO_MAX = self.hs2000_npc.CLIP_AMMO_MAX * self.hs2000_npc.NR_CLIPS_MAX
-	self.vhs_npc.AMMO_MAX = self.vhs_npc.CLIP_AMMO_MAX * self.vhs_npc.NR_CLIPS_MAX
-	self.m134_npc.AMMO_MAX = self.m134_npc.CLIP_AMMO_MAX * self.m134_npc.NR_CLIPS_MAX
-	self.rpg7_npc.AMMO_MAX = self.rpg7_npc.CLIP_AMMO_MAX * self.rpg7_npc.NR_CLIPS_MAX
-	self.cobray_npc.AMMO_MAX = self.cobray_npc.CLIP_AMMO_MAX * self.cobray_npc.NR_CLIPS_MAX
-	self.b682_npc.AMMO_MAX = self.b682_npc.CLIP_AMMO_MAX * self.b682_npc.NR_CLIPS_MAX
-	self.x_g22c_npc.AMMO_MAX = self.x_g22c_npc.CLIP_AMMO_MAX * self.x_g22c_npc.NR_CLIPS_MAX
-	self.x_g17_npc.AMMO_MAX = self.x_g17_npc.CLIP_AMMO_MAX * self.x_g17_npc.NR_CLIPS_MAX
-	self.x_usp_npc.AMMO_MAX = self.x_usp_npc.CLIP_AMMO_MAX * self.x_usp_npc.NR_CLIPS_MAX
-	self.flamethrower_mk2_npc.AMMO_MAX = self.flamethrower_mk2_npc.CLIP_AMMO_MAX * self.flamethrower_mk2_npc.NR_CLIPS_MAX
-	self.m32_npc.AMMO_MAX = self.m32_npc.CLIP_AMMO_MAX * self.m32_npc.NR_CLIPS_MAX
-	self.aa12_npc.AMMO_MAX = self.aa12_npc.CLIP_AMMO_MAX * self.aa12_npc.NR_CLIPS_MAX
-	self.peacemaker_npc.AMMO_MAX = self.peacemaker_npc.CLIP_AMMO_MAX * self.peacemaker_npc.NR_CLIPS_MAX
-	self.winchester1874_npc.AMMO_MAX = self.winchester1874_npc.CLIP_AMMO_MAX * self.winchester1874_npc.NR_CLIPS_MAX
-	self.plainsrider_npc.AMMO_MAX = self.plainsrider_npc.CLIP_AMMO_MAX * self.plainsrider_npc.NR_CLIPS_MAX
-	self.mateba_npc.AMMO_MAX = self.mateba_npc.CLIP_AMMO_MAX * self.mateba_npc.NR_CLIPS_MAX
-	self.asval_npc.AMMO_MAX = self.asval_npc.CLIP_AMMO_MAX * self.asval_npc.NR_CLIPS_MAX
-	self.sub2000_npc.AMMO_MAX = self.sub2000_npc.CLIP_AMMO_MAX * self.sub2000_npc.NR_CLIPS_MAX
-	self.wa2000_npc.AMMO_MAX = self.wa2000_npc.CLIP_AMMO_MAX * self.wa2000_npc.NR_CLIPS_MAX
-	self.polymer_npc.AMMO_MAX = self.polymer_npc.CLIP_AMMO_MAX * self.polymer_npc.NR_CLIPS_MAX
-	self.hunter_npc.AMMO_MAX = self.hunter_npc.CLIP_AMMO_MAX * self.hunter_npc.NR_CLIPS_MAX
-	self.baka_npc.AMMO_MAX = self.baka_npc.CLIP_AMMO_MAX * self.baka_npc.NR_CLIPS_MAX
-	self.arblast_npc.AMMO_MAX = self.arblast_npc.CLIP_AMMO_MAX * self.arblast_npc.NR_CLIPS_MAX
-	self.frankish_npc.AMMO_MAX = self.frankish_npc.CLIP_AMMO_MAX * self.frankish_npc.NR_CLIPS_MAX
-	self.long_npc.AMMO_MAX = self.long_npc.CLIP_AMMO_MAX * self.long_npc.NR_CLIPS_MAX
-	self.par_npc.AMMO_MAX = self.par_npc.CLIP_AMMO_MAX * self.par_npc.NR_CLIPS_MAX
-	self.sparrow_npc.AMMO_MAX = self.sparrow_npc.CLIP_AMMO_MAX * self.sparrow_npc.NR_CLIPS_MAX
-	self.model70_npc.AMMO_MAX = self.model70_npc.CLIP_AMMO_MAX * self.model70_npc.NR_CLIPS_MAX
-	self.m37_npc.AMMO_MAX = self.m37_npc.CLIP_AMMO_MAX * self.m37_npc.NR_CLIPS_MAX
-	self.china_npc.AMMO_MAX = self.china_npc.CLIP_AMMO_MAX * self.china_npc.NR_CLIPS_MAX
-	self.sr2_npc.AMMO_MAX = self.sr2_npc.CLIP_AMMO_MAX * self.sr2_npc.NR_CLIPS_MAX
-	self.x_sr2_npc.AMMO_MAX = self.x_sr2_npc.CLIP_AMMO_MAX * self.x_sr2_npc.NR_CLIPS_MAX
-	self.pl14_npc.AMMO_MAX = self.pl14_npc.CLIP_AMMO_MAX * self.pl14_npc.NR_CLIPS_MAX
-	self.rpk_lmg_npc.AMMO_MAX = self.rpk_lmg_npc.CLIP_AMMO_MAX * self.rpk_lmg_npc.NR_CLIPS_MAX
-	self.svd_snp_npc.AMMO_MAX = self.svd_snp_npc.CLIP_AMMO_MAX * self.svd_snp_npc.NR_CLIPS_MAX
-	self.akmsu_smg_npc.AMMO_MAX = self.akmsu_smg_npc.CLIP_AMMO_MAX * self.akmsu_smg_npc.NR_CLIPS_MAX
-	self.asval_smg_npc.AMMO_MAX = self.asval_smg_npc.CLIP_AMMO_MAX * self.asval_smg_npc.NR_CLIPS_MAX
-	self.sr2_smg_npc.AMMO_MAX = self.sr2_smg_npc.CLIP_AMMO_MAX * self.sr2_smg_npc.NR_CLIPS_MAX
-	self.ak47_ass_npc.AMMO_MAX = self.ak47_ass_npc.CLIP_AMMO_MAX * self.ak47_ass_npc.NR_CLIPS_MAX
-	self.x_mp5_npc.AMMO_MAX = self.x_mp5_npc.CLIP_AMMO_MAX * self.x_mp5_npc.NR_CLIPS_MAX
-	self.x_akmsu_npc.AMMO_MAX = self.x_akmsu_npc.CLIP_AMMO_MAX * self.x_akmsu_npc.NR_CLIPS_MAX
-	self.tecci_npc.AMMO_MAX = self.tecci_npc.CLIP_AMMO_MAX * self.tecci_npc.NR_CLIPS_MAX
-	self.hajk_npc.AMMO_MAX = self.hajk_npc.CLIP_AMMO_MAX * self.hajk_npc.NR_CLIPS_MAX
-	self.boot_npc.AMMO_MAX = self.boot_npc.CLIP_AMMO_MAX * self.boot_npc.NR_CLIPS_MAX
-	self.packrat_npc.AMMO_MAX = self.packrat_npc.CLIP_AMMO_MAX * self.packrat_npc.NR_CLIPS_MAX
-	self.schakal_npc.AMMO_MAX = self.schakal_npc.CLIP_AMMO_MAX * self.schakal_npc.NR_CLIPS_MAX
-	self.desertfox_npc.AMMO_MAX = self.desertfox_npc.CLIP_AMMO_MAX * self.desertfox_npc.NR_CLIPS_MAX
-	self.x_packrat_npc.AMMO_MAX = self.x_packrat_npc.CLIP_AMMO_MAX * self.x_packrat_npc.NR_CLIPS_MAX
-	self.rota_npc.AMMO_MAX = self.rota_npc.CLIP_AMMO_MAX * self.rota_npc.NR_CLIPS_MAX
-	self.arbiter_npc.AMMO_MAX = self.arbiter_npc.CLIP_AMMO_MAX * self.arbiter_npc.NR_CLIPS_MAX
-	self.contraband_npc.AMMO_MAX = self.contraband_npc.CLIP_AMMO_MAX * self.contraband_npc.NR_CLIPS_MAX
-	self.contraband_m203_npc.AMMO_MAX = self.contraband_m203_npc.CLIP_AMMO_MAX * self.contraband_m203_npc.NR_CLIPS_MAX
-	self.ray_npc.AMMO_MAX = self.ray_npc.CLIP_AMMO_MAX * self.ray_npc.NR_CLIPS_MAX
-	self.sg417_npc.AMMO_MAX = self.sg417_npc.CLIP_AMMO_MAX * self.sg417_npc.NR_CLIPS_MAX
-	self.tti_npc.AMMO_MAX = self.tti_npc.CLIP_AMMO_MAX * self.tti_npc.NR_CLIPS_MAX
-	self.svdsil_snp_npc.AMMO_MAX = self.svdsil_snp_npc.CLIP_AMMO_MAX * self.svdsil_snp_npc.NR_CLIPS_MAX
-	self.siltstone_npc.AMMO_MAX = self.siltstone_npc.CLIP_AMMO_MAX * self.siltstone_npc.NR_CLIPS_MAX
-	self.flint_npc.AMMO_MAX = self.flint_npc.CLIP_AMMO_MAX * self.flint_npc.NR_CLIPS_MAX
-	self.coal_npc.AMMO_MAX = self.coal_npc.CLIP_AMMO_MAX * self.coal_npc.NR_CLIPS_MAX
-	self.lemming_npc.AMMO_MAX = self.lemming_npc.CLIP_AMMO_MAX * self.lemming_npc.NR_CLIPS_MAX
-	self.m4_crew.AMMO_MAX = self.m4_crew.CLIP_AMMO_MAX * self.m4_crew.NR_CLIPS_MAX
-	self.m14_crew.AMMO_MAX = self.m14_crew.CLIP_AMMO_MAX * self.m14_crew.NR_CLIPS_MAX
-	self.c45_crew.AMMO_MAX = self.c45_crew.CLIP_AMMO_MAX * self.c45_crew.NR_CLIPS_MAX
-	self.x_c45_crew.AMMO_MAX = self.x_c45_crew.CLIP_AMMO_MAX * self.x_c45_crew.NR_CLIPS_MAX
-	self.beretta92_crew.AMMO_MAX = self.beretta92_crew.CLIP_AMMO_MAX * self.beretta92_crew.NR_CLIPS_MAX
-	self.raging_bull_crew.AMMO_MAX = self.raging_bull_crew.CLIP_AMMO_MAX * self.raging_bull_crew.NR_CLIPS_MAX
-	self.r870_crew.AMMO_MAX = self.r870_crew.CLIP_AMMO_MAX * self.r870_crew.NR_CLIPS_MAX
-	self.benelli_crew.AMMO_MAX = self.benelli_crew.CLIP_AMMO_MAX * self.benelli_crew.NR_CLIPS_MAX
-	self.mossberg_crew.AMMO_MAX = self.mossberg_crew.CLIP_AMMO_MAX * self.mossberg_crew.NR_CLIPS_MAX
-	self.mp5_crew.AMMO_MAX = self.mp5_crew.CLIP_AMMO_MAX * self.mp5_crew.NR_CLIPS_MAX
-	self.mp5_tactical_crew.AMMO_MAX = self.mp5_tactical_crew.CLIP_AMMO_MAX * self.mp5_tactical_crew.NR_CLIPS_MAX
-	self.ump_crew.AMMO_MAX = self.ump_crew.CLIP_AMMO_MAX * self.ump_crew.NR_CLIPS_MAX
-	self.mac11_crew.AMMO_MAX = self.mac11_crew.CLIP_AMMO_MAX * self.mac11_crew.NR_CLIPS_MAX
-	self.glock_18_crew.AMMO_MAX = self.glock_18_crew.CLIP_AMMO_MAX * self.glock_18_crew.NR_CLIPS_MAX
-	self.ak47_crew.AMMO_MAX = self.ak47_crew.CLIP_AMMO_MAX * self.ak47_crew.NR_CLIPS_MAX
-	self.g36_crew.AMMO_MAX = self.g36_crew.CLIP_AMMO_MAX * self.g36_crew.NR_CLIPS_MAX
-	self.g17_crew.AMMO_MAX = self.g17_crew.CLIP_AMMO_MAX * self.g17_crew.NR_CLIPS_MAX
-	self.mp9_crew.AMMO_MAX = self.mp9_crew.CLIP_AMMO_MAX * self.mp9_crew.NR_CLIPS_MAX
-	self.olympic_crew.AMMO_MAX = self.olympic_crew.CLIP_AMMO_MAX * self.olympic_crew.NR_CLIPS_MAX
-	self.m16_crew.AMMO_MAX = self.m16_crew.CLIP_AMMO_MAX * self.m16_crew.NR_CLIPS_MAX
-	self.aug_crew.AMMO_MAX = self.aug_crew.CLIP_AMMO_MAX * self.aug_crew.NR_CLIPS_MAX
-	self.ak74_crew.AMMO_MAX = self.ak74_crew.CLIP_AMMO_MAX * self.ak74_crew.NR_CLIPS_MAX
-	self.ak5_crew.AMMO_MAX = self.ak5_crew.CLIP_AMMO_MAX * self.ak5_crew.NR_CLIPS_MAX
-	self.p90_crew.AMMO_MAX = self.p90_crew.CLIP_AMMO_MAX * self.p90_crew.NR_CLIPS_MAX
-	self.amcar_crew.AMMO_MAX = self.amcar_crew.CLIP_AMMO_MAX * self.amcar_crew.NR_CLIPS_MAX
-	self.mac10_crew.AMMO_MAX = self.mac10_crew.CLIP_AMMO_MAX * self.mac10_crew.NR_CLIPS_MAX
-	self.akmsu_crew.AMMO_MAX = self.akmsu_crew.CLIP_AMMO_MAX * self.akmsu_crew.NR_CLIPS_MAX
-	self.akm_crew.AMMO_MAX = self.akm_crew.CLIP_AMMO_MAX * self.akm_crew.NR_CLIPS_MAX
-	self.akm_gold_crew.AMMO_MAX = self.akm_gold_crew.CLIP_AMMO_MAX * self.akm_gold_crew.NR_CLIPS_MAX
-	self.deagle_crew.AMMO_MAX = self.deagle_crew.CLIP_AMMO_MAX * self.deagle_crew.NR_CLIPS_MAX
-	self.serbu_crew.AMMO_MAX = self.serbu_crew.CLIP_AMMO_MAX * self.serbu_crew.NR_CLIPS_MAX
-	self.saiga_crew.AMMO_MAX = self.saiga_crew.CLIP_AMMO_MAX * self.saiga_crew.NR_CLIPS_MAX
-	self.huntsman_crew.AMMO_MAX = self.huntsman_crew.CLIP_AMMO_MAX * self.huntsman_crew.NR_CLIPS_MAX
-	self.saw_crew.AMMO_MAX = self.saw_crew.CLIP_AMMO_MAX * self.saw_crew.NR_CLIPS_MAX
-	self.usp_crew.AMMO_MAX = self.usp_crew.CLIP_AMMO_MAX * self.usp_crew.NR_CLIPS_MAX
-	self.g22c_crew.AMMO_MAX = self.g22c_crew.CLIP_AMMO_MAX * self.p226_crew.NR_CLIPS_MAX
-	self.judge_crew.AMMO_MAX = self.judge_crew.CLIP_AMMO_MAX * self.judge_crew.NR_CLIPS_MAX
-	self.m45_crew.AMMO_MAX = self.m45_crew.CLIP_AMMO_MAX * self.m45_crew.NR_CLIPS_MAX
-	self.s552_crew.AMMO_MAX = self.s552_crew.CLIP_AMMO_MAX * self.s552_crew.NR_CLIPS_MAX
-	self.ppk_crew.AMMO_MAX = self.ppk_crew.CLIP_AMMO_MAX * self.ppk_crew.NR_CLIPS_MAX
-	self.mp7_crew.AMMO_MAX = self.mp7_crew.CLIP_AMMO_MAX * self.mp7_crew.NR_CLIPS_MAX
-	self.scar_crew.AMMO_MAX = self.scar_crew.CLIP_AMMO_MAX * self.scar_crew.NR_CLIPS_MAX
-	self.p226_crew.AMMO_MAX = self.p226_crew.CLIP_AMMO_MAX * self.p226_crew.NR_CLIPS_MAX
-	self.hk21_crew.AMMO_MAX = self.hk21_crew.CLIP_AMMO_MAX * self.hk21_crew.NR_CLIPS_MAX
-	self.m249_crew.AMMO_MAX = self.m249_crew.CLIP_AMMO_MAX * self.m249_crew.NR_CLIPS_MAX
-	self.rpk_crew.AMMO_MAX = self.rpk_crew.CLIP_AMMO_MAX * self.rpk_crew.NR_CLIPS_MAX
-	self.m95_crew.AMMO_MAX = self.m95_crew.CLIP_AMMO_MAX * self.m95_crew.NR_CLIPS_MAX
-	self.msr_crew.AMMO_MAX = self.msr_crew.CLIP_AMMO_MAX * self.msr_crew.NR_CLIPS_MAX
-	self.r93_crew.AMMO_MAX = self.r93_crew.CLIP_AMMO_MAX * self.r93_crew.NR_CLIPS_MAX
-	self.fal_crew.AMMO_MAX = self.fal_crew.CLIP_AMMO_MAX * self.fal_crew.NR_CLIPS_MAX
-	self.ben_crew.AMMO_MAX = self.ben_crew.CLIP_AMMO_MAX * self.ben_crew.NR_CLIPS_MAX
-	self.striker_crew.AMMO_MAX = self.striker_crew.CLIP_AMMO_MAX * self.striker_crew.NR_CLIPS_MAX
-	self.ksg_crew.AMMO_MAX = self.ksg_crew.CLIP_AMMO_MAX * self.ksg_crew.NR_CLIPS_MAX
-	self.gre_m79_crew.AMMO_MAX = self.gre_m79_crew.CLIP_AMMO_MAX * self.gre_m79_crew.NR_CLIPS_MAX
-	self.g3_crew.AMMO_MAX = self.g3_crew.CLIP_AMMO_MAX * self.g3_crew.NR_CLIPS_MAX
-	self.galil_crew.AMMO_MAX = self.galil_crew.CLIP_AMMO_MAX * self.galil_crew.NR_CLIPS_MAX
-	self.famas_crew.AMMO_MAX = self.famas_crew.CLIP_AMMO_MAX * self.famas_crew.NR_CLIPS_MAX
-	self.scorpion_crew.AMMO_MAX = self.scorpion_crew.CLIP_AMMO_MAX * self.scorpion_crew.NR_CLIPS_MAX
-	self.tec9_crew.AMMO_MAX = self.tec9_crew.CLIP_AMMO_MAX * self.tec9_crew.NR_CLIPS_MAX
-	self.uzi_crew.AMMO_MAX = self.uzi_crew.CLIP_AMMO_MAX * self.uzi_crew.NR_CLIPS_MAX
-	self.jowi_crew.AMMO_MAX = self.jowi_crew.CLIP_AMMO_MAX * self.jowi_crew.NR_CLIPS_MAX
-	self.x_1911_crew.AMMO_MAX = self.x_1911_crew.CLIP_AMMO_MAX * self.x_1911_crew.NR_CLIPS_MAX
-	self.x_b92fs_crew.AMMO_MAX = self.x_b92fs_crew.CLIP_AMMO_MAX * self.x_b92fs_crew.NR_CLIPS_MAX
-	self.x_deagle_crew.AMMO_MAX = self.x_deagle_crew.CLIP_AMMO_MAX * self.x_deagle_crew.NR_CLIPS_MAX
+	for k, v in pairs(self) do
+		if v.CLIP_AMMO_MAX and v.NR_CLIPS_MAX and not v.AMMO_MAX then
+			v.AMMO_MAX = v.CLIP_AMMO_MAX * v.NR_CLIPS_MAX
+		end
+	end
 	self.g26_crew.AMMO_MAX = 150
-	self.spas12_crew.AMMO_MAX = self.spas12_crew.CLIP_AMMO_MAX * self.spas12_crew.NR_CLIPS_MAX
-	self.mg42_crew.AMMO_MAX = self.mg42_crew.CLIP_AMMO_MAX * self.mg42_crew.NR_CLIPS_MAX
-	self.c96_crew.AMMO_MAX = self.c96_crew.CLIP_AMMO_MAX * self.c96_crew.NR_CLIPS_MAX
-	self.sterling_crew.AMMO_MAX = self.sterling_crew.CLIP_AMMO_MAX * self.sterling_crew.NR_CLIPS_MAX
-	self.mosin_crew.AMMO_MAX = self.mosin_crew.CLIP_AMMO_MAX * self.mosin_crew.NR_CLIPS_MAX
-	self.m1928_crew.AMMO_MAX = self.m1928_crew.CLIP_AMMO_MAX * self.m1928_crew.NR_CLIPS_MAX
-	self.l85a2_crew.AMMO_MAX = self.l85a2_crew.CLIP_AMMO_MAX * self.l85a2_crew.NR_CLIPS_MAX
-	self.hs2000_crew.AMMO_MAX = self.hs2000_crew.CLIP_AMMO_MAX * self.hs2000_crew.NR_CLIPS_MAX
-	self.vhs_crew.AMMO_MAX = self.vhs_crew.CLIP_AMMO_MAX * self.vhs_crew.NR_CLIPS_MAX
-	self.m134_crew.AMMO_MAX = self.m134_crew.CLIP_AMMO_MAX * self.m134_crew.NR_CLIPS_MAX
-	self.rpg7_crew.AMMO_MAX = self.rpg7_crew.CLIP_AMMO_MAX * self.rpg7_crew.NR_CLIPS_MAX
-	self.cobray_crew.AMMO_MAX = self.cobray_crew.CLIP_AMMO_MAX * self.cobray_crew.NR_CLIPS_MAX
-	self.b682_crew.AMMO_MAX = self.b682_crew.CLIP_AMMO_MAX * self.b682_crew.NR_CLIPS_MAX
-	self.x_g22c_crew.AMMO_MAX = self.x_g22c_crew.CLIP_AMMO_MAX * self.x_g22c_crew.NR_CLIPS_MAX
-	self.x_g17_crew.AMMO_MAX = self.x_g17_crew.CLIP_AMMO_MAX * self.x_g17_crew.NR_CLIPS_MAX
-	self.x_usp_crew.AMMO_MAX = self.x_usp_crew.CLIP_AMMO_MAX * self.x_usp_crew.NR_CLIPS_MAX
-	self.flamethrower_mk2_crew.AMMO_MAX = self.flamethrower_mk2_crew.CLIP_AMMO_MAX * self.flamethrower_mk2_crew.NR_CLIPS_MAX
-	self.m32_crew.AMMO_MAX = self.m32_crew.CLIP_AMMO_MAX * self.m32_crew.NR_CLIPS_MAX
-	self.aa12_crew.AMMO_MAX = self.aa12_crew.CLIP_AMMO_MAX * self.aa12_crew.NR_CLIPS_MAX
-	self.peacemaker_crew.AMMO_MAX = self.peacemaker_crew.CLIP_AMMO_MAX * self.peacemaker_crew.NR_CLIPS_MAX
-	self.winchester1874_crew.AMMO_MAX = self.winchester1874_crew.CLIP_AMMO_MAX * self.winchester1874_crew.NR_CLIPS_MAX
-	self.plainsrider_crew.AMMO_MAX = self.plainsrider_crew.CLIP_AMMO_MAX * self.plainsrider_crew.NR_CLIPS_MAX
-	self.mateba_crew.AMMO_MAX = self.mateba_crew.CLIP_AMMO_MAX * self.mateba_crew.NR_CLIPS_MAX
-	self.asval_crew.AMMO_MAX = self.asval_crew.CLIP_AMMO_MAX * self.asval_crew.NR_CLIPS_MAX
-	self.sub2000_crew.AMMO_MAX = self.sub2000_crew.CLIP_AMMO_MAX * self.sub2000_crew.NR_CLIPS_MAX
-	self.wa2000_crew.AMMO_MAX = self.wa2000_crew.CLIP_AMMO_MAX * self.wa2000_crew.NR_CLIPS_MAX
-	self.polymer_crew.AMMO_MAX = self.polymer_crew.CLIP_AMMO_MAX * self.polymer_crew.NR_CLIPS_MAX
-	self.hunter_crew.AMMO_MAX = self.hunter_crew.CLIP_AMMO_MAX * self.hunter_crew.NR_CLIPS_MAX
-	self.baka_crew.AMMO_MAX = self.baka_crew.CLIP_AMMO_MAX * self.baka_crew.NR_CLIPS_MAX
-	self.arblast_crew.AMMO_MAX = self.arblast_crew.CLIP_AMMO_MAX * self.arblast_crew.NR_CLIPS_MAX
-	self.frankish_crew.AMMO_MAX = self.frankish_crew.CLIP_AMMO_MAX * self.frankish_crew.NR_CLIPS_MAX
-	self.long_crew.AMMO_MAX = self.long_crew.CLIP_AMMO_MAX * self.long_crew.NR_CLIPS_MAX
-	self.par_crew.AMMO_MAX = self.par_crew.CLIP_AMMO_MAX * self.par_crew.NR_CLIPS_MAX
-	self.sparrow_crew.AMMO_MAX = self.sparrow_crew.CLIP_AMMO_MAX * self.sparrow_crew.NR_CLIPS_MAX
-	self.model70_crew.AMMO_MAX = self.model70_crew.CLIP_AMMO_MAX * self.model70_crew.NR_CLIPS_MAX
-	self.m37_crew.AMMO_MAX = self.m37_crew.CLIP_AMMO_MAX * self.m37_crew.NR_CLIPS_MAX
-	self.china_crew.AMMO_MAX = self.china_crew.CLIP_AMMO_MAX * self.china_crew.NR_CLIPS_MAX
-	self.sr2_crew.AMMO_MAX = self.sr2_crew.CLIP_AMMO_MAX * self.sr2_crew.NR_CLIPS_MAX
-	self.x_sr2_crew.AMMO_MAX = self.x_sr2_crew.CLIP_AMMO_MAX * self.x_sr2_crew.NR_CLIPS_MAX
-	self.pl14_crew.AMMO_MAX = self.pl14_crew.CLIP_AMMO_MAX * self.pl14_crew.NR_CLIPS_MAX
-	self.rpk_lmg_crew.AMMO_MAX = self.rpk_lmg_crew.CLIP_AMMO_MAX * self.rpk_lmg_crew.NR_CLIPS_MAX
-	self.akmsu_smg_crew.AMMO_MAX = self.akmsu_smg_crew.CLIP_AMMO_MAX * self.akmsu_smg_crew.NR_CLIPS_MAX
-	self.asval_smg_crew.AMMO_MAX = self.asval_smg_crew.CLIP_AMMO_MAX * self.asval_smg_crew.NR_CLIPS_MAX
-	self.sr2_smg_crew.AMMO_MAX = self.sr2_smg_crew.CLIP_AMMO_MAX * self.sr2_smg_crew.NR_CLIPS_MAX
-	self.ak47_ass_crew.AMMO_MAX = self.ak47_ass_crew.CLIP_AMMO_MAX * self.ak47_ass_crew.NR_CLIPS_MAX
-	self.x_mp5_crew.AMMO_MAX = self.x_mp5_crew.CLIP_AMMO_MAX * self.x_mp5_crew.NR_CLIPS_MAX
-	self.x_akmsu_crew.AMMO_MAX = self.x_akmsu_crew.CLIP_AMMO_MAX * self.x_akmsu_crew.NR_CLIPS_MAX
-	self.tecci_crew.AMMO_MAX = self.tecci_crew.CLIP_AMMO_MAX * self.tecci_crew.NR_CLIPS_MAX
-	self.hajk_crew.AMMO_MAX = self.hajk_crew.CLIP_AMMO_MAX * self.hajk_crew.NR_CLIPS_MAX
-	self.boot_crew.AMMO_MAX = self.boot_crew.CLIP_AMMO_MAX * self.boot_crew.NR_CLIPS_MAX
-	self.packrat_crew.AMMO_MAX = self.packrat_crew.CLIP_AMMO_MAX * self.packrat_crew.NR_CLIPS_MAX
-	self.schakal_crew.AMMO_MAX = self.schakal_crew.CLIP_AMMO_MAX * self.schakal_crew.NR_CLIPS_MAX
-	self.desertfox_crew.AMMO_MAX = self.desertfox_crew.CLIP_AMMO_MAX * self.desertfox_crew.NR_CLIPS_MAX
-	self.x_packrat_crew.AMMO_MAX = self.x_packrat_crew.CLIP_AMMO_MAX * self.x_packrat_crew.NR_CLIPS_MAX
-	self.rota_crew.AMMO_MAX = self.rota_crew.CLIP_AMMO_MAX * self.rota_crew.NR_CLIPS_MAX
-	self.arbiter_crew.AMMO_MAX = self.arbiter_crew.CLIP_AMMO_MAX * self.arbiter_crew.NR_CLIPS_MAX
-	self.contraband_crew.AMMO_MAX = self.contraband_crew.CLIP_AMMO_MAX * self.contraband_crew.NR_CLIPS_MAX
-	self.contraband_m203_crew.AMMO_MAX = self.contraband_m203_crew.CLIP_AMMO_MAX * self.contraband_m203_crew.NR_CLIPS_MAX
-	self.ray_crew.AMMO_MAX = self.ray_crew.CLIP_AMMO_MAX * self.ray_crew.NR_CLIPS_MAX
-	self.sg417_crew.AMMO_MAX = self.sg417_crew.CLIP_AMMO_MAX * self.sg417_crew.NR_CLIPS_MAX
-	self.tti_crew.AMMO_MAX = self.tti_crew.CLIP_AMMO_MAX * self.tti_crew.NR_CLIPS_MAX
-	self.siltstone_crew.AMMO_MAX = self.siltstone_crew.CLIP_AMMO_MAX * self.siltstone_crew.NR_CLIPS_MAX
-	self.flint_crew.AMMO_MAX = self.flint_crew.CLIP_AMMO_MAX * self.flint_crew.NR_CLIPS_MAX
-	self.coal_crew.AMMO_MAX = self.coal_crew.CLIP_AMMO_MAX * self.coal_crew.NR_CLIPS_MAX
-	self.lemming_crew.AMMO_MAX = self.lemming_crew.CLIP_AMMO_MAX * self.lemming_crew.NR_CLIPS_MAX
 end

@@ -408,7 +408,7 @@ function HUDMissionBriefing:init(hud, workspace)
 		self._paygrade_panel:move(0, -pg_text:h())
 	end
 	local text = utf8.to_upper(managers.localization:text(self._current_contact_data.name_id) .. ": " .. managers.localization:text(self._current_job_data.name_id))
-	local text_len
+	local text_align, text_len
 	if managers.crime_spree:_is_active() then
 		local level_id = Global.game_settings.level_id
 		local name_id = level_id and tweak_data.levels[level_id] and tweak_data.levels[level_id].name_id
@@ -418,37 +418,36 @@ function HUDMissionBriefing:init(hud, workspace)
 		text = text .. "+" .. managers.localization:text("menu_cs_level", {
 			level = mission and mission.add or 0
 		})
+		text_align = "right"
 	end
 	local job_text = self._foreground_layer_one:text({
 		name = "job_text",
 		text = text,
-		align = "left",
-		vertical = "center",
+		align = text_align or "left",
+		vertical = "top",
 		font_size = title_font_size,
 		font = title_font,
 		color = tweak_data.screen_colors.text
 	})
-	local _, _, w, h = job_text:text_rect()
-	job_text:set_size(w, h)
 	if managers.crime_spree:_is_active() then
 		job_text:set_range_color(text_len, utf8.len(text), tweak_data.screen_colors.crime_spree_risk)
 	end
-	local big_text = self._background_layer_three:text({
-		name = "job_text",
-		text = text,
-		align = "left",
-		vertical = "top",
-		font_size = bg_font_size,
-		font = bg_font,
-		color = tweak_data.screen_colors.button_stage_1,
-		alpha = 0.4
-	})
-	local _, _, w, h = big_text:text_rect()
-	big_text:set_size(w, h)
-	big_text:set_world_center_y(self._foreground_layer_one:child("job_text"):world_center_y())
-	big_text:set_world_x(self._foreground_layer_one:child("job_text"):world_x())
-	big_text:move(-13, 9)
-	self._backdrop:animate_bg_text(big_text)
+	if not text_align then
+		local big_text = self._background_layer_three:text({
+			name = "job_text",
+			text = text,
+			align = text_align or "left",
+			vertical = "top",
+			font_size = bg_font_size,
+			font = bg_font,
+			color = tweak_data.screen_colors.button_stage_1,
+			alpha = 0.4
+		})
+		big_text:set_world_center_y(self._foreground_layer_one:child("job_text"):world_center_y())
+		big_text:set_world_x(self._foreground_layer_one:child("job_text"):world_x())
+		big_text:move(-13, 9)
+		self._backdrop:animate_bg_text(big_text)
+	end
 	if managers.crime_spree:_is_active() then
 		self._paygrade_panel:set_visible(false)
 		self._job_schedule_panel:set_visible(false)

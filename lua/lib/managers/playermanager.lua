@@ -120,6 +120,8 @@ function PlayerManager:init()
 end
 
 function PlayerManager:check_skills()
+	self._coroutine_mgr:remove_coroutine(PlayerAction.UnseenStrike)
+	self._coroutine_mgr:remove_coroutine(PlayerAction.UnseenStrikeStart)
 	self._saw_panic_when_kill = self:has_category_upgrade("saw", "panic_when_kill")
 	self._unseen_strike = self:has_category_upgrade("player", "unseen_increased_crit_chance")
 	if self:has_category_upgrade("pistol", "stacked_accuracy_bonus") then
@@ -502,7 +504,7 @@ function PlayerManager:update(t, dt)
 		end
 	end
 	local equipped_grenade = managers.blackmarket:equipped_grenade()
-	if self:player_unit() and equipped_grenade and tweak_data.blackmarket.projectiles[equipped_grenade] and tweak_data.blackmarket.projectiles[equipped_grenade].ability then
+	if self:player_unit() and equipped_grenade and tweak_data.blackmarket.projectiles[equipped_grenade] and tweak_data.blackmarket.projectiles[equipped_grenade].base_cooldown then
 		self:update_ability_hud(equipped_grenade)
 	end
 end
@@ -1344,8 +1346,8 @@ function PlayerManager:activate_temporary_upgrade(category, upgrade)
 	self._temporary_upgrades[category] = self._temporary_upgrades[category] or {}
 	self._temporary_upgrades[category][upgrade] = {}
 	self._temporary_upgrades[category][upgrade].expire_time = Application:time() + time
-	if Network:is_client() and self:is_upgrade_synced(category, upgrade) then
-		managers.network:session():send_to_host("sync_temporary_upgrade_activated", self:temporary_upgrade_index(category, upgrade))
+	if self:is_upgrade_synced(category, upgrade) then
+		managers.network:session():send_to_peers("sync_temporary_upgrade_activated", self:temporary_upgrade_index(category, upgrade))
 	end
 end
 
@@ -3390,7 +3392,7 @@ function PlayerManager:_set_grenade(params)
 	managers.hud:set_teammate_grenades(HUDManager.PLAYER_PANEL, {
 		amount = amount,
 		icon = icon,
-		ability = tweak_data.ability
+		has_cooldown = not not tweak_data.base_cooldown
 	})
 end
 
@@ -3481,7 +3483,10 @@ function PlayerManager:has_grenade(peer_id)
 end
 
 function PlayerManager:on_throw_grenade()
-	self:add_grenade_amount(-1)
+	local should_decrement = true
+	if should_decrement then
+		self:add_grenade_amount(-1)
+	end
 	local peer_id = managers.network:session():local_peer():id()
 	if table.contains(tweak_data.achievement.fire_in_the_hole.grenade, self:get_synced_grenades(peer_id).grenade) then
 		managers.achievment:award_progress(tweak_data.achievement.fire_in_the_hole.stat)
@@ -4180,20 +4185,28 @@ function PlayerManager:activate_ability(ability)
 	if not self:player_unit() then
 		return
 	end
-	self:activate_temporary_upgrade("temporary", ability)
+	if self:has_inactivate_temporary_upgrade("temporary", ability) then
+		self:activate_temporary_upgrade("temporary", ability)
+	end
 	local t = TimerManager:game():time()
 	local tweak = tweak_data.blackmarket.projectiles[ability]
 	self["_cooldown_" .. ability] = t + tweak.base_cooldown
-	
-	local function speed_up_on_kill()
-		managers.player:speed_up_ability_cooldown(ability, 1)
+	if self["_on_activate_" .. ability] then
+		self["_on_activate_" .. ability](self)
 	end
-	
-	self:register_message(Message.OnEnemyKilled, "speed_up_" .. ability, speed_up_on_kill)
 	if tweak.sounds and tweak.sounds.activate then
 		self:player_unit():sound():play(tweak.sounds.activate)
 	end
-	managers.network:session():send_to_peers("sync_ability_hud", self:temporary_upgrade_index("temporary", ability), self:upgrade_value("temporary", ability)[2])
+	if self:has_inactivate_temporary_upgrade("temporary", ability) then
+		managers.network:session():send_to_peers("sync_ability_hud", self:temporary_upgrade_index("temporary", ability), self:upgrade_value("temporary", ability)[2])
+	end
+end
+
+function PlayerManager:_on_activate_chico_injector()
+	local speed_up_on_kill = function()
+		managers.player:speed_up_ability_cooldown("chico_injector", 1)
+	end
+	self:register_message(Message.OnEnemyKilled, "speed_up_chico_injector", speed_up_on_kill)
 end
 
 function PlayerManager:has_active_ability_cooldown(ability)

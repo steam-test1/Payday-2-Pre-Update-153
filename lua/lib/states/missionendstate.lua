@@ -493,9 +493,8 @@ function MissionEndState:generate_safehouse_statistics()
 	if managers.crime_spree:_is_active() and 0 < total_income then
 		stage_safehouse_summary_string = managers.localization:text("menu_es_safehouse_earned", {
 			amount = tostring(total_income)
-		})
+		}) .. "\n"
 	end
-	stage_safehouse_summary_string = stage_safehouse_summary_string .. "\n"
 	if 0 < exp_income then
 		exp_income = managers.experience:cash_string(math.floor(exp_income), "")
 		stage_safehouse_summary_string = stage_safehouse_summary_string .. managers.localization:text("menu_es_safehouse_earned_income", {amount = exp_income}) .. "\n"

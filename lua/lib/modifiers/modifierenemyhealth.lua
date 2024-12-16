@@ -3,6 +3,7 @@ ModifierEnemyHealth._type = "ModifierEnemyHealth"
 ModifierEnemyHealth.name_id = "none"
 ModifierEnemyHealth.desc_id = "menu_cs_modifier_enemy_health"
 ModifierEnemyHealth.default_value = "health"
+ModifierEnemyHealth.total_localization = "menu_cs_modifier_total_generic_percent"
 
 function ModifierEnemyHealth:init(data)
 	ModifierEnemyHealth.super.init(self, data)

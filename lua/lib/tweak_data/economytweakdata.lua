@@ -725,7 +725,7 @@ function EconomyTweakData:init()
 	self.contents.cs3_01_legendary.rarity = "legendary"
 	self.bundles.cs3_01 = {}
 	self.bundles.cs3_01.def_id = 30002
-	self.bundles.cs3_01.dlc_id = "518760"
+	self.bundles.cs3_01.dlc_id = "627400"
 	self.bundles.cs3_01.quality = "mint"
 	self.bundles.cs3_01.bonus = false
 	self.bundles.cs3_01.contains = {
@@ -921,10 +921,11 @@ function EconomyTweakData:init()
 	self.safes.cs3_01.free = true
 	self.safes.cs3_01.drill = "cs3_01"
 	self.safes.cs3_01.content = "cs3_01"
+	self.safes.cs3_01.bundle = "cs3_01"
 	self.safes.cs3_01.name_id = "bm_menu_safe_cs3_01"
 	self.safes.cs3_01.unit_name = "units/payday2_cash/safes/cs3/safe/eco_safe_cs3"
 	self.safes.cs3_01.texture_bundle_folder = "cash/safes/cs3"
-	self.safes.cs3_01.market_link = "https://steamcommunity.com/market/listings/218620/John%20Wick%20Safe"
+	self.safes.cs3_01.market_link = "https://steamcommunity.com/market/listings/218620/Community%20Safe%203"
 	self.safes.cvc_01 = {}
 	self.safes.cvc_01.free = true
 	self.safes.cvc_01.drill = "cvc_01"

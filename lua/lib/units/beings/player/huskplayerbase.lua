@@ -26,6 +26,25 @@ function HuskPlayerBase:post_init()
 	self._unit:movement():play_state(spawn_state)
 end
 
+function HuskPlayerBase:load(data)
+	self._concealment_modifier = data.concealment_modifier
+	if data.upgrades then
+		for category, upgrades in pairs(data.upgrades) do
+			for upgrade, level in pairs(upgrades) do
+				self:set_upgrade_value(category, upgrade, level)
+			end
+		end
+	end
+	if data.temporary_upgrades then
+		for category, temporary_upgrades in pairs(data.temporary_upgrades) do
+			for upgrade, upgrade_data in pairs(temporary_upgrades) do
+				self:set_temporary_upgrade_owned(category, upgrade, upgrade_data.level, upgrade_data.index)
+			end
+		end
+	end
+	self._concealment_modifier = nil
+end
+
 function HuskPlayerBase:set_upgrade_value(category, upgrade, level)
 	self._upgrades[category] = self._upgrades[category] or {}
 	self._upgrade_levels[category] = self._upgrade_levels[category] or {}
@@ -33,7 +52,11 @@ function HuskPlayerBase:set_upgrade_value(category, upgrade, level)
 	self._upgrades[category][upgrade] = value
 	self._upgrade_levels[category][upgrade] = level
 	if upgrade == "passive_concealment_modifier" then
-		local con_mul, index = managers.blackmarket:get_concealment_of_peer(managers.network:session():peer_by_unit(self._unit))
+		local peer = managers.network:session():peer_by_unit(self._unit)
+		local con_mul = self._concealment_modifier
+		if peer then
+			con_mul = managers.blackmarket:get_concealment_of_peer(peer)
+		end
 		self:set_suspicion_multiplier("equipment", 1 / con_mul)
 		self:set_detection_multiplier("equipment", 1 / con_mul)
 	elseif upgrade == "suspicion_multiplier" then

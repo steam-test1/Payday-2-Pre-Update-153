@@ -4705,6 +4705,7 @@ function NarrativeTweakData:init(tweak_data)
 		0
 	}
 	self.jobs.crime_spree.ignore_heat = true
+	self.jobs.crime_spree.hidden = true
 	self._jobs_index = {
 		"jewelry_store",
 		"four_stores",

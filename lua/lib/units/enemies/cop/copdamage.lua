@@ -811,7 +811,7 @@ function CopDamage:damage_fire(attack_data)
 				self:_comment_death(attacker_unit, self._unit:base()._tweak_table)
 			end
 			self:_show_death_hint(self._unit:base()._tweak_table)
-			if not attack_data.is_fire_dot_damage then
+			if not attack_data.is_fire_dot_damage or data.is_molotov then
 				managers.statistics:killed(data)
 			end
 			if is_civilian then
@@ -1787,6 +1787,10 @@ function CopDamage:sync_damage_explosion(attacker_unit, damage_percent, i_attack
 	end
 	if attack_data.attacker_unit and attack_data.attacker_unit == managers.player:player_unit() then
 		managers.hud:on_hit_confirmed()
+		managers.statistics:shot_fired({
+			hit = true,
+			weapon_unit = attacker_unit and attacker_unit:inventory() and attacker_unit:inventory():equipped_unit()
+		})
 	end
 	if result.type == "death" then
 		local data = {
@@ -1813,7 +1817,6 @@ function CopDamage:sync_damage_explosion(attacker_unit, damage_percent, i_attack
 			end
 		end
 	end
-	local weapon_unit = attack_data.weapon_unit
 	if alive(weapon_unit) and weapon_unit:base() and weapon_unit:base().add_damage_result then
 		weapon_unit:base():add_damage_result(self._unit, result.type == "death", damage_percent)
 	end

@@ -3635,6 +3635,8 @@ function PlayerInventoryGui:open_armor_menu()
 	new_node_data.skip_blur = true
 	new_node_data.use_bgs = true
 	new_node_data.panel_grid_w_mul = 0.6
+	managers.environment_controller:set_dof_distance(10, false)
+	managers.menu_scene:remove_item()
 	managers.menu:open_node("blackmarket_armor_node", {new_node_data})
 end
 
