@@ -350,7 +350,7 @@ function MenuInput:mouse_pressed(o, button, x, y)
 			for _, row_item in pairs(node_gui.row_items) do
 				if row_item.item:parameters().pd2_corner then
 					if row_item.gui_text:inside(x, y) then
-						local item = row_item.item
+						local item = self._logic:selected_item()
 						if item then
 							self._item_input_action_map[item.TYPE](item, self._controller, true)
 							return node_gui.mouse_pressed and node_gui:mouse_pressed(button, x, y)
@@ -379,7 +379,7 @@ function MenuInput:mouse_pressed(o, button, x, y)
 						end
 					end
 				elseif row_item.type == "kitslot" then
-					local item = row_item.item
+					local item = self._logic:selected_item()
 					if row_item.arrow_right:inside(x, y) then
 						item:next()
 						self._logic:trigger_item(true, item)
@@ -427,8 +427,9 @@ function MenuInput:mouse_pressed(o, button, x, y)
 					if row_item.chat_input:inside(x, y) then
 						row_item.chat_input:script().set_focus(true)
 					end
+				elseif row_item.type == "divider" then
 				else
-					local item = row_item.item
+					local item = self._logic:selected_item()
 					if item then
 						self._item_input_action_map[item.TYPE](item, self._controller, true)
 						return node_gui.mouse_pressed and node_gui:mouse_pressed(button, x, y)

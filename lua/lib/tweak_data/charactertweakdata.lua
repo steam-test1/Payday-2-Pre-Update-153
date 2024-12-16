@@ -7566,7 +7566,8 @@ function CharacterTweakData:_create_table_structure()
 		"x_c45",
 		"sg417",
 		"svdsil_snp",
-		"mini"
+		"mini",
+		"heavy_zeal_sniper"
 	}
 	self.weap_unit_names = {
 		Idstring("units/payday2/weapons/wpn_npc_beretta92/wpn_npc_beretta92"),
@@ -7596,7 +7597,8 @@ function CharacterTweakData:_create_table_structure()
 		Idstring("units/payday2/weapons/wpn_npc_c45/wpn_npc_x_c45"),
 		Idstring("units/pd2_dlc_chico/weapons/wpn_npc_sg417/wpn_npc_sg417"),
 		Idstring("units/pd2_dlc_spa/weapons/wpn_npc_svd_silenced/wpn_npc_svd_silenced"),
-		Idstring("units/pd2_dlc_drm/weapons/wpn_npc_mini/wpn_npc_mini")
+		Idstring("units/pd2_dlc_drm/weapons/wpn_npc_mini/wpn_npc_mini"),
+		Idstring("units/pd2_dlc_drm/weapons/wpn_npc_heavy_zeal_sniper/wpn_npc_heavy_zeal_sniper")
 	}
 end
 
