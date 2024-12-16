@@ -29,56 +29,69 @@ function MultiProfileItemGui:init(ws, panel)
 		}
 	})
 	if managers.menu:is_pc_controller() then
-		self._quick_panel = self._quick_panel or self._panel:panel({
-			h = self.quick_panel_h
+		self._panel:set_w(self._panel:w() + self._profile_panel:h())
+		self._quick_select_panel = self._quick_select_panel or self._panel:panel({
+			w = self._profile_panel:h(),
+			h = self._profile_panel:h()
 		})
-		self._quick_select_panel = self._quick_select_panel or self._quick_panel:panel({
-			w = self.quick_panel_h,
-			h = self.quick_panel_h
-		})
-		self._quick_select_panel:set_right(self._quick_panel:right())
+		self._quick_select_panel:set_left(self._profile_panel:right())
+		self._quick_select_panel:set_top(self._profile_panel:top())
 		if not self._quick_select_panel_elements then
 			self._quick_select_panel_elements = {}
 			table.insert(self._quick_select_panel_elements, self._quick_select_panel:rect({
 				color = tweak_data.screen_colors.button_stage_3,
-				x = 4,
-				y = 5,
-				w = 3,
+				x = 5,
+				y = 7,
+				w = 5,
 				h = 3
 			}))
 			table.insert(self._quick_select_panel_elements, self._quick_select_panel:rect({
 				color = tweak_data.screen_colors.button_stage_3,
-				x = 9,
-				y = 5,
-				w = 11,
+				x = 12,
+				y = 7,
+				w = 16,
 				h = 3
 			}))
 			table.insert(self._quick_select_panel_elements, self._quick_select_panel:rect({
 				color = tweak_data.screen_colors.button_stage_3,
-				x = 4,
-				y = 11,
-				w = 3,
+				x = 5,
+				y = 13,
+				w = 5,
 				h = 3
 			}))
 			table.insert(self._quick_select_panel_elements, self._quick_select_panel:rect({
 				color = tweak_data.screen_colors.button_stage_3,
-				x = 9,
-				y = 11,
-				w = 11,
+				x = 12,
+				y = 13,
+				w = 16,
 				h = 3
 			}))
 			table.insert(self._quick_select_panel_elements, self._quick_select_panel:rect({
 				color = tweak_data.screen_colors.button_stage_3,
-				x = 4,
-				y = 17,
-				w = 3,
+				x = 5,
+				y = 19,
+				w = 5,
 				h = 3
 			}))
 			table.insert(self._quick_select_panel_elements, self._quick_select_panel:rect({
 				color = tweak_data.screen_colors.button_stage_3,
-				x = 9,
-				y = 17,
-				w = 11,
+				x = 12,
+				y = 19,
+				w = 16,
+				h = 3
+			}))
+			table.insert(self._quick_select_panel_elements, self._quick_select_panel:rect({
+				color = tweak_data.screen_colors.button_stage_3,
+				x = 5,
+				y = 25,
+				w = 5,
+				h = 3
+			}))
+			table.insert(self._quick_select_panel_elements, self._quick_select_panel:rect({
+				color = tweak_data.screen_colors.button_stage_3,
+				x = 12,
+				y = 25,
+				w = 16,
 				h = 3
 			}))
 		end
@@ -89,10 +102,10 @@ function MultiProfileItemGui:init(ws, panel)
 		})
 		BoxGuiObject:new(self._quick_select_panel:panel(), {
 			sides = {
-				3,
-				3,
+				0,
 				1,
-				0
+				4,
+				4
 			}
 		})
 	end

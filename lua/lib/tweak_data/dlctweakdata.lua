@@ -5205,7 +5205,7 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.howl = {}
-	self.howl.free = true
+	self.howl.free = false
 	self.howl.content = {}
 	self.howl.content.loot_global_value = "halloween"
 	self.howl.content.loot_drops = {
@@ -5795,7 +5795,7 @@ function DLCTweakData:init(tweak_data)
 	self.pn2_bundle.content.loot_global_value = "pn2"
 	self.pn2_bundle.content.loot_drops = {}
 	self.mp2_bundle = {}
-	self.mp2_bundle.free = true
+	self.mp2_bundle.free = false
 	self.mp2_bundle.content = {}
 	self.mp2_bundle.content.loot_global_value = "normal"
 	self.mp2_bundle.content.loot_drops = {
@@ -5821,7 +5821,7 @@ function DLCTweakData:init(tweak_data)
 		}
 	}
 	self.amp_bundle = {}
-	self.amp_bundle.free = true
+	self.amp_bundle.free = false
 	self.amp_bundle.content = {}
 	self.amp_bundle.content.loot_global_value = "normal"
 	self.amp_bundle.content.loot_drops = {

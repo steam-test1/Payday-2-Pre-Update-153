@@ -823,6 +823,31 @@ function EconomyTweakData:init()
 		weapon_skins = {"p90_cs4"}
 	}
 	self.contents.cs4_01_legendary.rarity = "legendary"
+	self.bundles.cs4_01 = {}
+	self.bundles.cs4_01.def_id = 30003
+	self.bundles.cs4_01.dlc_id = "694940"
+	self.bundles.cs4_01.quality = "mint"
+	self.bundles.cs4_01.bonus = false
+	self.bundles.cs4_01.contains = {
+		weapon_skins = {
+			"polymer_cs4",
+			"l85a2_cs4",
+			"amcar_cs4",
+			"usp_cs4",
+			"m16_cs4",
+			"benelli_cs4",
+			"wa2000_cs4",
+			"serbu_cs4",
+			"arbiter_cs4",
+			"flint_cs4",
+			"chinchilla_cs4",
+			"rpg7_cs4",
+			"mac10_cs4",
+			"new_raging_bull_cs4",
+			"striker_cs4",
+			"p90_cs4"
+		}
+	}
 	self.safes.overkill_01 = {}
 	self.safes.overkill_01.def_id = 50000
 	self.safes.overkill_01.promo = true
@@ -1008,6 +1033,7 @@ function EconomyTweakData:init()
 	self.safes.cs4_01.free = true
 	self.safes.cs4_01.drill = "cs4_01"
 	self.safes.cs4_01.content = "cs4_01"
+	self.safes.cs4_01.bundle = "cs4_01"
 	self.safes.cs4_01.name_id = "bm_menu_safe_cs4_01"
 	self.safes.cs4_01.unit_name = "units/payday2_cash/safes/cs4/safe/eco_safe_cs4"
 	self.safes.cs4_01.texture_bundle_folder = "cash/safes/cs4"

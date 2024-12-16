@@ -637,6 +637,8 @@ function TweakData:init()
 	self.ai_carry = {}
 	self.ai_carry.throw_distance = 500
 	self.ai_carry.throw_force = 100
+	self.ai_carry.revive_distance_autopickup = 300
+	self.ai_carry.death_distance_teleport = 300
 	self.EFFECT_QUALITY = 0.5
 	if SystemInfo:platform() == Idstring("X360") then
 		self.EFFECT_QUALITY = 0.5

@@ -1683,10 +1683,9 @@ function MenuComponentManager:can_afford()
 end
 
 function MenuComponentManager:_create_crimenet_gui(...)
-	if self._crimenet_gui then
-		return
+	if not self._crimenet_gui then
+		self._crimenet_gui = CrimeNetGui:new(self._ws, self._fullscreen_ws, ...)
 	end
-	self._crimenet_gui = CrimeNetGui:new(self._ws, self._fullscreen_ws, ...)
 end
 
 function MenuComponentManager:start_crimenet_job()

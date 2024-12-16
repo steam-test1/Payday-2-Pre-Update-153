@@ -94,7 +94,6 @@ function CrimeSpreeResultTabItem:_create_level(total_w)
 		local font = tweak_data.menu.pd2_small_font
 		local font_size = tweak_data.menu.pd2_small_font_size
 		local bonus = self._level_panel:text({
-			name = "bonus" .. tostring(bonus_i),
 			text = text or "",
 			h = font_size,
 			align = "center",
@@ -112,7 +111,6 @@ function CrimeSpreeResultTabItem:_create_level(total_w)
 		local bonus_amt
 		if level ~= nil then
 			bonus_amt = self._level_panel:text({
-				name = "amount" .. tostring(bonus_i),
 				text = "+" .. managers.localization:text("menu_cs_level", {
 					level = level or 0
 				}),

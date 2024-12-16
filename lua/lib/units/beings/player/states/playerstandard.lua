@@ -2463,7 +2463,7 @@ function PlayerStandard:_get_unit_intimidation_action(intimidate_enemies, intimi
 	if intimidate_civilians then
 		local civilians = managers.enemy:all_civilians()
 		for u_key, u_data in pairs(civilians) do
-			if u_data.unit:in_slot(21) and not u_data.unit:movement():cool() and not u_data.unit:anim_data().long_dis_interact_disabled then
+			if alive(u_data.unit) and u_data.unit:in_slot(21) and not u_data.unit:movement():cool() and not u_data.unit:anim_data().long_dis_interact_disabled then
 				local is_escort = u_data.char_tweak.is_escort
 				if not is_escort or intimidate_escorts then
 					local dist = is_escort and 300 or intimidate_range_civ

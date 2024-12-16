@@ -226,8 +226,10 @@ function GroupAIStateBase:set_AI_enabled(state)
 			end
 		end
 		for u_key, u_data in pairs(managers.enemy:all_civilians()) do
-			Network:detach_unit(u_data.unit)
-			World:delete_unit(u_data.unit)
+			if alive(u_data.unit) then
+				Network:detach_unit(u_data.unit)
+				World:delete_unit(u_data.unit)
+			end
 		end
 		for _, char in ipairs(managers.criminals:characters()) do
 			if char.ai == false and alive(char.unit) then
@@ -2384,7 +2386,8 @@ function GroupAIStateBase:remove_one_teamAI(name_to_remove, replace_with_player)
 	local trade_entry = self:sync_remove_one_teamAI(name, replace_with_player)
 	managers.network:session():send_to_peers_synched("sync_remove_one_teamAI", name, replace_with_player)
 	if alive(unit) then
-		if unit:movement():carrying_bag() then
+		local teleported = unit:character_damage():_teleport_carried_bag()
+		if not teleported and unit:movement():carrying_bag() then
 			unit:movement():throw_bag()
 		end
 		unit:brain():set_active(false)

@@ -479,7 +479,7 @@ function MenuItemMultiChoice:popup_choice(row_item)
 	end
 	local divider = {}
 	divider.no_text = true
-	divider.allow_selection = false
+	divider.no_selection = true
 	table.insert(dialog_data.button_list, divider)
 	local no_button = {}
 	no_button.text = managers.localization:text("dialog_cancel")

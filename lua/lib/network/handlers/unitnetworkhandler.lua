@@ -3221,3 +3221,13 @@ function UnitNetworkHandler:sync_shotgun_push(unit, hit_pos, dir, distance, atta
 	end
 	managers.game_play_central:_do_shotgun_push(unit, hit_pos, dir, distance, attacker, sender)
 end
+
+function UnitNetworkHandler:sync_carry_set_position_and_throw(unit, destination, direction, force, sender)
+	if not self._verify_gamestate(self._gamestate_filter.any_ingame) or not self._verify_sender(sender) then
+		return
+	end
+	if not alive(unit) then
+		return
+	end
+	unit:carry_data():set_position_and_throw(destination, direction, force)
+end

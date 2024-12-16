@@ -261,7 +261,10 @@ end
 
 function TeamAIMovement:set_should_stay(should_stay)
 	if self._should_stay ~= should_stay then
-		managers.hud:set_ai_stopped(managers.criminals:character_data_by_unit(self._unit).panel_id, should_stay)
+		local panel = managers.criminals:character_data_by_unit(self._unit)
+		if panel then
+			managers.hud:set_ai_stopped(panel.panel_id, should_stay)
+		end
 		self._should_stay = should_stay
 		managers.network:session():send_to_peers_synched("sync_team_ai_stopped", self._unit, should_stay)
 		if should_stay then
@@ -305,11 +308,16 @@ function TeamAIMovement:throw_bag(target_unit, reason)
 		return
 	end
 	local carry_unit = self._carry_unit
+	self._was_carrying = {unit = carry_unit, reason = reason}
 	carry_unit:carry_data():unlink()
 	if Network:is_server() then
 		self:sync_throw_bag(carry_unit, target_unit)
 		managers.network:session():send_to_peers("sync_ai_throw_bag", self._unit, carry_unit, target_unit)
 	end
+end
+
+function TeamAIMovement:was_carrying_bag()
+	return self._was_carrying
 end
 
 function TeamAIMovement:sync_throw_bag(carry_unit, target_unit)
@@ -326,16 +334,6 @@ function TeamAIMovement:update(...)
 	if self._pre_destroyed then
 		return
 	end
-	if self._last_position then
-		local ray = World:raycast("ray", self._last_position, self:m_detect_pos(), "ignore_unit", self._unit, "ray_type", "throw bag body")
-		if ray and not ray.unit:visible() and self:carry_data() then
-			print("[CarryData:link_to] this is not a valid place for a bag, dropping it", self:carry_data()._unit, ray.unit)
-			self:carry_data():unlink()
-		end
-	else
-		self._last_position = Vector3()
-	end
-	mvector3.set(self._last_position, self:m_detect_pos())
 	if self._ext_anim and self._ext_anim.reload then
 		if not alive(self._left_hand_obj) then
 			self._left_hand_obj = self._unit:get_object(Idstring("LeftHandMiddle1"))

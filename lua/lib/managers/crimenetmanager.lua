@@ -3232,7 +3232,8 @@ function CrimeNetGui:update(t, dt)
 			self:_set_map_position(0, my)
 		end
 	end
-	if not managers.menu:is_pc_controller() and managers.mouse_pointer:mouse_move_x() == 0 and managers.mouse_pointer:mouse_move_y() == 0 then
+	local update_controller_snap = true
+	if update_controller_snap and not managers.menu:is_pc_controller() and managers.mouse_pointer:mouse_move_x() == 0 and managers.mouse_pointer:mouse_move_y() == 0 then
 		local closest_job
 		local closest_dist = 100000000
 		local closest_job_x, closest_job_y = 0, 0
