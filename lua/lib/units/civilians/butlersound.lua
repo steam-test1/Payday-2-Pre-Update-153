@@ -20,6 +20,15 @@ function ButlerSound:init(unit)
 	self._unit:set_extension_update_enabled(Idstring("sound"), false)
 	managers.enemy:add_delayed_clbk("ButlerSound", callback(self, self, "_mirroring_clbk"), TimerManager:game():time() + 2)
 	self.character = "btl"
+	local found = World:find_units_quick("all", 1)
+	for k, v in pairs(found) do
+		if string.ends(v:model_filename(), "rsu_prop_trophy_officer_footlocker") then
+			self._chest_unit = v
+			break
+		end
+	end
+	self._raid_box_count = 1
+	self._raid_idle_count = 1
 end
 
 function ButlerSound:_mirroring_clbk()
@@ -49,4 +58,30 @@ function ButlerSound:_sound_start_mirroring()
 	if snd_event then
 		self:say(snd_event, false, true)
 	end
+end
+
+function ButlerSound:_sound_start_muttering()
+	local override_sound
+	local CLOSE_SQ = 1000000
+	local CLOSE_Z = 200
+	if self._last_chest then
+		self._last_chest = false
+	elseif self._chest_unit and (self._raid_box_count < 5 and math.random() < 0.8 or math.random() < 0.2) then
+		local my_pos = self._unit:position()
+		local chest_pos = self._chest_unit:position()
+		local dist_sq = mvector3.distance_sq(my_pos, chest_pos)
+		if CLOSE_SQ > dist_sq and CLOSE_Z > math.abs(my_pos.z - chest_pos.z) then
+			override_sound = "Play_btl_raid_box_large"
+			self._raid_box_count = self._raid_box_count + 1
+			self._last_chest = true
+		end
+	end
+	if self._last_promo then
+		self._last_promo = false
+	elseif not override_sound and (self._raid_idle_count < 6 and math.random() < 0.7 or math.random() < 0.1) then
+		override_sound = "Play_btl_raid_promo_01"
+		self._raid_idle_count = self._raid_idle_count + 1
+		self._last_promo = true
+	end
+	ButlerSound.super._sound_start_muttering(self, override_sound)
 end

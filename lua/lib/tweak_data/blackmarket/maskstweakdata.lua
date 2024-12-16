@@ -4107,6 +4107,14 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.dgm.texture_bundle_folder = "dgm"
 	self.masks.dgm.sort_number = 50
 	self.masks.dgm.global_value = "pd2_clan"
+	self.masks.gcm = {}
+	self.masks.gcm.unit = "units/pd2_dlc_gcm/masks/msk_gcm"
+	self.masks.gcm.name_id = "bm_msk_gcm"
+	self.masks.gcm.pcs = {}
+	self.masks.gcm.value = 0
+	self.masks.gcm.texture_bundle_folder = "gcm"
+	self.masks.gcm.sort_number = 53
+	self.masks.gcm.global_value = "pd2_clan"
 	local free_dlcs = tweak_data:free_dlc_list()
 	for _, data in pairs(self.masks) do
 		if free_dlcs[data.dlc] then

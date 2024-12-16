@@ -573,7 +573,7 @@ end
 function PlayerDriving:on_inventory_event(unit, event)
 	local weapon = self._unit:inventory():equipped_unit()
 	table.insert(weapon:base()._setup.ignore_units, self._vehicle_unit)
-	if self._current_weapon then
+	if alive(self._current_weapon) then
 		table.delete(self._current_weapon:base()._setup.ignore_units, self._vehicle_unit)
 	end
 	self._current_weapon = weapon

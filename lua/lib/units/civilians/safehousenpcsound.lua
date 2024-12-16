@@ -80,7 +80,7 @@ function SafehouseNPCSound:_on_muttering_done()
 	self._snd_clbk = nil
 end
 
-function SafehouseNPCSound:_sound_start_muttering()
+function SafehouseNPCSound:_sound_start_muttering(override_sound)
 	if not self.character then
 		debug_pause("[SafehouseNPCSound:_sound_start_muttering] no character set!")
 		return
@@ -89,5 +89,5 @@ function SafehouseNPCSound:_sound_start_muttering()
 		self._unit:interaction():set_active(false)
 	end
 	self._snd_clbk = callback(self, self, "_on_muttering_done")
-	self:say(string.format("Play_%s_idle", self.character), false, true)
+	self:say(override_sound or string.format("Play_%s_idle", self.character), false, true)
 end

@@ -1853,6 +1853,15 @@ Play the full version soon to get your full PAYDAY!]],
 	}
 	self.casino.infamous_cost = 3000000
 	self.casino.infamous_chance = 3
+	self.weapon_disable_crit_for_damage = {
+		frag = {explosion = false, fire = false},
+		dada_com = {explosion = false, fire = false},
+		fir_com = {explosion = false, fire = false},
+		launcher_frag = {explosion = false, fire = false},
+		launcher_rocket = {explosion = false, fire = false},
+		rocket_ray_frag = {explosion = false, fire = false},
+		environment_fire = {fire = false}
+	}
 	self.projectiles = {}
 	self.projectiles.frag = {}
 	self.projectiles.frag.damage = 160
@@ -1919,7 +1928,7 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.launcher_incendiary.init_timer = 2.5
 	self.projectiles.launcher_incendiary.mass_look_up_modifier = 1
 	self.projectiles.launcher_incendiary.sound_event = "gl_explode"
-	self.projectiles.launcher_incendiary.sound_event_impact_duration = 1
+	self.projectiles.launcher_incendiary.sound_event_impact_duration = 0.25
 	self.projectiles.launcher_incendiary.name_id = "bm_launcher_incendiary"
 	self.projectiles.launcher_incendiary.burn_duration = 6
 	self.projectiles.launcher_incendiary.burn_tick_period = 0.5
@@ -1953,7 +1962,7 @@ Play the full version soon to get your full PAYDAY!]],
 	self.projectiles.launcher_incendiary_arbiter.init_timer = 2.5
 	self.projectiles.launcher_incendiary_arbiter.mass_look_up_modifier = 1
 	self.projectiles.launcher_incendiary_arbiter.sound_event = "gl_explode"
-	self.projectiles.launcher_incendiary_arbiter.sound_event_impact_duration = 1
+	self.projectiles.launcher_incendiary_arbiter.sound_event_impact_duration = 0.25
 	self.projectiles.launcher_incendiary_arbiter.name_id = "bm_launcher_incendiary"
 	self.projectiles.launcher_incendiary_arbiter.burn_duration = 3
 	self.projectiles.launcher_incendiary_arbiter.burn_tick_period = 0.5

@@ -1540,7 +1540,8 @@ function CharacterTweakData:_init_tank(presets)
 		}
 	}
 	self.tank_hw.HEALTH_INIT = 200
-	self.tank_hw.headshot_dmg_mul = 2
+	self.tank_hw.headshot_dmg_mul = 1
+	self.tank_hw.ignore_headshot = true
 	self.tank_hw.damage.explosion_damage_mul = 1
 	self.tank_hw.use_animation_on_fire_damage = false
 	self.tank_hw.flammable = true

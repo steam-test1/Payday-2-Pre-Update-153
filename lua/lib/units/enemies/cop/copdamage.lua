@@ -349,7 +349,7 @@ function CopDamage:damage_bullet(attack_data)
 	local headshot = false
 	local headshot_multiplier = 1
 	if attack_data.attacker_unit == managers.player:player_unit() then
-		local critical_hit, crit_damage = self:roll_critical_hit(damage)
+		local critical_hit, crit_damage = self:roll_critical_hit(attack_data)
 		if critical_hit then
 			managers.hud:on_crit_confirmed()
 			damage = crit_damage
@@ -365,7 +365,7 @@ function CopDamage:damage_bullet(attack_data)
 			headshot = true
 		end
 	end
-	if not self._damage_reduction_multiplier and head then
+	if not self._char_tweak.ignore_headshot and not self._damage_reduction_multiplier and head then
 		if self._char_tweak.headshot_dmg_mul then
 			damage = damage * self._char_tweak.headshot_dmg_mul * headshot_multiplier
 		else
@@ -514,130 +514,141 @@ end
 
 function CopDamage:_check_damage_achievements(attack_data, head)
 	local attack_weapon = attack_data.weapon_unit
-	if alive(attack_weapon) and attack_weapon:base() and attack_weapon:base().weapon_tweak_data and not CopDamage.is_civilian(self._unit:base()._tweak_table) then
-		if managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.pump_action.mask and attack_weapon:base():is_category("shotgun") then
-			managers.achievment:award_progress(tweak_data.achievement.pump_action.stat)
+	local is_weapon_valid = alive(attack_weapon) and attack_weapon:base()
+	if not is_weapon_valid then
+		return
+	end
+	if CopDamage.is_civilian(self._unit:base()._tweak_table) then
+		return
+	end
+	if attack_weapon:base().thrower_unit then
+		return
+	end
+	if managers.blackmarket:equipped_mask().mask_id == tweak_data.achievement.pump_action.mask and attack_weapon:base():is_category("shotgun") then
+		managers.achievment:award_progress(tweak_data.achievement.pump_action.stat)
+	end
+	local unit_type = self._unit:base()._tweak_table
+	local unit_weapon = self._unit:base()._default_weapon_id
+	local unit_anim = self._unit.anim_data and self._unit:anim_data()
+	local achievements = tweak_data.achievement.enemy_kill_achievements or {}
+	local current_mask_id = managers.blackmarket:equipped_mask().mask_id
+	local weapons_pass, weapon_pass, fire_mode_pass, ammo_pass, enemy_pass, enemy_weapon_pass, mask_pass, hiding_pass, head_pass, steelsight_pass, distance_pass, zipline_pass, rope_pass, one_shot_pass, weapon_type_pass, level_pass, part_pass, parts_pass, timer_pass, cop_pass, gangster_pass, civilian_pass, count_no_reload_pass, count_pass, count_in_row_pass, diff_pass, complete_count_pass, all_pass, memory
+	local kill_count_no_reload = managers.job:get_memory("kill_count_no_reload_" .. tostring(attack_weapon:base()._name_id), true)
+	kill_count_no_reload = (kill_count_no_reload or 0) + 1
+	managers.job:set_memory("kill_count_no_reload_" .. tostring(attack_weapon:base()._name_id), kill_count_no_reload, true)
+	local kill_count_carry_or_not = managers.job:get_memory("kill_count_" .. (managers.player:is_carrying() and "carry" or "no_carry"), true)
+	kill_count_carry_or_not = (kill_count_carry_or_not or 0) + 1
+	managers.job:set_memory("kill_count_" .. (managers.player:is_carrying() and "carry" or "no_carry"), kill_count_carry_or_not, true)
+	local is_cop = CopDamage.is_cop(self._unit:base()._tweak_table)
+	local weapon_category = {}
+	if attack_weapon:base().weapon_tweak_data then
+		weapon_category = attack_weapon:base():weapon_tweak_data().categories
+	end
+	for achievement, achievement_data in pairs(achievements) do
+		weapon_type_pass = not achievement_data.weapon_type or weapon_category and table.contains(weapon_category, achievement_data.weapon_type)
+		weapons_pass = not achievement_data.weapons or table.contains(achievement_data.weapons, attack_weapon:base()._name_id)
+		weapon_pass = not achievement_data.weapon or attack_weapon:base().name_id == achievement_data.weapon
+		fire_mode_pass = not achievement_data.fire_mode or attack_weapon:base():fire_mode() == achievement_data.fire_mode
+		ammo_pass = not achievement_data.total_ammo or attack_weapon:base():get_ammo_total() == achievement_data.total_ammo
+		one_shot_pass = not achievement_data.one_shot or attack_data.damage == self._HEALTH_INIT
+		enemy_pass = not achievement_data.enemy or unit_type == achievement_data.enemy
+		enemy_weapon_pass = not achievement_data.enemy_weapon or unit_weapon == achievement_data.enemy_weapon
+		mask_pass = not achievement_data.mask or current_mask_id == achievement_data.mask
+		hiding_pass = not achievement_data.hiding or unit_anim and unit_anim.hide
+		head_pass = not achievement_data.in_head or head
+		distance_pass = not achievement_data.distance or attack_data.col_ray and attack_data.col_ray.distance and attack_data.col_ray.distance >= achievement_data.distance
+		zipline_pass = not achievement_data.on_zipline or attack_data.attacker_unit and attack_data.attacker_unit:movement():zipline_unit()
+		rope_pass = not achievement_data.on_rope or self._unit:movement() and self._unit:movement():rope_unit()
+		level_pass = not achievement_data.level_id or (managers.job:current_level_id() or "") == achievement_data.level_id
+		steelsight_pass = achievement_data.in_steelsight == nil or attack_data.attacker_unit and attack_data.attacker_unit:movement() and not not attack_data.attacker_unit:movement():current_state():in_steelsight() == not not achievement_data.in_steelsight
+		count_no_reload_pass = not achievement_data.count_no_reload or kill_count_no_reload >= achievement_data.count_no_reload
+		count_pass = not achievement_data.kill_count or achievement_data.weapon and managers.statistics:session_killed_by_weapon(achievement_data.weapon) == achievement_data.kill_count
+		diff_pass = not achievement_data.difficulty or table.contains(achievement_data.difficulty, Global.game_settings.difficulty)
+		cop_pass = not achievement_data.is_cop or is_cop
+		complete_count_pass = not achievement_data.complete_count
+		if achievement_data.complete_count and achievement_data.weapons then
+			local total = 0
+			for _, weapon in ipairs(achievement_data.weapons) do
+				total = total + managers.statistics:session_killed_by_weapon(weapon)
+			end
+			complete_count_pass = total == achievement_data.complete_count
 		end
-		local unit_type = self._unit:base()._tweak_table
-		local unit_weapon = self._unit:base()._default_weapon_id
-		local unit_anim = self._unit.anim_data and self._unit:anim_data()
-		local achievements = tweak_data.achievement.enemy_kill_achievements or {}
-		local current_mask_id = managers.blackmarket:equipped_mask().mask_id
-		local weapons_pass, weapon_pass, fire_mode_pass, ammo_pass, enemy_pass, enemy_weapon_pass, mask_pass, hiding_pass, head_pass, steelsight_pass, distance_pass, zipline_pass, rope_pass, one_shot_pass, weapon_type_pass, level_pass, part_pass, parts_pass, timer_pass, cop_pass, gangster_pass, civilian_pass, count_no_reload_pass, count_pass, count_in_row_pass, diff_pass, complete_count_pass, all_pass, memory
-		local kill_count_no_reload = managers.job:get_memory("kill_count_no_reload_" .. tostring(attack_weapon:base()._name_id), true)
-		kill_count_no_reload = (kill_count_no_reload or 0) + 1
-		managers.job:set_memory("kill_count_no_reload_" .. tostring(attack_weapon:base()._name_id), kill_count_no_reload, true)
-		local kill_count_carry_or_not = managers.job:get_memory("kill_count_" .. (managers.player:is_carrying() and "carry" or "no_carry"), true)
-		kill_count_carry_or_not = (kill_count_carry_or_not or 0) + 1
-		managers.job:set_memory("kill_count_" .. (managers.player:is_carrying() and "carry" or "no_carry"), kill_count_carry_or_not, true)
-		local is_cop = CopDamage.is_cop(self._unit:base()._tweak_table)
-		local weapon_category = attack_weapon:base():weapon_tweak_data().categories
-		for achievement, achievement_data in pairs(achievements) do
-			weapon_type_pass = not achievement_data.weapon_type or weapon_category and table.contains(weapon_category, achievement_data.weapon_type)
-			weapons_pass = not achievement_data.weapons or table.contains(achievement_data.weapons, attack_weapon:base()._name_id)
-			weapon_pass = not achievement_data.weapon or attack_weapon:base().name_id == achievement_data.weapon
-			fire_mode_pass = not achievement_data.fire_mode or attack_weapon:base():fire_mode() == achievement_data.fire_mode
-			ammo_pass = not achievement_data.total_ammo or attack_weapon:base():get_ammo_total() == achievement_data.total_ammo
-			one_shot_pass = not achievement_data.one_shot or attack_data.damage == self._HEALTH_INIT
-			enemy_pass = not achievement_data.enemy or unit_type == achievement_data.enemy
-			enemy_weapon_pass = not achievement_data.enemy_weapon or unit_weapon == achievement_data.enemy_weapon
-			mask_pass = not achievement_data.mask or current_mask_id == achievement_data.mask
-			hiding_pass = not achievement_data.hiding or unit_anim and unit_anim.hide
-			head_pass = not achievement_data.in_head or head
-			distance_pass = not achievement_data.distance or attack_data.col_ray and attack_data.col_ray.distance and attack_data.col_ray.distance >= achievement_data.distance
-			zipline_pass = not achievement_data.on_zipline or attack_data.attacker_unit and attack_data.attacker_unit:movement():zipline_unit()
-			rope_pass = not achievement_data.on_rope or self._unit:movement() and self._unit:movement():rope_unit()
-			level_pass = not achievement_data.level_id or (managers.job:current_level_id() or "") == achievement_data.level_id
-			steelsight_pass = achievement_data.in_steelsight == nil or attack_data.attacker_unit and attack_data.attacker_unit:movement() and not not attack_data.attacker_unit:movement():current_state():in_steelsight() == not not achievement_data.in_steelsight
-			count_no_reload_pass = not achievement_data.count_no_reload or kill_count_no_reload >= achievement_data.count_no_reload
-			count_pass = not achievement_data.kill_count or achievement_data.weapon and managers.statistics:session_killed_by_weapon(achievement_data.weapon) == achievement_data.kill_count
-			diff_pass = not achievement_data.difficulty or table.contains(achievement_data.difficulty, Global.game_settings.difficulty)
-			cop_pass = not achievement_data.is_cop or is_cop
-			complete_count_pass = not achievement_data.complete_count
-			if achievement_data.complete_count and achievement_data.weapons then
-				local total = 0
-				for _, weapon in ipairs(achievement_data.weapons) do
-					total = total + managers.statistics:session_killed_by_weapon(weapon)
-				end
-				complete_count_pass = total == achievement_data.complete_count
-			end
-			local enemy_type = self._unit:base()._tweak_table
-			if achievement_data.enemies then
-				enemy_pass = false
-				for _, enemy in pairs(achievement_data.enemies) do
-					if enemy == enemy_type then
-						enemy_pass = true
-						break
-					end
+		local enemy_type = self._unit:base()._tweak_table
+		if achievement_data.enemies then
+			enemy_pass = false
+			for _, enemy in pairs(achievement_data.enemies) do
+				if enemy == enemy_type then
+					enemy_pass = true
+					break
 				end
 			end
-			part_pass = not achievement_data.part_id or attack_weapon:base().has_part and attack_weapon:base():has_part(achievement_data.part_id)
-			parts_pass = not achievement_data.parts
-			if achievement_data.parts and attack_weapon:base().has_part then
-				for _, part_id in ipairs(achievement_data.parts) do
-					if attack_weapon:base():has_part(part_id) then
-						parts_pass = true
-						break
-					end
+		end
+		part_pass = not achievement_data.part_id or attack_weapon:base().has_part and attack_weapon:base():has_part(achievement_data.part_id)
+		parts_pass = not achievement_data.parts
+		if achievement_data.parts and attack_weapon:base().has_part then
+			for _, part_id in ipairs(achievement_data.parts) do
+				if attack_weapon:base():has_part(part_id) then
+					parts_pass = true
+					break
 				end
 			end
-			all_pass = weapon_type_pass and weapons_pass and weapon_pass and fire_mode_pass and ammo_pass and one_shot_pass and enemy_pass and enemy_weapon_pass and mask_pass and hiding_pass and head_pass and distance_pass and zipline_pass and rope_pass and level_pass and part_pass and steelsight_pass and cop_pass and count_no_reload_pass and count_pass and diff_pass and complete_count_pass
-			timer_pass = not achievement_data.timer
-			if all_pass and achievement_data.timer then
-				memory = managers.job:get_memory(achievement, true)
-				local t = TimerManager:game():time()
-				if memory then
-					table.insert(memory, t)
-					for i = #memory, 1, -1 do
-						if t - memory[i] >= achievement_data.timer then
-							table.remove(memory, i)
-						end
+		end
+		all_pass = weapon_type_pass and weapons_pass and weapon_pass and fire_mode_pass and ammo_pass and one_shot_pass and enemy_pass and enemy_weapon_pass and mask_pass and hiding_pass and head_pass and distance_pass and zipline_pass and rope_pass and level_pass and part_pass and steelsight_pass and cop_pass and count_no_reload_pass and count_pass and diff_pass and complete_count_pass
+		timer_pass = not achievement_data.timer
+		if all_pass and achievement_data.timer then
+			memory = managers.job:get_memory(achievement, true)
+			local t = TimerManager:game():time()
+			if memory then
+				table.insert(memory, t)
+				for i = #memory, 1, -1 do
+					if t - memory[i] >= achievement_data.timer then
+						table.remove(memory, i)
 					end
-					timer_pass = #memory >= achievement_data.count
-					managers.job:set_memory(achievement, memory, true)
+				end
+				timer_pass = #memory >= achievement_data.count
+				managers.job:set_memory(achievement, memory, true)
+			else
+				managers.job:set_memory(achievement, {t}, true)
+			end
+		end
+		all_pass = all_pass and timer_pass
+		count_in_row_pass = not achievement_data.count_in_row
+		if achievement_data.count_in_row then
+			memory = managers.job:get_memory(achievement, true) or 0
+			if memory then
+				if all_pass then
+					memory = memory + 1
+					count_in_row_pass = memory >= achievement_data.count_in_row
 				else
-					managers.job:set_memory(achievement, {t}, true)
+					memory = false
 				end
-			end
-			all_pass = all_pass and timer_pass
-			count_in_row_pass = not achievement_data.count_in_row
-			if achievement_data.count_in_row then
-				memory = managers.job:get_memory(achievement, true) or 0
-				if memory then
-					if all_pass then
-						memory = memory + 1
-						count_in_row_pass = memory >= achievement_data.count_in_row
-					else
-						memory = false
-					end
-					managers.job:set_memory(achievement, memory, true)
-				end
-			end
-			all_pass = all_pass and count_in_row_pass
-			if all_pass then
-				if achievement_data.stat then
-					managers.achievment:award_progress(achievement_data.stat)
-				elseif achievement_data.award then
-					managers.achievment:award(achievement_data.award)
-				elseif achievement_data.challenge_stat then
-					managers.challenge:award_progress(achievement_data.challenge_stat)
-				elseif achievement_data.trophy_stat then
-					managers.custom_safehouse:award(achievement_data.trophy_stat)
-				elseif achievement_data.challenge_award then
-					managers.challenge:award(achievement_data.challenge_award)
-				end
+				managers.job:set_memory(achievement, memory, true)
 			end
 		end
-		if unit_type == "spooc" then
-			local spooc_action = self._unit:movement()._active_actions[1]
-			if spooc_action and spooc_action:type() == "spooc" then
-				if spooc_action:is_flying_strike() then
-					if attack_weapon:base():is_category(tweak_data.achievement.in_town_you_are_law.weapon_type) then
-						managers.achievment:award(tweak_data.achievement.in_town_you_are_law.award)
-					end
-				elseif not spooc_action:has_striken() and attack_weapon:base().name_id == tweak_data.achievement.dont_push_it.weapon then
-					managers.achievment:award(tweak_data.achievement.dont_push_it.award)
+		all_pass = all_pass and count_in_row_pass
+		if all_pass then
+			if achievement_data.stat then
+				managers.achievment:award_progress(achievement_data.stat)
+			elseif achievement_data.award then
+				managers.achievment:award(achievement_data.award)
+			elseif achievement_data.challenge_stat then
+				managers.challenge:award_progress(achievement_data.challenge_stat)
+			elseif achievement_data.trophy_stat then
+				managers.custom_safehouse:award(achievement_data.trophy_stat)
+			elseif achievement_data.challenge_award then
+				managers.challenge:award(achievement_data.challenge_award)
+			end
+		end
+	end
+	if unit_type == "spooc" then
+		local spooc_action = self._unit:movement()._active_actions[1]
+		if spooc_action and spooc_action:type() == "spooc" then
+			if spooc_action:is_flying_strike() then
+				if attack_weapon:base():is_category(tweak_data.achievement.in_town_you_are_law.weapon_type) then
+					managers.achievment:award(tweak_data.achievement.in_town_you_are_law.award)
 				end
+			elseif not spooc_action:has_striken() and attack_weapon:base().name_id == tweak_data.achievement.dont_push_it.weapon then
+				managers.achievment:award(tweak_data.achievement.dont_push_it.award)
 			end
 		end
 	end
@@ -707,7 +718,7 @@ function CopDamage:damage_fire(attack_data)
 		managers.player:send_message(Message.OnEnemyShot, nil, attack_data.attacker_unit, self._unit, "fire")
 	end
 	if attack_data.attacker_unit == managers.player:player_unit() then
-		local critical_hit, crit_damage = self:roll_critical_hit(damage)
+		local critical_hit, crit_damage = self:roll_critical_hit(attack_data)
 		damage = crit_damage
 		if attack_data.weapon_unit and attack_data.variant ~= "stun" and not attack_data.is_fire_dot_damage then
 			if critical_hit then
@@ -754,7 +765,7 @@ function CopDamage:damage_fire(attack_data)
 	local head = self._head_body_name and attack_data.col_ray.body and attack_data.col_ray.body:name() == self._ids_head_body_name
 	local headshot_multiplier = 1
 	if attack_data.attacker_unit == managers.player:player_unit() then
-		local critical_hit, crit_damage = self:roll_critical_hit(damage)
+		local critical_hit, crit_damage = self:roll_critical_hit(attack_data)
 		if critical_hit then
 			damage = crit_damage
 		end
@@ -795,7 +806,7 @@ function CopDamage:damage_fire(attack_data)
 		if not attack_data.is_fire_dot_damage or data.is_molotov then
 			managers.statistics:killed_by_anyone(data)
 		end
-		if not is_civilian and managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") and attacker_unit == managers.player:player_unit() and alive(attack_data.weapon_unit) and not attack_data.weapon_unit:base().thrower_unit and attack_data.weapon_unit:base():is_category("shotgun", "saw") then
+		if not is_civilian and managers.player:has_category_upgrade("temporary", "overkill_damage_multiplier") and attacker_unit == managers.player:player_unit() and alive(attack_data.weapon_unit) and not attack_data.weapon_unit:base().thrower_unit and attack_data.weapon_unit:base().is_category and attack_data.weapon_unit:base():is_category("shotgun", "saw") then
 			managers.player:activate_temporary_upgrade("temporary", "overkill_damage_multiplier")
 		end
 		if attacker_unit and alive(attacker_unit) and attacker_unit:base() and attacker_unit:base().thrower_unit then
@@ -948,7 +959,7 @@ function CopDamage:damage_explosion(attack_data)
 	damage = damage * (self._char_tweak.damage.explosion_damage_mul or 1)
 	damage = damage * (self._marked_dmg_mul or 1)
 	if attack_data.attacker_unit == managers.player:player_unit() then
-		local critical_hit, crit_damage = self:roll_critical_hit(damage)
+		local critical_hit, crit_damage = self:roll_critical_hit(attack_data)
 		damage = crit_damage
 		if attack_data.weapon_unit and attack_data.variant ~= "stun" then
 			if critical_hit then
@@ -1088,7 +1099,11 @@ function CopDamage:_on_stun_hit_exit()
 	self._listener_holder:remove("after_stun_accuracy")
 end
 
-function CopDamage:roll_critical_hit(damage)
+function CopDamage:roll_critical_hit(attack_data)
+	local damage = attack_data.damage
+	if not self:can_be_critical(attack_data) then
+		return false, damage
+	end
 	local critical_hits = self._char_tweak.critical_hits or {}
 	local critical_hit = false
 	local critical_value = (critical_hits.base_chance or 0) + managers.player:critical_hit_chance() * (critical_hits.player_chance_multiplier or 1)
@@ -1105,6 +1120,45 @@ function CopDamage:roll_critical_hit(damage)
 		end
 	end
 	return critical_hit, damage
+end
+
+function CopDamage:can_be_critical(attack_data)
+	local LOG_CATEGORY = "[GameSystem_CriticalHit] "
+	local weapon_unit_base
+	if alive(attack_data.weapon_unit) then
+		weapon_unit_base = attack_data.weapon_unit:base()
+	end
+	if weapon_unit_base == nil then
+		print(LOG_CATEGORY, "No weapon unit in attack data, so CAN CRIT")
+		return true
+	end
+	local weapon_type
+	local damage_type = attack_data.variant
+	if weapon_unit_base.thrower_unit then
+		local unit_base = weapon_unit_base._unit:base()
+		if unit_base._tweak_projectile_entry then
+			weapon_type = unit_base._tweak_projectile_entry
+		elseif unit_base._projectile_entry then
+			weapon_type = unit_base._projectile_entry
+		end
+	elseif weapon_unit_base.weapon_tweak_data then
+		local weapon_td = weapon_unit_base:weapon_tweak_data()
+		weapon_type = weapon_td.categories[1]
+	elseif weapon_unit_base.get_name_id then
+		weapon_type = weapon_unit_base:get_name_id()
+	end
+	local damage_crit_data = tweak_data.weapon_disable_crit_for_damage[weapon_type]
+	if not damage_crit_data then
+		print(LOG_CATEGORY, "No damage tweak data for ", weapon_type, "CAN CRIT. (you can add tweak data at \"weapon_disable_crit_for_damage\")")
+		return true
+	end
+	local is_damage_type_can_crit = damage_crit_data[damage_type]
+	if is_damage_type_can_crit then
+		print(LOG_CATEGORY, "Tweak data found for ", weapon_type, ": ", damage_type, "CAN CRIT")
+		return true
+	end
+	print(LOG_CATEGORY, "Tweak data found for ", weapon_type, ": ", damage_type, "NO CRIT")
+	return false
 end
 
 function CopDamage:damage_tase(attack_data)
@@ -1124,7 +1178,7 @@ function CopDamage:damage_tase(attack_data)
 	local result
 	local damage = attack_data.damage
 	if attack_data.attacker_unit == managers.player:player_unit() then
-		local critical_hit, crit_damage = self:roll_critical_hit(damage)
+		local critical_hit, crit_damage = self:roll_critical_hit(attack_data)
 		damage = crit_damage
 		if attack_data.weapon_unit then
 			if critical_hit then
@@ -1238,7 +1292,7 @@ function CopDamage:damage_melee(attack_data)
 	local head = self._head_body_name and attack_data.col_ray.body and attack_data.col_ray.body:name() == self._ids_head_body_name
 	local damage = attack_data.damage
 	if attack_data.attacker_unit and attack_data.attacker_unit == managers.player:player_unit() then
-		local critical_hit, crit_damage = self:roll_critical_hit(damage)
+		local critical_hit, crit_damage = self:roll_critical_hit(attack_data)
 		if critical_hit then
 			managers.hud:on_crit_confirmed()
 			damage = crit_damage

@@ -258,9 +258,10 @@ function NewRaycastWeaponBase:check_highlight_unit(unit)
 	if unit:character_damage() and unit:character_damage().dead and unit:character_damage():dead() then
 		return
 	end
-	if unit:base().can_be_marked then
-		managers.game_play_central:auto_highlight_enemy(unit, true)
+	if not unit:base().can_be_marked and managers.groupai:state():enemy_weapons_hot() then
+		return
 	end
+	managers.game_play_central:auto_highlight_enemy(unit, true)
 end
 
 function NewRaycastWeaponBase:change_part(part_id)
@@ -602,18 +603,6 @@ function NewRaycastWeaponBase:_get_tweak_data_weapon_animation(anim)
 	return anim
 end
 
-function NewRaycastWeaponBase:set_objects_visible(unit, objects, visible)
-	if type(objects) == "string" then
-		objects = {objects}
-	end
-	for _, object_name in ipairs(objects) do
-		local graphic_object = unit:get_object(Idstring(object_name))
-		if graphic_object then
-			graphic_object:set_visibility(visible)
-		end
-	end
-end
-
 function NewRaycastWeaponBase:set_reload_objects_visible(visible, anim)
 	local data = tweak_data.weapon.factory[self._factory_id]
 	local reload_objects = anim and data.reload_objects and data.reload_objects[anim]
@@ -644,18 +633,20 @@ function NewRaycastWeaponBase:tweak_data_anim_play(anim, speed_multiplier)
 	local data = tweak_data.weapon.factory[self._factory_id]
 	if data.animations and data.animations[unit_anim] then
 		local anim_name = data.animations[unit_anim]
-		local length = self._unit:anim_length(Idstring(anim_name))
+		local ids_anim_name = Idstring(anim_name)
+		local length = self._unit:anim_length(ids_anim_name)
 		speed_multiplier = speed_multiplier or 1
-		self._unit:anim_stop(Idstring(anim_name))
-		self._unit:anim_play_to(Idstring(anim_name), length, speed_multiplier)
+		self._unit:anim_stop(ids_anim_name)
+		self._unit:anim_play_to(ids_anim_name, length, speed_multiplier)
 	end
 	for part_id, data in pairs(self._parts) do
 		if data.animations and data.animations[unit_anim] then
 			local anim_name = data.animations[unit_anim]
-			local length = data.unit:anim_length(Idstring(anim_name))
+			local ids_anim_name = Idstring(anim_name)
+			local length = data.unit:anim_length(ids_anim_name)
 			speed_multiplier = speed_multiplier or 1
-			data.unit:anim_stop(Idstring(anim_name))
-			data.unit:anim_play_to(Idstring(anim_name), length, speed_multiplier)
+			data.unit:anim_stop(ids_anim_name)
+			data.unit:anim_play_to(ids_anim_name, length, speed_multiplier)
 		end
 	end
 	self:set_reload_objects_visible(true, anim)
@@ -827,6 +818,7 @@ function NewRaycastWeaponBase:has_part(part_id)
 end
 
 function NewRaycastWeaponBase:on_equip(user_unit)
+	NewRaycastWeaponBase.super.on_equip(self, user_unit)
 	if self:was_gadget_on() then
 		local gadgets = managers.weapon_factory:get_parts_from_weapon_by_type_or_perk("gadget", self._factory_id, self._blueprint)
 		if gadgets then

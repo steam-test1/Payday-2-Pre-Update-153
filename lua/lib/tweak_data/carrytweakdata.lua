@@ -29,6 +29,11 @@ function CarryTweakData:init(tweak_data)
 	self.types.heavy.jump_modifier = 0.5
 	self.types.heavy.can_run = false
 	self.types.heavy.throw_distance_multiplier = 0.5
+	self.types.slightly_heavy = {}
+	self.types.slightly_heavy.move_speed_modifier = 0.6
+	self.types.slightly_heavy.jump_modifier = 1
+	self.types.slightly_heavy.can_run = false
+	self.types.slightly_heavy.throw_distance_multiplier = 0.8
 	self.types.medium = {}
 	self.types.medium.move_speed_modifier = 0.75
 	self.types.medium.jump_modifier = 1
@@ -49,6 +54,7 @@ function CarryTweakData:init(tweak_data)
 	self.types.cloaker_explosives = deep_clone(self.types.medium)
 	self.types.cloaker_explosives.can_poof = true
 	self.small_loot = {}
+	self.small_loot.german_folder = tweak_data:get_value("money_manager", "small_loot", "german_folder")
 	self.small_loot.money_bundle = tweak_data:get_value("money_manager", "small_loot", "money_bundle")
 	self.small_loot.ring_band = tweak_data:get_value("money_manager", "small_loot", "ring_band")
 	self.small_loot.diamondheist_vault_bust = tweak_data:get_value("money_manager", "small_loot", "diamondheist_vault_bust")

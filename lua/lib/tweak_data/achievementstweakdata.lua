@@ -2331,32 +2331,32 @@ function AchievementsTweakData:init(tweak_data)
 		trophy_transport_crossroads = {
 			trophy_stat = "trophy_transport_crossroads",
 			difficulty = overkill_and_above,
-			job = "arm_cro"
+			level_id = "arm_cro"
 		},
 		trophy_transport_downtown = {
 			trophy_stat = "trophy_transport_downtown",
 			difficulty = overkill_and_above,
-			job = "arm_hcm"
+			level_id = "arm_hcm"
 		},
 		trophy_transport_harbor = {
 			trophy_stat = "trophy_transport_harbor",
 			difficulty = overkill_and_above,
-			job = "arm_fac"
+			level_id = "arm_fac"
 		},
 		trophy_transport_park = {
 			trophy_stat = "trophy_transport_park",
 			difficulty = overkill_and_above,
-			job = "arm_par"
+			level_id = "arm_par"
 		},
 		trophy_transport_underpass = {
 			trophy_stat = "trophy_transport_underpass",
 			difficulty = overkill_and_above,
-			job = "arm_und"
+			level_id = "arm_und"
 		},
 		trophy_transport_train = {
 			trophy_stat = "trophy_transport_train",
 			difficulty = overkill_and_above,
-			job = "arm_for"
+			level_id = "arm_for"
 		},
 		trophy_escapes = {
 			trophy_stat = "trophy_escapes",

@@ -29,7 +29,8 @@ function IncendiaryBurstGrenade:_detonate(tag, unit, body, other_unit, other_bod
 	}
 	local hit_units, splinters = managers.fire:detect_and_give_dmg(params)
 	managers.network:session():send_to_peers_synched("sync_unit_event_id_16", self._unit, "base", GrenadeBase.EVENT_IDS.detonate)
-	self._unit:set_slot(0)
+	self.burn_stop_time = TimerManager:game():time() + self._fire_dot_data.dot_length + 1
+	self._unit:set_visible(false)
 end
 
 function IncendiaryBurstGrenade:_detonate_on_client()
@@ -37,4 +38,12 @@ function IncendiaryBurstGrenade:_detonate_on_client()
 	local range = self._range
 	managers.fire:give_local_player_dmg(pos, range, self._player_damage)
 	managers.explosion:explode_on_client(pos, math.UP, nil, self._damage, range, self._curve_pow, self._custom_params)
+end
+
+function IncendiaryBurstGrenade:update(unit, t, dt)
+	FragGrenade.update(self, unit, t, dt)
+	local is_burn_finish = self.burn_stop_time and t > self.burn_stop_time
+	if is_burn_finish then
+		self._unit:set_slot(0)
+	end
 end

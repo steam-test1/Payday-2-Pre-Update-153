@@ -28,7 +28,8 @@ function EnvironmentFire:on_spawn(data, normal, user_unit, added_time, range_mul
 		camera_shake_max_mul = 4,
 		sound_muffle_effect = true,
 		sound_event_burning = data.sound_event_burning,
-		sound_event_impact_duration = data.sound_event_impact_duration
+		sound_event_impact_duration = data.sound_event_impact_duration,
+		sound_event_duration = data.burn_duration
 	}
 	self._data = data
 	self._normal = normal
@@ -205,6 +206,7 @@ function EnvironmentFire:_do_damage()
 						player_damage = 0,
 						ignore_unit = self._unit,
 						user = self._user_unit,
+						owner = self._unit,
 						push_units = false,
 						alert_radius = self._fire_alert_radius,
 						fire_dot_data = self._fire_dot_data,

@@ -1818,7 +1818,11 @@ function StatisticsManager:session_favourite_weapon()
 			weapon_id = id
 		end
 	end
-	return weapon_id and managers.localization:text(tweak_data.weapon[weapon_id].name_id) or managers.localization:text("debug_undecided")
+	local weapon_tweak_data = tweak_data.weapon[weapon_id]
+	if not weapon_tweak_data then
+		return managers.localization:text("debug_undecided")
+	end
+	return weapon_id and managers.localization:text(weapon_tweak_data.name_id) or managers.localization:text("debug_undecided")
 end
 
 function StatisticsManager:session_used_weapons()

@@ -67,6 +67,7 @@ function DLCTweakData:init(tweak_data)
 			fir = true,
 			pn2 = true,
 			max = true,
+			gcm = true,
 			rip = true,
 			pd2_goty = 1,
 			pd2_hw_boxing = true,
@@ -5931,6 +5932,17 @@ function DLCTweakData:init(tweak_data)
 		{
 			type_items = "masks",
 			item_entry = "dgm",
+			amount = 1
+		}
+	}
+	self.gcm_bundle = {}
+	self.gcm_bundle.free = true
+	self.gcm_bundle.content = {}
+	self.gcm_bundle.content.loot_global_value = "pd2_clan"
+	self.gcm_bundle.content.loot_drops = {
+		{
+			type_items = "masks",
+			item_entry = "gcm",
 			amount = 1
 		}
 	}

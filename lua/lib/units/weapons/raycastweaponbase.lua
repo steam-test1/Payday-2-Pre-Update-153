@@ -1430,6 +1430,18 @@ function RaycastWeaponBase:set_timer(timer)
 	self._unit:set_animation_timer(timer)
 end
 
+function RaycastWeaponBase:set_objects_visible(unit, objects, visible)
+	if type(objects) == "string" then
+		objects = {objects}
+	end
+	for _, object_name in ipairs(objects) do
+		local graphic_object = unit:get_object(Idstring(object_name))
+		if graphic_object then
+			graphic_object:set_visibility(visible)
+		end
+	end
+end
+
 InstantBulletBase = InstantBulletBase or class()
 InstantBulletBase.id = "instant"
 
