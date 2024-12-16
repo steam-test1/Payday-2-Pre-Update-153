@@ -745,7 +745,7 @@ function CrewManagementGui:populate_primaries(henchman_index, data, gui)
 	for k, v in ipairs(data) do
 		local tweak = tweak_data.weapon[v.name]
 		v.equipped = loadout.primary_slot == v.slot
-		if tweak and not managers.blackmarket:is_weapon_category_allowed_for_crew(tweak.category) then
+		if tweak and not managers.blackmarket:is_weapon_category_allowed_for_crew(tweak.categories[1]) then
 			v.buttons = {}
 			v.unlocked = false
 			v.lock_texture = "guis/textures/pd2/lock_incompatible"

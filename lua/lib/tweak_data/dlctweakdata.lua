@@ -5861,11 +5861,11 @@ function DLCTweakData:init(tweak_data)
 			amount = 1
 		}
 	}
-	self.bny_bundle = {}
-	self.bny_bundle.free = true
-	self.bny_bundle.content = {}
-	self.bny_bundle.content.loot_global_value = "infamous"
-	self.bny_bundle.content.loot_drops = {
+	self.mdm_bundle = {}
+	self.mdm_bundle.free = true
+	self.mdm_bundle.content = {}
+	self.mdm_bundle.content.loot_global_value = "infamous"
+	self.mdm_bundle.content.loot_drops = {
 		{
 			type_items = "masks",
 			item_entry = "mdm",

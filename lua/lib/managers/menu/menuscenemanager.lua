@@ -1147,7 +1147,7 @@ end
 function MenuSceneManager:_select_lobby_character_pose(peer_id, unit, weapon_info)
 	local state = unit:play_redirect(Idstring("idle_menu"))
 	local weapon_id = managers.weapon_factory:get_weapon_id_by_factory_id(weapon_info.factory_id)
-	local category = tweak_data.weapon[weapon_id].category
+	local category = tweak_data.weapon[weapon_id].categories[1]
 	local lobby_poses = self._lobby_poses[weapon_id]
 	lobby_poses = lobby_poses or self._lobby_poses[category]
 	lobby_poses = lobby_poses or self._lobby_poses.generic

@@ -19,7 +19,6 @@ function BlackMarketTweakData:_init_masks(tweak_data)
 	self.masks.character_locked.sokol = "sokol"
 	self.masks.character_locked.dragon = "jiro"
 	self.masks.character_locked.bodhi = "bodhi"
-	self.masks.character_locked.bodhi = "max"
 	self.masks.character_locked.jimmy = "jimmy_duct"
 	self.masks.character_locked.sydney = "sydney"
 	self.masks.character_locked.wild = "rust"

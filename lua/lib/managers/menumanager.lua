@@ -8849,7 +8849,7 @@ function MenuChooseWeaponRewardInitiator:modify_node(original_node, data)
 		return weapon_tweak[weapon.weapon_id] and not weapon_tweak[weapon.weapon_id].parent_weapon_id
 	end
 	
-	local category, loot_table, data
+	local loot_table, data
 	for i, category_data in ipairs({primaries, secondaries}) do
 		for _, weapon_data in ipairs(category_data) do
 			if chk_dlc_func(weapon_data) and chk_parent_func(weapon_data) then
@@ -8857,10 +8857,11 @@ function MenuChooseWeaponRewardInitiator:modify_node(original_node, data)
 				if 0 < #loot_table then
 					data = deep_clone(weapon_data)
 					data.loot_table = loot_table
-					category = weapon_tweak[weapon_data.weapon_id].category
-					category = tweak_data.gui.buy_weapon_category_groups[category] or category
-					items[category] = items[category] or {}
-					table.insert(items[category], data)
+					for _, category in ipairs(weapon_tweak[weapon_data.weapon_id].categories) do
+						category = tweak_data.gui.buy_weapon_category_groups[category] or category
+						items[category] = items[category] or {}
+						table.insert(items[category], data)
+					end
 				end
 			end
 		end

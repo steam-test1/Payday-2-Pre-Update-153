@@ -69,7 +69,7 @@ function WeaponFactoryManager:get_all_weapon_categories()
 	local category
 	for factory_id, data in pairs(tweak_data.weapon.factory) do
 		if factory_id ~= "parts" and not string.match(factory_id, "_npc") and weapon_data[self:get_weapon_id_by_factory_id(factory_id)] then
-			category = weapon_data[self:get_weapon_id_by_factory_id(factory_id)].category
+			category = weapon_data[self:get_weapon_id_by_factory_id(factory_id)].categories[1]
 			weapon_categories[category] = weapon_categories[category] or {}
 			table.insert(weapon_categories[category], factory_id)
 		end

@@ -123,6 +123,7 @@ end
 function PlayerManager:check_skills()
 	self._coroutine_mgr:remove_coroutine(PlayerAction.UnseenStrike)
 	self._coroutine_mgr:remove_coroutine(PlayerAction.UnseenStrikeStart)
+	self._coroutine_mgr:remove_coroutine(PlayerAction.BloodthirstBase)
 	self._saw_panic_when_kill = self:has_category_upgrade("saw", "panic_when_kill")
 	self._unseen_strike = self:has_category_upgrade("player", "unseen_increased_crit_chance")
 	if self:has_category_upgrade("pistol", "stacked_accuracy_bonus") then
@@ -208,9 +209,14 @@ function PlayerManager:check_skills()
 		
 		self:register_message(Message.OnPlayerDodge, "dodge_shot_gain_dodge", callback(self, self, "_dodge_shot_gain", 0))
 		self:register_message(Message.OnPlayerDamage, "dodge_shot_gain_damage", on_player_damage)
+	else
+		self:unregister_message(Message.OnPlayerDodge, "dodge_shot_gain_dodge")
+		self:unregister_message(Message.OnPlayerDamage, "dodge_shot_gain_damage")
 	end
 	if self:has_category_upgrade("player", "dodge_replenish_armor") then
-		self._message_system:register(Message.OnPlayerDodge, "dodge_replenish_armor", callback(self, self, "_dodge_replenish_armor"))
+		self:register_message(Message.OnPlayerDodge, "dodge_replenish_armor", callback(self, self, "_dodge_replenish_armor"))
+	else
+		self:unregister_message(Message.OnPlayerDodge, "dodge_replenish_armor")
 	end
 end
 
@@ -966,7 +972,7 @@ function PlayerManager:on_killshot(killed_unit, variant, headshot, weapon_id)
 	self._message_system:notify(Message.OnEnemyKilled, nil, equipped_unit, variant, killed_unit)
 	if self._saw_panic_when_kill and variant ~= "melee" then
 		local equipped_unit = self:get_current_state()._equipped_unit:base()
-		if equipped_unit:weapon_tweak_data().category == "saw" then
+		if equipped_unit:is_category("saw") then
 			local pos = player_unit:position()
 			local skill = self:upgrade_value("saw", "panic_when_kill")
 			if skill and type(skill) ~= "number" then

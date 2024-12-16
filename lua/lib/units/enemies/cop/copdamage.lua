@@ -531,8 +531,9 @@ function CopDamage:_check_damage_achievements(attack_data, head)
 		kill_count_carry_or_not = (kill_count_carry_or_not or 0) + 1
 		managers.job:set_memory("kill_count_" .. (managers.player:is_carrying() and "carry" or "no_carry"), kill_count_carry_or_not, true)
 		local is_cop = CopDamage.is_cop(self._unit:base()._tweak_table)
+		local weapon_category = attack_weapon:base():weapon_tweak_data().categories
 		for achievement, achievement_data in pairs(achievements) do
-			weapon_type_pass = not achievement_data.weapon_type or table.contains(attack_weapon:base():weapon_tweak_data().categories, achievement_data.weapon_type)
+			weapon_type_pass = not achievement_data.weapon_type or weapon_category and table.contains(weapon_category, achievement_data.weapon_type)
 			weapons_pass = not achievement_data.weapons or table.contains(achievement_data.weapons, attack_weapon:base()._name_id)
 			weapon_pass = not achievement_data.weapon or attack_weapon:base().name_id == achievement_data.weapon
 			fire_mode_pass = not achievement_data.fire_mode or attack_weapon:base():fire_mode() == achievement_data.fire_mode
