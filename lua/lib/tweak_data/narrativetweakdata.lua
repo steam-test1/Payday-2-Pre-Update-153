@@ -4599,7 +4599,7 @@ function NarrativeTweakData:init(tweak_data)
 		self.stages.glace
 	}
 	self.jobs.glace.briefing_event = "Play_pln_glc_cbf_01"
-	self.jobs.glace.debrief_event = "hct_rats_debrief"
+	self.jobs.glace.debrief_event = nil
 	self.jobs.glace.crimenet_callouts = {
 		"Play_pln_glc_cnc_01"
 	}

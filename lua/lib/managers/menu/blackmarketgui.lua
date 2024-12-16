@@ -8534,10 +8534,15 @@ function BlackMarketGui:populate_armor_skins(data)
 		local ar = tweak_data.economy.rarities[ad and ad.rarity or "common"].index
 		local br = tweak_data.economy.rarities[bd and bd.rarity or "common"].index
 		if ar ~= br then
-			return ar < br
-		else
-			return managers.localization:text(ad and ad.name_id or "error") < managers.localization:text(bd and bd.name_id or "error")
+			return ar > br
+		elseif ad.sorting_idx or bd.sorting_idx then
+			local as = ad.sorting_idx or -1
+			local bs = bd.sorting_idx or -1
+			if as ~= bs then
+				return as > bs
+			end
 		end
+		return managers.localization:text(ad and ad.name_id or "error") < managers.localization:text(bd and bd.name_id or "error")
 	end)
 	table.insert(sort_data, 1, "none")
 	local guis_catalog = "guis/"

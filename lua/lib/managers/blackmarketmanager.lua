@@ -727,6 +727,9 @@ function BlackMarketManager:equip_armor(armor_id)
 		managers.menu_scene:set_character_armor(armor_id)
 	end
 	MenuCallbackHandler:_update_outfit_information()
+	if self:equipped_armor_skin() ~= self:_get_default_armor_skin() then
+		self:set_equipped_armor_skin(tweak_data.economy:get_real_armor_skin_id(self:equipped_armor_skin()))
+	end
 	if SystemInfo:distribution() == Idstring("STEAM") then
 		managers.statistics:publish_equipped_to_steam()
 	end
@@ -5263,7 +5266,7 @@ end
 
 function BlackMarketManager:_remove_unowned_armor_skin()
 	local remove_armor = true
-	local skin_id = self:equipped_armor_skin()
+	local skin_id = tweak_data.economy:get_real_armor_skin_id(self:equipped_armor_skin())
 	local a_td = tweak_data.economy.armor_skins[skin_id]
 	if a_td.steam_economy ~= false then
 		for instance_id, item in pairs(self._global.inventory_tradable) do

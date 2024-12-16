@@ -423,7 +423,6 @@ function IngameWaitingForPlayersState:at_exit()
 		self._fadeout_loading_icon = nil
 	end
 	TestAPIHelper.on_event("start_job")
-	managers.community_challenges:on_mission_start()
 end
 
 function IngameWaitingForPlayersState:_get_cameras()

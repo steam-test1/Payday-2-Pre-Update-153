@@ -17862,6 +17862,10 @@ function BlackMarketTweakData:_init_weapon_skins()
 	self.weapon_skins.saw_cs3.name_id = "bm_wskn_saw_cs3"
 	self.weapon_skins.saw_cs3.desc_id = "bm_wskn_saw_cs3_desc"
 	self.weapon_skins.saw_cs3.weapon_id = "saw"
+	self.weapon_skins.saw_cs3.weapon_ids = {
+		"saw",
+		"saw_secondary"
+	}
 	self.weapon_skins.saw_cs3.rarity = "uncommon"
 	self.weapon_skins.saw_cs3.bonus = "concealment_p1"
 	self.weapon_skins.saw_cs3.reserve_quality = true

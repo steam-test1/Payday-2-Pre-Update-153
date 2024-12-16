@@ -290,9 +290,11 @@ function CustomSafehouseGuiPageTrophies:_setup_trophies_counter()
 	local total = 0
 	local completed = 0
 	for _, trophy in ipairs(managers.custom_safehouse:trophies()) do
-		total = total + 1
-		if trophy.completed and not trophy.hidden_in_list then
-			completed = completed + 1
+		if not trophy.hidden_in_list then
+			total = total + 1
+			if trophy.completed then
+				completed = completed + 1
+			end
 		end
 	end
 	local text = managers.localization:to_upper_text("menu_cs_trophy_counter", {total = total, completed = completed})

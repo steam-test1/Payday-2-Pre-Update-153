@@ -7,8 +7,6 @@ function CommunityChallengesManager:init()
 	self._full_crew_time = 0
 	self._message_system = MessageSystem:new()
 	self._next_stat_request_limit = 0
-	self:_migrate_old_statistic("sb17_challenge_1", "sb17_challenge_5", 0.016666668, 21600)
-	self:_migrate_old_statistic("sb17_challenge_3", "sb17_challenge_6", 0.016666668, 21600)
 	self._global = Global.community_challenges_manager or {active_bonus = 0}
 	Global.community_challenges_manager = self._global
 	self:fetch_community_challenge_data()
@@ -16,17 +14,6 @@ end
 
 function CommunityChallengesManager:update(t, dt)
 	self._message_system:update()
-end
-
-function CommunityChallengesManager:_migrate_old_statistic(old_stat, new_stat, ratio, limit)
-	repeat
-		local old_stat_value = Steam:sa_handler():get_stat(old_stat)
-		local new_stat_value = Steam:sa_handler():get_stat(new_stat)
-		local chunk = math.min(old_stat_value, limit)
-		if 0 < old_stat_value and Steam:sa_handler():set_stat(old_stat, old_stat_value - chunk) and Steam:sa_handler():set_stat(new_stat, new_stat_value + math.floor(chunk * ratio)) then
-			Steam:sa_handler():store_data()
-		end
-	until old_stat_value <= 0
 end
 
 function CommunityChallengesManager:fetch_community_challenge_data()
@@ -76,6 +63,7 @@ function CommunityChallengesManager:_on_global_stats_refresh_complete(success)
 		local stage_base_value = math.floor(base * ((1 - math.pow(ratio, stage)) / (1 - ratio)))
 		self._global.challenge_data[challenge.statistic_id] = {
 			stage = stage + 1,
+			total_value = total_value,
 			current_value = total_value - stage_base_value,
 			target_value = better_ceil(base * math.pow(ratio, stage)),
 			additional_zeroes = challenge.additional_zeroes
@@ -91,70 +79,6 @@ end
 
 function CommunityChallengesManager:get_active_experience_bonus()
 	return self._global.active_bonus
-end
-
-function CommunityChallengesManager:increment_custom_statistic(stat_name, value)
-	local val = managers.network.account:get_stat(stat_name)
-	managers.statistics:publish_custom_stat_to_steam(stat_name, val + value)
-end
-
-function CommunityChallengesManager:on_mission_start()
-	managers.criminals:add_listener("community_challenges:criminal_added", {
-		"on_criminal_added"
-	}, callback(self, self, "_on_criminal_added"))
-	managers.criminals:add_listener("community_challenges:criminal_removed", {
-		"on_criminal_removed"
-	}, callback(self, self, "_on_criminal_removed"))
-	if self:full_crew() then
-		self:mark_full_crew_start()
-	end
-end
-
-function CommunityChallengesManager:on_mission_end(success)
-	local time_played = managers.game_play_central:get_heist_timer()
-	self:increment_custom_statistic("sb17_challenge_5", math.round(time_played / 60))
-	if success then
-		local money_earned = managers.money:heist_spending() + managers.money:heist_offshore()
-		self:increment_custom_statistic("sb17_challenge_7", math.round(money_earned / 1000000))
-	end
-	self:mark_full_crew_end()
-	if self._full_crew_time > 0 then
-		self:increment_custom_statistic("sb17_challenge_6", math.round(self._full_crew_time / 60))
-	end
-end
-
-function CommunityChallengesManager:on_achievement_awarded(id)
-	if id == "kosugi_5" then
-		self:increment_custom_statistic("sb17_challenge_4", 1)
-	end
-end
-
-function CommunityChallengesManager:_on_criminal_added()
-	if self:full_crew() then
-		self:mark_full_crew_start()
-	end
-end
-
-function CommunityChallengesManager:_on_criminal_removed()
-	if not self:full_crew() then
-		self:mark_full_crew_end()
-	end
-end
-
-function CommunityChallengesManager:full_crew()
-	return managers.criminals:get_num_player_criminals() == CommunityChallengesManager.FULL_CREW_COUNT
-end
-
-function CommunityChallengesManager:mark_full_crew_start()
-	self._full_crew_start = managers.game_play_central:get_heist_timer()
-end
-
-function CommunityChallengesManager:mark_full_crew_end()
-	if self._full_crew_start then
-		local time = managers.game_play_central:get_heist_timer() - self._full_crew_start
-		self._full_crew_time = self._full_crew_time + time
-		self._full_crew_start = nil
-	end
 end
 
 function CommunityChallengesManager:add_event_listener(message, uid, func)
